@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build RCU (Debug)",
+            "type": "shell",
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceRoot}/rcu"
+                },
+                "command": "cmake -E make_directory ${workspaceRoot}/rcu/build/debug && cmake -S ${workspaceRoot}/rcu -B ${workspaceRoot}/rcu/build/debug -DCMAKE_BUILD_TYPE=DEBUG && cmake --build ${workspaceRoot}/rcu/build/debug"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": {
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build RCU (Release)",
+            "type": "shell",
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceRoot}/rcu"
+                },
+                "command": "cmake -E make_directory ${workspaceRoot}/rcu/build/release && cmake -S ${workspaceRoot}/rcu -B ${workspaceRoot}/rcu/build/release -DCMAKE_BUILD_TYPE=RELEASE && cmake --build ${workspaceRoot}/rcu/build/release"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": {
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}
