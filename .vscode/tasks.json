@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build RCU (Debug)",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "CXX_FLAGS": "-O0 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer",
+                    "VERBOSE": "1"
+                }
+            },
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceFolder}/rcu"
+                },
+                "command": "cmake -E make_directory ${workspaceFolder}/rcu/build/debug && cmake -S ${workspaceFolder}/rcu -B ${workspaceFolder}/rcu/build/debug -DCMAKE_BUILD_TYPE=DEBUG -DENABLE_CLANG_TIDY=on -DSANITIZE_THREAD=On -DCODE_COVERAGE=on && cmake --build ${workspaceFolder}/rcu/build/debug"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": {
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build RCU (Release)",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "CXX_FLAGS": "-O3 -g"
+                }
+            },
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceFolder}/rcu"
+                },
+                "command": "cmake -E make_directory ${workspaceFolder}/rcu/build/release && cmake -S ${workspaceFolder}/rcu -B ${workspaceFolder}/rcu/build/release -DCMAKE_BUILD_TYPE=RELEASE && cmake --build ${workspaceFolder}/rcu/build/release"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": {
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                }
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}
