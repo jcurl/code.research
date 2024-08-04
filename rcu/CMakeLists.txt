@@ -6,6 +6,10 @@ include(GNUInstallDirs)
 option(ENABLE_CLANG_TIDY "Enable checks using Clang-Tidy" ON)
 option(ENABLE_TEST "Enable building tests" ON)
 
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+    message(FATAL_ERROR "In-source builds are not allowed")
+endif()
+
 # Default to DEBUG mode if not provided.
 if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Debug")
@@ -51,11 +55,6 @@ if("${CMAKE_CXX_FLAGS}" STREQUAL "")
             add_compile_options(-O0)
         endif()
     endif()
-endif()
-
-if(IS_DEBUG)
-    # Used for self-tests in the code.
-    add_definitions(-DDEBUG)
 endif()
 
 # Checking if we should enable coverage. Only do so in DEBUG and if testing is enabled

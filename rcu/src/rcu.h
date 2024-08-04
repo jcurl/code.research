@@ -86,11 +86,14 @@ class rcu_ptr {
       // No more references. As this was the last reference, it can not be
       // incremented.
       delete this->ptr_;
-    } else if (prev_count == 0) {
+    }
+#if !defined(NDEBUG)
+    else if (prev_count == 0) {
       // Freed a reference counter that was already free
       std::cout << "rcu_ptr.free() free when ref=0" << std::endl;
       std::abort();
     }
+#endif
 
     // Only needed if we expect someone might use the object after it's been
     // destructed.
@@ -195,24 +198,36 @@ class rcu {
   ~rcu() {
     // Debug checks to ensure that the user doesn't leave any `rcu_ptr`
     // references alive.
+#if !defined(NDEBUG)
     bool success = true;
+#endif
+
     if (!free(this->index_.load())) {
+#if !defined(NDEBUG)
       std::cout
           << "Abort due to not final free, dangling reference of an `rcu_ptr`"
           << std::endl;
       success = false;
+#else
+      std::abort();
+#endif
     } else {
       for (std::uint32_t i = 0; i < N; i++) {
         if (this->slot_[i].refcount_.load() != 0) {
+#if !defined(NDEBUG)
           std::cout << "Abort due to not final free, dangling reference of an "
                        "`rcu_ptr`"
                     << std::endl;
           success = false;
           break;
+#else
+          std::abort();
+#endif
         }
       }
     }
 
+#if !defined(NDEBUG)
     if (!success) {
       std::cout << " Owning: " << this->index_ << std::endl;
       for (std::uint32_t x = 0; x < N; x++) {
@@ -222,6 +237,7 @@ class rcu {
       }
       std::abort();
     }
+#endif
   }
 
  private:
@@ -235,11 +251,14 @@ class rcu {
       auto ptr = this->slot_[index].ptr_;
       delete ptr;
       return true;
-    } else if (old_count == 0) {
+    }
+#if !defined(NDEBUG)
+    else if (old_count == 0) {
       // Double-free internally. Should never occur.
       std::cout << "Abort due to double free" << std::endl;
       std::abort();
     }
+#endif
     return false;
   }
 
