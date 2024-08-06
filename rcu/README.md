@@ -5,7 +5,7 @@ This is a research version of a user-space RCU class (read-copy-update).
 - [1. Compilation](#1-compilation)
   - [1.1. Using CMake](#11-using-cmake)
     - [1.1.1. Compiler Options](#111-compiler-options)
-    - [Code Coverage](#code-coverage)
+    - [1.1.2. Code Coverage](#112-code-coverage)
   - [1.2. Debugging with Visual Studio Code](#12-debugging-with-visual-studio-code)
   - [1.3. Clang-Tidy](#13-clang-tidy)
   - [1.4. Formatting](#14-formatting)
@@ -21,9 +21,22 @@ This is a research version of a user-space RCU class (read-copy-update).
     - [2.3.1. White Paper and `shared_ptr<T>`](#231-white-paper-and-shared_ptrt)
     - [2.3.2. RCU in the Linux Kernel](#232-rcu-in-the-linux-kernel)
     - [2.3.3. User Space Lock-Free RCU](#233-user-space-lock-free-rcu)
-- [3. Future Work](#3-future-work)
-  - [3.1. Build System](#31-build-system)
-  - [3.2. Implementation](#32-implementation)
+- [3. Performance Tests](#3-performance-tests)
+  - [3.1. Compilation](#31-compilation)
+    - [3.1.1. Linux Compilation](#311-linux-compilation)
+    - [3.1.2. QNX Compilation and Target Preparation](#312-qnx-compilation-and-target-preparation)
+  - [3.2. Execution](#32-execution)
+  - [3.3. Results](#33-results)
+    - [3.3.1. Test `rcutest`](#331-test-rcutest)
+      - [3.3.1.1. Target: Raspberry Pi4B A72 QNX 7.1.0 (GCC 8.3.0)](#3311-target-raspberry-pi4b-a72-qnx-710-gcc-830)
+      - [3.3.1.2. Target: Raspberry Pi4B A72 QNX 8.0.0 (GCC 12.2.0)](#3312-target-raspberry-pi4b-a72-qnx-800-gcc-1220)
+      - [3.3.1.3. Target: Raspberry Pi4B A72 Linux 6.6.20+rpt-rpi-v8 (GCC 12.2.0)](#3313-target-raspberry-pi4b-a72-linux-6620rpt-rpi-v8-gcc-1220)
+      - [3.3.1.4. Target: Raspberry Pi5 A76 Linux 6.6.31+rpt-rpi-2712 (GCC 12.2.0)](#3314-target-raspberry-pi5-a76-linux-6631rpt-rpi-2712-gcc-1220)
+      - [3.3.1.5. Target: i7-6700T 2.80GHz Linux 6.5.0-45-generic (GCC 11.4.0)](#3315-target-i7-6700t-280ghz-linux-650-45-generic-gcc-1140)
+      - [3.3.1.6. Target: Intel(R) Xeon(R) Silver 4410Y Linux 6.5.0-26-generic (GCC 11.4.0)](#3316-target-intelr-xeonr-silver-4410y-linux-650-26-generic-gcc-1140)
+- [4. Future Work](#4-future-work)
+  - [4.1. Build System](#41-build-system)
+  - [4.2. Implementation](#42-implementation)
 
 ## 1. Compilation
 
@@ -44,16 +57,16 @@ make
 Use the following options when building with CMake:
 
 - Build in debug mode.
+
   ```sh
   cmake ..
   ```
-
-  Adds `-DDEBUG`. Enabled clang-tidy.
 
 - Build in release mode.
 
   ```sh
   cmake .. -DCMAKE_BUILD_TYPE=Release
+  ```
 
   Still compiles unit tests and runs clang-tidy.
 
@@ -68,9 +81,10 @@ Use the following options when building with CMake:
   ```sh
   cmake .. -DENABLE_TEST=off
   ```
-#### Code Coverage
 
-Enable code covergae:
+#### 1.1.2. Code Coverage
+
+Enable code coverage:
 
 ```sh
 cmake .. -DENABLE_TEST=on -DCODE_COVERAGE=on
@@ -98,12 +112,11 @@ On Ubuntu 22.04, you need to have installed `clang-tidy` for the checks. It
 would fail on loading the header files, while GCC would compile quite happily.
 
 I had to make sure that
-[`libstdc++-12-dev](https://askubuntu.com/questions/1443701/clang-cant-find-headers-but-gcc-can)
+[`libstdc++-12-dev`](https://askubuntu.com/questions/1443701/clang-cant-find-headers-but-gcc-can)
 was installed. I also installed `libc++abi-dev` but that wasn't enough.
 
 ```sh
-sudo apt install libc++abi-dev
-sudo apt install ibstdc++-12-dev
+sudo apt install libstdc++-12-dev
 ```
 
 Then I could compile.
@@ -317,8 +330,8 @@ the data updates.
 There is a description [High-level C++ Implementation of the Read-Copy-Update
 Pattern](https://martong.github.io/high-level-cpp-rcu_informatics_2017.pdf)
 which looks interesting. It uses `shared_ptr<T>`. However the solution provided
-here _does not work_ as expected, as the atomic read of the `shared_ptr<T>` in
-the lines below are _not_ lockless:
+here *does not work* as expected, as the atomic read of the `shared_ptr<T>` in
+the lines below are *not* lockless:
 
 ```c++
 std::shared_ptr<const T> read() const {
@@ -388,20 +401,179 @@ articles in the previous section) as having a thread in the kernel free memory.
 
 One of the goals is to explore if this can be done differently.
 
-## 3. Future Work
+## 3. Performance Tests
 
-### 3.1. Build System
+This section documents the performance test `RcuStress.DISABLED_ReadOps`. The
+test runs for approximately 30 seconds.
+
+For each hardware thread in the system, it creates an Operating System thread
+that is in a tight loop getting an `rcu_ptr` and incrementing a counter, then
+decrementing the reference by dropping the `rcu_ptr`.
+
+In an additional thread, it will update the value of the pointer to new data, by
+waiting 10ms on every wake. This means that the number of updates is less than
+3000 (because a sleep) only guarantees a minimum sleep time.
+
+### 3.1. Compilation
+
+To compile for linux, compile release mode:
+
+#### 3.1.1. Linux Compilation
+
+```sh
+mkdir -p build/linux && cd build/linux
+cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release
+make
+```
+
+#### 3.1.2. QNX Compilation and Target Preparation
+
+To compile for QNX, compile release mode:
+
+```sh
+. ./qnxsdp-env.sh
+mkdir -p build/qnx7 && cd build/qnx7
+cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../../../toolchain/qcc_aarch64le
+make
+```
+
+Under QNX, you'll also need to copy the libraries if they're not on your target
+already:
+
+- libregex.so.1
+- libc++.so.1
+- libcatalog.so.1
+
+And you will need of course need to configure the `LD_LIBRARY_PATH`
+
+```sh
+export LD_LIBRARY_PATH=/dev/shmem
+```
+
+### 3.2. Execution
+
+To run the test:
+
+```sh
+./rcutest -p1
+```
+
+### 3.3. Results
+
+#### 3.3.1. Test `rcutest`
+
+##### 3.3.1.1. Target: Raspberry Pi4B A72 QNX 7.1.0 (GCC 8.3.0)
+
+| Threads | Updates | Reads     | Reads/sec/thread |
+| ------- | ------- | --------- | ---------------- |
+| 1       | 2727    | 383553524 | 12785117         |
+| 2       | 2728    | 174759127 | 2912652          |
+| 3       | 2728    | 165420314 | 1838003          |
+| 4       | 2500    | 160741187 | 1339509          |
+
+##### 3.3.1.2. Target: Raspberry Pi4B A72 QNX 8.0.0 (GCC 12.2.0)
+
+| Threads | Updates | Reads     | Reads/sec/thread |
+| ------- | ------- | --------- | ---------------- |
+| 1       | 2728    | 383881579 | 12796052         |
+| 2       | 2728    | 174247852 | 2904130          |
+| 3       | 2728    | 160078564 | 1778650          |
+| 4       | 2664    | 155756803 | 1297973          |
+
+##### 3.3.1.3. Target: Raspberry Pi4B A72 Linux 6.6.20+rpt-rpi-v8 (GCC 12.2.0)
+
+| Threads | Updates | Reads     | Reads/sec/thread |
+| ------- | ------- | --------- | ---------------- |
+| 1       | 2938    | 372720925 | 12424030         |
+| 2       | 2983    | 164341832 | 2739030          |
+| 3       | 2983    | 167824639 | 1864718          |
+| 4       | 2981    | 155176172 | 1293134          |
+
+##### 3.3.1.4. Target: Raspberry Pi5 A76 Linux 6.6.31+rpt-rpi-2712 (GCC 12.2.0)
+
+| Threads | Updates | Reads      | Reads/sec/thread |
+| ------- | ------- | ---------- | ---------------- |
+| 1       | 2985    | 1293102770 | 43103425         |
+| 2       | 2985    | 299227381  | 4987123          |
+| 3       | 2984    | 239748124  | 2663868          |
+| 4       | 2984    | 183437343  | 1528644          |
+
+##### 3.3.1.5. Target: i7-6700T 2.80GHz Linux 6.5.0-45-generic (GCC 11.4.0)
+
+| Threads | Updates | Reads      | Reads/sec/thread |
+| ------- | ------- | ---------- | ---------------- |
+| 1       | 2974    | 1522655515 | 50755183         |
+| 2       | 2974    | 292123635  | 4868727          |
+| 3       | 2980    | 251591951  | 2795466          |
+| 4       | 2983    | 245511283  | 2045927          |
+| 5       | 2983    | 247817975  | 1652119          |
+| 6       | 2978    | 229300718  | 1273892          |
+| 7       | 2984    | 232632030  | 1107771          |
+| 8       | 2984    | 240477582  | 1001989          |
+
+##### 3.3.1.6. Target: Intel(R) Xeon(R) Silver 4410Y Linux 6.5.0-26-generic (GCC 11.4.0)
+
+| Threads | Updates | Reads      | Reads/sec/thread |
+| ------- | ------- | ---------- | ---------------- |
+| 1       | 2983    | 1667101517 | 55570050         |
+| 2       | 2983    | 245107040  | 4085117          |
+| 3       | 2983    | 114285794  | 1269842          |
+| 4       | 2983    | 115300577  | 960838           |
+| 5       | 2982    | 119191492  | 794609           |
+| 6       | 2983    | 124185789  | 689921           |
+| 7       | 2983    | 127739171  | 608281           |
+| 8       | 2983    | 125469105  | 522787           |
+| 9       | 2983    | 126174897  | 467314           |
+| 10      | 2982    | 135241517  | 450805           |
+| 11      | 2982    | 134774947  | 408408           |
+| 12      | 2982    | 141818884  | 393941           |
+| 13      | 2982    | 152494869  | 391012           |
+| 14      | 2982    | 152175336  | 362322           |
+| 15      | 2982    | 151951092  | 337669           |
+| 16      | 2982    | 161342559  | 336130           |
+| 17      | 2982    | 157299437  | 308430           |
+| 18      | 2982    | 163461291  | 302706           |
+| 19      | 2982    | 164255236  | 288167           |
+| 20      | 2981    | 175015860  | 291693           |
+| 21      | 2980    | 174246468  | 276581           |
+| 22      | 2980    | 167670720  | 254046           |
+| 23      | 2980    | 177260910  | 256899           |
+| 24      | 2979    | 168028876  | 233373           |
+| 25      | 2979    | 170364070  | 227152           |
+| 26      | 2979    | 174466958  | 223675           |
+| 27      | 2979    | 178006386  | 219760           |
+| 28      | 2979    | 176460917  | 210072           |
+| 29      | 2979    | 171361691  | 196967           |
+| 30      | 2979    | 184372382  | 204858           |
+| 31      | 2979    | 176122201  | 189378           |
+| 32      | 2979    | 180545339  | 188068           |
+| 33      | 2976    | 167540454  | 169232           |
+| 34      | 2979    | 174513680  | 171091           |
+| 35      | 2979    | 180811643  | 172201           |
+| 36      | 2978    | 166970621  | 154602           |
+| 37      | 2977    | 174375612  | 157095           |
+| 38      | 2977    | 172444778  | 151267           |
+| 39      | 2976    | 167614797  | 143260           |
+| 40      | 2977    | 170048892  | 141707           |
+| 41      | 2978    | 168851417  | 137277           |
+| 42      | 2977    | 172821673  | 137160           |
+| 43      | 2979    | 175795027  | 136275           |
+| 44      | 2973    | 169588668  | 128476           |
+| 45      | 2980    | 171586474  | 127101           |
+| 46      | 2980    | 165350377  | 119819           |
+| 47      | 2981    | 169002080  | 119859           |
+| 48      | 2980    | 163818048  | 113762           |
+
+## 4. Future Work
+
+### 4.1. Build System
 
 - [ ] Update [Sanitizers](https://github.com/arsenm/sanitizers-cmake).
-- [ ] Add QNX 7.1.0 for testing.
 
-### 3.2. Implementation
+### 4.2. Implementation
 
 Further implementation details should be done:
 
-- [ ] Consider a test program `main.cpp` that sets up n threads, n-1 threads
-  read as fast as possible, the nth which writes occasionally. Then we can use
-  this for testing the cache behaviour and performance.
 - [ ] Should use the Deleter provided by the `std::unique_ptr<T>`.
 - [ ] The atomic exchanges should be optimised to use the correct memory
-  ordering.
+  ordering. New measurements.

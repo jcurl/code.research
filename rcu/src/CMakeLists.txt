@@ -9,7 +9,7 @@ set(SOURCES
 add_executable(${BINARY} ${SOURCES})
 
 #target_link_libraries(${BINARY} ${BINARY}-lib)
-target_compile_features(${BINARY} PUBLIC cxx_std_17)
+target_compile_features(${BINARY} PRIVATE cxx_std_17)
 
 if(IS_DEBUG)
     add_sanitizers(rcutest)

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(rcutest CXX)
+project(rcutest C CXX)
 
 include(GNUInstallDirs)
 
@@ -28,15 +28,34 @@ find_package(Sanitizers)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/clang-format" ${CMAKE_MODULE_PATH})
 include(ClangFormat)
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/qnx" ${CMAKE_MODULE_PATH})
+include(qnx)
+
+get_qnx_version()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
     if(CLANG_TIDY_EXE)
-      message(STATUS "LLVM clang-tidy is enabled with -DENABLE_CLANG_TIDY=on")
-      set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        message(STATUS "LLVM clang-tidy is enabled with -DENABLE_CLANG_TIDY=on")
+        # Must specify the C++17 version explicitly. When using GCC toolchain as
+        # the compiler, it might decide that it doesn't need to provide the
+        # "std=c++17" option (GCC 11.4 supports by default C++17). But then
+        # running "clang-tidy" e.g. from clang toolchain 14.0 needs the option.
+        # It isn't given as CMake doesn't do an additional check for clang-tidy.
+        # If you compile using clang++, then the two come from the same
+        # toolchain, so the assumption that the two are compatible holds.
+        #
+        # https://stackoverflow.com/questions/46808702/how-to-integrate-clang-tidy-with-cmake-lang-clang-tidy-and-msvc
+        # https://gitlab.kitware.com/cmake/cmake/-/issues/24238
+        if(CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang")
+            set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        else()
+            set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};--extra-arg-before=-std=c++17")
+        endif()
     else()
-      message(STATUS "LLVM clang-tidy is disabled (not found)")
+        message(STATUS "LLVM clang-tidy is disabled (not found)")
     endif()
 else()
     message(STATUS "LLVM clang-tidy is disabled with -DENABLE_CLANG_TIDY=off")

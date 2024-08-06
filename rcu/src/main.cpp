@@ -1,75 +1,125 @@
+#include <unistd.h>
+
+#include <charconv>
+#include <cstring>
 #include <iostream>
+#include <string_view>
+#include <thread>
+#include <vector>
 
 #include "rcu.h"
 
-auto test1() {
-  rcu<int> x{std::make_unique<int>(10)};
-
-  // Shows 2 references because `x` has one, then `p`.
-  std::cout << "p = x.read()" << std::endl;
-  rcu_ptr<int> p = x.read();
-  std::cout << "Value p = " << *p.get() << "; References = " << p.use_count()
-            << std::endl;
-
-  // Shows 3 references because `x` has one, then `p`, `q`.
-  std::cout << "q = x.read()" << std::endl;
-  rcu_ptr<int> q = x.read();
-  std::cout << "Value p = " << *p.get() << "; References = " << p.use_count()
-            << std::endl;
-  std::cout << "Value q = " << *q.get() << "; References = " << q.use_count()
-            << std::endl;
-
-  // Shows 2 references because `x` has one, then `q`. Variable `p` is
-  // destroyed.
-  std::cout << "p.~rcu_ptr()" << std::endl;
-  p.~rcu_ptr();
-  std::cout << "Value q = " << *q.get() << "; References = " << q.use_count()
-            << std::endl;
-
-  // Now the owner is destroyed.
-  std::cout << "x.~rcu()" << std::endl;
-  x.~rcu();
-  std::cout << "Value q = " << *q.get() << "; References = " << q.use_count()
-            << std::endl;
-
-  std::cout << "q.~rcu_ptr()" << std::endl;
-  q.~rcu_ptr();
-}
-
-auto test2() {
-  rcu<int> x{std::make_unique<int>(10)};
-
-  // Shows 2 references because `x` has one, then `p`.
-  std::cout << "p = x.read()" << std::endl;
-  rcu_ptr<int> p = x.read();
-  std::cout << "Value p = " << *p.get() << "; References = " << p.use_count()
-            << std::endl;
-
-  // Now update with a new value
-  std::cout << "x.update(20)" << std::endl;
-  x.update(std::make_unique<int>(20));
-  // Should still show 2.
-  std::cout << "Value p = " << *p.get() << "; References = " << p.use_count()
-            << std::endl;
-
-  // Shows 3 references because `x` has one, then `p`, `q`.
-  std::cout << "q = x.read()" << std::endl;
-  rcu_ptr<int> q = x.read();
-  std::cout << "Value p = " << *p.get() << "; References = " << p.use_count()
-            << std::endl;
-  std::cout << "Value q = " << *q.get() << "; References = " << q.use_count()
-            << std::endl;
-
-  // Shows 2 references because `x` has one, then `q`. Variable `p` is
-  // destroyed.
-  std::cout << "p.~rcu_ptr()" << std::endl;
-  p.~rcu_ptr();
-  std::cout << "Value q = " << *q.get() << "; References = " << q.use_count()
+auto print_help(std::string_view prog_name) -> void {
+  std::cout << "USAGE: " << prog_name << " [-p <threads>]" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Execute RCU stress test for [-p] threads on the system"
             << std::endl;
 }
 
-auto main() -> int {
-  test1();
-  test2();
-  return 0;
+auto run_stress(unsigned int threads) {
+  std::cout << "Running with " << threads << " threads" << std::endl;
+
+  std::unique_ptr<int> data(std::make_unique<int>(42));
+  rcu<int> rcu(std::move(data));
+
+  std::atomic<bool> terminate{false};
+  std::atomic<std::uint32_t> counter{0};
+  std::atomic<std::uint32_t> updates{0};
+
+  std::thread thread_update([&]() {
+    while (!terminate.load()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::unique_ptr<int> new_data(new int(24));
+      bool r = rcu.update(std::move(new_data));
+      if (!r) {
+        std::cout << "Error updating" << std::endl;
+        std::abort();
+      }
+      updates++;
+    }
+  });
+
+  std::vector<std::thread> reads;
+  for (unsigned int t = 0; t < threads; t++) {
+    reads.emplace_back(std::thread([&]() {
+      while (!terminate.load()) {
+        auto ptr = rcu.read();
+        counter++;
+      }
+    }));
+  }
+
+  std::this_thread::sleep_for(std::chrono::seconds(30));
+  terminate.store(true);
+  thread_update.join();
+  for (std::thread& r : reads) {
+    r.join();
+  }
+
+  std::cout << " Updates: " << updates << std::endl;
+  std::cout << " Reads: " << counter << std::endl;
+  std::cout << " Reads/core/sec: " << counter / threads / 30 << std::endl;
+}
+
+auto main(int argc, char* argv[]) -> int {
+  int c = 0;
+  unsigned int threads = 0;
+  bool help = false;
+  int exit_code = 0;
+
+  while ((c = getopt(argc, argv, "p:?")) != -1) {
+    switch (c) {
+      case 'p': {
+        std::string thread_string = optarg;
+        auto [ptr, ec] = std::from_chars(
+            thread_string.data(),
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            thread_string.data() + thread_string.size(), threads);
+        if (ec == std::errc()) {
+          if (threads < 1 || threads > std::thread::hardware_concurrency()) {
+            std::cerr
+                << "Error: Specify a minimum of 1 thread and not more than "
+                << std::thread::hardware_concurrency() << " threads"
+                << std::endl;
+            exit_code = 1;
+            help = true;
+          }
+        } else {
+          std::cerr << "Error: Specify a thread count as a number" << std::endl;
+          exit_code = 1;
+          help = true;
+        }
+        break;
+      }
+      case '?':
+        help = true;
+        if (optopt) exit_code = 1;
+        break;
+      case ':':
+        std::cerr << "Error: Option -" << optopt << " requires an operand"
+                  << std::endl;
+        exit_code = 1;
+        help = true;
+        break;
+      default:
+        std::cerr << "Error: Unknown option -" << optopt << std::endl;
+        exit_code = 1;
+        help = true;
+        break;
+    }
+  }
+
+  if (help) {
+    if (exit_code) std::cerr << std::endl;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    print_help(std::string_view(argv[0]));
+    return exit_code;
+  }
+
+  if (threads == 0) {
+    threads = std::thread::hardware_concurrency();
+  }
+
+  run_stress(threads);
+  return exit_code;
 }
