@@ -15,26 +15,23 @@ TEST(RcuInitTest, NullPointer) {
 }
 
 TEST(RcuInitTest, NullPointerFromReset) {
-  std::unique_ptr<int> v = std::make_unique<int>(5);
+  std::unique_ptr v = std::make_unique<int>(5);
   v.reset(nullptr);
 
   EXPECT_EXIT(
       {
         // Move an empty unique_ptr.
-        rcu<int> x{std::move(v)};
+        rcu x{std::move(v)};
       },
       testing::KilledBySignal(SIGABRT), "");
 }
 
 TEST(RcuInitTest, DestructorWhenNotFree) {
-  // No default constructor, so we make use of another. From an API, not ideal,
-  // we'd want a default constructor and only have `rcu` be able to create
-  // `rcu_ptr` with a reference.
   rcu_ptr<int> p;
 
   EXPECT_EXIT(
       {
-        rcu<int> x{std::make_unique<int>(5)};
+        rcu x{std::make_unique<int>(5)};
         p = x.read();
 
         // x would be destroyed here, while p outlives x.
@@ -43,11 +40,11 @@ TEST(RcuInitTest, DestructorWhenNotFree) {
 }
 
 TEST(RcuRead, InitAndRead) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
+  std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
-  rcu<int> x{std::move(v)};
+  rcu x{std::move(v)};
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
 
   // 2 references. The first in `rcu` because it's active, and `p`.
   EXPECT_EQ(p.use_count(), 2);
@@ -56,15 +53,15 @@ TEST(RcuRead, InitAndRead) {
 }
 
 TEST(RcuRead, ReadTwice) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
+  std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
-  rcu<int> x{std::move(v)};
+  rcu x{std::move(v)};
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
   EXPECT_EQ(p.use_count(), 2);
   EXPECT_EQ(p.get(), rv);
 
-  rcu_ptr<int> q = x.read();
+  rcu_ptr q = x.read();
   EXPECT_EQ(p.use_count(), 3);
   EXPECT_EQ(p.get(), rv);
   EXPECT_EQ(q.use_count(), 3);
@@ -72,16 +69,16 @@ TEST(RcuRead, ReadTwice) {
 }
 
 TEST(RcuRead, ReadTwiceFree) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
+  std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
-  rcu<int> x{std::move(v)};
+  rcu x{std::move(v)};
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
   EXPECT_EQ(p.use_count(), 2);
   EXPECT_EQ(p.get(), rv);
 
   {
-    rcu_ptr<int> q = x.read();
+    rcu_ptr q = x.read();
     EXPECT_EQ(p.use_count(), 3);
     EXPECT_EQ(p.get(), rv);
     EXPECT_EQ(q.use_count(), 3);
@@ -95,33 +92,33 @@ TEST(RcuRead, ReadTwiceFree) {
 }
 
 TEST(RcuUpdate, UpdateFirst) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
-  rcu<int> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(10);
+  rcu x{std::move(v)};
 
-  std::unique_ptr<int> w = std::make_unique<int>(20);
+  std::unique_ptr w = std::make_unique<int>(20);
   int *rw = w.get();
   EXPECT_TRUE(x.update(std::move(w)));
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
   EXPECT_EQ(p.use_count(), 2);
   EXPECT_EQ(p.get(), rw);
   EXPECT_EQ(*p, 20);
 }
 
 TEST(RcuUpdate, ReadUpdate) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
+  std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
-  rcu<int> x{std::move(v)};
+  rcu x{std::move(v)};
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
   EXPECT_EQ(p.use_count(), 2);
   EXPECT_EQ(p.get(), rv);
 
-  std::unique_ptr<int> w = std::make_unique<int>(20);
+  std::unique_ptr w = std::make_unique<int>(20);
   int *rw = w.get();
   EXPECT_TRUE(x.update(std::move(w)));
 
-  rcu_ptr<int> q = x.read();
+  rcu_ptr q = x.read();
   EXPECT_EQ(q.use_count(), 2);
   EXPECT_EQ(q.get(), rw);
   EXPECT_EQ(*q, 20);
@@ -135,18 +132,18 @@ TEST(RcuUpdate, ReadUpdate) {
 }
 
 TEST(RcuUpdate, UpdateTwice) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
+  std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
-  rcu<int> x{std::move(v)};
+  rcu x{std::move(v)};
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
   EXPECT_EQ(p.use_count(), 2);
   EXPECT_EQ(p.get(), rv);
 
-  std::unique_ptr<int> w = std::make_unique<int>(20);
+  std::unique_ptr w = std::make_unique<int>(20);
   EXPECT_TRUE(x.update(std::move(w)));
 
-  std::unique_ptr<int> t = std::make_unique<int>(30);
+  std::unique_ptr t = std::make_unique<int>(30);
 #ifndef __clang_analyzer__
   // Ignore the "use after free" diagnostic. Not relevant here.
   int *rt = t.get();
@@ -155,7 +152,7 @@ TEST(RcuUpdate, UpdateTwice) {
 #endif
   EXPECT_TRUE(x.update(std::move(t)));
 
-  rcu_ptr<int> q = x.read();
+  rcu_ptr q = x.read();
   EXPECT_EQ(q.use_count(), 2);
   EXPECT_EQ(q.get(), rt);
   EXPECT_EQ(*q, 30);
@@ -169,11 +166,11 @@ TEST(RcuUpdate, UpdateTwice) {
 }
 
 TEST(RcuUpdate, UpdateMany) {
-  std::unique_ptr<int> v = std::make_unique<int>(10);
+  std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
-  rcu<int, 5> x{std::move(v)};
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p = x.read();
+  rcu_ptr p = x.read();
   EXPECT_EQ(p.use_count(), 2);
   EXPECT_EQ(p.get(), rv);
 
@@ -181,12 +178,12 @@ TEST(RcuUpdate, UpdateMany) {
   // the array.
   int *rt = nullptr;
   for (int i = 0; i < 10; i++) {
-    std::unique_ptr<int> t = std::make_unique<int>(20);
+    std::unique_ptr t = std::make_unique<int>(20);
     rt = t.get();
     EXPECT_TRUE(x.update(std::move(t)));
   }
 
-  rcu_ptr<int> q = x.read();
+  rcu_ptr q = x.read();
   EXPECT_EQ(q.use_count(), 2);
   EXPECT_EQ(q.get(), rt);
   EXPECT_EQ(*q, 20);
@@ -200,40 +197,40 @@ TEST(RcuUpdate, UpdateMany) {
 }
 
 TEST(RcuUpdate, UpdateFull) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
   // Now we want to use all 5 slots
-  rcu_ptr<int> p0 = x.read();
+  rcu_ptr p0 = x.read();
   EXPECT_EQ(p0.use_count(), 2);
 
   EXPECT_TRUE(x.update(std::make_unique<int>(1)));
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
 
   EXPECT_TRUE(x.update(std::make_unique<int>(2)));
-  rcu_ptr<int> p2 = x.read();
+  rcu_ptr p2 = x.read();
   EXPECT_EQ(p2.use_count(), 2);
 
   EXPECT_TRUE(x.update(std::make_unique<int>(3)));
-  rcu_ptr<int> p3 = x.read();
+  rcu_ptr p3 = x.read();
   EXPECT_EQ(p3.use_count(), 2);
 
   EXPECT_TRUE(x.update(std::make_unique<int>(4)));
-  rcu_ptr<int> p4 = x.read();
+  rcu_ptr p4 = x.read();
   EXPECT_EQ(p4.use_count(), 2);
 
   // Too many different `rcu_ptr` instances with different values.
   EXPECT_FALSE(x.update(std::make_unique<int>(5)));
-  rcu_ptr<int> p5 = x.read();
+  rcu_ptr p5 = x.read();
   EXPECT_EQ(p4.use_count(), 3);
   EXPECT_EQ(p5.use_count(), 3);
   EXPECT_EQ(*p5, 4);
 }
 
 TEST(RcuUpdate, UpdateFullWithArray) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
   // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
   std::array<rcu_ptr<int>, 5> p;
@@ -248,31 +245,31 @@ TEST(RcuUpdate, UpdateFullWithArray) {
   // Too many different `rcu_ptr` instances with different values.
   EXPECT_FALSE(x.update(std::make_unique<int>(5)));
   p[4] = x.read();
-  EXPECT_EQ(p[3].use_count(), 1); // Decremented because the update succeeded
-  EXPECT_EQ(p[4].use_count(), 2); // Remains at 2 because the update failed
+  EXPECT_EQ(p[3].use_count(), 1);  // Decremented because the update succeeded
+  EXPECT_EQ(p[4].use_count(), 2);  // Remains at 2 because the update failed
   EXPECT_EQ(*p[4], 4);
 
-  rcu_ptr<int> p5 = x.read();
+  rcu_ptr p5 = x.read();
   EXPECT_EQ(p[4].use_count(), 3);
   EXPECT_EQ(p5.use_count(), 3);
   EXPECT_EQ(*p5, 4);
 }
 
 struct MyData {
-  MyData(int value) : value_{value} { }
+  MyData(int value) : value_{value} {}
 
   int value_;
 };
 
 TEST(RcuPtr, CopyConstructor) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_TRUE(p1);
 
-  rcu_ptr<int> p1c(p1);
+  rcu_ptr p1c(p1);
   EXPECT_EQ(p1.use_count(), 3);
   EXPECT_TRUE(p1);
   EXPECT_EQ(p1c.use_count(), 3);
@@ -280,14 +277,14 @@ TEST(RcuPtr, CopyConstructor) {
 }
 
 TEST(RcuPtr, CopyAssignment) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_TRUE(p1);
 
-  rcu_ptr<int> p1c = p1;
+  rcu_ptr p1c = p1;
   EXPECT_EQ(p1.use_count(), 3);
   EXPECT_TRUE(p1);
   EXPECT_EQ(p1c.use_count(), 3);
@@ -295,42 +292,46 @@ TEST(RcuPtr, CopyAssignment) {
 }
 
 TEST(RcuPtr, MoveConstructor) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_TRUE(p1);
 
-  rcu_ptr<int> p1c(std::move(p1));
+  rcu_ptr p1c(std::move(p1));
   // While a user shouldn't, the test shows the move worked.
-  EXPECT_EQ(p1.use_count(), 0); // NOLINT(bugprone-use-after-move, clang-analyzer-cplusplus.Move)
+  EXPECT_EQ(
+      // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move)
+      p1.use_count(), 0);
   EXPECT_FALSE(p1);
   EXPECT_EQ(p1c.use_count(), 2);
   EXPECT_TRUE(p1c);
 }
 
 TEST(RcuPtr, MoveAssignment) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_TRUE(p1);
 
-  rcu_ptr<int> p1c = std::move(p1);
+  rcu_ptr p1c = std::move(p1);
   // While a user shouldn't, the test shows the move worked.
-  EXPECT_EQ(p1.use_count(), 0); // NOLINT(bugprone-use-after-move, clang-analyzer-cplusplus.Move)
+  EXPECT_EQ(
+      // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move)
+      p1.use_count(), 0);
   EXPECT_FALSE(p1);
   EXPECT_EQ(p1c.use_count(), 2);
   EXPECT_TRUE(p1c);
 }
 
 TEST(RcuPtr, CopyAssignmentToEmpty) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_TRUE(p1);
 
@@ -343,20 +344,59 @@ TEST(RcuPtr, CopyAssignmentToEmpty) {
 }
 
 TEST(RcuPtr, MoveAssignmentToEmpty) {
-  std::unique_ptr<int> v = std::make_unique<int>(0);
-  rcu<int, 5> x{std::move(v)};
+  std::unique_ptr v = std::make_unique<int>(0);
+  rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
-  rcu_ptr<int> p1 = x.read();
+  rcu_ptr p1 = x.read();
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_TRUE(p1);
 
   rcu_ptr<int> p1c;
   p1c = std::move(p1);
   // While a user shouldn't, the test shows the move worked.
-  EXPECT_EQ(p1.use_count(), 0); // NOLINT(bugprone-use-after-move, clang-analyzer-cplusplus.Move)
+  EXPECT_EQ(
+      // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move)
+      p1.use_count(), 0);
   EXPECT_FALSE(p1);
   EXPECT_EQ(p1c.use_count(), 2);
   EXPECT_TRUE(p1c);
+}
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+std::atomic<int> del_counter{0};
+
+struct CustomDeleter {
+  void operator()(int *p) const {
+    std::cout << "Deleting *p=" << *p << "; ptr=" << p << std::endl;
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    delete p;
+
+    del_counter++;
+  };
+};
+
+TEST(RcuPtr, CustomDeleter) {
+  std::unique_ptr<int, CustomDeleter> v(new int(0));
+
+  {
+    rcu x{std::move(v)};
+    EXPECT_EQ(del_counter, 0);
+
+    {
+      rcu_ptr p = x.read();
+      EXPECT_EQ(del_counter, 0);
+
+      x.update(std::unique_ptr<int, CustomDeleter>(new int(1)));
+      // Still no deletions, because `p` is in scope.
+      EXPECT_EQ(del_counter, 0);
+    }
+
+    // The variable `p` is now out of scope.
+    EXPECT_EQ(del_counter, 1);
+  }
+
+  // The variable `x` is now out of scope.
+  EXPECT_EQ(del_counter, 2);
 }
 
 // Run with disabled tests. Disabled as it's a long running test.
@@ -364,8 +404,8 @@ TEST(RcuPtr, MoveAssignmentToEmpty) {
 //  rcutest-test --gtest_also_run_disabled_tests
 //    --gtest_filter=RcuStress.DISABLED_ThreadedUpdate
 TEST(RcuStress, DISABLED_ThreadedUpdate) {
-  std::unique_ptr<MyData> data(std::make_unique<MyData>(42));
-  rcu<MyData> rcu(std::move(data));
+  std::unique_ptr data(std::make_unique<MyData>(42));
+  rcu rcu(std::move(data));
 
   std::atomic<bool> terminate{false};
 

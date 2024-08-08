@@ -74,7 +74,9 @@
         "iomanip": "cpp",
         "span": "cpp",
         "cinttypes": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "charconv": "cpp",
+        "future": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceRoot}/rcu"
 }

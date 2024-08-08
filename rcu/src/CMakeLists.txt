@@ -15,7 +15,7 @@ if(IS_DEBUG)
     add_sanitizers(rcutest)
 endif()
 
-target_clangformat_setup(${BINARY} rcu.h)
+target_clangformat_setup(${BINARY})
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 

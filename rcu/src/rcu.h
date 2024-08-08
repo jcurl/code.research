@@ -9,11 +9,15 @@
 #ifndef RCU_H
 #define RCU_H
 
-template <typename T, std::size_t N>
+template <class T, class Deleter, std::size_t N>
 class rcu;
 
-template <typename T>
+template <class T, class Deleter = std::default_delete<T>>
 class rcu_ptr {
+  using pointer_type = const T *;
+  using element_type = T;
+  using deleter_type = Deleter;
+
  public:
   rcu_ptr() {}
 
@@ -68,13 +72,13 @@ class rcu_ptr {
 
  private:
   // Only the `rcu` class may instantiate a `rcu_ptr` with internal details.
-  template <typename U, std::size_t N>
+  template <class UT, class UDeleter, std::size_t N>
   friend class rcu;
 
-  const T *ptr_{nullptr};
+  pointer_type ptr_{nullptr};
   std::atomic<std::uint32_t> *refcount_{nullptr};
 
-  rcu_ptr(const T *ptr, std::atomic<std::uint32_t> *ref)
+  rcu_ptr(pointer_type ptr, std::atomic<std::uint32_t> *ref)
       : ptr_{ptr}, refcount_{ptr ? ref : nullptr} {}
 
   auto free() -> void {
@@ -85,7 +89,7 @@ class rcu_ptr {
     if (prev_count == 1) {
       // No more references. As this was the last reference, it can not be
       // incremented.
-      delete this->ptr_;
+      deleter_type{}(const_cast<T *>(this->ptr_));
     }
 #if !defined(NDEBUG)
     else if (prev_count == 0) {
@@ -102,8 +106,12 @@ class rcu_ptr {
   }
 };
 
-template <typename T, std::size_t N = 10>
+template <class T, class Deleter = std::default_delete<T>, std::size_t N = 10>
 class rcu {
+  using pointer_type = const T *;
+  using element_type = T;
+  using deleter_type = Deleter;
+
  public:
   rcu() = delete;
 
@@ -112,7 +120,7 @@ class rcu {
   rcu(rcu &&) = delete;
   auto operator=(rcu &&) -> rcu & = delete;
 
-  rcu(std::unique_ptr<const T> &&ptr) {
+  rcu(std::unique_ptr<T, Deleter> &&ptr) {
     if (!ptr) std::abort();
 
     this->index_.store(0);
@@ -120,7 +128,7 @@ class rcu {
     this->slot_[0].ptr_ = ptr.release();
   }
 
-  auto read() -> rcu_ptr<T> {
+  auto read() -> rcu_ptr<T, Deleter> {
     // Find the index, and atomically increment the reference for the active
     // index.
     std::uint32_t i;
@@ -161,10 +169,10 @@ class rcu {
     // live longer than all existing `rcu_ptr` objects. If this class dies, then
     // the `rcu_ptr` will point to a `refcount_` that no longer exists in
     // memory, leading to undefined behaviour.
-    return rcu_ptr<T>(this->slot_[i].ptr_, &this->slot_[i].refcount_);
+    return rcu_ptr<T, Deleter>(this->slot_[i].ptr_, &this->slot_[i].refcount_);
   }
 
-  auto update(std::unique_ptr<const T> &&update) -> bool {
+  auto update(std::unique_ptr<T, Deleter> &&update) -> bool {
     // Don't allow updates to `nullptr`.
     if (!update) return false;
 
@@ -248,8 +256,8 @@ class rcu {
     if (old_count == 1) {
       // No more references. As this was the last reference (it has reached
       // zero), it can not be incremented.
-      auto ptr = this->slot_[index].ptr_;
-      delete ptr;
+      pointer_type ptr = this->slot_[index].ptr_;
+      deleter_type{}(const_cast<T *>(ptr));
       return true;
     }
 #if !defined(NDEBUG)
@@ -265,7 +273,7 @@ class rcu {
   class ref {
    public:
     std::atomic<std::uint32_t> refcount_{0};
-    const T *ptr_{nullptr};
+    pointer_type ptr_{nullptr};
   };
 
   std::atomic<std::uint32_t> index_{0};

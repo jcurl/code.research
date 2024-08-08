@@ -21,6 +21,7 @@ function(prefix_clangformat_setup prefix)
         set(CLANGFORMAT_EXECUTABLE ${clangformat_executable_tmp})
         unset(clangformat_executable_tmp)
         set_property(GLOBAL PROPERTY CLANGFORMAT_FOUND TRUE)
+        set_property(GLOBAL PROPERTY CLANGFORMAT_EXECUTABLE ${clangformat_executable_tmp})
       else()
         # If it's not found, we report it to the user, but don't abort the
         # build. It's not critical for users that build.
@@ -28,30 +29,35 @@ function(prefix_clangformat_setup prefix)
         set_property(GLOBAL PROPERTY CLANGFORMAT_FOUND FALSE)
       endif()
     endif()
+  else()
+    if(clangformat_found MATCHES "TRUE")
+      get_property(clangformat_exe GLOBAL PROPERTY CLANGFORMAT_EXECUTABLE)
+      set(CLANGFORMAT_EXECUTABLE ${clangformat_exe})
+    endif()
+  endif()
 
-    if(DEFINED CLANGFORMAT_EXECUTABLE)
-      foreach(clangformat_source ${ARGN})
-        get_filename_component(clangformat_source ${clangformat_source} ABSOLUTE)
-        list(APPEND clangformat_sources ${clangformat_source})
-      endforeach()
+  if(DEFINED CLANGFORMAT_EXECUTABLE)
+    foreach(clangformat_source ${ARGN})
+      get_filename_component(clangformat_source ${clangformat_source} ABSOLUTE)
+      list(APPEND clangformat_sources ${clangformat_source})
+    endforeach()
 
-      add_custom_target(${prefix}_clangformat
-        COMMAND
-          ${CLANGFORMAT_EXECUTABLE}
-          -style=google
-          -i
-          ${clangformat_sources}
-        WORKING_DIRECTORY
-          ${CMAKE_SOURCE_DIR}
-        COMMENT
-          "Formatting ${prefix} with ${CLANGFORMAT_EXECUTABLE} ..."
-      )
+    add_custom_target(${prefix}_clangformat
+      COMMAND
+        ${CLANGFORMAT_EXECUTABLE}
+        -style=google
+        -i
+        ${clangformat_sources}
+      WORKING_DIRECTORY
+        ${CMAKE_SOURCE_DIR}
+      COMMENT
+        "Formatting ${prefix} with ${CLANGFORMAT_EXECUTABLE} ..."
+    )
 
-      if(TARGET clangformat)
-        add_dependencies(clangformat ${prefix}_clangformat)
-      else()
-        add_custom_target(clangformat DEPENDS ${prefix}_clangformat)
-      endif()
+    if(TARGET clangformat)
+      add_dependencies(clangformat ${prefix}_clangformat)
+    else()
+      add_custom_target(clangformat DEPENDS ${prefix}_clangformat)
     endif()
   endif()
 endfunction()

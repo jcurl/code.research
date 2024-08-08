@@ -19,8 +19,8 @@ auto print_help(std::string_view prog_name) -> void {
 auto run_stress(unsigned int threads) {
   std::cout << "Running with " << threads << " threads" << std::endl;
 
-  std::unique_ptr<int> data(std::make_unique<int>(42));
-  rcu<int> rcu(std::move(data));
+  std::unique_ptr data(std::make_unique<int>(42));
+  rcu rcu(std::move(data));
 
   std::atomic<bool> terminate{false};
   std::atomic<std::uint32_t> counter{0};
@@ -29,7 +29,7 @@ auto run_stress(unsigned int threads) {
   std::thread thread_update([&]() {
     while (!terminate.load()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      std::unique_ptr<int> new_data(new int(24));
+      std::unique_ptr new_data(std::make_unique<int>(24));
       bool r = rcu.update(std::move(new_data));
       if (!r) {
         std::cout << "Error updating" << std::endl;
@@ -43,7 +43,7 @@ auto run_stress(unsigned int threads) {
   for (unsigned int t = 0; t < threads; t++) {
     reads.emplace_back(std::thread([&]() {
       while (!terminate.load()) {
-        auto ptr = rcu.read();
+        rcu_ptr ptr = rcu.read();
         counter++;
       }
     }));
