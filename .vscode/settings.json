@@ -76,7 +76,9 @@
         "cinttypes": "cpp",
         "variant": "cpp",
         "charconv": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceRoot}/rcu"
 }

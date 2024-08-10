@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
-project(rcutest C CXX)
+project(benchmarks C CXX)
 
 include(GNUInstallDirs)
 
 option(ENABLE_CLANG_TIDY "Enable checks using Clang-Tidy" ON)
-option(ENABLE_TEST "Enable building tests" ON)
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(FATAL_ERROR "In-source builds are not allowed")
@@ -33,7 +32,44 @@ include(qnx)
 
 get_qnx_version()
 
-# Note, if you add benchmarks, this must occur before the clang-tidy checks
+# So that we can find "config.h"
+include_directories("${PROJECT_BINARY_DIR}")
+
+if("${CMAKE_CXX_FLAGS}" STREQUAL "")
+    if((CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang") OR
+       (CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR
+       (CMAKE_CXX_COMPILER_ID MATCHES "QCC"))
+        add_compile_options(-Wall -Wextra)
+
+        if(IS_DEBUG)
+            add_compile_options(-O0)
+        endif()
+    endif()
+endif()
+
+# Checking if we should enable coverage. Only do so in DEBUG and if testing is enabled
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/coverage" ${CMAKE_MODULE_PATH})
+include(code-coverage)
+add_code_coverage()
+if(CODE_COVERAGE)
+    add_compile_options(-O0)
+endif()
+
+# The `make install` target shouldn't install GTEST/GMOCK.
+set(INSTALL_GMOCK OFF)
+set(INSTALL_GTEST OFF)
+add_subdirectory(${CMAKE_SOURCE_DIR}/../external/googletest external/googletest)
+
+# Google-Benchmark needs `regex`, QNX has this as a separate library.
+if (QNXNTO)
+    # QNX has -lregex needed for linking
+    set(BENCHMARK_CXX_LIBRARIES regex)
+    # Enabling testing results in compilation errors on QNX cross-chain builds
+    set(BENCHMARK_ENABLE_TESTING OFF)
+endif()
+add_subdirectory(${CMAKE_SOURCE_DIR}/../external/benchmark external/benchmark)
+
+# Must enable CLANG-TIDY *after* google packages, so we don't interfere.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
@@ -61,44 +97,8 @@ else()
     message(STATUS "LLVM clang-tidy is disabled with -DENABLE_CLANG_TIDY=off")
 endif()
 
-# So that we can find "config.h"
-include_directories("${PROJECT_BINARY_DIR}")
-
-if("${CMAKE_CXX_FLAGS}" STREQUAL "")
-    if((CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang") OR
-       (CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR
-       (CMAKE_CXX_COMPILER_ID MATCHES "QCC"))
-        add_compile_options(-Wall -Wextra)
-
-        if(IS_DEBUG)
-            add_compile_options(-O0)
-        endif()
-    endif()
-endif()
-
-# Checking if we should enable coverage. Only do so in DEBUG and if testing is enabled
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/coverage" ${CMAKE_MODULE_PATH})
-include(code-coverage)
-add_code_coverage()
-if(CODE_COVERAGE)
-    add_compile_options(-O0)
-endif()
-
-add_subdirectory(src)
-
-if(ENABLE_TEST)
-    # The `make install` target shouldn't install GTEST/GMOCK.
-    set(INSTALL_GMOCK OFF)
-    set(INSTALL_GTEST OFF)
-
-    message(STATUS "Test suite enabled with -DENABLE_TEST=on (execute with make && ctest)")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/../external/googletest external/googletest)
-
-    add_subdirectory(test)
-    enable_testing()
-else()
-    message(STATUS "Test suite disabled with -DENABLE_TEST=off")
-endif()
+add_subdirectory(benchmarks)
+#enable_testing()
 
 # Finally write the configuration file dependent on what is found
 # configure_file(${PROJECT_SOURCE_DIR}/src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
