@@ -78,7 +78,9 @@
         "charconv": "cpp",
         "future": "cpp",
         "bitset": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceRoot}/rcu"
 }

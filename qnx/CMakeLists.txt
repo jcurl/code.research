@@ -98,6 +98,7 @@ else()
 endif()
 
 add_subdirectory(benchmarks)
+add_subdirectory(tools)
 #enable_testing()
 
 # Finally write the configuration file dependent on what is found
