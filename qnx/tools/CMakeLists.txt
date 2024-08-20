@@ -1,1 +1,2 @@
 add_subdirectory(time_compare)
+add_subdirectory(core_latency)

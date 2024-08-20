@@ -27,9 +27,6 @@ See [malloc.md](./benchmarks/malloc.md)
 
 ## Time Comparison
 
-Prints out the times of some clocks in the system at periodic intervals. Check
-for which clocks are the same, and those that might drift apart over time.
-
 Shows the C++ resolution, if they're steady clocks. Prints out the following
 clocks, and they can be used to estimate the sources. For example, the clock
 `std::chrono::high_resolution_clock` has a different behaviour on QNX 7.1, than
@@ -37,3 +34,9 @@ Linux (QNX is a monotonic clock based on `ClockCycles()`, where on Linux it's
 based on `CLOCK_REALTIME`).
 
 See [time_compare.md](./tools/time_compare.md)
+
+## Core Latency
+
+Measure the cache-to-cache latency between cores.
+
+See [core_latency](./tools/core_latency.md)

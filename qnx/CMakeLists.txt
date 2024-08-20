@@ -33,7 +33,7 @@ include(qnx)
 get_qnx_version()
 
 # So that we can find "config.h"
-include_directories("${PROJECT_BINARY_DIR}")
+include_directories(${PROJECT_BINARY_DIR})
 
 if("${CMAKE_CXX_FLAGS}" STREQUAL "")
     if((CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang") OR
