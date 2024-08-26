@@ -8,6 +8,31 @@
 #include "sync_event.h"
 #include "thread_pin.h"
 
+namespace {
+template <std::uint32_t compare, std::uint32_t swap>
+__attribute__((always_inline)) inline auto cas(std::atomic<std::uint32_t> &flag)
+    -> void {
+#if __x86_64__
+  asm volatile(
+      " mov %1,%%esi;"
+      "0:"
+      " mov %0,%%eax;"
+      " lock cmpxchg %%esi,%2;"
+      " jne 0b;"
+      :
+      : "i"(compare), "i"(swap), "m"(flag)
+      : "eax", "esi");
+#else
+  std::uint32_t expected_flag = compare;
+  do {
+    expected_flag = compare;
+  } while (!flag.compare_exchange_strong(
+      expected_flag, swap, std::memory_order::memory_order_relaxed,
+      std::memory_order::memory_order_relaxed));
+#endif
+}
+}  // namespace
+
 auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     -> std::uint32_t {
   if (ping_core >= std::thread::hardware_concurrency() ||
@@ -22,12 +47,7 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     flag.wait();
 
     for (std::uint32_t i = 0; i < iterations_ * samples_; i++) {
-      std::uint32_t expected_flag = PING;
-      do {
-        expected_flag = PING;
-      } while (!flag_.compare_exchange_strong(
-          expected_flag, PONG, std::memory_order::memory_order_relaxed,
-          std::memory_order::memory_order_relaxed));
+      cas<PING, PONG>(this->flag_);
     }
   });
 
@@ -39,12 +59,7 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     for (std::uint32_t i = 0; i < samples_; i++) {
       auto start = std::chrono::high_resolution_clock::now();
       for (std::uint32_t j = 0; j < iterations_; j++) {
-        std::uint32_t expected_flag = PONG;
-        do {
-          expected_flag = PONG;
-        } while (!flag_.compare_exchange_strong(
-            expected_flag, PING, std::memory_order::memory_order_relaxed,
-            std::memory_order::memory_order_relaxed));
+        cas<PONG, PING>(this->flag_);
       }
       auto end = std::chrono::high_resolution_clock::now();
       std::uint32_t duration = std::chrono::nanoseconds(end - start).count();
