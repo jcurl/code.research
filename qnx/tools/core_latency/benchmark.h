@@ -13,6 +13,10 @@ class benchmark {
   auto operator=(const benchmark& other) -> benchmark& = default;
   auto operator=(benchmark&& other) -> benchmark& = default;
 
+  virtual auto name() const -> std::string = 0;
+
+  virtual auto init() -> void{};
+
   virtual auto run(std::uint32_t ping_core, std::uint32_t pong_core)
       -> std::uint32_t = 0;
 };

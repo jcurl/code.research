@@ -33,6 +33,10 @@ __attribute__((always_inline)) inline auto cas(std::atomic<std::uint32_t> &flag)
 }
 }  // namespace
 
+auto core_benchmark::name() const -> std::string { return std::string{"CAS"}; }
+
+auto core_benchmark::init() -> void { this->flag_ = PING; }
+
 auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     -> std::uint32_t {
   if (ping_core >= std::thread::hardware_concurrency() ||

@@ -3,15 +3,20 @@
 
 #include <atomic>
 #include <cstdint>
+#include <string>
 
 #include "benchmark.h"
 
-class core_benchmark : benchmark {
+class core_benchmark : public benchmark {
  public:
   core_benchmark() = default;
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   core_benchmark(std::uint32_t iterations, std::uint32_t samples)
       : iterations_{iterations}, samples_{samples} {}
+
+  auto name() const -> std::string override;
+
+  auto init() -> void override;
 
   auto run(std::uint32_t ping_core, std::uint32_t pong_core)
       -> std::uint32_t override;

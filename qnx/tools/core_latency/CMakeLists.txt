@@ -4,6 +4,7 @@ set(SOURCES core_latency.cpp
     thread_pin.h thread_pin.cpp
     benchmark.h
     core_benchmark.h core_benchmark.cpp
+    corerw_benchmark.h corerw_benchmark.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})
