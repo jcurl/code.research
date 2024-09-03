@@ -25,6 +25,9 @@ can be tested on other Operating Systems (notably QNX).
   - [3.1. Intel i9-13980HX with P and E cores](#31-intel-i9-13980hx-with-p-and-e-cores)
     - [3.1.1. Single Line CAS](#311-single-line-cas)
     - [3.1.2. Two Line Read/Write Ping/Pong](#312-two-line-readwrite-pingpong)
+  - [3.2. Intel i3-2120T](#32-intel-i3-2120t)
+    - [3.2.1. Single Line CAS](#321-single-line-cas)
+    - [3.2.2. Two Line Read/Write Ping/Pong](#322-two-line-readwrite-pingpong)
 
 ## 1. Usage
 
@@ -508,4 +511,34 @@ Num samples: 300
     Min  latency: 35.9ns ±0.0 cores: (15,14)
     Max  latency: 302.3ns ±0.8 cores: (28,27)
     Mean latency: 189.9ns
+```
+
+### 3.2. Intel i3-2120T
+
+#### 3.2.1. Single Line CAS
+
+```text
+Running CAS Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           39    13    38
+1     38          39    13
+2     12    38          39
+3     38    12    38
+```
+
+#### 3.2.2. Two Line Read/Write Ping/Pong
+
+```text
+Running Read/Write Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           51    19    51
+1     51          51    19
+2     20    51          51
+3     51    19    52
 ```
