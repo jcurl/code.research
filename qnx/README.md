@@ -39,4 +39,12 @@ See [time_compare.md](./tools/time_compare.md)
 
 Measure the cache-to-cache latency between cores.
 
-See [core_latency](./tools/core_latency.md)
+See [core_latency.md](./tools/core_latency.md)
+
+## Cache Line
+
+Estimate the cache line size by measuring the time it takes to do strided
+copies.
+
+See [cacheline.md](./benchmarks/cacheline.md) and
+[results](./benchmarks/cacheline/results/README.md).
