@@ -22,6 +22,16 @@ __attribute__((always_inline)) inline auto cas(std::atomic<std::uint32_t> &flag)
       :
       : "i"(compare), "i"(swap), "m"(flag)
       : "eax", "esi");
+#elif __i386__
+  asm volatile(
+      " mov %1,%%ebx;"
+      "0:"
+      " mov %0,%%eax;"
+      " lock cmpxchg %%ebx,%2;"
+      " jne 0b;"
+      :
+      : "i"(compare), "i"(swap), "m"(flag)
+      : "eax", "ebx");
 #else
   std::uint32_t expected_flag = compare;
   do {

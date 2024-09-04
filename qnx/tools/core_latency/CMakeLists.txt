@@ -10,6 +10,10 @@ set(SOURCES core_latency.cpp
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(${BINARY} Threads::Threads)
+
 if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()

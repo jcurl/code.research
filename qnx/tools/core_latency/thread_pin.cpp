@@ -1,5 +1,7 @@
 #include "thread_pin.h"
 
+#include <pthread.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <thread>
