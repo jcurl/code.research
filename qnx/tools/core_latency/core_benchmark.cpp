@@ -1,5 +1,6 @@
 #include "core_benchmark.h"
 
+#include <iostream>
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -9,10 +10,16 @@
 #include "thread_pin.h"
 
 namespace {
+// Compares the value of `compare` with `&flag`.
+// loop:
+//   if &flag == compare
+//     &flag = swap.
+//   else
+//     goto loop
 template <std::uint32_t compare, std::uint32_t swap>
 __attribute__((always_inline)) inline auto cas(std::atomic<std::uint32_t> &flag)
     -> void {
-#if __x86_64__
+#if defined(__x86_64__)
   asm volatile(
       " mov %1,%%esi;"
       "0:"
@@ -22,7 +29,7 @@ __attribute__((always_inline)) inline auto cas(std::atomic<std::uint32_t> &flag)
       :
       : "i"(compare), "i"(swap), "m"(flag)
       : "eax", "esi");
-#elif __i386__
+#elif defined(i386) || defined(__i386__) || defined(__i386)
   asm volatile(
       " mov %1,%%ebx;"
       "0:"
@@ -32,6 +39,20 @@ __attribute__((always_inline)) inline auto cas(std::atomic<std::uint32_t> &flag)
       :
       : "i"(compare), "i"(swap), "m"(flag)
       : "eax", "ebx");
+#elif defined(__aarch64__)
+  // For no feature `-lse` that has `cas` instruction.
+  asm volatile(
+      "0:"
+      " mov w1, %1;"
+      "1:"
+      " ldxr w0, %2;"
+      " cmp w0, %0;"
+      " b.ne 1b;"
+      " stxr w17, w1, %2;"
+      " cbnz w17, 1b;"
+      :
+      : "i"(compare), "i"(swap), "m"(flag)
+      : "w0", "w1", "w17");
 #else
   std::uint32_t expected_flag = compare;
   do {

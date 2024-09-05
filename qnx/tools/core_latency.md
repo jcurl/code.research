@@ -20,6 +20,7 @@ can be tested on other Operating Systems (notably QNX).
     - [2.1.1. Disassembly in C++ for x86\_64](#211-disassembly-in-c-for-x86_64)
     - [2.1.2. Optimisations for x86\_64](#212-optimisations-for-x86_64)
     - [2.1.3. Disassembly in C++ for x86 (32-bit)](#213-disassembly-in-c-for-x86-32-bit)
+    - [2.1.4. Disassembly in C++ for AARCH64 (ARM 64-bit)](#214-disassembly-in-c-for-aarch64-arm-64-bit)
   - [2.2. Load/Store](#22-loadstore)
     - [2.2.1. Disassembly in C++ for x86\_64](#221-disassembly-in-c-for-x86_64)
 - [3. Results](#3-results)
@@ -35,6 +36,12 @@ can be tested on other Operating Systems (notably QNX).
   - [3.4. Intel Core Duo2 T7700](#34-intel-core-duo2-t7700)
     - [3.4.1. Single Line CAS](#341-single-line-cas)
     - [3.4.2. Two Line Read/Write Ping/Pong](#342-two-line-readwrite-pingpong)
+  - [3.5. Rasbperry Pi 4, A72](#35-rasbperry-pi-4-a72)
+    - [3.5.1. Single Line CAS](#351-single-line-cas)
+    - [3.5.2. Two Line Read/Write Ping/Pong](#352-two-line-readwrite-pingpong)
+  - [3.6. Rasbperry Pi 5, A76](#36-rasbperry-pi-5-a76)
+    - [3.6.1. Single Line CAS](#361-single-line-cas)
+    - [3.6.2. Two Line Read/Write Ping/Pong](#362-two-line-readwrite-pingpong)
 
 ## 1. Usage
 
@@ -253,6 +260,119 @@ the results however.
 
 By using a hand-written version, the speed of the loop for the CAS swap is
 increased from a latency of about 113ns to 73ns (twice as fast).
+
+#### 2.1.4. Disassembly in C++ for AARCH64 (ARM 64-bit)
+
+Disassembling the generated code with `objdump -dCS core_latency` shows a helper
+function is used with two implementations of a compare and swap (a `cas`
+instruction, or an atomic load/store).
+
+```asm
+      compare_exchange_strong(__int_type& __i1, __int_type __i2,
+                              memory_order __m1, memory_order __m2) noexcept
+      {
+        __glibcxx_assert(__is_valid_cmpexch_failure_order(__m2));
+
+        return __atomic_compare_exchange_n(&_M_i, &__i1, __i2, 0,
+    2cf0:       91002053        add     x19, x2, #0x8
+    2cf4:       aa1303e2        mov     x2, x19                         // &flag
+    2cf8:       52800021        mov     w1, #0x1                        // #1 = PONG
+    2cfc:       52800000        mov     w0, #0x0                        // #0 = PING
+    2d00:       94000214        bl      3550 <__aarch64_cas4_relax>
+  } while (!flag.compare_exchange_strong(
+    2d04:       35ffff80        cbnz    w0, 2cf4 <std::thread::_State_impl<std::thread::_Invoker<std::tuple<core_benchmark::run(unsigned int, unsigned int)::{lambda()#1}> > >::_M_run()+0x44>
+
+    // Function continues with loop until here
+    2d2c:       d65f03c0        ret
+
+0000000000003550 <__aarch64_cas4_relax>:
+    3550:       d503245f        bti     c
+    3554:       b00000f0        adrp    x16, 20000 <std::ostream::put(char)@GLIBCXX_3.4>
+    3558:       3945e610        ldrb    w16, [x16, #377]
+    355c:       34000070        cbz     w16, 3568 <__aarch64_cas4_relax+0x18>
+    3560:       88a07c41        cas     w0, w1, [x2]
+    3564:       d65f03c0        ret
+    3568:       2a0003f0        mov     w16, w0
+    356c:       885f7c40        ldxr    w0, [x2]
+    3570:       6b10001f        cmp     w0, w16
+    3574:       54000061        b.ne    3580 <__aarch64_cas4_relax+0x30>  // b.any
+    3578:       88117c41        stxr    w17, w1, [x2]
+    357c:       35ffff91        cbnz    w17, 356c <__aarch64_cas4_relax+0x1c>
+    3580:       d65f03c0        ret
+```
+
+Compiling on the Raspberry Pi4 (A72) with `-DCMAKE_CXX_FLAGS="-g -march=native"`
+results in the following assembly as above.
+
+Writing explicit assembly on the RPi4 with:
+
+```c++
+#elif defined(__aarch64__)
+  // Must compile with `-marmv8.1-a+lse` to get the `cas` instruction.
+  asm volatile(
+      " mov w1, %1;"
+      "0:"
+      " mov w0, %0;"
+      " cas w0, w1, %2;"
+      " cbnz w0, 0b;"
+      :
+      : "i"(compare), "i"(swap), "m"(flag)
+      : "w0", "w1");
+```
+
+causes a fault `illegal instruction`, so that the Raspberry Pi 4, A72,
+does not implement the `cas` instruction.
+
+The code can be significantly optimised as:
+
+```asm
+  asm volatile(
+    2cb0:       52800021        mov     w1, #0x1                        // #1 = PONG
+    2cb4:       885f7c60        ldxr    w0, [x3]
+    2cb8:       7100001f        cmp     w0, #0x0                        // Compare &flag with PING
+    2cbc:       54ffffc1        b.ne    2cb4 <std::thread::_State_impl<std::thread::_Invoker<std::tuple<core_benchmark::run(unsigned int, unsigned int)::{lambda()#1}> > >::_M_run()+0x44>  // b.any
+    2cc0:       88117c61        stxr    w17, w1, [x3]
+    2cc4:       35ffff91        cbnz    w17, 2cb4 <std::thread::_State_impl<std::thread::_Invoker<std::tuple<core_benchmark::run(unsigned int, unsigned int)::{lambda()#1}> > >::_M_run()+0x44>
+
+    // Function continues with loop until here
+    2cdc:       d65f03c0        ret
+```
+
+As an example of the difference (on the Rasbperry Pi4 using RPiOS 5)
+before and after the optimisation:
+
+Using GCC 12.2.0:
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           88    85    86
+1     86          86    88
+2     88    89          86
+3     89    87    88
+```
+
+With the Optimisations:
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           85    82    83
+1     84          82    84
+2     84    84          84
+3     85    82    82
+```
+
+There is a small but noticable differences visible, showing that the
+cache coherency takes the majority of the time.
 
 ### 2.2. Load/Store
 
@@ -669,4 +789,102 @@ Running Read/Write Core Benchmark
       0     1
 0           110
 1     110
+```
+
+### 3.5. Rasbperry Pi 4, A72
+
+#### 3.5.1. Single Line CAS
+
+With the assembly optimisations (load/store):
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           85    83    82
+1     84          83    85
+2     84    84          84
+3     84    83    83
+```
+
+#### 3.5.2. Two Line Read/Write Ping/Pong
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000 -breadwrite
+Running Read/Write Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           85    83    84
+1     83          83    83
+2     83    83          84
+3     83    83    84
+```
+
+Without the hand-written assembly (commented out from code):
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           88    85    86
+1     86          86    88
+2     88    89          86
+3     89    87    88
+```
+
+### 3.6. Rasbperry Pi 5, A76
+
+#### 3.6.1. Single Line CAS
+
+With the assembly optimisations (load/store):
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           63    61    61
+1     61          62    63
+2     62    61          62
+3     61    62    61
+```
+
+Without the hand-written assembly (commented out from code):
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           73    67    68
+1     68          69    68
+2     67    68          68
+3     68    70    68
+```
+
+#### 3.6.2. Two Line Read/Write Ping/Pong
+
+```text
+$ ./tools/core_latency/core_latency -s2000 -i6000 -breadwrite
+Running Read/Write Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           74    73    73
+1     73          73    73
+2     73    73          72
+3     73    75    73
 ```
