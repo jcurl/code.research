@@ -1,6 +1,5 @@
 #include "core_benchmark.h"
 
-#include <iostream>
 #include <atomic>
 #include <chrono>
 #include <cstdlib>

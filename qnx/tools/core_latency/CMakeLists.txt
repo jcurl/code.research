@@ -1,11 +1,18 @@
 set(BINARY core_latency)
 set(SOURCES core_latency.cpp
     sync_event.h sync_event.cpp
-    thread_pin.h thread_pin.cpp
+    thread_pin.h
     benchmark.h
     core_benchmark.h core_benchmark.cpp
     corerw_benchmark.h corerw_benchmark.cpp
 )
+
+if (QNXNTO)
+    set(SOURCES ${SOURCES} thread_pin_qnx.cpp)
+else()
+    set(SOURCES ${SOURCES} thread_pin.cpp)
+endif()
+
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)

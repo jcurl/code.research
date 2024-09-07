@@ -3,7 +3,6 @@
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
-#include <iostream>
 #include <thread>
 
 #include "sync_event.h"

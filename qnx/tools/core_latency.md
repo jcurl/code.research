@@ -38,8 +38,12 @@ can be tested on other Operating Systems (notably QNX).
     - [3.4.2. Two Line Read/Write Ping/Pong](#342-two-line-readwrite-pingpong)
   - [3.5. Rasbperry Pi 4, A72](#35-rasbperry-pi-4-a72)
     - [3.5.1. Single Line CAS](#351-single-line-cas)
+      - [3.5.1.1. Linux, RPi OS 5.3](#3511-linux-rpi-os-53)
+      - [3.5.1.2. QNX](#3512-qnx)
     - [3.5.2. Two Line Read/Write Ping/Pong](#352-two-line-readwrite-pingpong)
-  - [3.6. Rasbperry Pi 5, A76](#36-rasbperry-pi-5-a76)
+      - [3.5.2.1. Linux, RPi OS 5.3](#3521-linux-rpi-os-53)
+      - [3.5.2.2. QNX](#3522-qnx)
+  - [3.6. Rasbperry Pi 5, A76, RPi OS 5.3](#36-rasbperry-pi-5-a76-rpi-os-53)
     - [3.6.1. Single Line CAS](#361-single-line-cas)
     - [3.6.2. Two Line Read/Write Ping/Pong](#362-two-line-readwrite-pingpong)
 
@@ -795,6 +799,8 @@ Running Read/Write Core Benchmark
 
 #### 3.5.1. Single Line CAS
 
+##### 3.5.1.1. Linux, RPi OS 5.3
+
 With the assembly optimisations (load/store):
 
 ```text
@@ -810,7 +816,43 @@ Running CAS Core Benchmark
 3     84    83    83
 ```
 
+##### 3.5.1.2. QNX
+
+On QNX 7.1.0, the results are more consistent with fewer iterations (increasing
+doesn't change the results, as it did with Linux):
+
+```text
+Running CAS Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           80    80    80
+1     80          81    82
+2     80    81          82
+3     80    81    81
+```
+
+The clock used for the time measurements is the `high_resolution_clock`, which
+is derived from the free-running `ClockCycles()` on QNX and so is accurate.
+
+On QNX 8.0.0, the results are slightly slower and more iterations needed:
+
+```text
+Running CAS Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           83    82    84
+1     84          84    84
+2     84    82          84
+3     82    82    82
+```
+
 #### 3.5.2. Two Line Read/Write Ping/Pong
+
+##### 3.5.2.1. Linux, RPi OS 5.3
 
 ```text
 $ ./tools/core_latency/core_latency -s2000 -i6000 -breadwrite
@@ -840,7 +882,38 @@ Running CAS Core Benchmark
 3     89    87    88
 ```
 
-### 3.6. Rasbperry Pi 5, A76
+##### 3.5.2.2. QNX
+
+On QNX 7.1.0, the results are more consistent with fewer iterations (increasing
+doesn't change the results, as it did with Linux):
+
+```text
+Running Read/Write Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           84    84    84
+1     84          83    84
+2     84    84          84
+3     84    84    83
+```
+
+On QNX 8.0.0:
+
+```text
+Running Read/Write Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           83    80    80
+1     78          81    78
+2     78    78          78
+3     78    80    80
+```
+
+### 3.6. Rasbperry Pi 5, A76, RPi OS 5.3
 
 #### 3.6.1. Single Line CAS
 
