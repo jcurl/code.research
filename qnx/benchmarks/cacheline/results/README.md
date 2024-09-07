@@ -8,7 +8,7 @@
   - [2.2. i3-2120T (Ubuntu 22.04; GCC 11.4.0)](#22-i3-2120t-ubuntu-2204-gcc-1140)
   - [2.3. i7-4930K (Ubuntu 20.04; GCC 9.3.0)](#23-i7-4930k-ubuntu-2004-gcc-930)
   - [2.4. Intel Core2 Duo T7700 (Debian Bullseye; GCC 10.2.1)](#24-intel-core2-duo-t7700-debian-bullseye-gcc-1021)
-  - [2.5. Raspberry Pi4 (RPi OS 5; GCC 12.2.0)](#25-raspberry-pi4-rpi-os-5-gcc-1220)
+  - [2.5. Raspberry Pi4](#25-raspberry-pi4)
   - [2.6. Raspberry Pi5 (RPi OS 5; GCC 12.2.0)](#26-raspberry-pi5-rpi-os-5-gcc-1220)
 
 ## 1. Parsing the Results
@@ -110,15 +110,17 @@ gnuplot -e "INPUT_DATA='intel-t7700_8M.txt'; OUTPUT_IMG='intel-t7700_8M.png'" ./
 
 ![Intel Core2 Duo T7700](./intel-t7700_8M.png)
 
-### 2.5. Raspberry Pi4 (RPi OS 5; GCC 12.2.0)
+### 2.5. Raspberry Pi4
 
 ```sh
 sudo cpupower frequency-set --governor performance
 taskset -c 1 ./benchmarks/cacheline/cacheline_bench --benchmark_out=rpi4_8M.json --benchmark_out_format=json --benchmark_min_time=2s -b8
 
 analyse.py rpi4_8M.json 8 > rpi4_8M.txt
-gnuplot -e "INPUT_DATA='rpi4_8M.txt'; OUTPUT_IMG='rpi4_8M.png'" ./graph.gnuplot
 ```
+
+Data was collected on RPi OS 5.3, QNX 7.1.0 and QNX 8.0.0, plotted on the same
+graph.
 
 ![Raspberry Pi4 A72](./rpi4_8M.png)
 
