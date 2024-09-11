@@ -66,7 +66,10 @@ if (QNXNTO)
     set(BENCHMARK_CXX_LIBRARIES regex)
     # Enabling testing results in compilation errors on QNX cross-chain builds
     set(BENCHMARK_ENABLE_TESTING OFF)
+elseif (APPLE)
+    set(BENCHMARK_ENABLE_TESTING OFF)
 endif()
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/../external/benchmark external/benchmark)
 
 # Must enable CLANG-TIDY *after* google packages, so we don't interfere.
@@ -103,3 +106,4 @@ add_subdirectory(tools)
 
 # Finally write the configuration file dependent on what is found
 # configure_file(${PROJECT_SOURCE_DIR}/src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+

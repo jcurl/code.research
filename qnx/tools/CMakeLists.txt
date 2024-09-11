@@ -1,2 +1,5 @@
 add_subdirectory(time_compare)
-add_subdirectory(core_latency)
+if (NOT APPLE)
+    add_subdirectory(core_latency)
+endif()
+
