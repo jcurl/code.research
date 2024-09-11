@@ -69,7 +69,9 @@ if (QNXNTO)
 elseif (APPLE)
     set(BENCHMARK_ENABLE_TESTING OFF)
 endif()
-
+set(BENCHMARK_ENABLE_INSTALL OFF)
+set(BENCHMARK_ENABLE_DOXYGEN OFF)
+set(BENCHMARK_INSTALL_DOCS OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../external/benchmark external/benchmark)
 
 # Must enable CLANG-TIDY *after* google packages, so we don't interfere.
