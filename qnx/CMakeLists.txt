@@ -8,6 +8,8 @@ include(GNUInstallDirs)
 # - `VERBOSE=1 make` shows that the standard is really being passed on the
 #   command line as you required, so that you have correct ABI. Google Benchmark
 #   is known _not_ to do this.
+# - Update the `target_compile_features` for `benchmark` and `benchmark_main` to
+#   the C++ version required.
 # - Update the `CMAKE_CXX_CLANG_TIDY` below to ensure that the standard is being
 #   used, because CMake assumes that if GCC doesn't need the argument because it
 #   defaults to the C++ standard being requested, then clang-tidy does too
@@ -93,6 +95,11 @@ set(BENCHMARK_INSTALL_DOCS OFF)
 # variable that Google Benchmark compiles with).
 set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../external/benchmark external/benchmark)
+# Force the upgrade to C++17 when building the libraries we link to, ensuring
+# ABI compatibility (our C++17 binaries link to a library also compiled against
+# C++17, not C++14).
+target_compile_features(benchmark PRIVATE cxx_std_17)
+target_compile_features(benchmark_main PRIVATE cxx_std_17)
 
 # Must enable CLANG-TIDY *after* google packages, so we don't interfere.
 option(ENABLE_CLANG_TIDY "Enable checks using Clang-Tidy" ON)
