@@ -5,11 +5,12 @@
   - [1.2. Generating a Graph](#12-generating-a-graph)
 - [2. Results](#2-results)
   - [2.1. i9-13980HX (Ubuntu 22.04; GCC 12.3.0)](#21-i9-13980hx-ubuntu-2204-gcc-1230)
-  - [2.2. i3-2120T (Ubuntu 22.04; GCC 11.4.0)](#22-i3-2120t-ubuntu-2204-gcc-1140)
-  - [2.3. i7-4930K (Ubuntu 20.04; GCC 9.3.0)](#23-i7-4930k-ubuntu-2004-gcc-930)
-  - [2.4. Intel Core2 Duo T7700 (Debian Bullseye; GCC 10.2.1)](#24-intel-core2-duo-t7700-debian-bullseye-gcc-1021)
-  - [2.5. Raspberry Pi4](#25-raspberry-pi4)
-  - [2.6. Raspberry Pi5 (RPi OS 5; GCC 12.2.0)](#26-raspberry-pi5-rpi-os-5-gcc-1220)
+  - [2.2. i7-13850HX (Ubuntu 22.04; Clang 14.0)](#22-i7-13850hx-ubuntu-2204-clang-140)
+  - [2.3. i3-2120T (Ubuntu 22.04; GCC 11.4.0)](#23-i3-2120t-ubuntu-2204-gcc-1140)
+  - [2.4. i7-4930K (Ubuntu 20.04; GCC 9.3.0)](#24-i7-4930k-ubuntu-2004-gcc-930)
+  - [2.5. Intel Core2 Duo T7700 (Debian Bullseye; GCC 10.2.1)](#25-intel-core2-duo-t7700-debian-bullseye-gcc-1021)
+  - [2.6. Raspberry Pi4](#26-raspberry-pi4)
+  - [2.7. Raspberry Pi5 (RPi OS 5; GCC 12.2.0)](#27-raspberry-pi5-rpi-os-5-gcc-1220)
 
 ## 1. Parsing the Results
 
@@ -50,7 +51,7 @@ gnuplot -e "INPUT_DATA='<file>.txt'; OUTPUT_IMG='<file>.png'" ./graph.gnuplot
 ### 2.1. i9-13980HX (Ubuntu 22.04; GCC 12.3.0)
 
 The results here use 256MB arrays, as the L3 cache is 36MB. The graph is flat,
-until after 64MB, and then increases linearly.
+until after 64b, and then increases linearly.
 
 ```sh
 sudo cpupower frequency-set --governor performance
@@ -64,7 +65,24 @@ gnuplot -e "INPUT_DATA='i9-13980hx_256M.txt'; OUTPUT_IMG='i9-13980hx_256M.png'" 
 
 This shows that there is a 64-byte cache-line.
 
-### 2.2. i3-2120T (Ubuntu 22.04; GCC 11.4.0)
+### 2.2. i7-13850HX (Ubuntu 22.04; Clang 14.0)
+
+The results here use 256MB arrays, as the L3 cache is 30MB. The graph is flat,
+until after 64b, and then increases linearly.
+
+```sh
+sudo cpupower frequency-set --governor performance
+taskset -c 0 cacheline_bench --benchmark_out=i7-13850hx_256M.json --benchmark_out_format=json --benchmark_min_time=5s
+
+analyse.py i7-13850hx_256M.json 256 > i7-13850hx_256M.txt
+gnuplot -e "INPUT_DATA='i7-13850hx_256M.txt'; OUTPUT_IMG='i7-13850hx_256M'" ./graph.gnuplot
+```
+
+![i7-13850HX 256MB](./i7-13850hx_256M.png)
+
+This shows that there is a 64-byte cache-line.
+
+### 2.3. i3-2120T (Ubuntu 22.04; GCC 11.4.0)
 
 The results here use 8MB arrays, as the L3 cache is 3MB.
 
@@ -81,7 +99,7 @@ gnuplot -e "INPUT_DATA='i3-2120t_8M.txt'; OUTPUT_IMG='i3-2120t_8M.png'" ./graph.
 From about 64b we see that the copies are slightly slower with a linear increase
 from 64 to 256, and then a sharp increase.
 
-### 2.3. i7-4930K (Ubuntu 20.04; GCC 9.3.0)
+### 2.4. i7-4930K (Ubuntu 20.04; GCC 9.3.0)
 
 The results here use 32MB arrays as the L3 cache is 12MB.
 
@@ -98,7 +116,7 @@ gnuplot -e "INPUT_DATA='i7-4930k_32M.txt'; OUTPUT_IMG='i7-4930k_32M.png'" ./grap
 For this processor, it is more difficult to tell from the results, with a slight
 increase after 64b, but more noticeable after 96b.
 
-### 2.4. Intel Core2 Duo T7700 (Debian Bullseye; GCC 10.2.1)
+### 2.5. Intel Core2 Duo T7700 (Debian Bullseye; GCC 10.2.1)
 
 ```sh
 sudo cpupower frequency-set --governor performance
@@ -110,7 +128,7 @@ gnuplot -e "INPUT_DATA='intel-t7700_8M.txt'; OUTPUT_IMG='intel-t7700_8M.png'" ./
 
 ![Intel Core2 Duo T7700](./intel-t7700_8M.png)
 
-### 2.5. Raspberry Pi4
+### 2.6. Raspberry Pi4
 
 ```sh
 sudo cpupower frequency-set --governor performance
@@ -126,7 +144,7 @@ graph.
 
 The Raspberry Pi 4 has a cache-line of 64b.
 
-### 2.6. Raspberry Pi5 (RPi OS 5; GCC 12.2.0)
+### 2.7. Raspberry Pi5 (RPi OS 5; GCC 12.2.0)
 
 ```sh
 sudo cpupower frequency-set --governor performance
