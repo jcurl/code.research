@@ -3,7 +3,20 @@ project(benchmarks C CXX)
 
 include(GNUInstallDirs)
 
-option(ENABLE_CLANG_TIDY "Enable checks using Clang-Tidy" ON)
+# Set the minimum C++ standard that should be used. When incrementing this,
+# ensure that:
+# - `VERBOSE=1 make` shows that the standard is really being passed on the
+#   command line as you required, so that you have correct ABI. Google Benchmark
+#   is known _not_ to do this.
+# - Update the `CMAKE_CXX_CLANG_TIDY` below to ensure that the standard is being
+#   used, because CMake assumes that if GCC doesn't need the argument because it
+#   defaults to the C++ standard being requested, then clang-tidy does too
+#   (which is not true).
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if (NOT QNXNTO)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(FATAL_ERROR "In-source builds are not allowed")
@@ -60,21 +73,29 @@ set(INSTALL_GMOCK OFF)
 set(INSTALL_GTEST OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../external/googletest external/googletest)
 
-# Google-Benchmark needs `regex`, QNX has this as a separate library.
+# Pull in Google Benchmark. Note, that the current comment in `external` has a
+# `CMakeLists.txt` file that forces usage of C++14, where the tools in this
+# project compile against C++17. This _may_ result in undefined behaviour of the
+# ABI between the two C++ standards are not compatible. I've not found a way to
+# force Google Benchmark to use the C++ version we want (but Google Test will).
+# The variable `BENCHMARK_CXX_STANDARD` is not a cached variable, but this
+# should ideally be set to the value of 17.
 if (QNXNTO)
     # QNX has -lregex needed for linking
     set(BENCHMARK_CXX_LIBRARIES regex)
-    # Enabling testing results in compilation errors on QNX cross-chain builds
-    set(BENCHMARK_ENABLE_TESTING OFF)
-elseif (APPLE)
-    set(BENCHMARK_ENABLE_TESTING OFF)
 endif()
 set(BENCHMARK_ENABLE_INSTALL OFF)
 set(BENCHMARK_ENABLE_DOXYGEN OFF)
 set(BENCHMARK_INSTALL_DOCS OFF)
+# Disable Google Benchmark Testing for: speed; QNX compilation issues; compiler
+# errors (shown when using Clang) because Google Benchmark is only compatible
+# with an older version of Google Test (and we can't override the CXX_STANDARD
+# variable that Google Benchmark compiles with).
+set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../external/benchmark external/benchmark)
 
 # Must enable CLANG-TIDY *after* google packages, so we don't interfere.
+option(ENABLE_CLANG_TIDY "Enable checks using Clang-Tidy" ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
@@ -105,7 +126,3 @@ endif()
 add_subdirectory(benchmarks)
 add_subdirectory(tools)
 #enable_testing()
-
-# Finally write the configuration file dependent on what is found
-# configure_file(${PROJECT_SOURCE_DIR}/src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
-
