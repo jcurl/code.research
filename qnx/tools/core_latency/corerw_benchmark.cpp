@@ -33,9 +33,9 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
 
     std::uint32_t v = PING;
     for (std::uint32_t i = 0; i < iterations_ * samples_; i++) {
-      while (this->ping_.load(std::memory_order::memory_order_acquire) != v) {
+      while (this->ping_.load(std::memory_order_acquire) != v) {
       }
-      this->pong_.store(!v, std::memory_order::memory_order_release);
+      this->pong_.store(!v, std::memory_order_release);
       v = !v;
     }
   });
@@ -49,9 +49,9 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     for (std::uint32_t i = 0; i < samples_; i++) {
       auto start = std::chrono::high_resolution_clock::now();
       for (std::uint32_t j = 0; j < iterations_; j++) {
-        while (this->pong_.load(std::memory_order::memory_order_acquire) != v) {
+        while (this->pong_.load(std::memory_order_acquire) != v) {
         }
-        this->ping_.store(v, std::memory_order::memory_order_release);
+        this->ping_.store(v, std::memory_order_release);
         v = !v;
       }
       auto end = std::chrono::high_resolution_clock::now();
