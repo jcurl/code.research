@@ -1,0 +1,9 @@
+{
+    "Default": "i9-13950hx_Linux/i9-13950hx.json",
+    "TRIM_THRESHOLD=0": "i9-13950hx_Linux/i9-13950hx_threshold0.json",
+    "TOP_PAD=0": "i9-13950hx_Linux/i9-13950hx_pad0.json",
+    "MMAP": "i9-13950hx_Linux/i9-13950hx_mmap.json",
+    "Locked": "i9-13950hx_Linux/i9-13950hx_mlockall.json",
+    "MMAP Locked": "i9-13950hx_Linux/i9-13950hx_mmap_mlockall.json"
+}
+

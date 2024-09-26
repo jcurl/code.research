@@ -1,0 +1,28 @@
+// Available features determined during configuration with CMake
+
+#cmakedefine01 HAVE_MALLOPT
+#cmakedefine01 HAVE_MLOCKALL
+
+// Linux Arena Options
+#cmakedefine01 HAVE_M_ARENA_MAX
+#cmakedefine01 HAVE_M_ARENA_TEST
+#cmakedefine01 HAVE_M_MMAP_MAX
+#cmakedefine01 HAVE_M_MMAP_THRESHOLD
+#cmakedefine01 HAVE_M_MXFAST
+#cmakedefine01 HAVE_M_PERTURB
+#cmakedefine01 HAVE_M_TOP_PAD
+#cmakedefine01 HAVE_M_TRIM_THRESHOLD
+
+// QNX 7.1.0 Arena Options
+#cmakedefine01 HAVE_MALLOC_ARENA_CACHE_FREE_NOW
+#cmakedefine01 HAVE_MALLOC_ARENA_CACHE_MAXBLK
+#cmakedefine01 HAVE_MALLOC_ARENA_CACHE_MAXSZ
+#cmakedefine01 HAVE_MALLOC_ARENA_SIZE
+#cmakedefine01 HAVE_MALLOC_FREE_CHECK
+#cmakedefine01 HAVE_MALLOC_MAX_ALIGNMENT
+#cmakedefine01 HAVE_MALLOC_MEMORY_HOLD
+#cmakedefine01 HAVE_MALLOC_VERIFY
+#cmakedefine01 HAVE_MALLOC_VERIFY_ON
+
+// QNX 8.0.0 Arena Options
+#cmakedefine01 HAVE_M_GRANULARITY
