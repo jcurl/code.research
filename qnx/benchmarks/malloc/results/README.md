@@ -14,7 +14,7 @@ a configuration file you can modify in the notebook, and finally
 - [2. Linux Results](#2-linux-results)
   - [2.1. Conclusions](#21-conclusions)
   - [2.2. Intel i9-13950HX - 32GB (Ubuntu 22.04; GCC 11.4.0; Linux 6.8.0-40-generic; Ubuntu GLIBC 2.35-0ubuntu3.8)](#22-intel-i9-13950hx---32gb-ubuntu-2204-gcc-1140-linux-680-40-generic-ubuntu-glibc-235-0ubuntu38)
-  - [2.3. Raspberry Pi 4 - 2GB (Linux)](#23-raspberry-pi-4---2gb-linux)
+  - [2.3. Raspberry Pi 4 - 8GB (Linux)](#23-raspberry-pi-4---8gb-linux)
   - [2.4. Raspberry Pi 4 - 2GB (QNX 7.1.0)](#24-raspberry-pi-4---2gb-qnx-710)
   - [2.5. Raspberry Pi 4 - 2GB (QNX 8.0.0)](#25-raspberry-pi-4---2gb-qnx-800)
   - [2.6. Raspberry Pi 5 - 8GB (Linux)](#26-raspberry-pi-5---8gb-linux)
@@ -164,7 +164,19 @@ taskset -c 1 malloc_bench --benchmark_out_format=json --benchmark_out=i9-13950hx
 
 ![](./i9-13950hx_Linux/memsetwalk.png)
 
-### 2.3. Raspberry Pi 4 - 2GB (Linux)
+### 2.3. Raspberry Pi 4 - 8GB (Linux)
+
+To ensure that the results are comparable with the QNX Operating System, the
+frequency of the cores were set to 1500MHz by adding the section to
+`/boot/firmware/config.txt`
+
+```toml
+[all]
+arm_freq=1500
+```
+
+Note that Raspberry Pi 4 with smaller memory configurations (e.g. 2GB) will not
+allocate larger chunks of memory with locking.
 
 ![](./rpi4_linux/malloc.png)
 
@@ -176,9 +188,8 @@ taskset -c 1 malloc_bench --benchmark_out_format=json --benchmark_out=i9-13950hx
 
 ### 2.4. Raspberry Pi 4 - 2GB (QNX 7.1.0)
 
-This is using the default configuration of `procnto-smp-instr` without
-superlocking enabled, except for the graph with superlocking that uses the
-option `-mL` on the command line of `procnto-smp-instr`.
+The kernel `procnto-smp-instr` is started with the default configuration, except
+for *Superlocking* which enables the option `-mL`.
 
 ![](./rpi4_qnx710/malloc.png)
 
@@ -190,8 +201,8 @@ option `-mL` on the command line of `procnto-smp-instr`.
 
 ### 2.5. Raspberry Pi 4 - 2GB (QNX 8.0.0)
 
-This is using the default configuration of `procnto-smp-instr` without
-superlocking enabled.
+The kernel `procnto-smp-instr` is started with the default configuration, except
+for *Superlocking* which enables the option `-mL`.
 
 ![](./rpi4_qnx800/malloc.png)
 
