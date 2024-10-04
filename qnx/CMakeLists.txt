@@ -47,6 +47,8 @@ include(ClangFormat)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/qnx" ${CMAKE_MODULE_PATH})
 include(qnx)
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/arm" ${CMAKE_MODULE_PATH})
+
 get_qnx_version()
 
 # So that we can find "config.h"

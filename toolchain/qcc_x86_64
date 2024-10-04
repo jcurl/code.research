@@ -4,6 +4,7 @@
 #
 
 set(CMAKE_SYSTEM_NAME QNX)
+set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
 set(arch gcc_ntox86_64)
 

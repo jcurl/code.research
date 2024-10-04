@@ -16,7 +16,7 @@ class corerw_benchmark : public benchmark {
 
   auto name() const -> std::string override;
 
-  auto init() -> void override;
+  auto init() -> bool override;
 
   auto run(std::uint32_t ping_core, std::uint32_t pong_core)
       -> std::uint32_t override;

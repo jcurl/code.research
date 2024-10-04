@@ -1,0 +1,5 @@
+// Available features determined during configuration with CMake
+
+#cmakedefine01 HAVE_CXX_ARM64_LSE
+#cmakedefine01 HAVE_C_ARM64_LSE
+

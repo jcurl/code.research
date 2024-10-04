@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <thread>
 
+#include "statistics.h"
 #include "sync_event.h"
 #include "thread_pin.h"
 
@@ -12,10 +13,11 @@ auto corerw_benchmark::name() const -> std::string {
   return std::string{"Read/Write"};
 }
 
-auto corerw_benchmark::init() -> void {
+auto corerw_benchmark::init() -> bool {
   // Both must be PING, else there may be race conditions.
   this->ping_ = PING;
   this->pong_ = PING;
+  return true;
 }
 
 auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
@@ -40,7 +42,7 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     }
   });
 
-  std::uint64_t total_time = 0;
+  statistics stats{};
   std::thread ping_thread([&]() {
     thread_pin_core(ping_core);
     flag.wait();
@@ -56,7 +58,7 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
       }
       auto end = std::chrono::high_resolution_clock::now();
       std::uint32_t duration = std::chrono::nanoseconds(end - start).count();
-      total_time += duration;
+      stats.insert(duration);
     }
   });
 
@@ -64,5 +66,5 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
 
   ping_thread.join();
   pong_thread.join();
-  return total_time / iterations_ / samples_ / 2;
+  return stats.median() / iterations_ / 2;
 }

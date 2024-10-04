@@ -15,7 +15,7 @@ class benchmark {
 
   virtual auto name() const -> std::string = 0;
 
-  virtual auto init() -> void{};
+  virtual auto init() -> bool { return true; };
 
   virtual auto run(std::uint32_t ping_core, std::uint32_t pong_core)
       -> std::uint32_t = 0;

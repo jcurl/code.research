@@ -12,45 +12,63 @@ It is inspired by the rust tool [core-to-core
 latency](https://github.com/nviennot/core-to-core-latency) ported to C++ so it
 can be tested on other Operating Systems (notably QNX).
 
-- [1. Usage](#1-usage)
-  - [1.1. CAS Latency Test](#11-cas-latency-test)
-  - [1.2. Load/Store or Read/Write latency test](#12-loadstore-or-readwrite-latency-test)
-- [2. Design](#2-design)
-  - [2.1. CAS Latency](#21-cas-latency)
-    - [2.1.1. Disassembly in C++ for x86\_64](#211-disassembly-in-c-for-x86_64)
-    - [2.1.2. Optimisations for x86\_64](#212-optimisations-for-x86_64)
-    - [2.1.3. Disassembly in C++ for x86 (32-bit)](#213-disassembly-in-c-for-x86-32-bit)
-    - [2.1.4. Disassembly in C++ for AARCH64 (ARM 64-bit)](#214-disassembly-in-c-for-aarch64-arm-64-bit)
-  - [2.2. Load/Store](#22-loadstore)
-    - [2.2.1. Disassembly in C++ for x86\_64](#221-disassembly-in-c-for-x86_64)
-- [3. Results](#3-results)
-  - [3.1. Intel i9-13980HX with P and E cores](#31-intel-i9-13980hx-with-p-and-e-cores)
-    - [3.1.1. Single Line CAS](#311-single-line-cas)
-    - [3.1.2. Two Line Read/Write Ping/Pong](#312-two-line-readwrite-pingpong)
-  - [3.2. Intel 13th Gen Intel(R) Core(TM) i7-13850HX](#32-intel-13th-gen-intelr-coretm-i7-13850hx)
-    - [3.2.1. Single Line CAS](#321-single-line-cas)
-  - [3.3. Two Line Read/Write Ping/Pong](#33-two-line-readwrite-pingpong)
-  - [3.4. Intel i3-2120T](#34-intel-i3-2120t)
-    - [3.4.1. Single Line CAS](#341-single-line-cas)
-    - [3.4.2. Two Line Read/Write Ping/Pong](#342-two-line-readwrite-pingpong)
-  - [3.5. Intel i7-4930k](#35-intel-i7-4930k)
-    - [3.5.1. Single Line CAS](#351-single-line-cas)
-    - [3.5.2. Two Line Read/Write Ping/Pong](#352-two-line-readwrite-pingpong)
-  - [3.6. Intel Core Duo2 T7700](#36-intel-core-duo2-t7700)
-    - [3.6.1. Single Line CAS](#361-single-line-cas)
-    - [3.6.2. Two Line Read/Write Ping/Pong](#362-two-line-readwrite-pingpong)
-  - [3.7. Rasbperry Pi 4, A72](#37-rasbperry-pi-4-a72)
-    - [3.7.1. Single Line CAS](#371-single-line-cas)
-      - [3.7.1.1. Linux, RPi OS 5.3](#3711-linux-rpi-os-53)
-      - [3.7.1.2. QNX](#3712-qnx)
-    - [3.7.2. Two Line Read/Write Ping/Pong](#372-two-line-readwrite-pingpong)
-      - [3.7.2.1. Linux, RPi OS 5.3](#3721-linux-rpi-os-53)
-      - [3.7.2.2. QNX](#3722-qnx)
-  - [3.8. Rasbperry Pi 5, A76, RPi OS 5.3](#38-rasbperry-pi-5-a76-rpi-os-53)
-    - [3.8.1. Single Line CAS](#381-single-line-cas)
-    - [3.8.2. Two Line Read/Write Ping/Pong](#382-two-line-readwrite-pingpong)
+- [1. Compilation](#1-compilation)
+- [2. Usage](#2-usage)
+  - [2.1. CAS Latency Test](#21-cas-latency-test)
+  - [2.2. Load/Store or Read/Write latency test](#22-loadstore-or-readwrite-latency-test)
+- [3. Design](#3-design)
+  - [3.1. CAS Latency](#31-cas-latency)
+    - [3.1.1. Disassembly in C++ for x86\_64](#311-disassembly-in-c-for-x86_64)
+    - [3.1.2. Optimisations for x86\_64](#312-optimisations-for-x86_64)
+    - [3.1.3. Disassembly in C++ for x86 (32-bit)](#313-disassembly-in-c-for-x86-32-bit)
+    - [3.1.4. Disassembly in C++ for AARCH64 (ARM 64-bit, Linux GCC)](#314-disassembly-in-c-for-aarch64-arm-64-bit-linux-gcc)
+    - [3.1.5. Disassembly in C++ for AARCH64 (QNX 7.1.0)](#315-disassembly-in-c-for-aarch64-qnx-710)
+  - [3.2. Load/Store](#32-loadstore)
+    - [3.2.1. Disassembly in C++ for x86\_64](#321-disassembly-in-c-for-x86_64)
+- [4. Results](#4-results)
+  - [4.1. Intel i9-13980HX with P and E cores](#41-intel-i9-13980hx-with-p-and-e-cores)
+    - [4.1.1. Single Line CAS](#411-single-line-cas)
+    - [4.1.2. Two Line Read/Write Ping/Pong](#412-two-line-readwrite-pingpong)
+  - [4.2. Intel 13th Gen Intel(R) Core(TM) i7-13850HX](#42-intel-13th-gen-intelr-coretm-i7-13850hx)
+    - [4.2.1. Single Line CAS](#421-single-line-cas)
+  - [4.3. Two Line Read/Write Ping/Pong](#43-two-line-readwrite-pingpong)
+  - [4.4. Intel i3-2120T](#44-intel-i3-2120t)
+    - [4.4.1. Single Line CAS](#441-single-line-cas)
+    - [4.4.2. Two Line Read/Write Ping/Pong](#442-two-line-readwrite-pingpong)
+  - [4.5. Intel i7-4930k](#45-intel-i7-4930k)
+    - [4.5.1. Single Line CAS](#451-single-line-cas)
+    - [4.5.2. Two Line Read/Write Ping/Pong](#452-two-line-readwrite-pingpong)
+  - [4.6. Intel Core Duo2 T7700](#46-intel-core-duo2-t7700)
+    - [4.6.1. Single Line CAS](#461-single-line-cas)
+    - [4.6.2. Two Line Read/Write Ping/Pong](#462-two-line-readwrite-pingpong)
+  - [4.7. Rasbperry Pi 4, A72](#47-rasbperry-pi-4-a72)
+    - [4.7.1. Single Line CAS](#471-single-line-cas)
+      - [4.7.1.1. Linux, RPi OS 5.3](#4711-linux-rpi-os-53)
+      - [4.7.1.2. QNX](#4712-qnx)
+    - [4.7.2. Two Line Read/Write Ping/Pong](#472-two-line-readwrite-pingpong)
+      - [4.7.2.1. Linux, RPi OS 5.3](#4721-linux-rpi-os-53)
+      - [4.7.2.2. QNX](#4722-qnx)
+  - [4.8. Rasbperry Pi 5, A76, RPi OS 5.3](#48-rasbperry-pi-5-a76-rpi-os-53)
+    - [4.8.1. Single Line CAS](#481-single-line-cas)
+    - [4.8.2. Two Line Read/Write Ping/Pong](#482-two-line-readwrite-pingpong)
 
-## 1. Usage
+## 1. Compilation
+
+On Intel processors, you should likely compile with the architecture appropriate
+to your target:
+
+```sh
+cmake -B . -S .. -DCMAKE_CXX_FLAGS="march=x86-64-v3"
+```
+
+On ARM processors that support LSE (like the Raspberry Pi 5), you should enable
+LSE extensions in the compiler:
+
+```sh
+cmake -B . -S .. -DCMAKE_CXX_FLAGS="march=armv8.1-a+lse"
+```
+
+## 2. Usage
 
 Run `core_latency -?` for information.
 
@@ -66,27 +84,27 @@ To run Load/Store latency tests:
 core_latency -b readwrite
 ```
 
-### 1.1. CAS Latency Test
+### 2.1. CAS Latency Test
 
 This test does a Compare and Swap on two threads. One thread swaps when the
 value is PING (writing PONG), the other thread swaps when the value is PONG
 (writing PING). The reads and writes are on the same cache-line.
 
-### 1.2. Load/Store or Read/Write latency test
+### 2.2. Load/Store or Read/Write latency test
 
 The test has two threads, each swapping state on change, moving data from one
 thread to another thread using atomic load and store operations.
 
-## 2. Design
+## 3. Design
 
-### 2.1. CAS Latency
+### 3.1. CAS Latency
 
 The CAS (Compare and Swap) latency is a ping-pong system where one core waits to
 switch from the value ping to pong, and another core wats to swith from pong to
 ping. This measures the delays in the synchronisation of the caches between the
 two cores.
 
-#### 2.1.1. Disassembly in C++ for x86_64
+#### 3.1.1. Disassembly in C++ for x86_64
 
 Using `objdump -d` to view the assembly for the "ping" thread:
 
@@ -200,7 +218,7 @@ and in Rust:
    25f55:       ff 15 7d e0 0d 00       call   *0xde07d(%rip)        # 103fd8 <_GLOBAL_OFFSET_TABLE_+0xc30>
 ```
 
-#### 2.1.2. Optimisations for x86_64
+#### 3.1.2. Optimisations for x86_64
 
 This results in a hand-written optimised version in assembly.
 
@@ -227,7 +245,7 @@ One must be careful when providing the compiler flags, that additional
 instructions are not added in the for loop. Some compiler options provide `nop`
 which distorts the results.
 
-#### 2.1.3. Disassembly in C++ for x86 (32-bit)
+#### 3.1.3. Disassembly in C++ for x86 (32-bit)
 
 The code generated by GCC 10.2.1 (Debian Bullseye) is a little better, but can
 be optimised slightly.
@@ -268,11 +286,12 @@ the results however.
 By using a hand-written version, the speed of the loop for the CAS swap is
 increased from a latency of about 113ns to 73ns (twice as fast).
 
-#### 2.1.4. Disassembly in C++ for AARCH64 (ARM 64-bit)
+#### 3.1.4. Disassembly in C++ for AARCH64 (ARM 64-bit, Linux GCC)
 
-Disassembling the generated code with `objdump -dCS core_latency` shows a helper
-function is used with two implementations of a compare and swap (a `cas`
-instruction, or an atomic load/store).
+Disassembling the generated code (compiled on Linux Ubuntu with GCC) with
+`objdump -dCS core_latency` shows a helper function is used with two
+implementations of a compare and swap (a `cas` instruction, or an atomic
+load/store).
 
 ```asm
       compare_exchange_strong(__int_type& __i1, __int_type __i2,
@@ -381,7 +400,36 @@ Running CAS Core Benchmark
 There is a small but noticable differences visible, showing that the
 cache coherency takes the majority of the time.
 
-### 2.2. Load/Store
+#### 3.1.5. Disassembly in C++ for AARCH64 (QNX 7.1.0)
+
+QNX 7.1.0 is much better code, but has one instruction that is unnecessary.
+Using `ntoaarch64-objdump -dCS core_latency`. Code was compiled without the
+feature flag LSE.
+
+```asm
+    3a84:       d503201f        nop
+  return __atomic_compare_exchange(&__a->__a_value, __expected, &__value,
+    3a88:       885f7c22        ldxr    w2, [x1]
+    3a8c:       7100045f        cmp     w2, #0x1
+    3a90:       54000061        b.ne    3a9c               // b.any
+    3a94:       88037c3f        stxr    w3, wzr, [x1]
+    3a98:       35ffff83        cbnz    w3, 3a88
+  } while (!flag.compare_exchange_strong(
+    3a9c:       54ffff61        b.ne    3a88
+```
+
+Compiling with `-DCMAKE_CXX_FLAGS="-g -march=armv8.1-a+lse` generates the code:
+
+```asm
+    3a7c:       d503201f        nop
+    3a80:       52800022        mov     w2, #0x1                        // #1
+    3a84:       88a27c3f        cas     w2, wzr, [x1]
+    3a88:       7100045f        cmp     w2, #0x1
+  } while (!flag.compare_exchange_strong(
+    3a8c:       54ffffa1        b.ne    3a80
+```
+
+### 3.2. Load/Store
 
 The basic principle is to have two variables, each in their own cache-line
 separated so a memory access must read from the cache line. This requires an
@@ -423,7 +471,7 @@ If the initial conditions are incorrect:
 - `ping = PING`; `pong = PING`; The two threads are always toggling between each
   other.
 
-#### 2.2.1. Disassembly in C++ for x86_64
+#### 3.2.1. Disassembly in C++ for x86_64
 
 Under Intel, the generated assemlby is very simple due to the memory ordering
 model of Intel processors. Compiling with `-g` option and disassembly shows:
@@ -468,21 +516,21 @@ The value at `0x80(%rax)` is `alignas(128) std::atomic<std::uint32_t> ping_;`.
 This shows the atomic load on Intel is just a `mov` instruction. The core of the
 loop is then a `mov` and a `cmp` instruction at 32-bits.
 
-## 3. Results
+## 4. Results
 
-### 3.1. Intel i9-13980HX with P and E cores
+### 4.1. Intel i9-13980HX with P and E cores
 
 The Intel 13th Gen i9-13980HX has 8 P-Cores with Hyperthreading and 16 E-Cores.
 
-#### 3.1.1. Single Line CAS
+#### 4.1.1. Single Line CAS
 
 The core-to-core for a single line (CAS) latencies.
 
 With Turbo Mode enabled under Linux:
 
 ```txt
-$ ./tools/core_latency/core_latency -i8000
-Running CAS Core Benchmark
+$ ./tools/core_latency/core_latency -bcas -i8000
+Running CAS_x86_64 Core Benchmark
  Samples: 500
  Iterations: 8000
 
@@ -532,7 +580,8 @@ which is the pong, they should have the same values. The time is the average of
 all the samples, and is half the time of a ping-pong-ping.
 
 ```txt
-Running Core Benchmark
+$ ./tools/core_latency/core_latency -bcas
+Running CAS_x86_64 Core Benchmark
  Samples: 500
  Iterations: 4000
 
@@ -642,7 +691,7 @@ It shows similar results:
 - Slightly faster speeds on cores 0-15 with cores 16-19
 - Cores 16-19 appear to be faster also
 
-#### 3.1.2. Two Line Read/Write Ping/Pong
+#### 4.1.2. Two Line Read/Write Ping/Pong
 
 With Turboboost enabled:
 
@@ -778,11 +827,11 @@ Num samples: 300
     Mean latency: 189.9ns
 ```
 
-### 3.2. Intel 13th Gen Intel(R) Core(TM) i7-13850HX
+### 4.2. Intel 13th Gen Intel(R) Core(TM) i7-13850HX
 
 The Intel 13th Gen i7-13850HX has 8 P-Cores with Hyperthreading and 12 E-Cores.
 
-#### 3.2.1. Single Line CAS
+#### 4.2.1. Single Line CAS
 
 With turbo mode disabled:
 
@@ -791,8 +840,8 @@ echo "1" > /sys/devices/system/cpu/intel_pstate/no_turbo
 ```
 
 ```txt
-$ ./tools/core_latency/core_latency
-Running CAS Core Benchmark
+$ ./tools/core_latency/core_latency -b cas
+Running CAS_x86_64 Core Benchmark
  Samples: 500
  Iterations: 4000
 
@@ -830,8 +879,8 @@ Running CAS Core Benchmark
 With Turbo Mode Enabled shows considerably faster results:
 
 ```txt
-$ ./tools/core_latency/core_latency -i 6000 -s 500
-Running CAS Core Benchmark
+$ ./tools/core_latency/core_latency -b cas -i 6000 -s 500
+Running CAS_x86_64 Core Benchmark
  Samples: 500
  Iterations: 6000
 
@@ -866,7 +915,7 @@ Running CAS Core Benchmark
 27    38    38    37    37    37    37    37    37    29    29    34    34    34    34    34    34    47    47    47    47    40    43    47    45    53    53    53
 ```
 
-### 3.3. Two Line Read/Write Ping/Pong
+### 4.3. Two Line Read/Write Ping/Pong
 
 With turbo mode disabled:
 
@@ -946,12 +995,12 @@ Running Read/Write Core Benchmark
 27    72    73    71    69    75    67    72    63    64    64    66    66    67    67    76    67    103   103   103   103   110   103   103   102   68    67    66
 ```
 
-### 3.4. Intel i3-2120T
+### 4.4. Intel i3-2120T
 
-#### 3.4.1. Single Line CAS
+#### 4.4.1. Single Line CAS
 
 ```text
-Running CAS Core Benchmark
+Running CAS_x86_64 Core Benchmark
  Samples: 500
  Iterations: 4000
 
@@ -962,7 +1011,7 @@ Running CAS Core Benchmark
 3     38    12    38
 ```
 
-#### 3.4.2. Two Line Read/Write Ping/Pong
+#### 4.4.2. Two Line Read/Write Ping/Pong
 
 ```text
 Running Read/Write Core Benchmark
@@ -976,14 +1025,14 @@ Running Read/Write Core Benchmark
 3     51    19    52
 ```
 
-### 3.5. Intel i7-4930k
+### 4.5. Intel i7-4930k
 
-#### 3.5.1. Single Line CAS
+#### 4.5.1. Single Line CAS
 
 Running on Linux Ubuntu 20,04 with Kernel 5.15.0-84-generic #93~20.04.1-Ubuntu.
 
 ```text
-Running CAS Core Benchmark
+Running CAS_x86_64 Core Benchmark
  Samples: 500
  Iterations: 4000
 
@@ -1005,7 +1054,7 @@ Running CAS Core Benchmark
 It can be seen that the machine has hyperthreading enabled, with pairs 0/6, 1/7,
 2/8, 3/9, 4/10 and 5/11.
 
-#### 3.5.2. Two Line Read/Write Ping/Pong
+#### 4.5.2. Two Line Read/Write Ping/Pong
 
 ```text
 Running Read/Write Core Benchmark
@@ -1026,14 +1075,14 @@ Running Read/Write Core Benchmark
 10    49    54    54    53    13    51    48    54    54    53          51
 ```
 
-### 3.6. Intel Core Duo2 T7700
+### 4.6. Intel Core Duo2 T7700
 
-#### 3.6.1. Single Line CAS
+#### 4.6.1. Single Line CAS
 
 With the hand-written optimisations:
 
 ```text
-Running CAS Core Benchmark
+Running CAS_x86 Core Benchmark
  Samples: 500
  Iterations: 4000
 
@@ -1044,7 +1093,7 @@ Running CAS Core Benchmark
 
 Using the compiler generated code results in latences of approximately 130ns.
 
-#### 3.6.2. Two Line Read/Write Ping/Pong
+#### 4.6.2. Two Line Read/Write Ping/Pong
 
 ```text
 Running Read/Write Core Benchmark
@@ -1056,94 +1105,125 @@ Running Read/Write Core Benchmark
 1     110
 ```
 
-### 3.7. Rasbperry Pi 4, A72
+### 4.7. Rasbperry Pi 4, A72
 
-#### 3.7.1. Single Line CAS
+#### 4.7.1. Single Line CAS
 
-##### 3.7.1.1. Linux, RPi OS 5.3
+##### 4.7.1.1. Linux, RPi OS 5.3
 
 With the assembly optimisations (load/store):
 
 ```text
-$ ./tools/core_latency/core_latency -s2000 -i6000
-Running CAS Core Benchmark
- Samples: 2000
- Iterations: 6000
+$ ./tools/core_latency/core_latency -bllsc
+Running CAS_arm64 Core Benchmark
+ Samples: 500
+ Iterations: 4000
 
       0     1     2     3
-0           85    83    82
-1     84          83    85
-2     84    84          84
-3     84    83    83
+0           87    87    87
+1     87          87    87
+2     87    87          87
+3     87    87    87
 ```
 
-##### 3.7.1.2. QNX
-
-On QNX 7.1.0, the results are more consistent with fewer iterations (increasing
-doesn't change the results, as it did with Linux):
+or with GCC implementation:
 
 ```text
+$ core_latency -bdefault
 Running CAS Core Benchmark
  Samples: 500
  Iterations: 4000
 
       0     1     2     3
-0           80    80    80
-1     80          81    82
-2     80    81          82
-3     80    81    81
+0           87    88    87
+1     87          88    88
+2     88    88          88
+3     88    88    88
+```
+
+##### 4.7.1.2. QNX
+
+On QNX 7.1.0, the results are more consistent with fewer iterations (increasing
+doesn't change the results, as it did with Linux):
+
+```text
+Running CAS_arm64 Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           89    89    89
+1     89          88    88
+2     89    88          88
+3     89    88    88
+```
+
+Using the compiler generated code is very fast, indicating well optimised code.
+
+```text
+# ./core_latency -s500 -i4000
+Running CAS Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           87    87    87
+1     86          87    87
+2     87    87          87
+3     86    87    87
 ```
 
 The clock used for the time measurements is the `high_resolution_clock`, which
 is derived from the free-running `ClockCycles()` on QNX and so is accurate.
 
-On QNX 8.0.0, the results are slightly slower and more iterations needed:
+On QNX 8.0.0, the results are about the same
 
 ```text
-Running CAS Core Benchmark
- Samples: 2000
- Iterations: 6000
+# ./core_latency -bllsc
+Running CAS_arm64 Core Benchmark
+ Samples: 500
+ Iterations: 4000
 
       0     1     2     3
-0           83    82    84
-1     84          84    84
-2     84    82          84
-3     82    82    82
+0           86    86    87
+1     86          86    86
+2     86    86          86
+3     86    86    86
 ```
 
-#### 3.7.2. Two Line Read/Write Ping/Pong
-
-##### 3.7.2.1. Linux, RPi OS 5.3
+and with the compiler generated code:
 
 ```text
-$ ./tools/core_latency/core_latency -s2000 -i6000 -breadwrite
+# ./core_latency
+Running CAS Core Benchmark
+ Samples: 500
+ Iterations: 4000
+
+      0     1     2     3
+0           87    86    87
+1     86          87    87
+2     87    87          87
+3     87    87    87
+```
+
+#### 4.7.2. Two Line Read/Write Ping/Pong
+
+##### 4.7.2.1. Linux, RPi OS 5.3
+
+```text
+$ core_latency -i6000 -s2000 -breadwrite
 Running Read/Write Core Benchmark
  Samples: 2000
  Iterations: 6000
 
       0     1     2     3
-0           85    83    84
+0           83    84    83
 1     83          83    83
-2     83    83          84
+2     83    83          83
 3     83    83    84
 ```
 
-Without the hand-written assembly (commented out from code):
-
-```text
-$ ./tools/core_latency/core_latency -s2000 -i6000
-Running CAS Core Benchmark
- Samples: 2000
- Iterations: 6000
-
-      0     1     2     3
-0           88    85    86
-1     86          86    88
-2     88    89          86
-3     89    87    88
-```
-
-##### 3.7.2.2. QNX
+##### 4.7.2.2. QNX
 
 On QNX 7.1.0, the results are more consistent with fewer iterations (increasing
 doesn't change the results, as it did with Linux):
@@ -1174,51 +1254,67 @@ Running Read/Write Core Benchmark
 3     78    80    80
 ```
 
-### 3.8. Rasbperry Pi 5, A76, RPi OS 5.3
+### 4.8. Rasbperry Pi 5, A76, RPi OS 5.3
 
-#### 3.8.1. Single Line CAS
+#### 4.8.1. Single Line CAS
 
 With the assembly optimisations (load/store):
 
 ```text
-$ ./tools/core_latency/core_latency -s2000 -i6000
+$ core_latency -s2000 -i6000 -bcas
+Running CAS_arm64 Core Benchmark
+ Samples: 2000
+ Iterations: 6000
+
+      0     1     2     3
+0           60    60    60
+1     60          60    60
+2     60    60          60
+3     60    60    60
+```
+
+Using the C++ compiler without hand-written code.
+
+```text
+$ core_latency -s2000 -i6000 -bdefault
 Running CAS Core Benchmark
  Samples: 2000
  Iterations: 6000
 
       0     1     2     3
-0           63    61    61
-1     61          62    63
-2     62    61          62
-3     61    62    61
+0           28    28    28
+1     28          28    28
+2     28    28          28
+3     28    28    28
 ```
 
-Without the hand-written assembly (commented out from code):
+This shows clearly that it is using the LSE instruction set. We can compare with
+hand-written assembly using the ARM `cas` instruction.
 
 ```text
-$ ./tools/core_latency/core_latency -s2000 -i6000
-Running CAS Core Benchmark
+$ core_latency -s2000 -i6000 -blse
+Running CAS_arm64_lse Core Benchmark
  Samples: 2000
  Iterations: 6000
 
       0     1     2     3
-0           73    67    68
-1     68          69    68
-2     67    68          68
-3     68    70    68
+0           28    28    28
+1     28          28    28
+2     28    28          28
+3     28    28    28
 ```
 
-#### 3.8.2. Two Line Read/Write Ping/Pong
+#### 4.8.2. Two Line Read/Write Ping/Pong
 
 ```text
-$ ./tools/core_latency/core_latency -s2000 -i6000 -breadwrite
+$ core_latency -s2000 -i6000 -breadwrite
 Running Read/Write Core Benchmark
  Samples: 2000
  Iterations: 6000
 
       0     1     2     3
-0           74    73    73
-1     73          73    73
-2     73    73          72
-3     73    75    73
+0           70    70    70
+1     70          70    70
+2     69    70          70
+3     70    70    69
 ```

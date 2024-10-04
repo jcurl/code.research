@@ -41,6 +41,12 @@ Measure the cache-to-cache latency between cores.
 
 See [core_latency.md](./tools/core_latency.md)
 
+To enable LSE for ARM, you must add the appropriate compiler options, e.g.
+
+```sh
+cmake -B . -S .. -DCMAKE_CXX_FLAGS="armv8.1-a+lse"
+```
+
 ## Cache Line
 
 Estimate the cache line size by measuring the time it takes to do strided
