@@ -13,10 +13,6 @@ set(CMAKE_C_COMPILER_TARGET ${arch})
 set(CMAKE_CXX_COMPILER q++)
 set(CMAKE_CXX_COMPILER_TARGET ${arch})
 
-# This causes problems with an error like:
-#  cc: unknown option: '--sysroot=/opt/qnx/qos/target/qnx7'
-#set(CMAKE_SYSROOT $ENV{QNX_TARGET})
-
 # Disable the usage of clang-tidy for this toolchain, that will otherwise fail with
 # errors like:
 #

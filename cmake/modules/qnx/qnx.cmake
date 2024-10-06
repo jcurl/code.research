@@ -1,9 +1,19 @@
 set(QNX_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+# Include this file as soon as possible after setting the top level project.
+# This will run the function `get_qnx_version` when included.
+
 # get_qnx_version()
 #
 # On output, sets the variable HAVE_QNX_VERSION to the version in the header
 # files as the Version * 100 (e.g. 7.1.0 is 710, 8.0.0 is 800).
+#
+# On QNX 8.0 and later, the option `-lang-c++` produces a warning that this
+# option is deprecated. The option `-xc++` should be used instead. The variable
+# `CMAKE_CXX_COMPILE_OBJECT` and `CMAKE_CXX_LINK_EXECUTABLE` is patched to
+# change the option for QNX 8.0.0 and later. Therefore, this function should run
+# at the TOP LEVEL of your project and not in a function, to ensure those
+# variables are in scope.
 #
 # Tested on QNX 7.1.0 and 8.0.0.
 function(get_qnx_version_try_compile_c_cxx result)
@@ -60,4 +70,16 @@ function(get_qnx_version)
     else()
         message(STATUS "Checking for QNX - Found version ${HAVE_QNX_VERSION}")
     endif()
+
+    if(HAVE_QNX_VERSION GREATER_EQUAL 800)
+        # In QNX 8.0 and later, the `-lang-c++` option is deprecated.
+        # Unfortunately, it doesn't appear this can be set in the toolchain file
+        # where it should really be.
+        string(REPLACE "<CMAKE_CXX_COMPILER> -lang-c++" "<CMAKE_CXX_COMPILER> -xc++" CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+        set(CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT} PARENT_SCOPE)
+        string(REPLACE "<CMAKE_CXX_COMPILER> -lang-c++" "<CMAKE_CXX_COMPILER>" CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE})
+        set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE} PARENT_SCOPE)
+    endif()
 endfunction(get_qnx_version)
+
+get_qnx_version()

@@ -49,8 +49,6 @@ include(qnx)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/arm" ${CMAKE_MODULE_PATH})
 
-get_qnx_version()
-
 # So that we can find "config.h"
 include_directories(${PROJECT_BINARY_DIR})
 
