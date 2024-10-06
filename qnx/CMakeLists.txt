@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(benchmarks C CXX)
+project(benchmarks CXX)
 
 include(GNUInstallDirs)
 
