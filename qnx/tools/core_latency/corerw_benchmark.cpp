@@ -2,12 +2,13 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <thread>
 
 #include "statistics.h"
 #include "sync_event.h"
-#include "thread_pin.h"
+#include "ubench/thread.h"
 
 auto corerw_benchmark::name() const -> std::string {
   return std::string{"Read/Write"};
@@ -30,7 +31,10 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   sync_event flag{};
 
   std::thread pong_thread([&]() {
-    thread_pin_core(pong_core);
+    if (!ubench::thread::pin_core(pong_core)) {
+      perror("Could not pin 'pong' core");
+      std::abort();
+    }
     flag.wait();
 
     std::uint32_t v = PING;
@@ -44,7 +48,10 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
 
   statistics stats{};
   std::thread ping_thread([&]() {
-    thread_pin_core(ping_core);
+    if (!ubench::thread::pin_core(ping_core)) {
+      perror("Could not pin 'ping' core");
+      std::abort();
+    }
     flag.wait();
 
     std::uint32_t v = PONG;

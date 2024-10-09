@@ -132,6 +132,9 @@ else()
     message(STATUS "LLVM clang-tidy is disabled with -DENABLE_CLANG_TIDY=off")
 endif()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libubench/include)
+add_subdirectory(lib)
+
 add_subdirectory(benchmarks)
 add_subdirectory(tools)
 #enable_testing()

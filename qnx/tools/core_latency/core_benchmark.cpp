@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <thread>
 
@@ -9,7 +10,7 @@
 #include "config.h"
 #include "statistics.h"
 #include "sync_event.h"
-#include "thread_pin.h"
+#include "ubench/thread.h"
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define UNUSED(expr) \
@@ -187,7 +188,10 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   sync_event flag{};
 
   std::thread ping_thread([&]() {
-    thread_pin_core(ping_core);
+    if (!ubench::thread::pin_core(ping_core)) {
+      perror("Could not pin 'ping' core");
+      std::abort();
+    }
     flag.wait();
 
     std::size_t l = static_cast<std::size_t>(iterations_) * samples_;
@@ -195,7 +199,10 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   });
 
   std::thread pong_thread([&]() {
-    thread_pin_core(pong_core);
+    if (!ubench::thread::pin_core(pong_core)) {
+      perror("Could not pin 'pong' core");
+      std::abort();
+    }
     flag.wait();
 
     for (std::uint32_t i = 0; i < samples_; i++) {

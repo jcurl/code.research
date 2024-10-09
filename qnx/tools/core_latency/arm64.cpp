@@ -1,4 +1,5 @@
 #include "arm64.h"
+
 #include "config.h"
 
 #if defined(__aarch64__) && HAVE_CXX_ARM64_LSE
