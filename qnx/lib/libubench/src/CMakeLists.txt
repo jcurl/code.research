@@ -4,6 +4,7 @@ include(CMakePushCheckState)
 set(LIBRARY ubench)
 set(SOURCES
     ../include/ubench/thread.h
+    ../include/ubench/clock.h
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 
@@ -15,21 +16,29 @@ list(APPEND CMAKE_REQUIRED_LIBRARIES pthread)
 check_symbol_exists(pthread_setaffinity_np pthread.h HAVE_PTHREAD_SETAFFINITY_NP)
 cmake_reset_check_state()
 
-# We need to be able to set the affinity of a thread to a particular CPU
-if(HAVE_PTHREAD_SETAFFINITY_NP)
-    add_compile_definitions(_GNU_SOURCE)
-    target_sources(${LIBRARY} PRIVATE thread_pin.cpp)
+if (QNXNTO)
+    target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
+    target_sources(${LIBRARY} PRIVATE idle_clock_qnx.cpp)
 else()
-    # QNX doesn't have `pthread_getaffinity_np`, so we need to use `ThreadCtl`.
-    check_symbol_exists(ThreadCtl "sys/neutrino.h" HAVE_NTO_THREADCTL)
-    if(HAVE_NTO_THREADCTL)
-        target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
+    # We need to be able to set the affinity of a thread to a particular CPU
+    if(HAVE_PTHREAD_SETAFFINITY_NP)
+        add_compile_definitions(_GNU_SOURCE)
+        target_sources(${LIBRARY} PRIVATE thread_pin.cpp)
     else()
         target_sources(${LIBRARY} PRIVATE thread_pin_null.cpp)
         message(WARNING "Can't a way to pin threads to a core")
     endif()
+
+    # TODO: If the tests fail, we need to use "null"
+    string(TOUPPER "${CMAKE_SYSTEM_NAME}" upper_CMAKE_SYSTEM_NAME)
+    if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
+        target_sources(${LIBRARY} PRIVATE idle_clock_linux.cpp)
+    else()
+        target_sources(${LIBRARY} PRIVATE idle_clock_null.cpp)
+    endif()
 endif()
 
+# We need to provide clocks based on the Operating System
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 
 if(IS_DEBUG)
