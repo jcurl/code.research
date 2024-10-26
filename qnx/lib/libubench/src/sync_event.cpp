@@ -1,4 +1,6 @@
-#include "sync_event.h"
+#include "ubench/thread.h"
+
+namespace ubench::thread {
 
 void sync_event::set() {
   {
@@ -17,3 +19,5 @@ void sync_event::wait() {
   std::unique_lock lock(mutex_);
   cond_var_.wait(lock, [this]() { return flag_; });
 }
+
+}  // namespace ubench::thread

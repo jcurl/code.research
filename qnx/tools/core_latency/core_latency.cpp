@@ -13,7 +13,7 @@
 #include "config.h"
 #include "core_benchmark.h"
 #include "corerw_benchmark.h"
-#include "sync_event.h"
+#include "ubench/thread.h"
 
 static const std::unordered_map<std::string_view, cas_type>
     supported_cas_benchmarks = {

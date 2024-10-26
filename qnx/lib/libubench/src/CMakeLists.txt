@@ -5,6 +5,7 @@ set(LIBRARY ubench)
 set(SOURCES
     ../include/ubench/thread.h
     ../include/ubench/clock.h
+    sync_event.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 

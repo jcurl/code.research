@@ -7,7 +7,6 @@
 #include <thread>
 
 #include "statistics.h"
-#include "sync_event.h"
 #include "ubench/thread.h"
 
 auto corerw_benchmark::name() const -> std::string {
@@ -28,7 +27,7 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
       ping_core == pong_core) {
     std::abort();
   }
-  sync_event flag{};
+  ubench::thread::sync_event flag{};
 
   std::thread pong_thread([&]() {
     if (!ubench::thread::pin_core(pong_core)) {

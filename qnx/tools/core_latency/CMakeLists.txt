@@ -2,7 +2,6 @@ include(arm64_has_lse)
 
 set(BINARY core_latency)
 set(SOURCES core_latency.cpp
-    sync_event.h sync_event.cpp
     benchmark.h
     core_benchmark.h core_benchmark.cpp
     corerw_benchmark.h corerw_benchmark.cpp
