@@ -40,6 +40,26 @@ struct idle_clock {
   static auto is_available() noexcept -> bool;
 };
 
+struct process_clock {
+  typedef std::chrono::nanoseconds duration;
+  typedef duration::rep rep;
+  typedef duration::period period;
+  typedef std::chrono::time_point<process_clock, duration> time_point;
+  static constexpr const bool is_steady = true;
+
+  /// @brief Get the total idle time (of all CPUs) at the time of invocation.
+  ///
+  /// @return A time_point that can be used for comparison with other
+  /// invocations of idle time.
+  static auto now() noexcept -> time_point;
+
+  /// @brief Test if the implementation provides meaningful results.
+  ///
+  /// @return true if implemented and can be used; false if the values always
+  /// return zero idle time.
+  static auto is_available() noexcept -> bool;
+};
+
 }  // namespace ubench::chrono
 
 #endif
