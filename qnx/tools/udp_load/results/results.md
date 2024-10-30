@@ -1,0 +1,135 @@
+# Results of Rasbperry Pi4 <!-- omit in toc -->
+
+- [1. Capture](#1-capture)
+  - [1.1. Packet Sizes](#11-packet-sizes)
+- [2. Results](#2-results)
+  - [2.1. Raspberry Pi 4](#21-raspberry-pi-4)
+    - [2.1.1. Linux](#211-linux)
+    - [2.1.2. QNX 7.1 (io-pkt)](#212-qnx-71-io-pkt)
+    - [2.1.3. QNX 8.0 (io-sock)](#213-qnx-80-io-sock)
+  - [2.2. Raspberry Pi 5](#22-raspberry-pi-5)
+
+## 1. Capture
+
+When running the measurements, ensure that no unnecessary processes are running,
+that the background CPU load is 0%. Do not use the graphics subsystem,
+preferring instead to run the tests via a SSH or Serial console instead, as
+graphics sessions can cause CPU spikes in the background.
+
+The best way is to use a script similar to the `contrib/linux_test.sh` that runs
+the program multiple times for a fixed set of cores. Increasing the number of
+cores may allow higher bandwidth throughput if the underlying network stack has
+no serialisation of the data.
+
+A text file of the output is captured, and then given to the [Jupyter Notebook
+graph.ipynb](./graph.ipynb) that can be tweaked to generate the outputs for
+analysis.
+
+### 1.1. Packet Sizes
+
+The packet size is set to 1472 bytes, sent over an untagged network, so that the
+data sent out on the wire is maximised. Typical CPU load of a system should be
+dependent on the number of packets in the system (and not the packet size).
+
+| Frame Part              | Minimum Frame Size | Maximum Frame Size |
+| ----------------------- | ------------------ | ------------------ |
+| Interframe Gap (9.6ms)  | 12 bytes           | 12 bytes           |
+| MAC Preamble (+SFD)     | 8 bytes            | 8 bytes            |
+| MAC Destination Address | 6 bytes            | 6 bytes            |
+| MAC Source Address      | 6 bytes            | 6 bytes            |
+| MAC Type                | 2 bytes            | 2 bytes            |
+| Payload                 | 46 bytes           | 1500 bytes         |
+| CRC                     | 4 bytes            | 4 bytes            |
+| *TOTAL*                 | 84 bytes           | 1538 bytes         |
+
+Thus, the maximum number of packets that physically can be sent to saturate a
+1Gbps link is 81,274 packets/sec (1,000,000,000 / (1538 * 8)).
+
+## 2. Results
+
+### 2.1. Raspberry Pi 4
+
+All tests were run on a Raspberry Pi 4, 8GB model with a 1Gbps link to a switch
+using the integrated controller. The frequency of the RPi4 is set to 1500MHz so
+that comparisons between Operating Systems are meaningful (newer updates
+overclock the Raspberry Pi).
+
+Tests were done with the Ethernet controller and the Loopback device (to see the
+overhead the device driver introduces as well).
+
+#### 2.1.1. Linux
+
+![](./images/rpi4_rpios_sendto_eth.png)
+
+Shows that single-threaded performance is the best. Real-world applications with
+multiple processes/threads sending data have problems with the driver. The
+application and kernel takes 35% CPU, where the system has an additional 20% CPU
+overhead. This is due to the driver being tested, as when testing with Loopback,
+this overhead is not present.
+
+The bandwidth limit resulting in about 55% is approximately 540Mbps.
+
+![](./images/rpi4_rpios_sendto_lo.png)
+
+The network hardware is the limiting factor, where in software only, 1Gbps can
+be reached with about 105% CPU (2 threads).
+
+#### 2.1.2. QNX 7.1 (io-pkt)
+
+![](./images/rpi4_qnx71_sendto_eth.png)
+
+Under QNX 7.1, the bandwidth limits to 450Mbps at 140% CPU. As the number of
+threads increase, the bandwidth and CPU only marginally increase. This can be
+explained by the single-threaded implementation of `io-pkt` (the extra bandwidth
+achieved from 1 to 2 threads can be explained by the overhead in the message
+passing system and the resource manager implementation). Remember, that there
+are two context switches per blocking `sendto` call in this particular test.
+
+On the graph on the left, most of the overhead is in the `io-pkt` itself. The
+application running has higher CPU for a single threaded sender (with less
+throughput indicating it is CPU bound) where with two threads most time is
+waiting on `io-pkt`.
+
+For the same bandwidth, QNX requires 3x more CPU.
+
+The behaviour of networking timing is more predictable (given sufficient CPU
+resources).
+
+![](./images/rpi4_qnx71_sendto_lo.png)
+
+When testing the loopback device, we see that it's possible to achieve 1Gbps
+under QNX with idle time to spare, indicating a lot of work being done by the
+driver.
+
+Again, the hardware is the limiting factor, with the loopback device achieving
+similar performance to Linux of 1Gbps with 102% CPU.
+
+#### 2.1.3. QNX 8.0 (io-sock)
+
+![](./images/rpi4_qnx8_sendto_eth.png)
+
+With QNX8 and the introduced `io-sock`, multithreaded behaviour can be observed
+with ability to reach with 2 threads 890Mbps at 250% CPU, or slightly better
+(but not maximum performance) of 3 threads 902Mbps with 320% CPU.
+
+The CPU overhead of io-sock in a multithreaded environment is significantly
+higher for the same bandwidth.
+
+Comparing a single thread of `io-pkt` with a single thread of `io-sock` is
+similar performance (QNX 7.1 at 140% CPU, QNX 8 at 135% CPU for slightly lower
+bandwidth). But to now double the bandwith, more than double the CPU is
+required with 2 threads or more.
+
+![](./images/rpi4_qnx8_sendto_lo.png)
+
+The single threaded performance of `io-sock` with the loopback is half the
+performance of `io-pkt`.
+
+### 2.2. Raspberry Pi 5
+
+The Raspberry Pi 5 is a significant upgrade for network performance over the
+Rasbperry Pi 4, comparing the two Linux implementations.
+
+![](./images/rpi5_rpios_sendto_eth.png)
+
+![](./images/rpi5_rpios_sendto_lo.png)
