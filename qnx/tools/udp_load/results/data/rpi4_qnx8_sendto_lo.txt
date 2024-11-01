@@ -1,6 +1,6 @@
-$ ./qnx_test_lo.sh 
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -13,14 +13,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 16.40%
-Process CPU Busy: 1.34%
-Time in send: 3322ms
-Time in sleep: 26683ms
+Total CPU Busy: 16.66%
+Process CPU Busy: 1.40%
+Time in send: 3382ms
+Time in sleep: 26623ms
 Packets Sent: 150025
 Packets Expected: 150025
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -33,14 +34,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 32.38%
-Process CPU Busy: 2.63%
-Time in send: 6666ms
-Time in sleep: 23339ms
+Total CPU Busy: 32.75%
+Process CPU Busy: 2.70%
+Time in send: 6747ms
+Time in sleep: 23258ms
 Packets Sent: 300100
 Packets Expected: 300100
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -52,15 +54,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 48.48%
-Process CPU Busy: 4.05%
-Time in send: 10029ms
-Time in sleep: 19977ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 48.78%
+Process CPU Busy: 4.02%
+Time in send: 10071ms
+Time in sleep: 19935ms
 Packets Sent: 450150
 Packets Expected: 450150
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -72,15 +75,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 64.26%
-Process CPU Busy: 5.11%
-Time in send: 13254ms
-Time in sleep: 16748ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 64.94%
+Process CPU Busy: 5.35%
+Time in send: 13441ms
+Time in sleep: 16560ms
 Packets Sent: 600100
 Packets Expected: 600100
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -92,15 +96,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 80.35%
-Process CPU Busy: 6.46%
-Time in send: 16634ms
-Time in sleep: 13370ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 80.91%
+Process CPU Busy: 6.59%
+Time in send: 16763ms
+Time in sleep: 13239ms
 Packets Sent: 750125
 Packets Expected: 750125
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -113,14 +118,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 95.52%
-Process CPU Busy: 7.59%
-Time in send: 19737ms
-Time in sleep: 10267ms
+Total CPU Busy: 97.29%
+Process CPU Busy: 8.11%
+Time in send: 20184ms
+Time in sleep: 9817ms
 Packets Sent: 900150
 Packets Expected: 900150
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -133,14 +139,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 111.79%
-Process CPU Busy: 9.03%
-Time in send: 23140ms
-Time in sleep: 6863ms
+Total CPU Busy: 112.54%
+Process CPU Busy: 9.14%
+Time in send: 23329ms
+Time in sleep: 6672ms
 Packets Sent: 1050175
 Packets Expected: 1050175
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -152,15 +159,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 127.70%
-Process CPU Busy: 10.45%
-Time in send: 26459ms
-Time in sleep: 3541ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 129.63%
+Process CPU Busy: 10.81%
+Time in send: 26959ms
+Time in sleep: 3044ms
 Packets Sent: 1200200
 Packets Expected: 1200200
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -172,15 +180,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 143.25%
-Process CPU Busy: 11.56%
-Time in send: 29671ms
-Time in sleep: 327ms
-Packets Sent: 1350000
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 144.52%
+Process CPU Busy: 11.82%
+Time in send: 29994ms
+Time in sleep: 4ms
+Packets Sent: 1348875
 Packets Expected: 1350000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -192,15 +201,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 144.71%
-Process CPU Busy: 11.51%
-Time in send: 30000ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 144.42%
+Process CPU Busy: 11.86%
+Time in send: 29999ms
 Time in sleep: 0ms
-Packets Sent: 1357250
+Packets Sent: 1342750
 Packets Expected: 1500000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -213,14 +223,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 145.11%
-Process CPU Busy: 11.58%
+Total CPU Busy: 144.39%
+Process CPU Busy: 11.88%
 Time in send: 30000ms
 Time in sleep: 0ms
-Packets Sent: 1362075
+Packets Sent: 1344475
 Packets Expected: 1650000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -232,15 +243,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 144.72%
-Process CPU Busy: 11.84%
-Time in send: 29999ms
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 144.32%
+Process CPU Busy: 12.00%
+Time in send: 30001ms
 Time in sleep: 0ms
-Packets Sent: 1351800
+Packets Sent: 1339200
 Packets Expected: 1800000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -252,15 +264,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 144.63%
-Process CPU Busy: 11.56%
-Time in send: 30003ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 144.46%
+Process CPU Busy: 11.71%
+Time in send: 30005ms
 Time in sleep: 0ms
-Packets Sent: 1354275
+Packets Sent: 1347450
 Packets Expected: 1950325
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -272,15 +285,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 144.78%
-Process CPU Busy: 11.82%
-Time in send: 30002ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 144.41%
+Process CPU Busy: 11.91%
+Time in send: 30001ms
 Time in sleep: 0ms
-Packets Sent: 1353450
+Packets Sent: 1341900
 Packets Expected: 2100000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -292,15 +306,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 144.92%
-Process CPU Busy: 11.60%
-Time in send: 30005ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 144.47%
+Process CPU Busy: 11.89%
+Time in send: 30004ms
 Time in sleep: 0ms
-Packets Sent: 1358250
+Packets Sent: 1346250
 Packets Expected: 2250375
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -312,15 +327,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 145.11%
-Process CPU Busy: 11.65%
-Time in send: 30002ms
+Total CPU Busy (Idle Test): 0.18%
+Total CPU Busy: 144.41%
+Process CPU Busy: 12.09%
+Time in send: 30007ms
 Time in sleep: 0ms
-Packets Sent: 1362800
-Packets Expected: 2400000
+Packets Sent: 1341600
+Packets Expected: 2400400
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -333,14 +349,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 17.17%
-Process CPU Busy: 1.79%
-Time in send: 3841ms
-Time in sleep: 56169ms
+Total CPU Busy: 17.08%
+Process CPU Busy: 1.80%
+Time in send: 3822ms
+Time in sleep: 56188ms
 Packets Sent: 150024
 Packets Expected: 150024
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -352,15 +369,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 33.39%
-Process CPU Busy: 3.48%
-Time in send: 7631ms
-Time in sleep: 52378ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 33.38%
+Process CPU Busy: 3.45%
+Time in send: 7624ms
+Time in sleep: 52386ms
 Packets Sent: 300050
 Packets Expected: 300050
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -372,15 +390,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 49.66%
-Process CPU Busy: 5.16%
-Time in send: 11407ms
-Time in sleep: 48602ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 49.63%
+Process CPU Busy: 5.10%
+Time in send: 11390ms
+Time in sleep: 48619ms
 Packets Sent: 450074
 Packets Expected: 450074
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -392,15 +411,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 66.07%
-Process CPU Busy: 6.78%
-Time in send: 15277ms
-Time in sleep: 44735ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 66.00%
+Process CPU Busy: 6.79%
+Time in send: 15267ms
+Time in sleep: 44744ms
 Packets Sent: 600200
 Packets Expected: 600200
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -412,15 +432,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 82.38%
-Process CPU Busy: 8.49%
-Time in send: 19087ms
-Time in sleep: 40925ms
+Total CPU Busy (Idle Test): 0.18%
+Total CPU Busy: 82.16%
+Process CPU Busy: 8.39%
+Time in send: 19035ms
+Time in sleep: 40977ms
 Packets Sent: 750250
 Packets Expected: 750250
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -433,14 +454,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 98.60%
-Process CPU Busy: 10.12%
-Time in send: 22863ms
-Time in sleep: 37149ms
-Packets Sent: 900300
-Packets Expected: 900300
+Total CPU Busy: 96.45%
+Process CPU Busy: 7.82%
+Time in send: 20016ms
+Time in sleep: 39991ms
+Packets Sent: 900225
+Packets Expected: 900225
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -452,15 +474,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 115.22%
-Process CPU Busy: 11.84%
-Time in send: 26712ms
-Time in sleep: 33291ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 114.77%
+Process CPU Busy: 11.72%
+Time in send: 26635ms
+Time in sleep: 33369ms
 Packets Sent: 1050174
 Packets Expected: 1050174
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -472,15 +495,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 128.80%
-Process CPU Busy: 10.59%
-Time in send: 26741ms
-Time in sleep: 33264ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 129.96%
+Process CPU Busy: 11.03%
+Time in send: 27308ms
+Time in sleep: 32698ms
 Packets Sent: 1200200
 Packets Expected: 1200200
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -492,15 +516,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 147.43%
-Process CPU Busy: 15.26%
-Time in send: 34216ms
-Time in sleep: 25788ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 147.27%
+Process CPU Busy: 14.85%
+Time in send: 34197ms
+Time in sleep: 25807ms
 Packets Sent: 1350224
 Packets Expected: 1350224
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -512,15 +537,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 163.94%
-Process CPU Busy: 16.88%
-Time in send: 38096ms
-Time in sleep: 21905ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 164.12%
+Process CPU Busy: 16.76%
+Time in send: 38174ms
+Time in sleep: 21828ms
 Packets Sent: 1500250
 Packets Expected: 1500250
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -532,15 +558,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 179.85%
-Process CPU Busy: 18.41%
-Time in send: 41777ms
-Time in sleep: 18227ms
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 181.04%
+Process CPU Busy: 18.55%
+Time in send: 42113ms
+Time in sleep: 17893ms
 Packets Sent: 1650274
 Packets Expected: 1650274
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -552,15 +579,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 195.58%
-Process CPU Busy: 19.08%
-Time in send: 44112ms
-Time in sleep: 15891ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 195.06%
+Process CPU Busy: 18.38%
+Time in send: 43379ms
+Time in sleep: 16627ms
 Packets Sent: 1800300
 Packets Expected: 1800300
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -572,15 +600,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 212.67%
-Process CPU Busy: 21.81%
-Time in send: 49438ms
-Time in sleep: 10558ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 211.85%
+Process CPU Busy: 21.69%
+Time in send: 49309ms
+Time in sleep: 10687ms
 Packets Sent: 1950000
 Packets Expected: 1950000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -592,15 +621,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 228.24%
-Process CPU Busy: 22.85%
-Time in send: 52645ms
-Time in sleep: 7355ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 228.25%
+Process CPU Busy: 22.67%
+Time in send: 52755ms
+Time in sleep: 7246ms
 Packets Sent: 2100350
 Packets Expected: 2100350
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -612,15 +642,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 245.05%
-Process CPU Busy: 24.80%
-Time in send: 56674ms
-Time in sleep: 3324ms
-Packets Sent: 2250000
-Packets Expected: 2250000
+Total CPU Busy (Idle Test): 0.16%
+Total CPU Busy: 244.77%
+Process CPU Busy: 24.61%
+Time in send: 56632ms
+Time in sleep: 3367ms
+Packets Sent: 2250374
+Packets Expected: 2250374
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -633,14 +664,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 257.94%
-Process CPU Busy: 26.19%
-Time in send: 60005ms
+Total CPU Busy: 257.50%
+Process CPU Busy: 26.26%
+Time in send: 60000ms
 Time in sleep: 0ms
-Packets Sent: 2364400
+Packets Sent: 2367400
 Packets Expected: 2400000
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -652,15 +684,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 17.89%
-Process CPU Busy: 2.13%
-Time in send: 4541ms
-Time in sleep: 85472ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 17.90%
+Process CPU Busy: 2.08%
+Time in send: 4552ms
+Time in sleep: 85462ms
 Packets Sent: 150024
 Packets Expected: 150024
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -672,15 +705,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 34.69%
-Process CPU Busy: 3.91%
-Time in send: 8943ms
-Time in sleep: 81069ms
+Total CPU Busy (Idle Test): 0.18%
+Total CPU Busy: 34.70%
+Process CPU Busy: 3.96%
+Time in send: 8932ms
+Time in sleep: 81080ms
 Packets Sent: 300048
 Packets Expected: 300048
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -692,15 +726,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 51.42%
-Process CPU Busy: 5.70%
-Time in send: 13340ms
-Time in sleep: 76675ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 51.52%
+Process CPU Busy: 5.73%
+Time in send: 13355ms
+Time in sleep: 76658ms
 Packets Sent: 450075
 Packets Expected: 450075
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -714,13 +749,14 @@ Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.17%
 Total CPU Busy: 67.20%
-Process CPU Busy: 7.05%
-Time in send: 16344ms
-Time in sleep: 73669ms
+Process CPU Busy: 6.85%
+Time in send: 16289ms
+Time in sleep: 73726ms
 Packets Sent: 600099
 Packets Expected: 600099
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -733,14 +769,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 84.66%
-Process CPU Busy: 9.22%
-Time in send: 22032ms
-Time in sleep: 67983ms
-Packets Sent: 750249
-Packets Expected: 750249
+Total CPU Busy: 84.88%
+Process CPU Busy: 9.26%
+Time in send: 22090ms
+Time in sleep: 67911ms
+Packets Sent: 750123
+Packets Expected: 750123
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -752,15 +789,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 101.22%
-Process CPU Busy: 10.90%
-Time in send: 26040ms
-Time in sleep: 63978ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 101.21%
+Process CPU Busy: 10.91%
+Time in send: 26043ms
+Time in sleep: 63973ms
 Packets Sent: 900300
 Packets Expected: 900300
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -772,15 +810,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 118.31%
-Process CPU Busy: 12.75%
-Time in send: 30855ms
-Time in sleep: 59163ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 118.43%
+Process CPU Busy: 12.77%
+Time in send: 30886ms
+Time in sleep: 59132ms
 Packets Sent: 1050348
 Packets Expected: 1050348
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -792,15 +831,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 134.98%
-Process CPU Busy: 14.71%
-Time in send: 34931ms
-Time in sleep: 55088ms
-Packets Sent: 1200399
-Packets Expected: 1200399
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 134.93%
+Process CPU Busy: 14.54%
+Time in send: 34893ms
+Time in sleep: 55121ms
+Packets Sent: 1200265
+Packets Expected: 1200265
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -812,15 +852,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 151.95%
-Process CPU Busy: 16.53%
-Time in send: 39677ms
-Time in sleep: 50327ms
+Total CPU Busy (Idle Test): 0.16%
+Total CPU Busy: 152.06%
+Process CPU Busy: 16.40%
+Time in send: 39680ms
+Time in sleep: 50324ms
 Packets Sent: 1350225
 Packets Expected: 1350225
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -833,14 +874,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 164.85%
-Process CPU Busy: 16.30%
-Time in send: 38475ms
-Time in sleep: 51534ms
+Total CPU Busy: 168.59%
+Process CPU Busy: 18.19%
+Time in send: 43764ms
+Time in sleep: 46241ms
 Packets Sent: 1500249
 Packets Expected: 1500249
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -852,15 +894,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 179.19%
-Process CPU Busy: 16.97%
-Time in send: 40440ms
-Time in sleep: 49566ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 181.16%
+Process CPU Busy: 17.85%
+Time in send: 42451ms
+Time in sleep: 47555ms
 Packets Sent: 1650273
 Packets Expected: 1650273
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -872,15 +915,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 198.29%
-Process CPU Busy: 19.84%
-Time in send: 47076ms
-Time in sleep: 42933ms
+Total CPU Busy (Idle Test): 0.15%
+Total CPU Busy: 199.20%
+Process CPU Busy: 20.26%
+Time in send: 48461ms
+Time in sleep: 41552ms
 Packets Sent: 1800300
 Packets Expected: 1800300
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -892,15 +936,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 217.18%
-Process CPU Busy: 22.89%
-Time in send: 54963ms
-Time in sleep: 35049ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 219.51%
+Process CPU Busy: 23.62%
+Time in send: 57094ms
+Time in sleep: 32918ms
 Packets Sent: 1950324
 Packets Expected: 1950324
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -912,15 +957,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 231.95%
-Process CPU Busy: 23.70%
-Time in send: 55456ms
-Time in sleep: 34554ms
-Packets Sent: 2100348
-Packets Expected: 2100348
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 231.59%
+Process CPU Busy: 23.32%
+Time in send: 55204ms
+Time in sleep: 34805ms
+Packets Sent: 2100465
+Packets Expected: 2100465
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -933,14 +979,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 245.90%
-Process CPU Busy: 24.58%
-Time in send: 56771ms
-Time in sleep: 33236ms
+Total CPU Busy: 245.18%
+Process CPU Busy: 24.73%
+Time in send: 56680ms
+Time in sleep: 33326ms
 Packets Sent: 2250375
 Packets Expected: 2250375
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -952,15 +999,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 263.28%
-Process CPU Busy: 27.06%
-Time in send: 61881ms
-Time in sleep: 28125ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 263.58%
+Process CPU Busy: 27.40%
+Time in send: 62875ms
+Time in sleep: 27132ms
 Packets Sent: 2400399
 Packets Expected: 2400399
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -972,15 +1020,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 18.55%
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 18.47%
 Process CPU Busy: 2.31%
-Time in send: 5782ms
-Time in sleep: 114237ms
+Time in send: 5756ms
+Time in sleep: 114261ms
 Packets Sent: 150024
 Packets Expected: 150024
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -992,15 +1041,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 36.55%
-Process CPU Busy: 4.29%
-Time in send: 11621ms
-Time in sleep: 108397ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 36.41%
+Process CPU Busy: 4.28%
+Time in send: 11562ms
+Time in sleep: 108454ms
 Packets Sent: 300048
 Packets Expected: 300048
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1012,15 +1062,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 54.60%
-Process CPU Busy: 6.32%
-Time in send: 17475ms
-Time in sleep: 102542ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 54.39%
+Process CPU Busy: 6.30%
+Time in send: 17382ms
+Time in sleep: 102635ms
 Packets Sent: 450072
 Packets Expected: 450072
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1032,15 +1083,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 70.68%
-Process CPU Busy: 7.75%
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 70.58%
+Process CPU Busy: 7.86%
 Time in send: 20738ms
-Time in sleep: 99280ms
+Time in sleep: 99281ms
 Packets Sent: 600100
 Packets Expected: 600100
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1052,15 +1104,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 91.11%
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 90.92%
 Process CPU Busy: 10.10%
-Time in send: 29433ms
-Time in sleep: 90588ms
+Time in send: 29350ms
+Time in sleep: 90672ms
 Packets Sent: 750248
 Packets Expected: 750248
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1072,15 +1125,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 107.36%
-Process CPU Busy: 11.77%
-Time in send: 32948ms
-Time in sleep: 87084ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 107.28%
+Process CPU Busy: 11.90%
+Time in send: 33390ms
+Time in sleep: 86639ms
 Packets Sent: 900300
 Packets Expected: 900300
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1092,15 +1146,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 127.44%
-Process CPU Busy: 14.23%
-Time in send: 41224ms
-Time in sleep: 78798ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 126.97%
+Process CPU Busy: 14.01%
+Time in send: 41070ms
+Time in sleep: 78954ms
 Packets Sent: 1050348
 Packets Expected: 1050348
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1112,15 +1167,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 144.90%
-Process CPU Busy: 15.80%
-Time in send: 45779ms
-Time in sleep: 74224ms
-Packets Sent: 1200200
-Packets Expected: 1200200
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 133.87%
+Process CPU Busy: 13.69%
+Time in send: 32811ms
+Time in sleep: 87198ms
+Packets Sent: 1200250
+Packets Expected: 1200250
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1132,15 +1188,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 164.51%
-Process CPU Busy: 18.15%
-Time in send: 53297ms
-Time in sleep: 66709ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 163.26%
+Process CPU Busy: 17.96%
+Time in send: 52832ms
+Time in sleep: 67174ms
 Packets Sent: 1350224
 Packets Expected: 1350224
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1152,15 +1209,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 173.88%
-Process CPU Busy: 18.51%
-Time in send: 49358ms
-Time in sleep: 70651ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 171.56%
+Process CPU Busy: 17.96%
+Time in send: 46177ms
+Time in sleep: 73831ms
 Packets Sent: 1500311
 Packets Expected: 1500311
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1172,15 +1230,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 185.93%
-Process CPU Busy: 19.14%
-Time in send: 48084ms
-Time in sleep: 71928ms
-Packets Sent: 1650341
-Packets Expected: 1650341
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 199.81%
+Process CPU Busy: 21.99%
+Time in send: 64720ms
+Time in sleep: 55287ms
+Packets Sent: 1650272
+Packets Expected: 1650272
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1192,15 +1251,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.18%
-Total CPU Busy: 200.38%
-Process CPU Busy: 20.48%
-Time in send: 49768ms
-Time in sleep: 70245ms
-Packets Sent: 1800300
-Packets Expected: 1800300
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 200.81%
+Process CPU Busy: 20.35%
+Time in send: 49813ms
+Time in sleep: 70197ms
+Packets Sent: 1800375
+Packets Expected: 1800375
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1212,15 +1272,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 218.24%
-Process CPU Busy: 22.46%
-Time in send: 54987ms
-Time in sleep: 65023ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 219.42%
+Process CPU Busy: 22.33%
+Time in send: 56500ms
+Time in sleep: 63509ms
 Packets Sent: 1950405
 Packets Expected: 1950405
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1233,14 +1294,15 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 232.15%
-Process CPU Busy: 24.28%
-Time in send: 55578ms
-Time in sleep: 64433ms
+Total CPU Busy: 229.80%
+Process CPU Busy: 23.55%
+Time in send: 53405ms
+Time in sleep: 66606ms
 Packets Sent: 2100348
 Packets Expected: 2100348
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1252,15 +1314,16 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.17%
-Total CPU Busy: 246.68%
-Process CPU Busy: 25.49%
-Time in send: 58345ms
-Time in sleep: 61666ms
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 245.06%
+Process CPU Busy: 25.19%
+Time in send: 57012ms
+Time in sleep: 62999ms
 Packets Sent: 2250372
 Packets Expected: 2250372
 =======================================
 UDP Talker Parameters:
+ Mode: sendto
  Source: 127.0.0.1:3499
  Destination: 127.0.0.1:3500
  Slots (n): 20
@@ -1272,11 +1335,12 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.08%
-Total CPU Busy: 265.85%
-Process CPU Busy: 27.48%
-Time in send: 64686ms
-Time in sleep: 55325ms
+Total CPU Busy (Idle Test): 0.17%
+Total CPU Busy: 267.01%
+Process CPU Busy: 27.80%
+Time in send: 65919ms
+Time in sleep: 54093ms
 Packets Sent: 2400400
 Packets Expected: 2400400
-$ 
+$ uname -a
+QNX localhost 8.0.0 2024/06/13-12:41:10EDT RaspberryPi4B aarch64le

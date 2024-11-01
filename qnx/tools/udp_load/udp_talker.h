@@ -2,6 +2,9 @@
 #define BENCHMARK_UDP_TALKER_H
 
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/uio.h>
 
 #include <chrono>
 #include <cstdint>
@@ -116,23 +119,50 @@ class udp_talker {
   bool init_{false};
 };
 
-class udp_talker_bsdipv4 final : public udp_talker {
+class udp_talker_bsd : public udp_talker {
  public:
-  explicit udp_talker_bsdipv4() = default;
-  ~udp_talker_bsdipv4() override;
+  explicit udp_talker_bsd() = default;
+  ~udp_talker_bsd() override;
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
                     const struct sockaddr_in& dest,
                     std::uint16_t pkt_size) noexcept -> bool override;
 
-  auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
-
- private:
+ protected:
   int socket_fd_{-1};
   struct sockaddr_in source_ {};
   struct sockaddr_in dest_ {};
+};
+
+class udp_talker_sendto final : public udp_talker_bsd {
+ public:
+  explicit udp_talker_sendto() = default;
+
+ protected:
+  auto init_packets(const struct sockaddr_in& source,
+                    const struct sockaddr_in& dest,
+                    std::uint16_t pkt_size) noexcept -> bool override;
+  auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
+
+ private:
   std::vector<std::uint8_t> buffer_{};
+};
+
+class udp_talker_sendmmsg final : public udp_talker_bsd {
+ public:
+  explicit udp_talker_sendmmsg() = default;
+
+ protected:
+  auto init_packets(const struct sockaddr_in& source,
+                    const struct sockaddr_in& dest,
+                    std::uint16_t pkt_size) noexcept -> bool override;
+  auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
+
+ private:
+  std::vector<std::vector<std::uint8_t>> eth_packets_{};
+  std::vector<struct iovec> msgvec_{};
+  std::vector<struct mmsghdr> msgpool_{};
 };
 
 #endif

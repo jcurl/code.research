@@ -141,6 +141,7 @@ udp_load [-n<slots>] [-m<width>] [-p<packets>] [-s<size>]
 
 Writes UDP packets bound from <sourceip> IPv4 address to <destip>.
 
+ -B<mode> - sending mode: sendto; sendmmsg. Default is 'sendto'
  -n<slots> - Number of slots in a time window (default 20).
  -m<width> - Width of each slot in milliseconds (default 5ms).
  -p<packets> - Number of packets to send in a window (n*m duration, default 1000).
@@ -150,6 +151,8 @@ Writes UDP packets bound from <sourceip> IPv4 address to <destip>.
  -S<sourceip> - Source IP address (must be an existing interface).
  -D<destip> - Destination IP address (can be unicast or multicast).
  -I - Enable IDLE mode test prior
+
+ -? - Display this help.
 ```
 
 A window of traffic is defined by a duration of time of `n` slots, over `m`
@@ -188,6 +191,11 @@ to send to with a colon and the port number.
 The `-I` option instructs to run a 5s test in idle, just measuring the CPU busy
 time when nothing should occur. This can give an indication of work being done
 outside of the context of the test being run.
+
+The `-B` chooses how the packets are sent:
+
+- `sendto` uses the `sendto()` call sending one packet at a time.
+- `sendmmsg` uses the `sendmmsg()` call sending up to 1024 packets in one slot.
 
 ## 2. Design
 

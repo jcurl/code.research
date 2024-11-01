@@ -37,7 +37,18 @@ auto main(int argc, char* argv[]) -> int {
   for (auto i = 0; i < options.threads(); i++) {
     std::uint32_t packets_thread =
         (i + 1) * packets / options.threads() - i * packets / options.threads();
-    std::unique_ptr<udp_talker> talker = std::make_unique<udp_talker_bsdipv4>();
+    std::unique_ptr<udp_talker> talker{};
+    switch (options.mode()) {
+      case send_mode::mode_sendto:
+        talker = std::make_unique<udp_talker_sendto>();
+        break;
+      case send_mode::mode_sendmmsg:
+        talker = std::make_unique<udp_talker_sendmmsg>();
+        break;
+      default:
+        std::cerr << "Error: Unknown sending mode" << std::endl;
+        return 1;
+    }
 
     talker->set_shaping(options.slots(), options.width(), packets_thread,
                         options.size());
@@ -77,6 +88,18 @@ auto main(int argc, char* argv[]) -> int {
   // Diagnostics to the User.
 
   std::cout << "UDP Talker Parameters:" << std::endl;
+  std::cout << " Mode: ";
+  switch (options.mode()) {
+    case send_mode::mode_sendto:
+      std::cout << "sendto" << std::endl;
+      break;
+    case send_mode::mode_sendmmsg:
+      std::cout << "sendmmsg" << std::endl;
+      break;
+    default:
+      std::cout << "unknown" << std::endl;
+      break;
+  }
   std::cout << " Source: " << inet_ntos(saddr) << std::endl;
   std::cout << " Destination: " << inet_ntos(daddr) << std::endl;
   std::cout << " Slots (n): " << options.slots() << std::endl;

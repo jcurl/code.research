@@ -5,9 +5,18 @@
 - [2. Results](#2-results)
   - [2.1. Raspberry Pi 4](#21-raspberry-pi-4)
     - [2.1.1. Linux](#211-linux)
+      - [2.1.1.1. sendto](#2111-sendto)
+      - [2.1.1.2. sendmmsg](#2112-sendmmsg)
     - [2.1.2. QNX 7.1 (io-pkt)](#212-qnx-71-io-pkt)
+      - [2.1.2.1. sendto](#2121-sendto)
+      - [2.1.2.2. sendmmsg](#2122-sendmmsg)
     - [2.1.3. QNX 8.0 (io-sock)](#213-qnx-80-io-sock)
+      - [2.1.3.1. sendto](#2131-sendto)
+      - [2.1.3.2. sendmmsg](#2132-sendmmsg)
   - [2.2. Raspberry Pi 5](#22-raspberry-pi-5)
+    - [2.2.1. Linux](#221-linux)
+      - [2.2.1.1. sendto](#2211-sendto)
+      - [2.2.1.2. sendmmsg](#2212-sendmmsg)
 
 ## 1. Capture
 
@@ -59,6 +68,8 @@ overhead the device driver introduces as well).
 
 #### 2.1.1. Linux
 
+##### 2.1.1.1. sendto
+
 ![](./images/rpi4_rpios_sendto_eth.png)
 
 Shows that single-threaded performance is the best. Real-world applications with
@@ -74,7 +85,15 @@ The bandwidth limit resulting in about 55% is approximately 540Mbps.
 The network hardware is the limiting factor, where in software only, 1Gbps can
 be reached with about 105% CPU (2 threads).
 
+##### 2.1.1.2. sendmmsg
+
+![](./images/rpi4_rpios_sendmmsg_eth.png)
+
+![](./images/rpi4_rpios_sendmmsg_lo.png)
+
 #### 2.1.2. QNX 7.1 (io-pkt)
+
+##### 2.1.2.1. sendto
 
 ![](./images/rpi4_qnx71_sendto_eth.png)
 
@@ -104,7 +123,23 @@ driver.
 Again, the hardware is the limiting factor, with the loopback device achieving
 similar performance to Linux of 1Gbps with 102% CPU.
 
+##### 2.1.2.2. sendmmsg
+
+![](./images/rpi4_qnx71_sendmmsg_eth.png)
+
+We can see that the `sendmmsg()` call is more efficient by a reduction of 20%
+CPU for the same bandwidth. The overhead of the application itself is less (with
+more time being spent in `io-pkt`) which is to be expected due to the reduction
+of messages (going from up to 80,000 calls per second in the maximum use case,
+to 200 calls per second with m=5ms).
+
+The overall bandwidth is not increased significantly.
+
+![](./images/rpi4_qnx71_sendmmsg_lo.png)
+
 #### 2.1.3. QNX 8.0 (io-sock)
+
+##### 2.1.3.1. sendto
 
 ![](./images/rpi4_qnx8_sendto_eth.png)
 
@@ -125,7 +160,17 @@ required with 2 threads or more.
 The single threaded performance of `io-sock` with the loopback is half the
 performance of `io-pkt`.
 
+##### 2.1.3.2. sendmmsg
+
+![](./images/rpi4_qnx8_sendmmsg_eth.png)
+
+![](./images/rpi4_qnx8_sendmmsg_lo.png)
+
 ### 2.2. Raspberry Pi 5
+
+#### 2.2.1. Linux
+
+##### 2.2.1.1. sendto
 
 The Raspberry Pi 5 is a significant upgrade for network performance over the
 Rasbperry Pi 4, comparing the two Linux implementations.
@@ -133,3 +178,9 @@ Rasbperry Pi 4, comparing the two Linux implementations.
 ![](./images/rpi5_rpios_sendto_eth.png)
 
 ![](./images/rpi5_rpios_sendto_lo.png)
+
+##### 2.2.1.2. sendmmsg
+
+![](./images/rpi5_rpios_sendmmsg_eth.png)
+
+![](./images/rpi5_rpios_sendmmsg_lo.png)

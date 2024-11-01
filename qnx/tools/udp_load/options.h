@@ -7,6 +7,12 @@
 #include <cstdint>
 #include <string>
 
+/// @brief The class to instantiate when testing.
+enum class send_mode {
+  mode_sendto,   //< Use sendto() for sending packets.
+  mode_sendmmsg  //< use sendmmsg() for sending packets.
+};
+
 /// @brief Decode the command line and present the options to the user.
 class options {
  public:
@@ -40,6 +46,14 @@ class options {
   /// @return true if the configuration is valid. false if the user provided an
   /// error in the arguments, and the program should abort.
   auto is_valid() const noexcept -> bool { return is_valid_; }
+
+  /// @brief The test mode that should be used.
+  ///
+  /// This is the '-B mode' option that defines the underlying API for sending
+  /// traffic.
+  ///
+  /// @return Returns the test mode that should be used.
+  auto mode() const noexcept -> send_mode { return mode_; }
 
   /// @brief Get the user provided source port and address.
   ///
@@ -155,6 +169,7 @@ class options {
 
  private:
   bool is_valid_{false};
+  send_mode mode_{send_mode::mode_sendto};
   bool idle_{false};
   struct sockaddr_in source_ {};
   struct sockaddr_in dest_ {};

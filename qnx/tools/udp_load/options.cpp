@@ -71,6 +71,8 @@ void print_help(std::string_view prog_name) {
                "to <destip>."
             << std::endl;
   std::cout << std::endl;
+  std::cout << " -B<mode> - sending mode: sendto; sendmmsg. Default is 'sendto'"
+            << std::endl;
   std::cout << " -n<slots> - Number of slots in a time window (default 20)."
             << std::endl;
   std::cout << " -m<width> - Width of each slot in milliseconds (default 5ms)."
@@ -125,7 +127,7 @@ options::options(int& argc, char* const argv[]) noexcept {
     prog_name = std::string_view("udp_load");
   }
 
-  while ((c = getopt(argc, argv, "n:m:p:s:d:T:S:D:I?")) != -1) {
+  while ((c = getopt(argc, argv, "n:m:p:s:d:B:T:S:D:I?")) != -1) {
     switch (c) {
       case 'n': {
         std::uint16_t n = 0;
@@ -199,6 +201,18 @@ options::options(int& argc, char* const argv[]) noexcept {
           return;
         }
         duration_ = t;
+        break;
+      }
+      case 'B': {
+        auto arg = std::string_view{optarg};
+        if (arg == "sendto") {
+          mode_ = send_mode::mode_sendto;
+        } else if (arg == "sendmmsg") {
+          mode_ = send_mode::mode_sendmmsg;
+        } else {
+          std::cerr << "Error: Invalid test mode " << arg << std::endl;
+          return;
+        }
         break;
       }
       case 'T': {

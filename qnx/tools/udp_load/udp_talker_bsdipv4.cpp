@@ -5,26 +5,20 @@
 #include <unistd.h>
 
 #include <cstdio>
+#include <iostream>
 
 #include "udp_talker.h"
 
-udp_talker_bsdipv4::~udp_talker_bsdipv4() {
+udp_talker_bsd::~udp_talker_bsd() {
   if (socket_fd_ != -1) close(socket_fd_);
   socket_fd_ = -1;
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-auto udp_talker_bsdipv4::init_packets(const struct sockaddr_in &source,
-                                      const struct sockaddr_in &dest,
-                                      std::uint16_t pkt_size) noexcept -> bool {
+auto udp_talker_bsd::init_packets(
+    const struct sockaddr_in &source, const struct sockaddr_in &dest,
+    [[maybe_unused]] std::uint16_t pkt_size) noexcept -> bool {
   if (socket_fd_ != -1) return false;
-
-  std::uint8_t x = 0;
-  buffer_.resize(pkt_size);
-  for (auto &b : buffer_) {
-    b = x;
-    x++;
-  }
 
   int fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (fd < 0) return false;
@@ -90,7 +84,21 @@ auto udp_talker_bsdipv4::init_packets(const struct sockaddr_in &source,
   return true;
 }
 
-auto udp_talker_bsdipv4::send_packets(std::uint16_t count) noexcept
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+auto udp_talker_sendto::init_packets(const struct sockaddr_in &source,
+                                     const struct sockaddr_in &dest,
+                                     std::uint16_t pkt_size) noexcept -> bool {
+  std::uint8_t x = 0;
+  buffer_.resize(pkt_size);
+  for (auto &b : buffer_) {
+    b = x;
+    x++;
+  }
+
+  return udp_talker_bsd::init_packets(source, dest, pkt_size);
+}
+
+auto udp_talker_sendto::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
   if (socket_fd_ == -1) return 0;
 
@@ -102,6 +110,58 @@ auto udp_talker_bsdipv4::send_packets(std::uint16_t count) noexcept
                             sizeof(dest_));
     if (nbytes < 0) return sent;
     sent++;
+  }
+  return sent;
+}
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+auto udp_talker_sendmmsg::init_packets(const struct sockaddr_in &source,
+                                       const struct sockaddr_in &dest,
+                                       std::uint16_t pkt_size) noexcept
+    -> bool {
+  // Prepare up to 1024 Ethernet packets (UIO_MAXIOV) which is supported on QNX
+  // and Linux.
+  eth_packets_.resize(1024);
+  msgvec_.resize(1024);
+  msgpool_.resize(1024);
+  for (size_t i = 0; i < 1024; i++) {
+    std::vector<std::uint8_t> packet(pkt_size);
+    std::uint8_t x = i;
+    for (auto &b : packet) {
+      b = x;
+      x++;
+    }
+
+    msgvec_[i].iov_base = packet.data();
+    msgvec_[i].iov_len = pkt_size;
+
+    msgpool_[i].msg_hdr.msg_name = static_cast<void *>(&dest_);
+    msgpool_[i].msg_hdr.msg_namelen = sizeof(dest_);
+    msgpool_[i].msg_hdr.msg_iov = &msgvec_[i];
+    msgpool_[i].msg_hdr.msg_iovlen = 1;
+    msgpool_[i].msg_hdr.msg_control = nullptr;
+    msgpool_[i].msg_hdr.msg_controllen = 0;
+    msgpool_[i].msg_hdr.msg_flags = 0;
+
+    eth_packets_[i] = std::move(packet);
+  }
+
+  return udp_talker_bsd::init_packets(source, dest, pkt_size);
+}
+
+auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
+    -> std::uint16_t {
+  if (socket_fd_ == -1) return 0;
+
+  std::uint16_t sent = 0;
+  while (sent < count) {
+    auto remain = std::min(count - sent, 1024);
+    int result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);
+    if (result == -1) {
+      perror("sendmmsg");
+      return sent;
+    }
+    sent += result;
   }
   return sent;
 }
