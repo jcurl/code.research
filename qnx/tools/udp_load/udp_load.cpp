@@ -37,6 +37,9 @@ auto main(int argc, char* argv[]) -> int {
   for (auto i = 0; i < options.threads(); i++) {
     std::uint32_t packets_thread =
         (i + 1) * packets / options.threads() - i * packets / options.threads();
+
+    // The options has checked beforehand if the talker mode makes sense or not,
+    // so we don't check if it is supported again here.
     std::unique_ptr<udp_talker> talker{};
     switch (options.mode()) {
       case send_mode::mode_sendto:

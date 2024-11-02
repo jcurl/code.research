@@ -8,11 +8,19 @@
 
 #include <chrono>
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string_view>
 #include <vector>
 
 #include "busy_measurement.h"
+#include "config.h"
+
+/// @brief The class to instantiate when testing.
+enum class send_mode {
+  mode_sendto,   //< Use sendto() for sending packets.
+  mode_sendmmsg  //< use sendmmsg() for sending packets.
+};
 
 /// @brief Executes a period of time in idle for background CPU usage
 /// measurement.
@@ -32,8 +40,10 @@ struct udp_results {
   /// @brief The number of packets dropped / not sent, during the test.
   std::uint32_t packets_expected;
 
+  /// @brief The amount of time the benchmark is sleeping.
   std::chrono::milliseconds wait_time;
 
+  /// @brief The amount of time spent sending traffic.
   std::chrono::milliseconds send_time;
 };
 
@@ -46,6 +56,15 @@ class udp_talker {
   udp_talker(udp_talker&& other) = delete;
   auto operator=(udp_talker&& other) -> udp_talker& = delete;
   virtual ~udp_talker() = default;
+
+  /// @brief Check if this implementation is valid for this platform.
+  ///
+  /// Not all platforms support all methods for doing benchmarks. By
+  /// instantiating this object and testing if it's enabled, we can test if it
+  /// usable or not.
+  ///
+  /// @return true if this benchmark is usable, false otherwise.
+  virtual auto is_supported() noexcept -> bool { return false; }
 
   /// @brief Set the address (IPv4) to bind to locally.
   ///
@@ -92,6 +111,12 @@ class udp_talker {
                    std::uint32_t packets, std::uint16_t pkt_size) noexcept
       -> bool;
 
+  /// @brief Initialise the benchmark for testing.
+  ///
+  /// The initialisation step can be run first, and should be run without any
+  /// timing measurements.
+  ///
+  /// @return true if initialisation succeeded, false otherwise.
   auto init() noexcept -> bool;
 
   /// @brief Runs the simulation.
@@ -106,8 +131,8 @@ class udp_talker {
  protected:
   auto virtual init_packets(const struct sockaddr_in& source,
                             const struct sockaddr_in& dest,
-                            std::uint16_t pkt_size) noexcept -> bool = 0;
-  auto virtual send_packets(std::uint16_t count) noexcept -> std::uint16_t = 0;
+                            std::uint16_t pkt_size) noexcept -> bool;
+  auto virtual send_packets(std::uint16_t count) noexcept -> std::uint16_t;
 
  private:
   struct sockaddr_in source_ {};
@@ -119,6 +144,10 @@ class udp_talker {
   bool init_{false};
 };
 
+/// @brief An intermediate class not for direct instantiation.
+///
+/// This class provides common initialisation code needed for using BSD socket
+/// API for the udp_talker.
 class udp_talker_bsd : public udp_talker {
  public:
   explicit udp_talker_bsd() = default;
@@ -135,9 +164,12 @@ class udp_talker_bsd : public udp_talker {
   struct sockaddr_in dest_ {};
 };
 
+/// @brief Send packets using the sendto() BSD socket call.
 class udp_talker_sendto final : public udp_talker_bsd {
  public:
   explicit udp_talker_sendto() = default;
+
+  auto is_supported() noexcept -> bool override { return true; }
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
@@ -149,9 +181,16 @@ class udp_talker_sendto final : public udp_talker_bsd {
   std::vector<std::uint8_t> buffer_{};
 };
 
+#if HAVE_SENDMMSG
+/// @brief Send packets using the sendmmsg() socket call.
+///
+/// The sendmmsg() call allows to send multiple packets in one system call,
+/// allowing for the reduction of overhead for multiple packets in one slot.
 class udp_talker_sendmmsg final : public udp_talker_bsd {
  public:
   explicit udp_talker_sendmmsg() = default;
+
+  auto is_supported() noexcept -> bool override { return true; }
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
@@ -164,5 +203,12 @@ class udp_talker_sendmmsg final : public udp_talker_bsd {
   std::vector<struct iovec> msgvec_{};
   std::vector<struct mmsghdr> msgpool_{};
 };
+#else
+// The sendmmsg() is not supported.
+using udp_talker_sendmmsg = udp_talker;
+#endif
+
+/// @brief Create the benchmark class from the mode.
+auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker>;
 
 #endif

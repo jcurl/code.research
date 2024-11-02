@@ -60,6 +60,7 @@ auto udp_talker_bsd::init_packets(
     return false;
   }
 
+#if HAVE_SO_REUSEPORT
   int reuseport = 1;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &reuseport, sizeof(reuseport))) {
     perror("setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)");
@@ -67,6 +68,7 @@ auto udp_talker_bsd::init_packets(
     socket_fd_ = -1;
     return false;
   }
+#endif
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (bind(fd, reinterpret_cast<const sockaddr *>(&source),
@@ -108,12 +110,16 @@ auto udp_talker_sendto::send_packets(std::uint16_t count) noexcept
     auto dest = reinterpret_cast<const sockaddr *>(&dest_);
     ssize_t nbytes = sendto(socket_fd_, buffer_.data(), buffer_.size(), 0, dest,
                             sizeof(dest_));
-    if (nbytes < 0) return sent;
+    if (nbytes < 0) {
+      perror("sendto");
+      return sent;
+    }
     sent++;
   }
   return sent;
 }
 
+#if HAVE_SENDMMSG
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto udp_talker_sendmmsg::init_packets(const struct sockaddr_in &source,
                                        const struct sockaddr_in &dest,
@@ -165,3 +171,4 @@ auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
   }
   return sent;
 }
+#endif

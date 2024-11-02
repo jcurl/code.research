@@ -11,18 +11,18 @@ add_library(${LIBRARY} STATIC ${SOURCES})
 
 find_package(Threads REQUIRED)
 
-cmake_push_check_state(RESET)
-list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
-list(APPEND CMAKE_REQUIRED_LIBRARIES pthread)
-check_symbol_exists(pthread_setaffinity_np pthread.h HAVE_PTHREAD_SETAFFINITY_NP)
-cmake_reset_check_state()
-
 if (QNXNTO)
     target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
     target_sources(${LIBRARY} PRIVATE idle_clock_qnx.cpp)
     target_sources(${LIBRARY} PRIVATE process_clock_qnx.cpp)
 else()
     # We need to be able to set the affinity of a thread to a particular CPU
+    cmake_push_check_state(RESET)
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES pthread)
+    check_symbol_exists(pthread_setaffinity_np pthread.h HAVE_PTHREAD_SETAFFINITY_NP)
+    cmake_reset_check_state()
+
     if(HAVE_PTHREAD_SETAFFINITY_NP)
         add_compile_definitions(_GNU_SOURCE)
         target_sources(${LIBRARY} PRIVATE thread_pin.cpp)
@@ -31,9 +31,10 @@ else()
         message(WARNING "Can't a way to pin threads to a core")
     endif()
 
-    # TODO: If the tests fail, we need to use "null"
     string(TOUPPER "${CMAKE_SYSTEM_NAME}" upper_CMAKE_SYSTEM_NAME)
-    if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
+    if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX" OR upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+        # Don't rely on this for Cygwin, the resolution appears to be really
+        # bad. Only expect that it compiles.
         target_sources(${LIBRARY} PRIVATE idle_clock_linux.cpp)
         target_sources(${LIBRARY} PRIVATE process_clock_linux.cpp)
     else()

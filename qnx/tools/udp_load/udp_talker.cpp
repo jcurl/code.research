@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <cstring>
@@ -16,6 +17,22 @@
 #endif
 
 #include "ubench/clock.h"
+
+auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker> {
+  std::unique_ptr<udp_talker> talker;
+  switch (mode) {
+    case send_mode::mode_sendto:
+      talker = std::make_unique<udp_talker_sendto>();
+      break;
+    case send_mode::mode_sendmmsg:
+      talker = std::make_unique<udp_talker_sendmmsg>();
+      break;
+    default:
+      talker = std::make_unique<udp_talker>();
+      break;
+  }
+  return talker;
+}
 
 auto idle_test(std::chrono::milliseconds duration) noexcept
     -> std::optional<busy_measurement> {
@@ -70,6 +87,19 @@ auto udp_talker::set_shaping(std::uint16_t slots, std::uint16_t width,
   packets_ = packets;
   size_ = pkt_size;
   return true;
+}
+
+auto udp_talker::init_packets(
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+    [[maybe_unused]] const struct sockaddr_in& source,
+    [[maybe_unused]] const struct sockaddr_in& dest,
+    [[maybe_unused]] std::uint16_t pkt_size) noexcept -> bool {
+  return false;
+}
+
+auto udp_talker::send_packets([[maybe_unused]] std::uint16_t count) noexcept
+    -> std::uint16_t {
+  return 0;
 }
 
 auto udp_talker::init() noexcept -> bool {

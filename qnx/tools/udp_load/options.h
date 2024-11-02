@@ -7,11 +7,7 @@
 #include <cstdint>
 #include <string>
 
-/// @brief The class to instantiate when testing.
-enum class send_mode {
-  mode_sendto,   //< Use sendto() for sending packets.
-  mode_sendmmsg  //< use sendmmsg() for sending packets.
-};
+#include "udp_talker.h"
 
 /// @brief Decode the command line and present the options to the user.
 class options {

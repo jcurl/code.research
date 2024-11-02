@@ -16,7 +16,7 @@ include(GNUInstallDirs)
 #   (which is not true).
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-if (NOT QNXNTO)
+if (NOT QNXNTO AND NOT CYGWIN)
     set(CMAKE_CXX_EXTENSIONS OFF)
 endif()
 

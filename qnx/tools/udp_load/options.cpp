@@ -71,8 +71,25 @@ void print_help(std::string_view prog_name) {
                "to <destip>."
             << std::endl;
   std::cout << std::endl;
-  std::cout << " -B<mode> - sending mode: sendto; sendmmsg. Default is 'sendto'"
-            << std::endl;
+
+  std::cout << " -B<mode> - sending mode: ";
+  bool option = false;
+  if (make_udp_talker(send_mode::mode_sendto)->is_supported()) {
+    if (option) std::cout << ", ";
+    option = true;
+    std::cout << "sendto";
+  }
+  if (make_udp_talker(send_mode::mode_sendmmsg)->is_supported()) {
+    if (option) std::cout << ", ";
+    option = true;
+    std::cout << "sendmmsg";
+  }
+  if (option) {
+    std::cout << "." << std::endl;
+  } else {
+    std::cout << "(none)." << std::endl;
+  }
+
   std::cout << " -n<slots> - Number of slots in a time window (default 20)."
             << std::endl;
   std::cout << " -m<width> - Width of each slot in milliseconds (default 5ms)."
@@ -211,6 +228,11 @@ options::options(int& argc, char* const argv[]) noexcept {
           mode_ = send_mode::mode_sendmmsg;
         } else {
           std::cerr << "Error: Invalid test mode " << arg << std::endl;
+          return;
+        }
+        auto talker = make_udp_talker(mode_);
+        if (!talker->is_supported()) {
+          std::cerr << "Error: Unsupported test mode " << arg << std::endl;
           return;
         }
         break;
