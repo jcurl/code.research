@@ -51,6 +51,7 @@ Measures the time on the "default" usage of the `malloc` c-library call.
 Other Platforms:
 
 - (X) MacOS-X: Generates invalid results.
+- (!) Cygwin (Windows): No customisations for malloc parameters supported
 
 #### 2.1.2. Cache Line
 
@@ -62,6 +63,10 @@ copies.
 - [Documentation](./benchmarks/cacheline.md)
 - [Results](./benchmarks/cacheline/results/README.md)
 
+Other Platforms:
+
+- (!) Cygwin (Windows): Runs. Values not checked.
+
 #### 2.1.3. String Comparison
 
 Determine the fastest way to check if a string starts with another string in
@@ -71,6 +76,10 @@ C++.
 - Supported: Linux, QNX 7.1, QNX 8.0
 - [Documentation](./benchmarks/strcomp.md)
 - [Results](./benchmarks/strcomp.md)
+
+Other Platforms:
+
+- (/) Cygwin (Windows): Runs.
 
 ### 2.2. Tools
 
@@ -86,6 +95,10 @@ based on `CLOCK_REALTIME`).
 - Supported: Linux, QNX 7.1, QNX 8.0
 - [Documentation](./tools/time_compare.md)
 - [Results](./tools/time_compare.md)
+
+Other Platforms:
+
+- (/) Cygwin (Windows): Runs.
 
 #### 2.2.2. Core Latency
 
@@ -106,6 +119,7 @@ cmake -B . -S .. -DCMAKE_CXX_FLAGS="armv8.1-a+lse"
 Other Platforms:
 
 - (X) MacOS-X: Pinning threads in the Operating System not supported.
+- (/) Cygwin (Windows): Shows core latencies as expected.
 
 #### 2.2.3. Network Performance with UDP Load
 
@@ -115,3 +129,7 @@ Generate a constant rate of UDP traffic and measure system load.
 - Supported: Linux, QNX 7.1, QNX 8.0
 - [Documentation](./tools/udp_load.md)
 - [Results](./tools/udp_load/results/results.md)
+
+Other Platforms:
+
+- (X) Cygwin (Windows): Works. Values should be informational only.

@@ -209,7 +209,7 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
         log << "; W=" << W;
 #endif
 
-        // Increase crdits for the upcoming slot from `sp+1` up to `s`
+        // Increase credits for the upcoming slot from `sp+1` up to `s`
         // inclusive.
         if (s >= slots_ && packet_sent_window_count >= packets_) {
           // Only subtract credits once we've used the time of the full window.

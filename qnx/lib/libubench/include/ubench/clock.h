@@ -8,8 +8,9 @@ namespace ubench::chrono {
 /// @brief Provides the clock type used to measure the idle time.
 enum class idle_clock_type {
   null,       ///< Clock is non-functional.
-  proc_stat,  ///< Clock uses /proc/stat and jiffies
-  qnx         ///< Clock uses QNX ClockTime() call
+  proc_stat,  ///< Clock uses /proc/stat and jiffies.
+  qnx,        ///< Clock uses QNX ClockTime() call.
+  windows,    ///< Clock uses Windows.
 };
 
 /// @brief A TrivialClock that returns the total idle time for the Operating

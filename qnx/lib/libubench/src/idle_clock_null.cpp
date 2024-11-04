@@ -3,7 +3,7 @@
 namespace ubench::chrono {
 
 auto idle_clock::now() noexcept -> time_point {
-  return time_point{std::chrono::milliseconds(0)};
+  return time_point{duration(0)};
 }
 
 auto idle_clock::is_available() noexcept -> bool { return false; }

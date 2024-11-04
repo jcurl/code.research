@@ -32,11 +32,12 @@ else()
     endif()
 
     string(TOUPPER "${CMAKE_SYSTEM_NAME}" upper_CMAKE_SYSTEM_NAME)
-    if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX" OR upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
-        # Don't rely on this for Cygwin, the resolution appears to be really
-        # bad. Only expect that it compiles.
+    if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
         target_sources(${LIBRARY} PRIVATE idle_clock_linux.cpp)
         target_sources(${LIBRARY} PRIVATE process_clock_linux.cpp)
+    elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+        target_sources(${LIBRARY} PRIVATE idle_clock_cygwin.cpp)
+        target_sources(${LIBRARY} PRIVATE process_clock_cygwin.cpp)
     else()
         target_sources(${LIBRARY} PRIVATE idle_clock_null.cpp)
         target_sources(${LIBRARY} PRIVATE process_clock_null.cpp)
