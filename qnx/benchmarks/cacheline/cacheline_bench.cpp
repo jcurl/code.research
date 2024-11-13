@@ -16,7 +16,11 @@ __attribute__((noinline)) auto stride_copy(std::uint8_t* arr1,
                                            std::uint32_t slice) -> void {
   for (std::uint32_t s = 0; s < slice; s++) {
     for (std::uint32_t i = 0; i < buffer_size; i += slice) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+      // We know the copy is copying garbage data. We don't do anything with it.
+      // It's for measuring the time of the operation only.
+      //
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic,clang-analyzer-core.uninitialized.Assign)
       arr2[i] = arr1[i];
     }
   }

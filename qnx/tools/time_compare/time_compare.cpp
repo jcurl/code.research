@@ -153,21 +153,29 @@ auto main(/* int argc, char* argv[] */) -> int {
     auto sysclk = std::chrono::system_clock::now();
     auto hiresclk = std::chrono::high_resolution_clock::now();
     auto stdclk = std::chrono::steady_clock::now();
-    auto monoclk = clock(CLOCK_MONOTONIC).value();
-    auto realclk = clock(CLOCK_REALTIME).value();
+    auto monoclk = clock(CLOCK_MONOTONIC);
+    auto realclk = clock(CLOCK_REALTIME);
 #if __QNXNTO__
     auto clkcyc = qnx_clockcycles();
 #endif
 
     std::cout << std::right << std::setw(22) << print_time(sysclk) << " "
               << std::right << std::setw(22) << print_time(hiresclk) << " "
-              << std::right << std::setw(22) << print_time(stdclk) << " "
-              << std::right << std::setw(22) << print_time(monoclk) << " "
-              << std::right << std::setw(22) << print_time(realclk) << " "
+              << std::right << std::setw(22) << print_time(stdclk) << " ";
+    if (monoclk) {
+      std::cout << std::right << std::setw(22) << print_time(monoclk.value()) << " ";
+    } else {
+      std::cout << std::right << std::setw(22) << "Error" << " ";
+    }
+    if (realclk) {
+      std::cout << std::right << std::setw(22) << print_time(realclk.value()) << " ";
+    } else {
+      std::cout << std::right << std::setw(22) << "Error" << " ";
+    }
 #if __QNXNTO__
-              << std::right << std::setw(22) << print_time(clkcyc) << " "
+    std::cout << std::right << std::setw(22) << print_time(clkcyc) << " ";
 #endif
-              << std::endl;
+    std::cout << std::endl;
   }
 
   return 0;

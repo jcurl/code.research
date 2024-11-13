@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <unistd.h>
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
