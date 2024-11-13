@@ -22,7 +22,7 @@ repository.
 ## 1. Project Goals
 
 The project aims to provide simple microbenchmarking tools that can be used to
-compare unix-like systems. This is a research project. It should be easy for
+compare Unix-like systems. This is a research project. It should be easy for
 users to build on the Tier 1 targets using the GCC compiler.
 
 ### 1.1. Secondary Goals
@@ -34,7 +34,7 @@ deliver interesting comparisons.
 
 As part of portability, decisions on code separation must be made, separation
 using the build tool CMake, and can lead to better, maintainable software (think
-about using the CMake buildsystem to choose different files for compilation for
+about using the CMake build system to choose different files for compilation for
 larger changes, or macros for smaller variants). It can serve as an example for
 other esoteric platforms.
 
@@ -45,7 +45,7 @@ part of the research we should not disregard correctness and design.
 
 Code written should still be pragmatic (a goal).
 
-Don't overuse abstractions and generic libraries and reusability and sharable
+Don't overuse abstractions and generic libraries and reusability and shareable
 code. Share code only when there is a use case for it. This occurs typically for
 Operating System abstractions when supporting multiple platforms, to keep the
 rest of the code maintainable by reducing variant handling. When writing a
@@ -65,8 +65,11 @@ complexity of testing.
 
 The following systems are used for development:
 
-- Ubuntu 20.04, 22.04
+- Ubuntu 22.04
 - CMake 3.14
+- podman version 3.4.4
+  - Allows building in Ubuntu 20.04, 22.04, 24.04 within a container. See
+    `scripts/build.sh`
 - GCC 8.3.0 or later with C++17 (the standard compiler toolchain with the OS
   used)
 
@@ -85,8 +88,10 @@ The following platforms are targetted for running benchmarks. Not all tools may
 build, but the build system should disable such tools that are not supported:
 
 - Linux (Ubuntu 20.04 and later)
-- QNX 7.1.0
-- QNX 8.0.0
+  - CMake 3.14 and later
+  - GCC 8.3.0 and later
+- QNX 7.1
+- QNX 8.0
 
 Target Compiler is GCC for the platform.
 
@@ -96,15 +101,16 @@ familiar with CMake and most people already have all the necessary tooling to
 build projects based on CMake. CMake is significantly simpler to write for, and
 use, than automake.
 
+See the `scripts/Makefile` for running the target `all` for the various targets,
+using `podman` under Linux (Ubuntu 22.04 and later). This automates the checks
+before committing changes.
+
 ### 3.2. Tier 2
 
 There may be patches for other platforms. The support for other platforms are
 not continuously tested, may result in data that is incorrect. However, there is
 value in such platforms for the sake of portability and designing code to handle
 the different variants.
-
-Clang and Clang++ are Tier2 compiler targets. Their usage can be used to help
-improve the quality and portability of the software.
 
 ## 4. Submitting Patches
 
@@ -133,15 +139,17 @@ make clangformat
 
 #### 4.1.4. Tier 1 Targets
 
-Try and test on all possible targets:
+Try and test on all possible targets (see the `scripts` folder for automatic
+Ubuntu targets):
 
 | OS / Architecture | x86 | x86_64 | RPi 4 | RPi 5 |
 | ----------------- | --- | ------ | ----- | ----- |
 | Ubuntu 20.04      | -   | X      | -     | -     |
 | Ubuntu 22.04      | -   | X      | -     | -     |
+| Ubuntu 24.04      | -   | X      | -     | -     |
 | RPi OS            | -   | -      | X     | X     |
-| QNX 7.1.0         | -   | -      | X     | -     |
-| QNX 8.0.0         | -   | -      | X     | -     |
+| QNX 7.1           | -   | -      | X     | -     |
+| QNX 8.0           | -   | -      | X     | -     |
 
 ### 4.2. Separation between Library Code and Tools
 
@@ -151,13 +159,14 @@ to be generalised or put under a library.
 Guidelines when to put in the `libubench` library would be:
 
 - Common functions that abstract the Operating System (such as timers, thread
-  pinning, networking).
+  pinning, networking). It is especially useful for variant handling to be done
+  in the library.
 - If more than one tool requires the code. In this case, refactor the existing
   tool and put it in the library.
 
 By minimising the code in the library, it becomes less burdensome to retest all
 the tools on the supported targets. Existing test results remain generally
-valid. Breaking code through isolation of code is reduced.
+valid. Breaking targets through isolation of code is reduced.
 
 By putting non-essential, reusable code, that is Operating Specific, code is
 simpler to maintain without affecting test results.

@@ -35,6 +35,10 @@ make -j8
 See further instructions for the tools for specific build instructions (such as
 enabling assembly instruction sets, etc.).
 
+See the `scripts` folder for using `podman` to build for Linux targets inside a
+container. See documentation [README.md](./scripts/README.md) for further
+information. More development information is in [Developer.md](./DEVELOPER.md).
+
 ## 2. Installed Binaries
 
 ### 2.1. Benchmarks
