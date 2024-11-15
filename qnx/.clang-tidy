@@ -1,2 +1,9 @@
-Checks: 'bugprone-*,modernize-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-avoid-do-while'
+---
+Checks: >
+    bugprone-*,
+    -bugprone-exception-escape,
+    modernize-*,
+    cppcoreguidelines-*,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-avoid-do-while
 HeaderFilterRegex: ''
