@@ -13,24 +13,21 @@ INTERACTIVE=0
 ROOT=0
 CODENAME=focal
 
+CODENAMESET=0
 OPTSTRING="c:d:irv:?"
-while getopts ${OPTSTRING} OPTION; do
+while getopts $OPTSTRING OPTION; do
   case $OPTION in
   i)
     INTERACTIVE=1
     ;;
   c)
     CODENAME=$OPTARG
+    CODENAMESET=1
     ;;
   d)
     DISTRO=$OPTARG
-    if [ -z "${DISTRO}" ]; then
-      echo "Must provide a distribution"
-      exit 1
-    fi
-    if [ ! -f "${BASEDIR}/qnx/scripts/docker/${DISTRO}-docker" ]; then
-      echo "Can't find qnx/scripts/docker/${DISTRO}-docker"
-      exit 1
+    if [ $CODENAMESET -eq 0 ]; then
+      CODENAME=""
     fi
     ;;
   r)
@@ -79,11 +76,31 @@ done
 shift $((OPTIND-1))
 OTHERARGS=$@
 
-echo CODENAME=${CODENAME}
+if [ "$CODENAME" == "" ]; then
+  echo "Must set the code name."
+  exit 1
+fi
+if [ "$DISTRO" == "" ]; then
+  echo "Distro is not set."
+  exit 1
+fi
 
-podman image inspect "coderesearch:${CODENAME}" > /dev/null 2> /dev/null
+# If the user provides "latest", then this could be many different
+# distributions. So rename it to not conflict.
+PODVERSION=$DISTRO-$CODENAME
+echo PODVERSION=coderesearch:$PODVERSION
+
+podman image inspect "coderesearch:$PODVERSION" > /dev/null 2> /dev/null
 if [ $? -ne 0 ]; then
-  podman build --build-arg CODE_VERSION=${CODENAME} -t "coderesearch:${CODENAME}" $BASEDIR/qnx/scripts/docker -f $BASEDIR/qnx/scripts/docker/${DISTRO}-docker
+  DOCKERFILE=$BASEDIR/qnx/scripts/docker/$PODVERSION-docker
+  if [ ! -f "$DOCKERFILE" ]; then
+    DOCKERFILE=$BASEDIR/qnx/scripts/docker/$DISTRO-docker
+  fi
+  if [ ! -f "$DOCKERFILE" ]; then
+    echo "Can't find file 'docker/$PODVERSION-docker' to build"
+    exit 1
+  fi
+  podman build --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
   if [ $? -ne 0 ]; then
     echo "Error building. Exiting"
     exit 1
@@ -96,21 +113,21 @@ else
   ROOTOPT="--userns=keep-id"
 fi
 
-VARIANTEXT=""
-if [ -z "${VARIANT}" ]; then
-  VARIANTEXT="${CODENAME}"
+BUILDDIR=""
+if [ -z "$VARIANT" ]; then
+  BUILDDIR="$PODVERSION"
 else
-  VARIANTEXT="${CODENAME}-${VARIANT}"
+  BUILDDIR="$PODVERSION-$VARIANT"
 fi
 
-if [ ! -e "${BASEDIR}/qnx/build/${DISTRO}-${VARIANTEXT}" ]; then
-  mkdir -p "${BASEDIR}/qnx/build/${DISTRO}-${VARIANTEXT}"
+if [ ! -e "$BASEDIR/qnx/build/$BUILDDIR" ]; then
+  mkdir -p "$BASEDIR/qnx/build/$BUILDDIR"
 fi
 
 if [ ${INTERACTIVE} -ne 0 ]; then
-  podman run -it --rm ${ROOTOPT} -v ${PWD}/${BASEDIR}:/source:ro -v "${PWD}/${BASEDIR}/qnx/build/${DISTRO}-${VARIANTEXT}":/build:rw --tmpfs /tmp "coderesearch:${CODENAME}"
+  podman run -it --rm $ROOTOPT -v $PWD/$BASEDIR:/source:ro -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION"
 else
   echo "Non-Interactive"
-  echo "${OTHERARGS}"
-  podman run -t --rm ${ROOTOPT} -v ${PWD}/${BASEDIR}:/source:ro -v "${PWD}/${BASEDIR}/qnx/build/${DISTRO}-${VARIANTEXT}":/build:rw --tmpfs /tmp "coderesearch:${CODENAME}" sh -c "${OTHERARGS}"
+  echo "$OTHERARGS"
+  podman run -t --rm $ROOTOPT -v $PWD/$BASEDIR:/source:ro -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION" sh -c "$OTHERARGS"
 fi

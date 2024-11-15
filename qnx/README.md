@@ -28,7 +28,7 @@ To compile for QNX
 . ./qnxsdp-env.sh
 mkdir -p build/qnx7
 cd build/qnx7
-cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../../../toolchain/qcc_aarch64le
+cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../../../toolchain/qcc_aarch64le.cmake
 make -j8
 ```
 

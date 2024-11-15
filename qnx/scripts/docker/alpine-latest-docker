@@ -1,0 +1,12 @@
+ARG CODE_VERSION=latest
+FROM alpine:${CODE_VERSION}
+LABEL MAINTAINER="Davide Cunial <dcunial@proton.me>"
+
+RUN apk update                                                          \
+    && apk add clang clang-extra-tools compiler-rt lld libc++-dev       \
+       libunwind-dev musl-dev cmake samurai
+
+RUN mkdir /source
+RUN mkdir /build
+WORKDIR /build
+CMD [ "sh" ]

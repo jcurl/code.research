@@ -1,6 +1,6 @@
 # To use this toolchain file
 #
-# cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain/qcc_x86_64
+# cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain/qcc_x86_64.cmake
 #
 
 set(CMAKE_SYSTEM_NAME QNX)
