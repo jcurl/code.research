@@ -10,11 +10,6 @@ target_compile_features(${BINARY} PRIVATE cxx_std_17)
 target_link_libraries(${BINARY} PRIVATE GTest::gtest_main)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
-if(QNXNTO)
-    # Googletest needs `regex`, QNX has this as a separate library.
-    target_link_libraries(${BINARY} PRIVATE regex)
-endif()
-
 if(IS_DEBUG)
     add_sanitizers(rcutest)
 endif()

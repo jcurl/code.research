@@ -1,4 +1,4 @@
-include(arm64_has_lse)
+include(research/arm64_has_lse)
 
 set(BINARY core_latency)
 set(SOURCES core_latency.cpp

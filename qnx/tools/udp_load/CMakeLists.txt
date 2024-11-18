@@ -1,5 +1,5 @@
 include(CheckSymbolExists)
-include(sockets)
+include(research/sockets)
 
 find_package(Threads REQUIRED)
 

@@ -10,6 +10,9 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(FATAL_ERROR "In-source builds are not allowed")
 endif()
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules" ${CMAKE_MODULE_PATH})
+include(research/qnx)
+
 # Default to DEBUG mode if not provided.
 if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Debug")
@@ -27,11 +30,6 @@ find_package(Sanitizers)
 # See https://github.com/zemasoft/clangformat-cmake
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/clang-format" ${CMAKE_MODULE_PATH})
 include(ClangFormat)
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/qnx" ${CMAKE_MODULE_PATH})
-include(qnx)
-
-get_qnx_version()
 
 # Note, if you add benchmarks, this must occur before the clang-tidy checks
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")

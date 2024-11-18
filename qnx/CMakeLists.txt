@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(benchmarks CXX)
 
 include(GNUInstallDirs)
@@ -25,6 +25,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/" ${CMAKE_MODULE_PATH})
+include(research/qnx)
 
 # Default to DEBUG mode if not provided.
 if(CMAKE_BUILD_TYPE STREQUAL "")
@@ -43,11 +44,6 @@ find_package(Sanitizers)
 # See https://github.com/zemasoft/clangformat-cmake
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/clang-format" ${CMAKE_MODULE_PATH})
 include(ClangFormat)
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/qnx" ${CMAKE_MODULE_PATH})
-include(qnx)
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/arm" ${CMAKE_MODULE_PATH})
 
 # So that we can find "config.h"
 include_directories(${PROJECT_BINARY_DIR})
@@ -84,7 +80,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/../external/googletest external/googletest)
 # force Google Benchmark to use the C++ version we want (but Google Test will).
 # The variable `BENCHMARK_CXX_STANDARD` is not a cached variable, but this
 # should ideally be set to the value of 17.
-if (QNXNTO)
+if (QNXNTO AND CMAKE_SYSTEM_VERSION VERSION_GREATER_EQUAL 7.1)
     # QNX has -lregex needed for linking
     set(BENCHMARK_CXX_LIBRARIES regex)
 endif()
