@@ -6,6 +6,7 @@
 #include <memory>
 #include <thread>
 
+#include "ubench/net.h"
 #include "ubench/thread.h"
 #include "options.h"
 #include "udp_talker.h"
@@ -103,8 +104,8 @@ auto main(int argc, char* argv[]) -> int {
       std::cout << "unknown" << std::endl;
       break;
   }
-  std::cout << " Source: " << inet_ntos(saddr) << std::endl;
-  std::cout << " Destination: " << inet_ntos(daddr) << std::endl;
+  std::cout << " Source: " << saddr << std::endl;
+  std::cout << " Destination: " << daddr << std::endl;
   std::cout << " Slots (n): " << options.slots() << std::endl;
   std::cout << " Width (m): " << options.width() << " (ms)" << std::endl;
   std::cout << " Packets (p): " << packets << std::endl;

@@ -3,6 +3,7 @@ include(GoogleTest)
 set(BINARY ubench_test)
 set(SOURCES
     args_test.cpp
+    net_test.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

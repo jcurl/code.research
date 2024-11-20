@@ -101,20 +101,6 @@ void print_help(std::string_view prog_name) {
 
 }  // namespace
 
-auto inet_ntos(const struct sockaddr_in& addr) -> const std::string {
-  // C/C++ interop with the OS.
-  //
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-  char paddr[INET_ADDRSTRLEN];
-  if (inet_ntop(AF_INET, &(addr.sin_addr), (char*)paddr, sizeof(paddr)) ==
-      nullptr)
-    return std::string{};
-
-  std::stringstream result;
-  result << std::string{(char*)paddr} << ":" << ntohs(addr.sin_port);
-  return std::string{result.str()};
-}
-
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
 options::options(int& argc, char* const argv[]) noexcept {
   int c = 0;

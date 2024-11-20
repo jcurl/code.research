@@ -1,0 +1,13 @@
+// Include file <linux/if.h> exists.
+#cmakedefine01 HAVE_NET_INCLUDE_LINUX_IF
+
+// Function getifaddrs() and freeifaddrs() exist.
+#cmakedefine01 HAVE_NET_GETIFADDRS
+
+// Network Interface Flags
+#cmakedefine01 HAVE_NET_IFF_LOOPBACK
+#cmakedefine01 HAVE_NET_IFF_POINTOPOINT
+#cmakedefine01 HAVE_NET_IFF_MULTICAST
+#cmakedefine01 HAVE_NET_IFF_BROADCAST
+// Linux Lower/Up (linux/if.h)
+#cmakedefine01 HAVE_NET_IFF_LOWER_UP
