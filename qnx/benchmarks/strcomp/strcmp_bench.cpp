@@ -1,8 +1,8 @@
-#include <benchmark/benchmark.h>
-
 #include <cstring>
 #include <string>
 #include <string_view>
+
+#include <benchmark/benchmark.h>
 
 #ifdef NDEBUG
 #include <cassert>
@@ -574,16 +574,14 @@ BENCHMARK(BM_StrVFindWithFirstOfLongLenCheck);
 // libc API
 // --------------------------------------------------------------------------
 
-static __attribute__((noinline)) auto StrCFindWithCompareN(const char* str,
-                                                           const char* substr)
-    -> bool {
+static __attribute__((noinline)) auto StrCFindWithCompareN(
+    const char* str, const char* substr) -> bool {
   auto token_len = strlen(substr);
   return strncmp(str, substr, token_len) == 0;
 }
 
-static __attribute__((noinline)) auto StrCFindWithCompare(const char* str,
-                                                          const char* substr)
-    -> bool {
+static __attribute__((noinline)) auto StrCFindWithCompare(
+    const char* str, const char* substr) -> bool {
   return strcmp(str, substr) == 0;
 }
 

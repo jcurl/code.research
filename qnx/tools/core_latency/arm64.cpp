@@ -1,17 +1,17 @@
 #include "arm64.h"
 
-#include "config.h"
-
 #if defined(__aarch64__) && HAVE_CXX_ARM64_LSE
 #if defined(__QNX__)
 #include <sys/syspage.h>
 #endif
 
 #if defined(__linux__)
-#include <asm/hwcap.h>
 #include <sys/auxv.h>
+#include <asm/hwcap.h>
 #endif
 #endif
+
+#include "config.h"
 
 auto has_arm64_lse() -> bool {
 #if !defined(__aarch64__) || !HAVE_CXX_ARM64_LSE

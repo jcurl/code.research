@@ -1,4 +1,3 @@
-#include <benchmark/benchmark.h>
 #include <unistd.h>
 
 #include <charconv>
@@ -8,15 +7,15 @@
 #include <iostream>
 #include <vector>
 
+#include <benchmark/benchmark.h>
+
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::uint32_t buffer_size = 0;
 
-__attribute__((noinline)) auto stride_copy(std::uint8_t* arr1,
-                                           std::uint8_t* arr2,
-                                           std::uint32_t slice) -> void {
+__attribute__((noinline)) auto stride_copy(
+    std::uint8_t* arr1, std::uint8_t* arr2, std::uint32_t slice) -> void {
   for (std::uint32_t s = 0; s < slice; s++) {
     for (std::uint32_t i = 0; i < buffer_size; i += slice) {
-
       // We know the copy is copying garbage data. We don't do anything with it.
       // It's for measuring the time of the operation only.
       //
@@ -84,8 +83,7 @@ auto main(int argc, char** argv) -> int {
     switch (c) {
       case 'b': {
         std::string buffer_arg = optarg;
-        auto [ptr, ec] = std::from_chars(
-            buffer_arg.data(),
+        auto [ptr, ec] = std::from_chars(buffer_arg.data(),
             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             buffer_arg.data() + buffer_arg.size(), buffer_size_opt);
         if (ec == std::errc{}) {

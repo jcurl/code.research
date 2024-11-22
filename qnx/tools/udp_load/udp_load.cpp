@@ -6,8 +6,8 @@
 #include <memory>
 #include <thread>
 
-#include "options.h"
 #include "ubench/thread.h"
+#include "options.h"
 #include "udp_talker.h"
 
 auto main(int argc, char* argv[]) -> int {
@@ -53,8 +53,8 @@ auto main(int argc, char* argv[]) -> int {
         return 1;
     }
 
-    talker->set_shaping(options.slots(), options.width(), packets_thread,
-                        options.size());
+    talker->set_shaping(
+        options.slots(), options.width(), packets_thread, options.size());
     if (!talker->set_source_addr(saddr)) {
       std::cerr << "Error: Invalid source address" << std::endl;
       return 1;
@@ -69,9 +69,9 @@ auto main(int argc, char* argv[]) -> int {
     }
 
     auto runner = [&sync, &packets_sent, &packets_expected, &wait_time,
-                   &sent_time,
-                   &thread_failures](std::unique_ptr<udp_talker> talker,
-                                     std::chrono::milliseconds duration) {
+                      &sent_time,
+                      &thread_failures](std::unique_ptr<udp_talker> talker,
+                      std::chrono::milliseconds duration) {
       sync.wait();
       auto result = talker->run(duration);
       if (result) {

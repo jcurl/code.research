@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <thread>
 
-#include "statistics.h"
 #include "ubench/thread.h"
+#include "statistics.h"
 
 auto corerw_benchmark::name() const -> std::string {
   return std::string{"Read/Write"};

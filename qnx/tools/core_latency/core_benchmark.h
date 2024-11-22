@@ -14,7 +14,7 @@ class core_benchmark : public benchmark {
   core_benchmark() = default;
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   core_benchmark(std::uint32_t iterations, std::uint32_t samples,
-                 cas_type ctype = cas_type::cpp)
+      cas_type ctype = cas_type::cpp)
       : iterations_{iterations}, samples_{samples}, ctype_{ctype} {}
 
   auto name() const -> std::string override;

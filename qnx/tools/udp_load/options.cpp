@@ -1,7 +1,7 @@
 #include "options.h"
 
-#include <arpa/inet.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #include <charconv>
@@ -44,8 +44,8 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
     if (arg.size() < port_sep - 1) return false;
 
     std::uint16_t port = 0;
-    std::string_view portstr(arg.data() + port_sep + 1,
-                             arg.size() - port_sep - 1);
+    std::string_view portstr(
+        arg.data() + port_sep + 1, arg.size() - port_sep - 1);
     if (!parse_unsigned(portstr, port)) return false;
     addr.sin_port = htons(port);
 

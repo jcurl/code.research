@@ -10,10 +10,11 @@
 #include <thread>
 #include <unordered_map>
 
-#include "config.h"
+#include "ubench/thread.h"
 #include "core_benchmark.h"
 #include "corerw_benchmark.h"
-#include "ubench/thread.h"
+
+#include "config.h"
 
 static const std::unordered_map<std::string_view, cas_type>
     supported_cas_benchmarks = {
@@ -59,8 +60,7 @@ auto main(int argc, char* argv[]) -> int {
     switch (c) {
       case 's': {
         std::string str_samples = optarg;
-        auto [ptr, ec] = std::from_chars(
-            str_samples.data(),
+        auto [ptr, ec] = std::from_chars(str_samples.data(),
             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             str_samples.data() + str_samples.size(), samples);
         if (ec == std::errc{}) {
@@ -78,8 +78,7 @@ auto main(int argc, char* argv[]) -> int {
       }
       case 'i': {
         std::string str_iters = optarg;
-        auto [ptr, ec] = std::from_chars(
-            str_iters.data(),
+        auto [ptr, ec] = std::from_chars(str_iters.data(),
             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             str_iters.data() + str_iters.size(), iterations);
         if (ec == std::errc{}) {

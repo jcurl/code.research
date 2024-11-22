@@ -10,9 +10,9 @@
 #include <time.h>
 
 #if __QNXNTO__
-#include <inttypes.h>
 #include <sys/neutrino.h>
 #include <sys/syspage.h>
+#include <inttypes.h>
 #endif
 
 template <class TClock>
@@ -27,7 +27,7 @@ template <class TClock, class TDuration>
 auto print_time(std::chrono::time_point<TClock, TDuration>& time)
     -> std::string {
   std::uint64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                         time.time_since_epoch())
+      time.time_since_epoch())
                          .count();
 
   std::stringstream ss;
@@ -83,7 +83,7 @@ auto print_qnx_details() -> void {
 
 auto qnx_clockcycles()
     -> std::chrono::time_point<std::chrono::high_resolution_clock,
-                               std::chrono::nanoseconds> {
+        std::chrono::nanoseconds> {
   uint64_t c = ClockCycles();
 
   uint64_t cs = c / SYSPAGE_ENTRY(qtime)->cycles_per_sec;
@@ -91,7 +91,7 @@ auto qnx_clockcycles()
                 SYSPAGE_ENTRY(qtime)->cycles_per_sec;
   auto duration = std::chrono::seconds{cs} + std::chrono::nanoseconds{cn};
   return std::chrono::time_point<std::chrono::high_resolution_clock,
-                                 std::chrono::nanoseconds>{
+      std::chrono::nanoseconds>{
       std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(
           duration)};
 }
@@ -99,7 +99,7 @@ auto qnx_clockcycles()
 
 auto clock(clockid_t clockid)
     -> std::optional<std::chrono::time_point<std::chrono::system_clock,
-                                             std::chrono::nanoseconds>> {
+        std::chrono::nanoseconds>> {
   struct timespec tp = {};
   int result = clock_gettime(clockid, &tp);
   if (result) return {};
@@ -107,7 +107,7 @@ auto clock(clockid_t clockid)
   auto duration =
       std::chrono::seconds{tp.tv_sec} + std::chrono::nanoseconds{tp.tv_nsec};
   return std::chrono::time_point<std::chrono::system_clock,
-                                 std::chrono::nanoseconds>{
+      std::chrono::nanoseconds>{
       std::chrono::duration_cast<std::chrono::system_clock::duration>(
           duration)};
 }
@@ -163,14 +163,18 @@ auto main(/* int argc, char* argv[] */) -> int {
               << std::right << std::setw(22) << print_time(hiresclk) << " "
               << std::right << std::setw(22) << print_time(stdclk) << " ";
     if (monoclk) {
-      std::cout << std::right << std::setw(22) << print_time(monoclk.value()) << " ";
+      std::cout << std::right << std::setw(22) << print_time(monoclk.value())
+                << " ";
     } else {
-      std::cout << std::right << std::setw(22) << "Error" << " ";
+      std::cout << std::right << std::setw(22) << "Error"
+                << " ";
     }
     if (realclk) {
-      std::cout << std::right << std::setw(22) << print_time(realclk.value()) << " ";
+      std::cout << std::right << std::setw(22) << print_time(realclk.value())
+                << " ";
     } else {
-      std::cout << std::right << std::setw(22) << "Error" << " ";
+      std::cout << std::right << std::setw(22) << "Error"
+                << " ";
     }
 #if __QNXNTO__
     std::cout << std::right << std::setw(22) << print_time(clkcyc) << " ";

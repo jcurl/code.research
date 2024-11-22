@@ -1,7 +1,7 @@
-#include "mallopt.h"
-
 #include <iostream>
 #include <string_view>
+
+#include "mallopt.h"
 
 auto mallopt_options::parse_mallopt_arg(std::string_view) -> bool {
   return false;

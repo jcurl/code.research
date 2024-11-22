@@ -1,5 +1,5 @@
-#include <inttypes.h>
 #include <sys/neutrino.h>
+#include <inttypes.h>
 
 #include "ubench/clock.h"
 

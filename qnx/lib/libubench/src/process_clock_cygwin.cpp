@@ -10,8 +10,8 @@ auto process_clock::now() noexcept -> time_point {
   FILETIME kernelTime{};
   FILETIME userTime{};
   HANDLE process = GetCurrentProcess();
-  BOOL result = GetProcessTimes(process, &creationTime, &exitTime, &kernelTime,
-                                &userTime);
+  BOOL result = GetProcessTimes(
+      process, &creationTime, &exitTime, &kernelTime, &userTime);
   if (result == 0) return time_point{duration(0)};
 
   // https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime

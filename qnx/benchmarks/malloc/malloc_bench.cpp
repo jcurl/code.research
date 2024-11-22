@@ -1,10 +1,11 @@
-#include <benchmark/benchmark.h>
 #include <unistd.h>
 
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+
+#include <benchmark/benchmark.h>
 
 #include "allocator.h"
 #include "mallopt.h"
@@ -163,12 +164,12 @@ auto main(int argc, char** argv) -> int {
   benchmark::RegisterBenchmark("BM_MallocWalkFreeBench", BM_MallocWalkFreeBench)
       ->RangeMultiplier(2)
       ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_MallocClearFreeBench",
-                               BM_MallocClearFreeBench)
+  benchmark::RegisterBenchmark(
+      "BM_MallocClearFreeBench", BM_MallocClearFreeBench)
       ->RangeMultiplier(2)
       ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_MallocClearWalkFreeBench",
-                               BM_MallocClearWalkFreeBench)
+  benchmark::RegisterBenchmark(
+      "BM_MallocClearWalkFreeBench", BM_MallocClearWalkFreeBench)
       ->RangeMultiplier(2)
       ->Range(4096, 1 << 30);
   benchmark::Initialize(&argc, argv);

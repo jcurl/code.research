@@ -12,4 +12,4 @@ auto idle_clock::type() noexcept -> idle_clock_type {
   return idle_clock_type::null;
 }
 
-}  // namespace ubench
+}  // namespace ubench::chrono

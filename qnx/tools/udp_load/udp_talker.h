@@ -1,10 +1,10 @@
 #ifndef BENCHMARK_UDP_TALKER_H
 #define BENCHMARK_UDP_TALKER_H
 
-#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
+#include <netinet/in.h>
 
 #include <chrono>
 #include <cstdint>
@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "busy_measurement.h"
+
 #include "config.h"
 
 /// @brief The class to instantiate when testing.
@@ -108,8 +109,7 @@ class udp_talker {
   /// @return Returns true if setting the shaping parameters succeeded,
   /// false otherwise.
   auto set_shaping(std::uint16_t slots, std::uint16_t width,
-                   std::uint32_t packets, std::uint16_t pkt_size) noexcept
-      -> bool;
+      std::uint32_t packets, std::uint16_t pkt_size) noexcept -> bool;
 
   /// @brief Initialise the benchmark for testing.
   ///
@@ -130,8 +130,7 @@ class udp_talker {
 
  protected:
   auto virtual init_packets(const struct sockaddr_in& source,
-                            const struct sockaddr_in& dest,
-                            std::uint16_t pkt_size) noexcept -> bool;
+      const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept -> bool;
   auto virtual send_packets(std::uint16_t count) noexcept -> std::uint16_t;
 
  private:
@@ -155,8 +154,8 @@ class udp_talker_bsd : public udp_talker {
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
-                    const struct sockaddr_in& dest,
-                    std::uint16_t pkt_size) noexcept -> bool override;
+      const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept
+      -> bool override;
 
  protected:
   int socket_fd_{-1};
@@ -173,8 +172,8 @@ class udp_talker_sendto final : public udp_talker_bsd {
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
-                    const struct sockaddr_in& dest,
-                    std::uint16_t pkt_size) noexcept -> bool override;
+      const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept
+      -> bool override;
   auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
 
  private:
@@ -194,8 +193,8 @@ class udp_talker_sendmmsg final : public udp_talker_bsd {
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
-                    const struct sockaddr_in& dest,
-                    std::uint16_t pkt_size) noexcept -> bool override;
+      const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept
+      -> bool override;
   auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
 
  private:

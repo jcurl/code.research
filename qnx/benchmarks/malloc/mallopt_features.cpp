@@ -7,8 +7,9 @@
 #include <optional>
 #include <string_view>
 
-#include "config.h"
 #include "mallopt.h"
+
+#include "config.h"
 
 namespace {
 
@@ -97,8 +98,8 @@ auto parse_mallopt(std::string_view mallopt_item)
   if (value_str.size() == 0) return "Value empty";
 
   int value = 0;
-  auto [ptr, ec] = std::from_chars(value_str.data(),
-                                   value_str.data() + value_str.size(), value);
+  auto [ptr, ec] = std::from_chars(
+      value_str.data(), value_str.data() + value_str.size(), value);
   if (ec != std::errc{}) return "Value not a number";
 
   auto mallopt_param = mallopt_find(key);

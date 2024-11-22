@@ -6,10 +6,11 @@
 #include <cstdlib>
 #include <thread>
 
-#include "arm64.h"
-#include "config.h"
-#include "statistics.h"
 #include "ubench/thread.h"
+#include "arm64.h"
+#include "statistics.h"
+
+#include "config.h"
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define UNUSED(expr) \
@@ -31,8 +32,8 @@ auto cas_default(std::size_t iter, std::atomic<std::uint32_t> &flag) -> void {
     std::uint32_t expected_flag = compare;
     do {
       expected_flag = compare;
-    } while (!flag.compare_exchange_strong(
-        expected_flag, swap, std::memory_order::memory_order_relaxed,
+    } while (!flag.compare_exchange_strong(expected_flag, swap,
+        std::memory_order::memory_order_relaxed,
         std::memory_order::memory_order_relaxed));
   }
 }

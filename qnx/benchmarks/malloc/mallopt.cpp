@@ -1,6 +1,5 @@
 #include "mallopt.h"
 
-#include <benchmark/benchmark.h>
 #include <unistd.h>
 
 #include <cerrno>
@@ -11,8 +10,11 @@
 #include <optional>
 #include <string_view>
 
-#include "config.h"
+#include <benchmark/benchmark.h>
+
 #include "mlock.h"
+
+#include "config.h"
 
 mallopt_options::mallopt_options(int argc, char **argv) {
   bool help = false;

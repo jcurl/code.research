@@ -1,9 +1,9 @@
 #include "udp_talker.h"
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -75,8 +75,7 @@ auto udp_talker::set_dest_addr(const struct sockaddr_in& addr) noexcept
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto udp_talker::set_shaping(std::uint16_t slots, std::uint16_t width,
-                             std::uint32_t packets,
-                             std::uint16_t pkt_size) noexcept -> bool {
+    std::uint32_t packets, std::uint16_t pkt_size) noexcept -> bool {
   if (slots < 1) return false;
   if (width < 1) return false;
   if (packets < 1) return false;
@@ -164,8 +163,8 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
         auto send_time = std::chrono::high_resolution_clock::now();
 #ifndef NDEBUG
         auto send_time_ms =
-            std::chrono::duration_cast<std::chrono::milliseconds>(send_time -
-                                                                  start_time);
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                send_time - start_time);
         log << "t=" << send_time_ms.count() << "; s=" << s << "; r=" << r
             << "; pse=" << packet_sent_expected
             << "; pswc=" << packet_sent_window_count
@@ -175,7 +174,7 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
         auto send_snapshot = std::chrono::high_resolution_clock::now();
         total_sent_time += (send_snapshot - send_time);
         elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-                           send_snapshot - start_time)
+            send_snapshot - start_time)
                            .count();
         packet_sent_window_count += sent;
         r++;
