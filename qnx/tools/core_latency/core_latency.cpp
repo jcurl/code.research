@@ -10,6 +10,7 @@
 #include <thread>
 #include <unordered_map>
 
+#include "ubench/args.h"
 #include "ubench/thread.h"
 #include "core_benchmark.h"
 #include "corerw_benchmark.h"
@@ -59,11 +60,9 @@ auto main(int argc, char* argv[]) -> int {
   while ((c = getopt(argc, argv, "s:i:b:?")) != -1) {
     switch (c) {
       case 's': {
-        std::string str_samples = optarg;
-        auto [ptr, ec] = std::from_chars(str_samples.data(),
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            str_samples.data() + str_samples.size(), samples);
-        if (ec == std::errc{}) {
+        auto samples_arg = ubench::args::parse_int<unsigned int>(optarg);
+        if (samples_arg) {
+          samples = *samples_arg;
           if (samples < 1 || samples > 60000) {
             std::cerr << "Error: Samples should be 1..60000" << std::endl;
             exit_code = 1;
@@ -77,11 +76,9 @@ auto main(int argc, char* argv[]) -> int {
         break;
       }
       case 'i': {
-        std::string str_iters = optarg;
-        auto [ptr, ec] = std::from_chars(str_iters.data(),
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            str_iters.data() + str_iters.size(), iterations);
-        if (ec == std::errc{}) {
+        auto iters_arg = ubench::args::parse_int<unsigned int>(optarg);
+        if (iters_arg) {
+          iterations = *iters_arg;
           if (iterations < 1 || iterations > 60000) {
             std::cerr << "Error: Iterations should be 1..60000" << std::endl;
             exit_code = 1;

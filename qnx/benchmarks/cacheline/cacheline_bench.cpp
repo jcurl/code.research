@@ -9,6 +9,8 @@
 
 #include <benchmark/benchmark.h>
 
+#include "ubench/args.h"
+
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::uint32_t buffer_size = 0;
 
@@ -82,11 +84,9 @@ auto main(int argc, char** argv) -> int {
   while ((c = getopt(argc, argv, "b:?")) != -1) {
     switch (c) {
       case 'b': {
-        std::string buffer_arg = optarg;
-        auto [ptr, ec] = std::from_chars(buffer_arg.data(),
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            buffer_arg.data() + buffer_arg.size(), buffer_size_opt);
-        if (ec == std::errc{}) {
+        auto buffer_arg = ubench::args::parse_int<std::uint32_t>(optarg);
+        if (buffer_arg) {
+          buffer_size_opt = *buffer_arg;
           if (buffer_size_opt < 1 || buffer_size_opt > 512) {
             std::cerr
                 << "Error: Buffer size should be from 1 to 512 (units of MB)"

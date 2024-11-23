@@ -68,6 +68,11 @@ if(CODE_COVERAGE)
     add_compile_options(-O0)
 endif()
 
+# This is for tests that are specific to the correct functioning and debugging
+# of this repository, not necessarily expected to be used for comparison on
+# targets.
+option(ENABLE_TEST "Enable building repository tests" ON)
+
 # The `make install` target shouldn't install GTEST/GMOCK.
 set(INSTALL_GMOCK OFF)
 set(INSTALL_GTEST OFF)
@@ -133,4 +138,10 @@ add_subdirectory(lib)
 
 add_subdirectory(benchmarks)
 add_subdirectory(tools)
-#enable_testing()
+
+if(ENABLE_TEST)
+    message(STATUS "Test suite enabled with -DENABLE_TEST=on (execute with make && ctest)")
+    enable_testing()
+else()
+    message(STATUS "Test suite disabled with -DENABLE_TEST=off")
+endif()

@@ -9,25 +9,9 @@
 #include <sstream>
 #include <string_view>
 
-namespace {
+#include "ubench/args.h"
 
-/// @brief Parses the string as an unsigned integer.
-///
-/// @tparam T The type to convert from the string to.
-///
-/// @param arg The argument given to the program which is to be parsed to an
-/// integer.
-///
-/// @param value [out] The result of the parsing
-///
-/// @return true if the conversion was successful, false otherwise.
-template <typename T>
-auto parse_unsigned(std::string_view arg, T& value) -> bool {
-  auto [ptr, ec] = std::from_chars(arg.data(), arg.data() + arg.size(), value);
-  if (ec != std::errc{}) return false;
-  if (ptr != arg.data() + arg.size()) return false;
-  return true;
-}
+namespace {
 
 /// @brief Parses the string in the format of an IPv4 number, a colon and a port
 ///
@@ -43,11 +27,11 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
   if (port_sep != std::string_view::npos) {
     if (arg.size() < port_sep - 1) return false;
 
-    std::uint16_t port = 0;
     std::string_view portstr(
         arg.data() + port_sep + 1, arg.size() - port_sep - 1);
-    if (!parse_unsigned(portstr, port)) return false;
-    addr.sin_port = htons(port);
+    auto port = ubench::args::parse_int<std::uint16_t>(portstr);
+    if (!port) return false;
+    addr.sin_port = htons(*port);
 
     // Get a NUL-terminated string.
     std::string addrstr{arg.data(), port_sep};
@@ -147,77 +131,77 @@ options::options(int& argc, char* const argv[]) noexcept {
   while ((c = getopt(argc, argv, "n:m:p:s:d:B:T:S:D:I?")) != -1) {
     switch (c) {
       case 'n': {
-        std::uint16_t n = 0;
-        if (!parse_unsigned(std::string_view{optarg}, n)) {
+        auto n = ubench::args::parse_int<std::uint16_t>(optarg);
+        if (!n) {
           std::cerr << "Error: Invalid value for the number of slots - "
                     << optarg << std::endl;
           return;
         }
-        if (n < 1) {
+        if (*n < 1) {
           std::cerr << "Error: Invalid value for the number of slots, must be "
                        "one or more, got "
-                    << n << std::endl;
+                    << *n << std::endl;
           return;
         }
-        slots_ = n;
+        slots_ = *n;
         break;
       }
       case 'm': {
-        std::uint16_t m = 0;
-        if (!parse_unsigned(std::string_view{optarg}, m)) {
+        auto m = ubench::args::parse_int<std::uint16_t>(optarg);
+        if (!m) {
           std::cerr << "Error: Invalid value for width - " << optarg
                     << std::endl;
           return;
         }
-        if (m < 1) {
+        if (*m < 1) {
           std::cerr << "Error: Invalid value for the slot width, must be one "
                        "or more, got "
-                    << m << std::endl;
+                    << *m << std::endl;
           return;
         }
-        width_ = m;
+        width_ = *m;
         break;
       }
       case 'p': {
-        std::uint32_t p = 0;
-        if (!parse_unsigned(std::string_view{optarg}, p)) {
+        auto p = ubench::args::parse_int<std::uint32_t>(optarg);
+        if (!p) {
           std::cerr << "Error: Invalid value for packets per window - "
                     << optarg << std::endl;
           return;
         }
-        if (p < 1) {
+        if (*p < 1) {
           std::cerr << "Error: Invalid value for packets per window, must be "
                        "one or more, got "
-                    << p << std::endl;
+                    << *p << std::endl;
           return;
         }
-        packets_ = p;
+        packets_ = *p;
         break;
       }
       case 's': {
-        std::uint16_t s = 0;
-        if (!parse_unsigned(std::string_view{optarg}, s)) {
+        auto s = ubench::args::parse_int<std::uint16_t>(optarg);
+        if (!s) {
           std::cerr << "Error: Invalid value for packet size - " << optarg
                     << std::endl;
           return;
         }
-        size_ = s;
+        size_ = *s;
         break;
       }
       case 'd': {
-        std::uint32_t t = 0;
-        if (!parse_unsigned(std::string_view{optarg}, t)) {
+        auto t = ubench::args::parse_int<std::uint32_t>(optarg);
+        if (!t) {
           std::cerr << "Error: Invalid value for duration - " << optarg
                     << std::endl;
           return;
         }
-        if (t < 1000) {
+        if (*t < 1000) {
           std::cerr << "Error: Invalid value for duration, should be at least "
                        "1000ms, got "
-                    << t << std::endl;
+                    << *t << std::endl;
           return;
         }
-        duration_ = t;
+        duration_ = *t;
         break;
       }
       case 'B': {
@@ -238,19 +222,19 @@ options::options(int& argc, char* const argv[]) noexcept {
         break;
       }
       case 'T': {
-        std::uint16_t t = 0;
-        if (!parse_unsigned(std::string_view{optarg}, t)) {
+        auto t = ubench::args::parse_int<std::uint16_t>(optarg);
+        if (!t) {
           std::cerr << "Error: Invalid value for number of threads - " << optarg
                     << std::endl;
           return;
         }
-        if (t < 1 || t > 255) {
+        if (*t < 1 || *t > 255) {
           std::cerr << "Error: Invalid value for number of threads, should be "
                        "in the range 1..255, got "
-                    << t << std::endl;
+                    << *t << std::endl;
           return;
         }
-        threads_ = t;
+        threads_ = *t;
         break;
       }
       case 'S': {
