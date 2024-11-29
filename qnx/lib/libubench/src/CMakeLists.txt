@@ -3,10 +3,12 @@ include(CMakePushCheckState)
 
 set(LIBRARY ubench)
 set(SOURCES
-    ../include/ubench/thread.h
-    ../include/ubench/clock.h
-    sync_event.cpp
     ../include/ubench/args.h args.cpp
+    ../include/ubench/clock.h
+    ../include/ubench/file.h
+    sync_event.cpp
+    ../include/ubench/os.h
+    ../include/ubench/thread.h
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 
