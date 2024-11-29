@@ -12,11 +12,3 @@ set(CMAKE_C_COMPILER qcc)
 set(CMAKE_C_COMPILER_TARGET ${arch})
 set(CMAKE_CXX_COMPILER q++)
 set(CMAKE_CXX_COMPILER_TARGET ${arch})
-
-# Disable the usage of clang-tidy for this toolchain, that will otherwise fail with
-# errors like:
-#
-# error: error reading 'CMakeFiles/dltudpbeacon.dir/src/dltudpbeacon.cpp.o.d' [clang-diagnostic-error]
-# error: unknown argument: '-MF' [clang-diagnostic-error]
-# error: unsupported option '-V gcc_ntox86_64' [clang-diagnostic-error]
-set(CLANG_TIDY_EXE "")

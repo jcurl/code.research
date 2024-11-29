@@ -12,7 +12,3 @@ set(CMAKE_C_COMPILER qcc)
 set(CMAKE_C_COMPILER_TARGET ${arch})
 set(CMAKE_CXX_COMPILER q++)
 set(CMAKE_CXX_COMPILER_TARGET ${arch})
-
-# Disable the usage of clang-tidy for this toolchain, that will otherwise fail with
-# errors.
-set(CLANG_TIDY_EXE "")
