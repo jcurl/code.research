@@ -16,10 +16,10 @@ enum class idle_clock_type {
 /// @brief A TrivialClock that returns the total idle time for the Operating
 /// System up until the point now().
 struct idle_clock {
-  typedef std::chrono::nanoseconds duration;
-  typedef duration::rep rep;
-  typedef duration::period period;
-  typedef std::chrono::time_point<idle_clock, duration> time_point;
+  using duration = std::chrono::nanoseconds;
+  using rep = duration::rep;
+  using period = duration::period;
+  using time_point = std::chrono::time_point<idle_clock, duration>;
   static constexpr const bool is_steady = true;
 
   /// @brief The type of clock in use, that an application can get an idea of
@@ -42,10 +42,10 @@ struct idle_clock {
 };
 
 struct process_clock {
-  typedef std::chrono::nanoseconds duration;
-  typedef duration::rep rep;
-  typedef duration::period period;
-  typedef std::chrono::time_point<process_clock, duration> time_point;
+  using duration = std::chrono::nanoseconds;
+  using rep = duration::rep;
+  using period = duration::period;
+  using time_point = std::chrono::time_point<process_clock, duration>;
   static constexpr const bool is_steady = true;
 
   /// @brief Get the total idle time (of all CPUs) at the time of invocation.

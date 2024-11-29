@@ -29,6 +29,7 @@ class options {
   /// @param argc [in, out] Reference to the number of arguments
   ///
   /// @param argv [in, out] Pointer to the argument vector array
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   options(int& argc, char* const argv[]) noexcept;
   options(const options& other) = delete;
   auto operator=(const options& other) -> options& = delete;
@@ -41,7 +42,7 @@ class options {
   ///
   /// @return true if the configuration is valid. false if the user provided an
   /// error in the arguments, and the program should abort.
-  auto is_valid() const noexcept -> bool { return is_valid_; }
+  [[nodiscard]] auto is_valid() const noexcept -> bool { return is_valid_; }
 
   /// @brief The test mode that should be used.
   ///
@@ -49,7 +50,7 @@ class options {
   /// traffic.
   ///
   /// @return Returns the test mode that should be used.
-  auto mode() const noexcept -> send_mode { return mode_; }
+  [[nodiscard]] auto mode() const noexcept -> send_mode { return mode_; }
 
   /// @brief Get the user provided source port and address.
   ///
@@ -59,7 +60,7 @@ class options {
   /// @return The user provided source port and address. If any parameter is not
   /// provided, the field contains 0. Code should determine a suitable default
   /// for itself.
-  auto source_addr() const noexcept -> const struct sockaddr_in& {
+  [[nodiscard]] auto source_addr() const noexcept -> const struct sockaddr_in& {
     return source_;
   }
 
@@ -71,7 +72,9 @@ class options {
   /// @return The user provided destination port and address. If any parameter
   /// is not provided, the field contains 0. Code shold determine a suitable
   /// default for itself.
-  auto dest_addr() const noexcept -> const struct sockaddr_in& { return dest_; }
+  [[nodiscard]] auto dest_addr() const noexcept -> const struct sockaddr_in& {
+    return dest_;
+  }
 
   /// @brief Get the number of slots the user provided.
   ///
@@ -80,7 +83,7 @@ class options {
   ///
   /// @return The number of slots that the user provided. In case the value is
   /// invalid, zero is returned. The default value is 20 slots.
-  auto slots() const noexcept -> std::uint16_t { return slots_; }
+  [[nodiscard]] auto slots() const noexcept -> std::uint16_t { return slots_; }
 
   /// @brief Get the width, in milliseconds, of each slot.
   ///
@@ -91,7 +94,7 @@ class options {
   /// @return The width, in milliseconds, of each slot for the sliding window
   /// for traffic shaping. In case the value is invalid, zero is returned. The
   /// default value is 10ms.
-  auto width() const noexcept -> std::uint16_t { return width_; }
+  [[nodiscard]] auto width() const noexcept -> std::uint16_t { return width_; }
 
   /// @brief Get the size of each packet that should be used.
   ///
@@ -103,7 +106,7 @@ class options {
   /// @return The size of the payload that should be used in a packet. In case
   /// the value is invalid, zero is returned. The default value is 1472 bytes,
   /// which is the maximum size of a UDP packet over Ethernet.
-  auto size() const noexcept -> std::uint16_t { return size_; }
+  [[nodiscard]] auto size() const noexcept -> std::uint16_t { return size_; }
 
   /// @brief The number of packets that should be sent in a complete window.
   ///
@@ -120,7 +123,9 @@ class options {
   /// which is defined as the duration of slots() * width() milliseconds. In
   /// case the vlaue is invalid, zero is returned. A default of 1000 packets is
   /// defined.
-  auto packets() const noexcept -> std::uint32_t { return packets_; }
+  [[nodiscard]] auto packets() const noexcept -> std::uint32_t {
+    return packets_;
+  }
 
   /// @brief The duration of the test in milliseconds.
   ///
@@ -130,7 +135,7 @@ class options {
   ///
   /// @return The duration of the test in milliseconds. In case this value is
   /// invalid, zero milliseconds is returned.
-  auto duration() const noexcept -> std::chrono::milliseconds {
+  [[nodiscard]] auto duration() const noexcept -> std::chrono::milliseconds {
     return std::chrono::milliseconds(duration_);
   }
 
@@ -149,7 +154,9 @@ class options {
   /// the user provided an invalid value. The default is one thread. No maximum
   /// is encoded, so that a single core may have multiple threads running.
   /// Threads are not bound to a CPU core.
-  auto threads() const noexcept -> std::uint16_t { return threads_; }
+  [[nodiscard]] auto threads() const noexcept -> std::uint16_t {
+    return threads_;
+  }
 
   /// @brief Enable the IDLE test
   ///
@@ -161,7 +168,7 @@ class options {
   /// the idle mode test.
   ///
   /// @return true if the idle test should run, false otherwise.
-  auto enable_idle_test() const noexcept -> bool { return idle_; }
+  [[nodiscard]] auto enable_idle_test() const noexcept -> bool { return idle_; }
 
  private:
   bool is_valid_{false};

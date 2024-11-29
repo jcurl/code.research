@@ -17,15 +17,15 @@ struct busy_measurement {
 class busy_stop_watch {
  public:
   explicit busy_stop_watch() noexcept;
-  auto start() const noexcept
+  [[nodiscard]] auto start() const noexcept
       -> std::chrono::high_resolution_clock::time_point {
     return start_time_;
   }
-  auto elapsed() const noexcept -> std::chrono::milliseconds {
+  [[nodiscard]] auto elapsed() const noexcept -> std::chrono::milliseconds {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - start_time_);
   }
-  auto measure() const noexcept -> busy_measurement;
+  [[nodiscard]] auto measure() const noexcept -> busy_measurement;
 
  private:
   ubench::chrono::idle_clock::time_point start_idle_{};

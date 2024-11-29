@@ -1,7 +1,7 @@
 #include <sys/neutrino.h>
-#include <inttypes.h>
 
 #include <cerrno>
+#include <cinttypes>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -13,6 +13,8 @@ namespace ubench::chrono {
 namespace {
 
 // Will contain the clock identifiers. Initialised on the first use.
+//
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 std::vector<int> idle_clocks{};
 
 auto init_idle_clocks() -> bool {

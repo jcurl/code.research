@@ -17,7 +17,7 @@ class core_benchmark : public benchmark {
       cas_type ctype = cas_type::cpp)
       : iterations_{iterations}, samples_{samples}, ctype_{ctype} {}
 
-  auto name() const -> std::string override;
+  [[nodiscard]] auto name() const -> std::string override;
 
   auto init() -> bool override;
 

@@ -150,6 +150,10 @@ class udp_talker {
 class udp_talker_bsd : public udp_talker {
  public:
   explicit udp_talker_bsd() = default;
+  udp_talker_bsd(const udp_talker_bsd&) = delete;
+  auto operator=(const udp_talker_bsd&) -> udp_talker_bsd& = delete;
+  udp_talker_bsd(udp_talker_bsd&& other) = delete;
+  auto operator=(udp_talker_bsd&&) -> udp_talker_bsd& = delete;
   ~udp_talker_bsd() override;
 
  protected:

@@ -10,6 +10,7 @@ class mallopt_options {
   mallopt_options(mallopt_options &&) = delete;
   auto operator=(const mallopt_options &) -> mallopt_options & = delete;
   auto operator=(mallopt_options &&) -> mallopt_options & = delete;
+  ~mallopt_options() = default;
 
   auto result() -> int;
   auto do_run() -> bool;

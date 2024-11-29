@@ -13,15 +13,16 @@ class statistics {
   auto operator=(const statistics& other) -> statistics& = delete;
   statistics(statistics&& other) = delete;
   auto operator=(statistics&& other) -> statistics& = delete;
+  ~statistics() = default;
 
   auto insert(value_type value) -> void;
   auto clear() -> void;
 
-  auto min() const noexcept -> value_type;
-  auto max() const noexcept -> value_type;
-  auto size() const noexcept -> unsigned long;
-  auto median() const noexcept -> value_type;
-  auto average() const noexcept -> value_type;
+  [[nodiscard]] auto min() const noexcept -> value_type;
+  [[nodiscard]] auto max() const noexcept -> value_type;
+  [[nodiscard]] auto size() const noexcept -> unsigned long;
+  [[nodiscard]] auto median() const noexcept -> value_type;
+  [[nodiscard]] auto average() const noexcept -> value_type;
 
  private:
   std::multiset<value_type> set_{};

@@ -14,7 +14,7 @@ class corerw_benchmark : public benchmark {
   corerw_benchmark(std::uint32_t iterations, std::uint32_t samples)
       : iterations_{iterations}, samples_{samples} {}
 
-  auto name() const -> std::string override;
+  [[nodiscard]] auto name() const -> std::string override;
 
   auto init() -> bool override;
 
@@ -30,8 +30,8 @@ class corerw_benchmark : public benchmark {
   // Starting from Intel's Sandy Bridge, spatial prefetcher is now pulling pairs
   // of 64-byte cache lines at a time, so we have to align to 128 bytes rather
   // than 64.
-  alignas(128) std::atomic<std::uint32_t> ping_;
-  alignas(128) std::atomic<std::uint32_t> pong_;
+  alignas(128) std::atomic<std::uint32_t> ping_{PING};
+  alignas(128) std::atomic<std::uint32_t> pong_{PING};
 };
 
 #endif

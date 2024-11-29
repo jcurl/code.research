@@ -13,7 +13,7 @@ class benchmark {
   auto operator=(const benchmark& other) -> benchmark& = default;
   auto operator=(benchmark&& other) -> benchmark& = default;
 
-  virtual auto name() const -> std::string = 0;
+  [[nodiscard]] virtual auto name() const -> std::string = 0;
 
   virtual auto init() -> bool { return true; };
 
