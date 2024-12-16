@@ -10,6 +10,7 @@
     - [2.2.1. Time Comparison](#221-time-comparison)
     - [2.2.2. Core Latency](#222-core-latency)
     - [2.2.3. Network Performance with UDP Load](#223-network-performance-with-udp-load)
+    - [2.2.4. List QNX Files](#224-list-qnx-files)
 
 ## 1. Compilation
 
@@ -137,3 +138,11 @@ Generate a constant rate of UDP traffic and measure system load.
 Other Platforms:
 
 - (X) Cygwin (Windows): Works. Values should be informational only.
+
+#### 2.2.4. List QNX Files
+
+Show all files opened by a process under QNX, like in `pidin`.
+
+- Tool: `lsqf`
+- Supported: QNX 7.1, QNX 8.0
+- [Documentation](./tools/lsqf.md)
