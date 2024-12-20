@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 
 namespace ubench::os {
@@ -93,6 +94,16 @@ class osbuff {
  private:
   alignas(T) std::array<std::uint8_t, sizeof(T) + N> buffer_{};
 };
+
+/// @brief Get the name of the process for the given pid.
+///
+/// The name of the process may be a full path, a partial path, or only the name
+/// of the executable.
+///
+/// @param pid the PID of the process to get the name for.
+///
+/// @return the name of the process.
+auto get_proc_name(pid_t pid) -> std::optional<std::string>;
 
 }  // namespace ubench::os
 
