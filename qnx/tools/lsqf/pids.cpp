@@ -23,35 +23,6 @@ auto get_filename(std::string path) -> std::string {
     return p.string();
   }
 }
-
-auto get_name_as(int pid) -> std::optional<std::string> {
-  std::ostringstream pathstream{};
-  pathstream << "/proc/" << pid << "/as";
-  ubench::file::fdesc fd{pathstream.str()};
-  if (!fd) return {};
-
-  using procfs_debuginfo_tx = ubench::os::osbuff<procfs_debuginfo, 1024>;
-  procfs_debuginfo_tx map{};
-
-  // Gets the base address of the binary. This is unsafe.
-  int status =
-      devctl(fd, DCMD_PROC_MAPDEBUG_BASE, &map(), sizeof(map), nullptr);
-  if (status != EOK) return {};
-
-  return std::string{map().path};
-}
-
-auto get_name_cmdline(int pid) -> std::optional<std::string> {
-  std::ostringstream pathstream{};
-  pathstream << "/proc/" << pid << "/cmdline";
-
-  std::ifstream file(pathstream.str(), std::ios::binary);
-  if (!file.is_open()) return {};
-
-  std::string procname{};
-  std::getline(file, procname, '\0');
-  return procname;
-}
 }  // namespace
 
 auto pids::get_name(int pid, bool short_path) -> std::optional<std::string> {
@@ -59,13 +30,10 @@ auto pids::get_name(int pid, bool short_path) -> std::optional<std::string> {
     return short_path ? get_filename(search->second) : search->second;
   }
 
-  auto x = get_name_as(pid);
-  if (!x) {
-    x = get_name_cmdline(pid);
-    if (!x) return {};
-  }
+  auto proc_name = ubench::os::get_proc_name(pid);
+  if (!proc_name) return {};
 
-  auto [it, ins] = pid_names_.try_emplace(pid, *x);
+  auto [it, ins] = pid_names_.try_emplace(pid, *proc_name);
   return short_path ? get_filename(it->second) : it->second;
 }
 

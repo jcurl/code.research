@@ -5,10 +5,6 @@
 
 #include <gtest/gtest.h>
 
-using ::testing::Gt;
-using ::testing::Lt;
-using ::testing::MatchesRegex;
-
 auto split_check(std::string arg, std::initializer_list<std::string> l)
     -> void {
   auto arg_parse = ubench::args::split_args(arg);

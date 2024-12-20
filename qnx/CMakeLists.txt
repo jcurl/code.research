@@ -77,6 +77,8 @@ option(ENABLE_TEST "Enable building repository tests" ON)
 # The `make install` target shouldn't install GTEST/GMOCK.
 set(INSTALL_GMOCK OFF)
 set(INSTALL_GTEST OFF)
+set(BUILD_GTEST ON)
+set(BUILD_GMOCK ON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../external/googletest external/googletest)
 
 # Pull in Google Benchmark. Note, that the current comment in `external` has a
