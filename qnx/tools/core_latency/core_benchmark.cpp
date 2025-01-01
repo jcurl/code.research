@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "core_benchmark.h"
 
 #include <atomic>
@@ -9,8 +11,6 @@
 #include "ubench/thread.h"
 #include "arm64.h"
 #include "statistics.h"
-
-#include "config.h"
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define UNUSED(expr) \

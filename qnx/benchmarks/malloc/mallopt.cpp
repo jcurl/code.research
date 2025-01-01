@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "mallopt.h"
 
 #include <unistd.h>
@@ -13,8 +15,6 @@
 #include <benchmark/benchmark.h>
 
 #include "mlock.h"
-
-#include "config.h"
 
 mallopt_options::mallopt_options(int argc, char **argv) {
   bool help = false;

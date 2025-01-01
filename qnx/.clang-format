@@ -84,7 +84,7 @@ IfMacros:
 IncludeBlocks:   Regroup
 IncludeCategories:
   - Regex:           '"config.h"'
-    Priority:        1000
+    Priority:        -1000
     CaseSensitive:   false
   - Regex:           '^<ext/.*\.h>'
     Priority:        3

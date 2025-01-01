@@ -1,6 +1,8 @@
 #ifndef BENCHMARK_UDP_TALKER_H
 #define BENCHMARK_UDP_TALKER_H
 
+#include "config.h"
+
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
@@ -14,8 +16,6 @@
 #include <vector>
 
 #include "busy_measurement.h"
-
-#include "config.h"
 
 /// @brief The class to instantiate when testing.
 enum class send_mode {

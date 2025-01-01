@@ -1,9 +1,9 @@
+#include "config.h"
+
 #include "mlock.h"
 
 #include <cerrno>
 #include <cstring>
-
-#include "config.h"
 
 #if HAVE_MLOCKALL
 #include <sys/mman.h>

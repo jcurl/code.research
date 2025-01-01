@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <malloc.h>
 
 #include <charconv>
@@ -8,8 +10,6 @@
 #include <string_view>
 
 #include "mallopt.h"
-
-#include "config.h"
 
 namespace {
 

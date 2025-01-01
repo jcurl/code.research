@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <pthread.h>
 #include <sched.h>
 #include <unistd.h>
@@ -14,8 +16,6 @@
 #include "ubench/thread.h"
 #include "core_benchmark.h"
 #include "corerw_benchmark.h"
-
-#include "config.h"
 
 static const std::unordered_map<std::string_view, cas_type>
     supported_cas_benchmarks = {
