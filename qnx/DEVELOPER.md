@@ -66,7 +66,7 @@ complexity of testing.
 The following systems are used for development:
 
 - Ubuntu 22.04
-- CMake 3.14
+- CMake 3.22.1
 - podman version 3.4.4
   - Allows building in Ubuntu 20.04, 22.04, 24.04 within a container. See
     `scripts/build.sh`
@@ -76,9 +76,9 @@ The following systems are used for development:
 Tools required for developing and maintaining code quality (building is
 optional):
 
-- Clang
-- Clang-Tidy
-- Clang-Format
+- Clang 14 or later.
+- Clang-Tidy 14 or later.
+- Clang-Format 14 or later.
 
 ## 3. Target Platforms
 
@@ -88,7 +88,7 @@ The following platforms are targetted for running benchmarks. Not all tools may
 build, but the build system should disable such tools that are not supported:
 
 - Linux (Ubuntu 20.04 and later)
-  - CMake 3.14 and later
+  - CMake 3.16 and later
   - GCC 8.3.0 and later
 - QNX 7.1
 - QNX 8.0
@@ -111,6 +111,12 @@ There may be patches for other platforms. The support for other platforms are
 not continuously tested, may result in data that is incorrect. However, there is
 value in such platforms for the sake of portability and designing code to handle
 the different variants.
+
+An example of occasional support for Tier 2 targets are:
+
+- Cygwin 3.x (Windows 10 64-bit or later)
+- NetBSD 10.1 (RPi4 cross-compile)
+- MacOS-X (non-free, support very limited)
 
 ## 4. Submitting Patches
 
