@@ -12,6 +12,8 @@ clockid_t clock_id = 0;
 auto init_clock() -> bool {
   // We could use a constant, but documentation states we should do this
   // anyway to determine if the clock is supported on the system.
+  //
+  // Present since NetBSD 8.0
   int result = clock_getcpuclockid(0, &clock_id);
   return result == 0;
 }

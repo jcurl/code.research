@@ -12,10 +12,16 @@ TEST(idle_clock, is_available) {
   ASSERT_THAT(ubench::chrono::idle_clock::is_available(), Eq(true));
   ASSERT_THAT(ubench::chrono::idle_clock::type(),
       Ne(ubench::chrono::idle_clock_type::null));
+
+  auto time = ubench::chrono::idle_clock::now();
+  EXPECT_THAT(time.time_since_epoch().count(), Ne(0));
 }
 
 TEST(process_clock, is_available) {
   // If this test fails, then it is not supported on the platform being
   // compiled. Work must be done to port it.
   ASSERT_THAT(ubench::chrono::process_clock::is_available(), Eq(true));
+
+  auto time = ubench::chrono::process_clock::now();
+  EXPECT_THAT(time.time_since_epoch().count(), Ne(0));
 }
