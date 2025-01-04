@@ -3,7 +3,9 @@ include(GoogleTest)
 set(BINARY ubench_test)
 set(SOURCES
     args_test.cpp
+    clock_test.cpp
     os_test.cpp
+    thread_test.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

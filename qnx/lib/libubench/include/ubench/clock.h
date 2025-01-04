@@ -1,5 +1,5 @@
-#ifndef UBENCH_IDLE_CLOCK_H
-#define UBENCH_IDLE_CLOCK_H
+#ifndef UBENCH_CHRONO_CLOCK_H
+#define UBENCH_CHRONO_CLOCK_H
 
 #include <chrono>
 
