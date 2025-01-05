@@ -12,8 +12,6 @@ set(SOURCES
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 
-find_package(Threads REQUIRED)
-
 # BSD Variable only available in CMake 3.25 or later.
 # LINUX Variable not available in CMake 3.16 (Ubuntu 20.04)
 string(TOUPPER "${CMAKE_SYSTEM_NAME}" upper_CMAKE_SYSTEM_NAME)
@@ -31,11 +29,23 @@ else()
     target_sources(${LIBRARY} PRIVATE idle_clock_null.cpp    process_clock_null.cpp)
 endif()
 
+# Process Name
+if (QNXNTO)
+    target_sources(${LIBRARY} PRIVATE get_proc_name_qnx.cpp   get_proc_name_common.cpp get_proc_name_common.h)
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN" OR
+       upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX" OR
+       upper_CMAKE_SYSTEM_NAME STREQUAL "NETBSD")
+    target_sources(${LIBRARY} PRIVATE get_proc_name_linux.cpp get_proc_name_common.cpp get_proc_name_common.h)
+else()
+    target_sources(${LIBRARY} PRIVATE get_proc_name_null.cpp)
+endif()
+
+# Thread Affinity
 if (QNXNTO)
     target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
-    target_sources(${LIBRARY} PRIVATE get_proc_name_qnx.cpp get_proc_name_common.cpp get_proc_name_common.h)
 else()
     # We need to be able to set the affinity of a thread to a particular CPU
+    find_package(Threads REQUIRED)
     cmake_push_check_state(RESET)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
     list(APPEND CMAKE_REQUIRED_LIBRARIES pthread)
@@ -49,17 +59,8 @@ else()
         target_sources(${LIBRARY} PRIVATE thread_pin_null.cpp)
         message(WARNING "Can't a way to pin threads to a core")
     endif()
-
-    if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
-        target_sources(${LIBRARY} PRIVATE get_proc_name_linux.cpp get_proc_name_common.cpp get_proc_name_common.h)
-    elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
-        target_sources(${LIBRARY} PRIVATE get_proc_name_linux.cpp get_proc_name_common.cpp get_proc_name_common.h)
-    else()
-        target_sources(${LIBRARY} PRIVATE get_proc_name_null.cpp)
-    endif()
 endif()
 
-# We need to provide clocks based on the Operating System
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 
 if(IS_DEBUG)
