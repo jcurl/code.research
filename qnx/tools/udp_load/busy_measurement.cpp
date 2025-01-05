@@ -1,6 +1,5 @@
 #include "busy_measurement.h"
 
-#include <iostream>
 #include <thread>
 
 busy_stop_watch::busy_stop_watch() noexcept {

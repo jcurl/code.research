@@ -48,8 +48,8 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
 void print_help(std::string_view prog_name) {
   std::cout << prog_name << " [-n<slots>] [-m<width>] [-p<packets>] [-s<size>]"
             << std::endl;
-  std::cout << "  [-d<duration>] [-T<threads>] [-I] -S<sourceip> -D<destip>"
-            << std::endl;
+  std::cout << "  [-d<duration>] [-T<threads>] [-I] [-B<mode]" << std::endl;
+  std::cout << "  -S<sourceip> -D<destip>" << std::endl;
   std::cout << std::endl;
   std::cout << "Writes UDP packets bound from <sourceip> IPv4 address "
                "to <destip>."
