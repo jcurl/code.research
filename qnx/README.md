@@ -193,7 +193,7 @@ Generate a constant rate of UDP traffic and measure system load.
 Other Platforms:
 
 - (X) Cygwin (Windows): Works. Values should be informational only.
-- (!) NetBSD 10.1: Runs but can't measure CPU times.
+- (/) NetBSD 10.1: Runs. IDLE/CPU time not accurate.
 
 #### 2.2.4. List QNX Files
 

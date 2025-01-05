@@ -96,7 +96,7 @@ class proc_idle_clock : public base_clock {
 
         // The idle_time is in units of jiffies. Need to convert this to
         // nanoseconds.
-        return idle_time * 1000000000 / clock_ticks_per_sec_;
+        return 1000000000 / clock_ticks_per_sec_ * idle_time;
       }
       i++;
     }

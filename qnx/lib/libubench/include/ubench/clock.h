@@ -11,6 +11,7 @@ enum class idle_clock_type {
   proc_stat,  ///< Clock uses /proc/stat and jiffies.
   qnx,        ///< Clock uses QNX ClockTime() call.
   windows,    ///< Clock uses Windows.
+  cptime,     ///< Clock from sysctl(kern.cp_time)
 };
 
 /// @brief A TrivialClock that returns the total idle time for the Operating
