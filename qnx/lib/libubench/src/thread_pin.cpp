@@ -26,8 +26,8 @@ auto pin_core(unsigned int core) -> bool {
   cpuset_set(ci, cpuset);
   int rc = pthread_setaffinity_np(current, cpuset_size(cpuset), cpuset);
   cpuset_destroy(cpuset);
-#elif defined(__linux__)
-  // Linux
+#elif defined(__linux__) || defined(__CYGWIN__)
+  // Linux, Cygwin
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
   CPU_SET(core, &cpuset);
