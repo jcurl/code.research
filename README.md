@@ -12,6 +12,6 @@ git submodule update --init
 
 See:
 
-- [Benchmarks and Tools for Linux and QNX](./qnx/README.md)
+- [Benchmarks and Tools for Linux, QNX and BSD](./qnx/README.md)
 - Research Code
   - [RCU for C++17](./rcu/README.md)

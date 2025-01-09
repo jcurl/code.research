@@ -101,9 +101,9 @@ familiar with CMake and most people already have all the necessary tooling to
 build projects based on CMake. CMake is significantly simpler to write for, and
 use, than automake.
 
-See the `scripts/Makefile` for running the target `all` for the various targets,
-using `podman` under Linux (Ubuntu 22.04 and later). This automates the checks
-before committing changes.
+See the `scripts/Makefile` for running the target `linux` for the various
+targets, using `podman` under Linux (Ubuntu 22.04 and later). This automates the
+checks before committing changes.
 
 ### 3.2. Tier 2
 
@@ -114,8 +114,9 @@ the different variants.
 
 An example of occasional support for Tier 2 targets are:
 
+- NetBSD 10.1 (RPi4 cross-compile) - Automated build under `scripts/Makefile`
+  for running the target `netbsd`.
 - Cygwin 3.x (Windows 10 64-bit or later)
-- NetBSD 10.1 (RPi4 cross-compile)
 - MacOS-X (non-free, support very limited)
 
 ## 4. Submitting Patches

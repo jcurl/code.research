@@ -1,0 +1,48 @@
+ARG CODE_VERSION=10.1
+ARG UBUNTU_VERSION=jammy
+FROM ubuntu:${UBUNTU_VERSION}
+LABEL MAINTAINER="Jason Curl <jcurl@arcor.de>"
+
+ARG CODE_VERSION
+ARG NETBSD_VERSION=${CODE_VERSION}
+
+# We need to make the install non-interactive, so that we don't get asked for
+# tzdata. We don't need DEBIAN_FRONTEND after the build, so we don't make it an
+# explicit variable.
+ARG DEBIAN_FRONTEND=noninteractive
+
+# And if we happen to build an unsupported release that doesn't receive updates
+# anymore, just update the apt sources and continue.
+RUN (apt update -y || \
+      sed -i -re 's/([a-z]{2}\.)?archive.ubuntu.com|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list \
+      && apt update -y) \
+    && apt install -y --no-install-recommends \
+      build-essential zlib1g-dev wget pigz \
+      lsb-release cmake git-core clang-format \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/netbsd/${NETBSD_VERSION}/src \
+   && cd /opt/netbsd/${NETBSD_VERSION}/src \
+   && wget --no-check-certificate -r -l 1 -np -nd -nc -nv -A "*.tgz" https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/source/sets
+
+# Put this on a new line, so we don't need to keep downloading the sources.
+# Extract the sources, build it, and then remove the sources and intermediate
+# build files.
+RUN cd /opt/netbsd/${NETBSD_VERSION}/src \
+  && for file in *.tgz; do echo Extracting $file...; tar -xzf $file; done \
+  && NPROC=`nproc` \
+  && cd /opt/netbsd/${NETBSD_VERSION}/src/usr/src \
+  && BASE=/opt/netbsd/${NETBSD_VERSION}/aarch64 && DESTDIR=$BASE/sysroot ./build.sh -O $BASE/build -T $BASE/tools -j$NPROC -m evbarm -a aarch64 tools libs \
+  && cd /opt/netbsd/${NETBSD_VERSION}/aarch64 && tar -cf - build | pigz -9 > build.tar.gz \
+  && cd /opt/netbsd/${NETBSD_VERSION}/src/usr/src \
+  && BASE=/opt/netbsd/${NETBSD_VERSION}/aarch64eb && DESTDIR=$BASE/sysroot ./build.sh -O $BASE/build -T $BASE/tools -j$NPROC -m evbarm -a aarch64eb tools libs \
+  && cd /opt/netbsd/${NETBSD_VERSION}/aarch64eb && tar -cf - build | pigz -9 > build.tar.gz \
+  && rm -rf /opt/netbsd/${NETBSD_VERSION}/aarch64/build \
+  && rm -rf /opt/netbsd/${NETBSD_VERSION}/aarch64eb/build \
+  && rm -rf /opt/netbsd/${NETBSD_VERSION}/src
+
+RUN mkdir -p /source && mkdir -p /build
+WORKDIR /build
+CMD [ "bash" ]
+

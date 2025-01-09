@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright © 2023-2024 Jason Curl <jcurl@arcor.de>
+Copyright © 2023-2025 Jason Curl <jcurl@arcor.de>
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

@@ -11,10 +11,11 @@ DISTRO=ubuntu
 VARIANT=
 INTERACTIVE=0
 ROOT=0
-CODENAME=focal
+CODENAME=jammy
+REBUILD=0
 
 CODENAMESET=0
-OPTSTRING="c:d:irv:?"
+OPTSTRING="c:d:firv:?"
 while getopts $OPTSTRING OPTION; do
   case $OPTION in
   i)
@@ -36,24 +37,27 @@ while getopts $OPTSTRING OPTION; do
   v)
     VARIANT=$OPTARG
     ;;
+  f)
+    REBUILD=1
+    ;;
   ?)
-    echo "build.sh -i [-r] [-c CODENAME]"
+    echo "build.sh -i [-r] [-d DISTRO] [-c CODENAME] [-v VAR]"
     echo "  Run in interactive mode for Ubuntu container \$CODENAME"
     echo ""
-    echo "build.sh [-r] [-c CODENAME] 'build commands'"
+    echo "build.sh [-r] [-d DISTRO] [-c CODENAME] [-v VAR] 'build commands'"
     echo "  Run the command in the quotes. Quotes are required"
     echo "  to ensure your current shell doesn't interpret the"
     echo "  commands, but instead are sent to the container shell."
     echo ""
     echo "Options:"
-    echo " -c - Define the Ubuntu \$CODENAME to build the container from"
     echo " -d - Choose a distribution \$DISTRO (docker file). Default is 'ubuntu'."
+    echo " -c - Define the \$CODENAME for the \$DISTRO to build the container from"
+    echo " -v - Define a build variant. Allows different builds for the same"
+    echo "      \$CODENAME (e.g. clang, gcc, etc.). Only changes the build path."
     echo " -i - Run in interactive mode (don't run the commands at the end, but"
     echo "      start the shell)"
     echo " -r - Start in the container as root. Note, that the container is"
     echo "      dropped when finished, so changes are not permanent."
-    echo " -v - Define a build variant. Allows different builds for the same"
-    echo "      \$CODENAME (e.g. clang, gcc, etc.). Only changes the build path."
     echo ""
     echo "Example:"
     echo "  $ build.sh -cjammy 'cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && make -j8'"
@@ -90,8 +94,11 @@ fi
 PODVERSION=$DISTRO-$CODENAME
 echo PODVERSION=coderesearch:$PODVERSION
 
-podman image inspect "coderesearch:$PODVERSION" > /dev/null 2> /dev/null
-if [ $? -ne 0 ]; then
+if [ $REBUILD -eq 0 ]; then
+  podman image inspect "coderesearch:$PODVERSION" > /dev/null 2> /dev/null
+  REBUILD=$?
+fi
+if [ $REBUILD -ne 0 ]; then
   DOCKERFILE=$BASEDIR/qnx/scripts/docker/$PODVERSION-docker
   if [ ! -f "$DOCKERFILE" ]; then
     DOCKERFILE=$BASEDIR/qnx/scripts/docker/$DISTRO-docker
@@ -109,8 +116,10 @@ fi
 
 if [ ${ROOT} -ne 0 ]; then
   ROOTOPT=""
+  SOURCE="rw"
 else
   ROOTOPT="--userns=keep-id"
+  SOURCE="ro"
 fi
 
 BUILDDIR=""
@@ -125,9 +134,9 @@ if [ ! -e "$BASEDIR/qnx/build/$BUILDDIR" ]; then
 fi
 
 if [ ${INTERACTIVE} -ne 0 ]; then
-  podman run -it --rm $ROOTOPT -v $PWD/$BASEDIR:/source:ro -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION"
+  podman run -it --rm $ROOTOPT -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION"
 else
   echo "Non-Interactive"
   echo "$OTHERARGS"
-  podman run -t --rm $ROOTOPT -v $PWD/$BASEDIR:/source:ro -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION" sh -c "$OTHERARGS"
+  podman run -t --rm $ROOTOPT -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION" sh -c "$OTHERARGS"
 fi

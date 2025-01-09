@@ -4,10 +4,10 @@
   - [1.1. Tier 1 Architecture Specific](#11-tier-1-architecture-specific)
     - [1.1.1. Linux (RPi4, RPi5, Intel)](#111-linux-rpi4-rpi5-intel)
     - [1.1.2. QNX 7.1, 8.0 (Linux Host, RPi4 Target)](#112-qnx-71-80-linux-host-rpi4-target)
-  - [1.2. Other Architectures (Not Supported)](#12-other-architectures-not-supported)
-    - [1.2.1. Cygwin 3.x (Windows)](#121-cygwin-3x-windows)
-    - [1.2.2. NetBSD 10.1 (Target RPi4, Host Linux)](#122-netbsd-101-target-rpi4-host-linux)
+  - [1.2. Docker Hosted Toolchains](#12-docker-hosted-toolchains)
   - [1.3. Further Notes](#13-further-notes)
+  - [1.4. Other Architectures (Not Supported)](#14-other-architectures-not-supported)
+    - [1.4.1. Cygwin 3.x (Windows)](#141-cygwin-3x-windows)
 - [2. Installed Binaries](#2-installed-binaries)
   - [2.1. Benchmarks](#21-benchmarks)
     - [2.1.1. Memory Allocation](#211-memory-allocation)
@@ -46,9 +46,21 @@ cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../../../t
 make -j8
 ```
 
-### 1.2. Other Architectures (Not Supported)
+### 1.2. Docker Hosted Toolchains
 
-#### 1.2.1. Cygwin 3.x (Windows)
+See the `scripts` folder for using `podman` to build for Linux and NetBSD
+targets inside a container. See documentation [README.md](./scripts/README.md)
+for further information. More development information is in
+[Developer.md](./DEVELOPER.md).
+
+### 1.3. Further Notes
+
+See further instructions for the tools for specific build instructions (such as
+enabling assembly instruction sets, etc.).
+
+### 1.4. Other Architectures (Not Supported)
+
+#### 1.4.1. Cygwin 3.x (Windows)
 
 To compile on Cygwin 64-bit under Windows 10 or later:
 
@@ -58,37 +70,6 @@ cd build/cygwin
 cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release
 make -j8
 ```
-
-#### 1.2.2. NetBSD 10.1 (Target RPi4, Host Linux)
-
-It is possible to use NetBSD 10.x documentation to create a cross compiler. A
-sample toolchain file to cross compile from Linux to NetBSD 10.1 on the
-Raspberry Pi4 (using GCC 10.5.0) is given at
-`toolchain/netbsd10.1-aarch64.cmake`.
-
-Build the toolchain similar to:
-
-```sh
-DESTDIR=~/netbsd/10.1/aarch64/destdir ./build.sh -U -O ~/netbsd/10.1/aarch64/build -T ~/netbsd/10.1/aarch64/tools -R ~/netbsd/10.1/aarch64/release -j32 -m evbarm -a aarch64 tools libs
-```
-
-This architecture can be interesting as it can be compiled also for Big Endian.
-
-```sh
-mkdir -p build/netbsd
-cd build/netbsd
-cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../../../toolchain/netbsd10.1-aarch64.cmake
-make -j8
-```
-
-### 1.3. Further Notes
-
-See further instructions for the tools for specific build instructions (such as
-enabling assembly instruction sets, etc.).
-
-See the `scripts` folder for using `podman` to build for Linux targets inside a
-container. See documentation [README.md](./scripts/README.md) for further
-information. More development information is in [Developer.md](./DEVELOPER.md).
 
 ## 2. Installed Binaries
 

@@ -6,6 +6,8 @@
   - [1.3. Using the build.sh script](#13-using-the-buildsh-script)
 - [2. Building using Makefile](#2-building-using-makefile)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
+- [4. Distribution Notes](#4-distribution-notes)
+  - [4.1. NetBSD](#41-netbsd)
 
 ## 1. Podman Container - build.sh
 
@@ -82,13 +84,15 @@ It will provide you instructions on its use.
 
 ## 2. Building using Makefile
 
-There is a `Makefile` in this directory, which allows executing all the podman
+There is a `Makefile` in this directory, which allows executing all the `podman`
 containers with the combinations of targets and different compilers to check for
 compatibility.
 
 From the `scripts` directory, run `make`. It will run `build.sh` to build the
 containers, and execute each variant (GCC and Clang), with the output of the
-build in `qnx/build/<dir>`.
+build in `qnx/build/<dir>`. A container is only built the first time and
+upstream changes are not automatically pulled. You will need to delete the image
+and rebuild to obtain a new image.
 
 Compilation stops on a build failure.
 
@@ -121,3 +125,20 @@ If the file `docker/$DISTRO-$CODENAME-docker` is not found, then the name
 
 In all cases, the `$CODENAME` is passed as an argument to your docker definition
 file.
+
+## 4. Distribution Notes
+
+### 4.1. NetBSD
+
+The `netbsd` target in the `Makefile` builds for ARM 64-Bit Little Endian and
+Big Endian.
+
+The Big Endian is an architecture that is no longer very common, predominantly
+from PowerPC and Motorola 68k processors. It has value to ensure the correctness
+of a program, specifically network programming is done correctly.
+
+Instructions used for building the NetBSD toolchain is taken from the [NetBSD
+Guide - Building the
+system](https://www.netbsd.org/docs/guide/en/chap-fetch.html). It should be
+trivial to extend the Dockerfile to support other architectures (e.g. MIPS,
+SH4), but ARM64 bit is chosen to compare on the Raspbery Pi 4.
