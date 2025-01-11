@@ -1,8 +1,14 @@
+.PHONY: linux
 linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-jammy-clang ubuntu-noble ubuntu-noble-clang
 
+.PHONY: netbsd
 netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb
 
-all: linux netbsd
+.PHONY: freebsd
+freebsd: freebsd14.2-aarch64
+
+.PHONY: all
+all: linux netbsd freebsd
 
 NUM_CPUS := $(shell nproc)
 
@@ -32,4 +38,7 @@ netbsd10.1-aarch64:
 
 netbsd10.1-aarch64eb:
 	@./build.sh -dnetbsd -c10.1 -veb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64eb.cmake && cmake --build . -j${NUM_CPUS}"
+
+freebsd14.2-aarch64:
+	@./build.sh -dfreebsd -c14.2 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS}"
 

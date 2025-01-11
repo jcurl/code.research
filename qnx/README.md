@@ -48,10 +48,10 @@ make -j8
 
 ### 1.2. Docker Hosted Toolchains
 
-See the `scripts` folder for using `podman` to build for Linux and NetBSD
-targets inside a container. See documentation [README.md](./scripts/README.md)
-for further information. More development information is in
-[Developer.md](./DEVELOPER.md).
+See the `scripts` folder for using `podman` to build for Linux, NetBSD and
+FreeBSD targets inside a container. See documentation
+[README.md](./scripts/README.md) for further information. More development
+information is in [Developer.md](./DEVELOPER.md).
 
 ### 1.3. Further Notes
 
@@ -89,6 +89,7 @@ Other Platforms:
 - (X) MacOS-X: Generates invalid results.
 - (!) Cygwin (Windows): No customisations for malloc parameters supported.
 - (!) NetBSD 10.1: No customisations for malloc parameters supported.
+- (X) FreeBSD 14.2: Generates invalid results (similar to MacOS-X)
 
 #### 2.1.2. Cache Line
 
@@ -104,6 +105,7 @@ Other Platforms:
 
 - (!) Cygwin (Windows): Runs. Values not checked.
 - (!) NetBSD 10.1: Runs. Values not checked.
+- (!) FreeBSD 14.2: Runs. Values not checked.
 
 #### 2.1.3. String Comparison
 
@@ -119,6 +121,7 @@ Other Platforms:
 
 - (/) Cygwin (Windows): Runs.
 - (/) NetBSD 10.1: Runs.
+- (/) FreeBSD 14.2: Runs.
 
 ### 2.2. Tools
 
@@ -139,6 +142,7 @@ Other Platforms:
 
 - (/) Cygwin (Windows): Runs.
 - (/) NetBSD 10.1: Runs.
+- (/) FreeBSD 14.2: Runs.
 
 #### 2.2.2. Core Latency
 
@@ -161,6 +165,7 @@ Other Platforms:
 - (X) MacOS-X: Pinning threads in the Operating System not supported.
 - (/) Cygwin (Windows): Shows core latencies as expected.
 - (/) NetBSD 10.1: Shows core latencies as expected (tested on RPi4).
+- (X) FreeBSD 14.2: Core Pinning not implemented.
 
 #### 2.2.3. Network Performance with UDP Load
 
@@ -175,6 +180,7 @@ Other Platforms:
 
 - (X) Cygwin (Windows): Works. Values should be informational only.
 - (/) NetBSD 10.1: Runs. IDLE/CPU time not accurate.
+- (!) FreeBSD 14.2: Runs. IDLE/CPU time not implemented.
 
 #### 2.2.4. List QNX Files
 

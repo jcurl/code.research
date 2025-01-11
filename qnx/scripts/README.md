@@ -3,11 +3,11 @@
 - [1. Podman Container - build.sh](#1-podman-container---buildsh)
   - [1.1. Building Ubuntu](#11-building-ubuntu)
   - [1.2. Building Alpine](#12-building-alpine)
-  - [1.3. Using the build.sh script](#13-using-the-buildsh-script)
+  - [1.3. Building NetBSD](#13-building-netbsd)
+  - [1.4. Building FreeBSD](#14-building-freebsd)
+  - [1.5. Using the build.sh script](#15-using-the-buildsh-script)
 - [2. Building using Makefile](#2-building-using-makefile)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
-- [4. Distribution Notes](#4-distribution-notes)
-  - [4.1. NetBSD](#41-netbsd)
 
 ## 1. Podman Container - build.sh
 
@@ -68,10 +68,62 @@ from the time it was build.
 To build on a single command line, using LLVM:
 
 ```sh
-$ ./build.sh -dalpine -clatest -vclang "rm -rf * && cmake -B . -S /source/qnx -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS}"
+$ make alpine-latest-clang
 ```
 
-### 1.3. Using the build.sh script
+If you want to update the image, you must first destroy the image:
+
+```sh
+$ podman image rm coderesearch:alpine-latest
+```
+
+Then on the next invocation of the `Makefile`, the image will be regenerated.
+
+### 1.3. Building NetBSD
+
+NetBSD supports a large number of target architectures. It is interesting as the
+network stack `io-pkt` from QNX is similar to NetBSD.
+
+To build the docker container, which builds the toolchain (may take 1h or
+longer):
+
+```sh
+$ ./build.sh -dnetbsd -c10.1
+```
+
+The `Makefile` and toolchain file `netbsd10.1-aarch64.cmake` and
+`netbsd10.1-aarch64eb.cmake` depend on version 10.1.
+
+The `netbsd` target in the `Makefile` builds for ARM 64-Bit Little Endian and
+Big Endian.
+
+The Big Endian is an architecture that is no longer very common, predominantly
+from PowerPC and Motorola 68k processors. It has value to ensure the correctness
+of a program, specifically network programming is done correctly.
+
+Instructions used for building the NetBSD toolchain is taken from the [NetBSD
+Guide - Building the
+system](https://www.netbsd.org/docs/guide/en/chap-fetch.html). It should be
+trivial to extend the Dockerfile to support other architectures (e.g. MIPS,
+SH4), but ARM64 bit is chosen to compare on the Raspbery Pi 4.
+
+### 1.4. Building FreeBSD
+
+FreeBSD is not as minimalistic as NetBSD and has a few forks and more software
+support, but supports fewer targets. It is interesting as the network stack
+`io-sock` from QNX 8.0 is similar to FreeBSD.
+
+To build the docker container, which downloads the base files and extracts them
+(the compiler toolchain comes from Ubuntu 22.04, which is Clang 14.0.0):
+
+```sh
+$ ./build.sh -dfreebsd -c14.2
+```
+
+The `Makefile` and toolchain file `freebsd14.2-aarch64.cmake` depend on version
+14.2.
+
+### 1.5. Using the build.sh script
 
 To see how to use the `build.sh` script, run the current version with the help
 option.
@@ -125,20 +177,3 @@ If the file `docker/$DISTRO-$CODENAME-docker` is not found, then the name
 
 In all cases, the `$CODENAME` is passed as an argument to your docker definition
 file.
-
-## 4. Distribution Notes
-
-### 4.1. NetBSD
-
-The `netbsd` target in the `Makefile` builds for ARM 64-Bit Little Endian and
-Big Endian.
-
-The Big Endian is an architecture that is no longer very common, predominantly
-from PowerPC and Motorola 68k processors. It has value to ensure the correctness
-of a program, specifically network programming is done correctly.
-
-Instructions used for building the NetBSD toolchain is taken from the [NetBSD
-Guide - Building the
-system](https://www.netbsd.org/docs/guide/en/chap-fetch.html). It should be
-trivial to extend the Dockerfile to support other architectures (e.g. MIPS,
-SH4), but ARM64 bit is chosen to compare on the Raspbery Pi 4.

@@ -114,10 +114,14 @@ the different variants.
 
 An example of occasional support for Tier 2 targets are:
 
-- NetBSD 10.1 (RPi4 cross-compile) - Automated build under `scripts/Makefile`
-  for running the target `netbsd`.
+- NetBSD 10.1 (RPi4 cross-compile)¹
+- FreeBSD 14.2 (RPi4 cross-compile)²
 - Cygwin 3.x (Windows 10 64-bit or later)
 - MacOS-X (non-free, support very limited)
+
+Notes:
+- ¹ Build from `scripts` with `make netbsd`
+- ² Build from `scripts` with `make freebsd`
 
 ## 4. Submitting Patches
 

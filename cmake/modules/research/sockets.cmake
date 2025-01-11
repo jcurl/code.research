@@ -43,7 +43,7 @@ function(find_libsocket)
     if(NOT DEFINED HAVE_LIBSOCKET)
         message(STATUS "Looking for libsocket")
 
-        check_symbol_exists(bind "arpa/inet.h" HAVE_LIBSOCKET)
+        check_symbol_exists(bind "sys/socket.h" HAVE_LIBSOCKET)
         if(HAVE_LIBSOCKET)
             message(STATUS "Looking for libsocket - found, linking not needed")
             set(HAVE_LIBSOCKET 1 CACHE STRING "Have symbol bind" FORCE)
