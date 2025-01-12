@@ -6,6 +6,7 @@
   - [1.3. Building NetBSD](#13-building-netbsd)
   - [1.4. Building FreeBSD](#14-building-freebsd)
   - [1.5. Using the build.sh script](#15-using-the-buildsh-script)
+  - [1.6. Removing ALL podman containers](#16-removing-all-podman-containers)
 - [2. Building using Makefile](#2-building-using-makefile)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
 
@@ -133,6 +134,23 @@ $ ./build.sh -?
 ```
 
 It will provide you instructions on its use.
+
+### 1.6. Removing ALL podman containers
+
+If your machine is only uses podman for this repository, you can easily remove
+all containers on podman with this instruction:
+
+```sh
+podman system prune --all --force && podman rmi --all --force
+```
+
+Running `make all` will reconstruct all repositories.
+
+**WARNING**: Because the containers depend on external resources out side of
+this repository, rebuilding may likely generate different images. The
+Dockerfiles may not work! This is due to changes on how external resources
+manage their URLs and package dependencies (e.g. with `alpine-latest` image,
+packages may be refactored at any time, less likely with the `ubuntu-*` images).
 
 ## 2. Building using Makefile
 

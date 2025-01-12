@@ -119,7 +119,11 @@ if [ ${ROOT} -ne 0 ]; then
   SOURCE="rw"
 else
   ROOTOPT="--userns=keep-id"
-  SOURCE="ro"
+  if [ ${INTERACTIVE} -ne 0 ]; then
+    SOURCE="rw"
+  else
+    SOURCE="ro"
+  fi
 fi
 
 BUILDDIR=""
@@ -136,7 +140,11 @@ fi
 if [ ${INTERACTIVE} -ne 0 ]; then
   podman run -it --rm $ROOTOPT -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION"
 else
-  echo "Non-Interactive"
-  echo "$OTHERARGS"
-  podman run -t --rm $ROOTOPT -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION" sh -c "$OTHERARGS"
+  if [ "x$OTHERARGS" = "x" ]; then
+    echo "No command, doing nothing..."
+  else
+    echo "Non-Interactive"
+    echo "$OTHERARGS"
+    podman run -t --rm $ROOTOPT -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw --tmpfs /tmp "coderesearch:$PODVERSION" sh -c "$OTHERARGS"
+  fi
 fi
