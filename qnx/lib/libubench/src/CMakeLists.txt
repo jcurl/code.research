@@ -49,7 +49,15 @@ else()
     cmake_push_check_state(RESET)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
     list(APPEND CMAKE_REQUIRED_LIBRARIES pthread)
-    check_symbol_exists(pthread_setaffinity_np pthread.h HAVE_PTHREAD_SETAFFINITY_NP)
+    check_symbol_exists(pthread_setaffinity_np "pthread.h" HAVE_PTHREAD_SETAFFINITY_NP)
+    if (NOT HAVE_PTHREAD_SETAFFINITY_NP)
+        # Test for FreeBSD.
+        check_include_file("pthread_np.h" HAVE_INCLUDE_PTHREAD_NP_H)
+        if (HAVE_INCLUDE_PTHREAD_NP_H)
+            unset(HAVE_PTHREAD_SETAFFINITY_NP CACHE)
+            check_symbol_exists(pthread_setaffinity_np "pthread_np.h" HAVE_PTHREAD_SETAFFINITY_NP)
+        endif()
+    endif()
     cmake_reset_check_state()
 
     if(HAVE_PTHREAD_SETAFFINITY_NP)
@@ -69,4 +77,5 @@ endif()
 
 target_clangformat_setup(${LIBRARY})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})

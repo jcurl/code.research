@@ -165,7 +165,7 @@ Other Platforms:
 - (X) MacOS-X: Pinning threads in the Operating System not supported.
 - (/) Cygwin (Windows): Shows core latencies as expected.
 - (/) NetBSD 10.1: Shows core latencies as expected (tested on RPi4).
-- (X) FreeBSD 14.2: Core Pinning not implemented.
+- (/) FreeBSD 14.2: Shows core latencies as expected (tested on RPi4).
 
 #### 2.2.3. Network Performance with UDP Load
 

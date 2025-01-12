@@ -1,4 +1,11 @@
+#include "config.h"
+
 #include <pthread.h>
+#if HAVE_INCLUDE_PTHREAD_NP_H
+// FreeBSD
+#include <pthread_np.h>
+#endif
+
 #include <sched.h>
 
 #include <cerrno>
@@ -26,7 +33,7 @@ auto pin_core(unsigned int core) -> bool {
   cpuset_set(ci, cpuset);
   int rc = pthread_setaffinity_np(current, cpuset_size(cpuset), cpuset);
   cpuset_destroy(cpuset);
-#elif defined(__linux__) || defined(__CYGWIN__)
+#elif defined(__linux__) || defined(__CYGWIN__) || defined(__FreeBSD__)
   // Linux, Cygwin
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
