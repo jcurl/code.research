@@ -1,3 +1,4 @@
+#include <sys/proc.h>
 #include <sys/sched.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
@@ -7,30 +8,11 @@
 #include <vector>
 
 #include "ubench/clock.h"
+#include "base_clock.h"
 
 namespace ubench::chrono {
 
 namespace {
-
-class base_clock {
- public:
-  base_clock() noexcept = default;
-  base_clock(const base_clock& other) = delete;
-  auto operator=(const base_clock& other) -> base_clock& = delete;
-  base_clock(base_clock&& other) = delete;
-  auto operator=(base_clock&& other) -> base_clock& = delete;
-  virtual ~base_clock() = default;
-
-  [[nodiscard]] virtual auto is_enabled() const noexcept -> bool {
-    return false;
-  }
-  [[nodiscard]] virtual auto get_idle_clock() noexcept -> std::uint64_t {
-    return 0;
-  }
-  [[nodiscard]] virtual auto type() const noexcept -> idle_clock_type {
-    return idle_clock_type::null;
-  }
-};
 
 class cp_time_idle_clock : public base_clock {
  public:
@@ -59,6 +41,7 @@ class cp_time_idle_clock : public base_clock {
   long clock_ticks_per_sec_{};
   unsigned int ncpu_{};
   std::vector<std::uint64_t> times_{};
+  std::array<int, 2> mib_cp_times_{};
 
   auto init_proc_clock() noexcept -> void {
     // Ask the Operating System tne number of CPUs. Don't use the CPP standard,
@@ -79,17 +62,28 @@ class cp_time_idle_clock : public base_clock {
 
     // Allocate dynamic memory only once for getting CPU time information.
     times_.resize(ncpu_ * CPUSTATES);
+
+    // Get the MIB for the KERN_CP_TIMES, as there is no constant available.
+#if __NetBSD__
+    mib_cp_times_[0] = CTL_KERN;
+    mib_cp_times_[1] = KERN_CP_TIME;
+#elif __FreeBSD__
+    size_t len = mib_cp_times_.size();
+    sysctlnametomib("kern.cp_times", mib_cp_times_.data(), &len);
+#else
+    // We don't know how to get the times, so initialise to unknown.
+    clock_ticks_per_sec_ = 0;
+#endif
   }
 
   auto get_idle_time() noexcept -> std::uint64_t {
     if (clock_ticks_per_sec_ == 0) return 0;
 
     // Get the clock details CP_* defined in <sys/sched.h>.
-    int mib[2];
-    mib[0] = CTL_KERN;
-    mib[1] = KERN_CP_TIME;
     std::size_t size = sizeof(decltype(times_)::value_type) * CPUSTATES * ncpu_;
-    if (sysctl(mib, 2, times_.data(), &size, NULL, 0) < 0) return 0;
+    if (sysctl(mib_cp_times_.data(), mib_cp_times_.size(), times_.data(), &size,
+            NULL, 0) < 0)
+      return 0;
 
     // Sum up the idle ticks per CPU. Note that the accuracy of this system call
     // is not very high (and appears lower than Linux) as it's likely based on

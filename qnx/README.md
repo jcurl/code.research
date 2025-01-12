@@ -180,7 +180,7 @@ Other Platforms:
 
 - (X) Cygwin (Windows): Works. Values should be informational only.
 - (/) NetBSD 10.1: Runs. IDLE/CPU time not accurate.
-- (!) FreeBSD 14.2: Runs. IDLE/CPU time not implemented.
+- (/) FreeBSD 14.2: Runs. Works. sendto buffer error when rate too high.
 
 #### 2.2.4. List QNX Files
 
