@@ -36,6 +36,9 @@ elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN" OR
        upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX" OR
        upper_CMAKE_SYSTEM_NAME STREQUAL "NETBSD")
     target_sources(${LIBRARY} PRIVATE get_proc_name_linux.cpp get_proc_name_common.cpp get_proc_name_common.h)
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "FREEBSD")
+    target_sources(${LIBRARY} PRIVATE get_proc_name_freebsd.cpp)
+    target_link_libraries(${LIBRARY} "util")
 else()
     target_sources(${LIBRARY} PRIVATE get_proc_name_null.cpp)
 endif()
