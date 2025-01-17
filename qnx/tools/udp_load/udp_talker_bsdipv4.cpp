@@ -5,8 +5,8 @@
 #include <unistd.h>
 
 #include <cstdio>
-#include <iostream>
 
+#include "ubench/net.h"
 #include "udp_talker.h"
 
 udp_talker_bsd::~udp_talker_bsd() {
@@ -24,8 +24,7 @@ auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
   if (fd < 0) return false;
   socket_fd_ = fd;
 
-  bool is_multicast = (ntohl(dest.sin_addr.s_addr) & 0xF0000000) == 0xE0000000;
-  if (is_multicast) {
+  if (ubench::net::is_multicast(dest.sin_addr)) {
     char loopch = 1;
     if (setsockopt(
             fd, IPPROTO_IP, IP_MULTICAST_LOOP, &loopch, sizeof(loopch))) {

@@ -184,14 +184,4 @@ class options {
   std::uint16_t threads_{1};
 };
 
-/// @brief Converts addr to a string.
-///
-/// This is functionality equivalent to inet_ntop() for C++ (can't use this
-/// function name as some systems won't compile if the names overlap).
-///
-/// @param addr The IPv4 address and port to stringify.
-///
-/// @return The string converted, or on error, an empty string.
-auto inet_ntos(const struct sockaddr_in& addr) -> const std::string;
-
 #endif

@@ -4,7 +4,10 @@ set(BINARY ubench_test)
 set(SOURCES
     args_test.cpp
     clock_test.cpp
+    flags_test.cpp
+    net_test.cpp
     os_test.cpp
+    strlcpy_test.cpp
     thread_test.cpp
 )
 
@@ -25,6 +28,8 @@ target_code_coverage(${BINARY}
 
 target_clangformat_setup(${BINARY})
 
-# Access the source directories under test. Header files are already included in
-# a parent CMakeLists.txt file.
-include_directories(${CMAKE_SOURCE_DIR}/test)
+# Access the source directories under test.
+#
+# Ensure we can access private implementations within the src directory also,
+# which needs "config.h" in addition.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src ${CMAKE_BINARY_DIR}/lib/libubench/src)

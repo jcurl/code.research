@@ -1,3 +1,64 @@
+// --------------------------------------------------------------------
 // Threads
+// --------------------------------------------------------------------
 
 #cmakedefine01 HAVE_INCLUDE_PTHREAD_NP_H
+
+// --------------------------------------------------------------------
+// Strings
+// --------------------------------------------------------------------
+
+#cmakedefine01 HAVE_STRLCPY
+#cmakedefine01 HAVE_INCLUDE_BSD_STRING_H
+
+// --------------------------------------------------------------------
+// Networking
+// --------------------------------------------------------------------
+
+// Include file <linux/if.h> exists.
+#cmakedefine01 HAVE_NET_INCLUDE_NET_ETHERNET_H
+#cmakedefine01 HAVE_NET_INCLUDE_LINUX_IF_H
+#cmakedefine01 HAVE_NET_INCLUDE_LINUX_SOCKIOS_H
+// NetBSD, QNX7.1
+#cmakedefine01 HAVE_NET_INCLUDE_NET_IF_VLANVAR_H
+// QNX8
+#cmakedefine01 HAVE_NET_INCLUDE_NET_IF_VLAN_VAR_H
+
+// Network Interface Flags
+// Linux: #include <net/if.h> (Alpine); #include <linux/if.h> (Ubuntu)
+// Cygwin: #include <net/if.h>
+#cmakedefine01 HAVE_NET_IFF_LOWER_UP
+
+// ioctl commands
+#cmakedefine01 HAVE_NET_SIOCGIFADDR
+#cmakedefine01 HAVE_NET_SIOCGIFCONF
+#cmakedefine01 HAVE_NET_SIOCGSIZIFCONF
+#cmakedefine01 HAVE_NET_SIOCGIFBRDADDR
+#cmakedefine01 HAVE_NET_SIOCGIFDSTADDR
+#cmakedefine01 HAVE_NET_SIOCGIFFLAGS
+#cmakedefine01 HAVE_NET_SIOCGIFNETMASK
+#cmakedefine01 HAVE_NET_SIOCGIFHWADDR
+#cmakedefine01 HAVE_NET_SIOCGIFFRNDLYNAM
+// Linux: #include <linux/sockios.h>
+#cmakedefine01 HAVE_NET_SIOCGIFVLAN
+// NetBSD, QNX7.1: #include <sys/types.h>; #include <net/if_ether.h>; #include <net/if_vlanvar.h>
+// QNX8.0: #include <sys/types.h>; @include <net/if.h>; #include <net/if_vlan_var.h>
+#cmakedefine01 HAVE_NET_SIOCGETVLAN
+
+// Address Family Types
+#cmakedefine01 HAVE_NET_AF_LINK
+
+// Types
+#cmakedefine01 HAVE_NET_SOCKADDR_DL
+
+// Link Types
+#cmakedefine01 HAVE_NET_IFT_ETHER
+
+// Function getifaddrs() and freeifaddrs() exist.
+#cmakedefine01 HAVE_NET_GETIFADDRS
+
+// Field in the struct ifreq (found on FreeBSD)
+#cmakedefine01 HAVE_NET_IFR_FLAGS_HIGH
+
+// Derived defines based on identified features
+#define HAVE_NET_VLAN (HAVE_NET_SIOCGIFVLAN || HAVE_NET_SIOCGETVLAN)

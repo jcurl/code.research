@@ -51,5 +51,6 @@ int main(int argc, char* argv[]) {
 
         file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${SOURCEFILE}" "${_MALLOPT_SOURCE}")
         try_compile(${VARIABLE} ${CMAKE_BINARY_DIR} "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${SOURCEFILE}" OUTPUT_VARIABLE OUTPUT)
+        unset(_MALLOPT_SOURCE)
     endif()
 endmacro(_check_mallopt_option_impl)

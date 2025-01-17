@@ -11,9 +11,8 @@
 # CMAKE_CXX_FLAGS that can change the behaviour.
 #
 # If the system processor is not ARM, then the variables are not touched.
-
 function(arm64_has_lse)
-    if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
         if(DEFINED HAVE_C_ARM64_LSE OR DEFINED HAVE_CXX_ARM64_LSE)
             return()
         endif()
@@ -63,5 +62,6 @@ int main(int argc, char **argv) {
         # Inspired by sources for CheckSymbolExists.cmake in CMake-3.16.9
         file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${SOURCEFILE}" "${_LSE_SOURCE}")
         try_compile(${VARIABLE} ${CMAKE_BINARY_DIR} "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${SOURCEFILE}" OUTPUT_VARIABLE OUTPUT)
+        unset(_LSE_SOURCE)
     endif()
 endmacro(_arm64_has_le_impl)

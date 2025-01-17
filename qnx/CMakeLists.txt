@@ -46,9 +46,6 @@ find_package(Sanitizers)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/clang-format" ${CMAKE_MODULE_PATH})
 include(ClangFormat)
 
-# So that we can find "config.h"
-include_directories(${PROJECT_BINARY_DIR})
-
 if("${CMAKE_CXX_FLAGS}" STREQUAL "")
     if((CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang") OR
        (CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR

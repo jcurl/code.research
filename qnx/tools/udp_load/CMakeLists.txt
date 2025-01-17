@@ -1,5 +1,6 @@
 include(CheckSymbolExists)
-include(research/sockets)
+include(research/check_symbol_lib_exists)
+include(research/check_symbol_enum_exists)
 
 find_package(Threads REQUIRED)
 
@@ -15,8 +16,8 @@ add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
 target_link_libraries(${BINARY} ubench Threads::Threads)
 
-find_libsocket(PROJECT ${BINARY} FATAL)
-check_symbol_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)
+check_symbol_lib_exists(socket "sys/socket.h" HAVE_SOCKET LIB "socket" TARGET ${BINARY} FATAL)
+check_symbol_enum_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)
 check_symbol_exists(sendmmsg "sys/socket.h" HAVE_SENDMMSG)
 
 if(IS_DEBUG)

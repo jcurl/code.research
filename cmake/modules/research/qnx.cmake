@@ -14,7 +14,6 @@
 # variables are in scope.
 #
 # Tested on QNX 7.1.0 and 8.0.0.
-
 function(get_qnx_version)
     if(NOT DEFINED HAVE_QNX_VERSION)
         set(_qnx_ver_firstrun 1)
@@ -62,14 +61,14 @@ function(_get_qnx_version_try_compile_c_cxx QNX_VERSION)
     # compiler to use for the file, we have to copy the source with a valid
     # extension the project is configured for.
     if(CMAKE_C_COMPILER_LOADED)
-        if (NOT CMAKE_C_COMPILER_ID MATCHES "QCC")
+        if(NOT CMAKE_C_COMPILER_ID MATCHES "QCC")
             message(STATUS "Checking for QNX - QCC not in use (compiler id is ${CMAKE_C_COMPILER_ID})")
             set(${QNX_VERSION} "" PARENT_SCOPE)
             return()
         endif()
         set(_qnx_version_source_file "qnx-version.c")
     elseif(CMAKE_CXX_COMPILER_LOADED)
-        if (NOT CMAKE_CXX_COMPILER_ID MATCHES "QCC")
+        if(NOT CMAKE_CXX_COMPILER_ID MATCHES "QCC")
             message(STATUS "Checking for QNX - QCC not in use (compiler id is ${CMAKE_CXX_COMPILER_ID})")
             set(${QNX_VERSION} "" PARENT_SCOPE)
             return()
@@ -106,7 +105,7 @@ int main() { return 0; }
         ${CMAKE_BINARY_DIR}
         "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${_qnx_version_source_file}"
         OUTPUT_VARIABLE _qnx_version_output)
-    if (_qnx_compile_result)
+    if(_qnx_compile_result)
         string(REGEX MATCH "QNX_VERSION: ([0-9]+)" _qnx_version "${_qnx_version_output}")
         set(_qnx_version ${CMAKE_MATCH_1})
         if("${_qnx_version}" STREQUAL "")

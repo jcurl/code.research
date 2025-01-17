@@ -12,21 +12,43 @@ namespace ubench::file {
 
 /// @brief Represents an OS file (file descriptor).
 ///
-/// Wrap an operating system filedescriptor in a class, so that when it goes out
-/// of scope, it is automatically closed.
+/// Wrap an operating system file descriptor in a class, so that when it goes
+/// out of scope, it is automatically closed.
 ///
 /// The copy constructor and copy assignment are deleted, so that there cannot
 /// be more than one instance of the same file descriptor. Use the implicit
 /// constructor accepting an integer (the returned file descriptor).
+///
+/// When passing this around, either move it, or pass a reference to fdesc for
+/// another function. A copy shouldn't duplicate the descriptor (this would be
+/// confusing when passing to functions), nor should there be two instances used
+/// at the same time. Don't create a second instance explicitly with the
+/// underlying file descriptor, as it would be undefined behaviour to close that
+/// file handle (the two instances would be managed independently and could lead
+/// to common race conditions, such as use after free, or manipulate to the
+/// wrong file).
 class fdesc {
  public:
-  /// @brief Instantiate an os_file from an integer file descriptor
+  /// @brief Instantiate an fdesc from an integer file descriptor.
   ///
   /// Operations that return a file descriptor can be given to this class. When
   /// this class goes out of scope, the file descriptor is closed.
   ///
   /// @param fd the file descriptor to manage.
   fdesc(int fd) noexcept : fd_{fd} {}
+
+  /// @brief Assign an fdesc from an integer file descriptor.
+  ///
+  /// Close the existing file descriptor if already open before assigning.
+  ///
+  /// @param fd the file descriptor to manage.
+  ///
+  /// @return this object that was assigned.
+  auto operator=(int fd) -> fdesc& {
+    if (fd_ != -1) close(fd_);
+    fd_ = fd;
+    return *this;
+  }
 
   /// @brief Open using the open() system call, read only.
   ///

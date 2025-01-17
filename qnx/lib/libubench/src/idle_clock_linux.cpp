@@ -2,14 +2,12 @@
 
 #include <cstdint>
 #include <fstream>
-#include <iostream>
 #include <locale>
 #include <memory>
 #include <sstream>
 #include <string>
 
 #include "ubench/clock.h"
-
 #include "base_clock.h"
 
 namespace ubench::chrono {

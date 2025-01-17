@@ -7,7 +7,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 #include "ubench/args.h"
