@@ -18,6 +18,7 @@
     - [2.2.2. Core Latency](#222-core-latency)
     - [2.2.3. Network Performance with UDP Load](#223-network-performance-with-udp-load)
     - [2.2.4. List QNX Files](#224-list-qnx-files)
+    - [2.2.5. List Interfaces and IPv4 Addresses](#225-list-interfaces-and-ipv4-addresses)
 
 ## 1. Compilation
 
@@ -189,3 +190,17 @@ Show all files opened by a process under QNX, like in `pidin`.
 - Tool: `lsqf`
 - Supported: QNX 7.1, QNX 8.0
 - [Documentation](./tools/lsqf.md)
+
+#### 2.2.5. List Interfaces and IPv4 Addresses
+
+Uses the library abstraction to list all interfaces and the properties.
+
+- Tool `iplist`
+- Supported: Linux, QNX 7.1, QNX 8.0
+- [Documentation](./tools/iplist.md)
+
+Other Platforms:
+
+- (/) Cygwin (Windows): Gets the alias names from the GUIDs. No VLANs.
+- (/) NetBSD 10.1: Works.
+- (/) FreeBSD 14.2: Works.
