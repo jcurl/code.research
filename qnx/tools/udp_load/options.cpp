@@ -33,12 +33,17 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
     if (!port) return false;
     addr.sin_port = htons(*port);
 
-    // Get a NUL-terminated string.
+    // Get a NUL-terminated string. The value `port_sep` is guaranteed to be
+    // to be within the bounds of the string.
+    //
+    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     std::string addrstr{arg.data(), port_sep};
     if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
   } else {
     addr.sin_port = 0;
-    if (inet_pton(AF_INET, arg.data(), &(addr.sin_addr)) != 1) return false;
+    // arg may not be NUL terminated. Ensure it is.
+    std::string addrstr{arg.data(), arg.size()};
+    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
   }
 
   addr.sin_family = AF_INET;
