@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug RCU",
+            "name": "Debug libubench.a",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Build RCU (Debug)",
-            "program": "${workspaceRoot}/rcu/build/debug/src/rcutest",
+            "preLaunchTask": "Build QNX (Debug)",
+            "program": "${workspaceRoot}/qnx/build/linux-debug/lib/libubench/test/ubench_test",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}/rcu/build/debug/src",
+            "cwd": "${workspaceRoot}/qnx/build/linux-debug/lib/libubench/test",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

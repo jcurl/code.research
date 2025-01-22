@@ -2,10 +2,6 @@
     "configurations": [
         {
             "name": "Linux",
-            "includePath": [
-                "${default}",
-                "${workspaceRoot}/external/googletest/googletest/include"
-            ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",

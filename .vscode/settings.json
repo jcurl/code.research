@@ -10,5 +10,5 @@
     "files.associations": {
         "*.tcc": "cpp"
     },
-    "cmake.sourceDirectory": "${workspaceRoot}/rcu"
+    "cmake.sourceDirectory": "${workspaceRoot}/qnx"
 }
