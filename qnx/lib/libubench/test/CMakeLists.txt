@@ -2,7 +2,7 @@ include(GoogleTest)
 
 set(BINARY ubench_test)
 set(SOURCES
-    args_test.cpp
+    string_test.cpp
     clock_test.cpp
     flags_test.cpp
     net_test.cpp

@@ -9,9 +9,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "ubench/args.h"
 #include "ubench/file.h"
 #include "ubench/os.h"
+#include "ubench/string.h"
 
 namespace {
 auto get_filename(std::string path) -> std::string {
@@ -52,8 +52,8 @@ auto pids::get_pids() -> std::vector<int> {
   for (auto const& pid_entry : dir_it) {
     try {
       if (pid_entry.is_directory()) {
-        auto pid =
-            ubench::args::parse_int<int>(pid_entry.path().filename().string());
+        auto pid = ubench::string::parse_int<int>(
+            pid_entry.path().filename().string());
         if (pid) {
           pids.push_back(*pid);
         }

@@ -11,7 +11,7 @@
 #include "ubench/file.h"
 
 #include "net_common.h"
-#include "stringext.h"
+#include "ubench/string.h"
 
 namespace ubench::net {
 

@@ -11,7 +11,7 @@ document file does not repeat how to use the library.
   - [1.5. Thread Handling (`thread.h`)](#15-thread-handling-threadh)
   - [1.6. Networking (`net.h`)](#16-networking-neth)
 - [2. Common Functionality](#2-common-functionality)
-  - [2.1. String Parsing (arguments `args.h`)](#21-string-parsing-arguments-argsh)
+  - [2.1. String Parsing (arguments `string.h`)](#21-string-parsing-arguments-stringh)
 - [3. Useful Information](#3-useful-information)
   - [3.1. Networking](#31-networking)
     - [3.1.1. Interfaces](#311-interfaces)
@@ -173,12 +173,13 @@ Other useful functionality:
 
 ## 2. Common Functionality
 
-### 2.1. String Parsing (arguments `args.h`)
+### 2.1. String Parsing (arguments `string.h`)
 
 Argument parsing often needs to read strings.
 
 - Convert a comma separated list of elements into a vector (`split_args`).
 - Parse a string into an integer (`parse_int`).
+- A backup implementation of `strlcpy` if not found by `CMakeLists.txt`.
 
 ## 3. Useful Information
 

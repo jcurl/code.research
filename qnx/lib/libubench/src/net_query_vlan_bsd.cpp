@@ -17,8 +17,8 @@
 #include <cerrno>
 #include <cstring>
 
+#include "ubench/string.h"
 #include "net_common.h"
-#include "stringext.h"
 
 namespace ubench::net {
 

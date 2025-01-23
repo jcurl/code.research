@@ -1,4 +1,4 @@
-#include "stringext.h"
+#include "ubench/string.h"
 
 auto strlcpy(char *dst, const char *src, size_t size) -> size_t {
   // We don't want to do a strlen() then a copy, as this traverses the string
@@ -10,7 +10,7 @@ auto strlcpy(char *dst, const char *src, size_t size) -> size_t {
 
   if (n > 0) {
     while (--n > 0) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic,bugprone-assignment-in-if-condition)
       if ((*d++ = *s++) == 0) break;
     }
   }

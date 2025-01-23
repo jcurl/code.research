@@ -4,12 +4,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#include <charconv>
 #include <iostream>
-#include <sstream>
 #include <string_view>
 
-#include "ubench/args.h"
+#include "ubench/string.h"
 
 namespace {
 
@@ -29,7 +27,7 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
 
     std::string_view portstr(
         arg.data() + port_sep + 1, arg.size() - port_sep - 1);
-    auto port = ubench::args::parse_int<std::uint16_t>(portstr);
+    auto port = ubench::string::parse_int<std::uint16_t>(portstr);
     if (!port) return false;
     addr.sin_port = htons(*port);
 
@@ -122,7 +120,7 @@ options::options(int& argc, char* const argv[]) noexcept {
   while ((c = getopt(argc, argv, "n:m:p:s:d:B:T:S:D:I?")) != -1) {
     switch (c) {
       case 'n': {
-        auto n = ubench::args::parse_int<std::uint16_t>(optarg);
+        auto n = ubench::string::parse_int<std::uint16_t>(optarg);
         if (!n) {
           std::cerr << "Error: Invalid value for the number of slots - "
                     << optarg << std::endl;
@@ -138,7 +136,7 @@ options::options(int& argc, char* const argv[]) noexcept {
         break;
       }
       case 'm': {
-        auto m = ubench::args::parse_int<std::uint16_t>(optarg);
+        auto m = ubench::string::parse_int<std::uint16_t>(optarg);
         if (!m) {
           std::cerr << "Error: Invalid value for width - " << optarg
                     << std::endl;
@@ -154,7 +152,7 @@ options::options(int& argc, char* const argv[]) noexcept {
         break;
       }
       case 'p': {
-        auto p = ubench::args::parse_int<std::uint32_t>(optarg);
+        auto p = ubench::string::parse_int<std::uint32_t>(optarg);
         if (!p) {
           std::cerr << "Error: Invalid value for packets per window - "
                     << optarg << std::endl;
@@ -170,7 +168,7 @@ options::options(int& argc, char* const argv[]) noexcept {
         break;
       }
       case 's': {
-        auto s = ubench::args::parse_int<std::uint16_t>(optarg);
+        auto s = ubench::string::parse_int<std::uint16_t>(optarg);
         if (!s) {
           std::cerr << "Error: Invalid value for packet size - " << optarg
                     << std::endl;
@@ -180,7 +178,7 @@ options::options(int& argc, char* const argv[]) noexcept {
         break;
       }
       case 'd': {
-        auto t = ubench::args::parse_int<std::uint32_t>(optarg);
+        auto t = ubench::string::parse_int<std::uint32_t>(optarg);
         if (!t) {
           std::cerr << "Error: Invalid value for duration - " << optarg
                     << std::endl;
@@ -213,7 +211,7 @@ options::options(int& argc, char* const argv[]) noexcept {
         break;
       }
       case 'T': {
-        auto t = ubench::args::parse_int<std::uint16_t>(optarg);
+        auto t = ubench::string::parse_int<std::uint16_t>(optarg);
         if (!t) {
           std::cerr << "Error: Invalid value for number of threads - " << optarg
                     << std::endl;

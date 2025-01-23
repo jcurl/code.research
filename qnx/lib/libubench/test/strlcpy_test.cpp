@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "stringext.h"
+#include "ubench/string.h"
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays,cppcoreguidelines-pro-bounds-array-to-pointer-decay,cppcoreguidelines-pro-bounds-constant-array-index)
 

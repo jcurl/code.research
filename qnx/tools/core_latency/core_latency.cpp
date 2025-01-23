@@ -12,7 +12,7 @@
 #include <thread>
 #include <unordered_map>
 
-#include "ubench/args.h"
+#include "ubench/string.h"
 #include "ubench/thread.h"
 #include "core_benchmark.h"
 #include "corerw_benchmark.h"
@@ -60,7 +60,7 @@ auto main(int argc, char* argv[]) -> int {
   while ((c = getopt(argc, argv, "s:i:b:?")) != -1) {
     switch (c) {
       case 's': {
-        auto samples_arg = ubench::args::parse_int<unsigned int>(optarg);
+        auto samples_arg = ubench::string::parse_int<unsigned int>(optarg);
         if (samples_arg) {
           samples = *samples_arg;
           if (samples < 1 || samples > 60000) {
@@ -76,7 +76,7 @@ auto main(int argc, char* argv[]) -> int {
         break;
       }
       case 'i': {
-        auto iters_arg = ubench::args::parse_int<unsigned int>(optarg);
+        auto iters_arg = ubench::string::parse_int<unsigned int>(optarg);
         if (iters_arg) {
           iterations = *iters_arg;
           if (iterations < 1 || iterations > 60000) {

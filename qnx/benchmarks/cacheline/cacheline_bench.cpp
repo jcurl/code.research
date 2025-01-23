@@ -9,7 +9,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include "ubench/args.h"
+#include "ubench/string.h"
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::uint32_t buffer_size = 0;
@@ -84,7 +84,7 @@ auto main(int argc, char** argv) -> int {
   while ((c = getopt(argc, argv, "b:?")) != -1) {
     switch (c) {
       case 'b': {
-        auto buffer_arg = ubench::args::parse_int<std::uint32_t>(optarg);
+        auto buffer_arg = ubench::string::parse_int<std::uint32_t>(optarg);
         if (buffer_arg) {
           buffer_size_opt = *buffer_arg;
           if (buffer_size_opt < 1 || buffer_size_opt > 512) {

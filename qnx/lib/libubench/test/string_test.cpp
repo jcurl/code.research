@@ -1,13 +1,12 @@
-#include "ubench/args.h"
+#include "ubench/string.h"
 
 #include <initializer_list>
-#include <string_view>
 
 #include <gtest/gtest.h>
 
 auto split_check(std::string arg, std::initializer_list<std::string> l)
     -> void {
-  auto arg_parse = ubench::args::split_args(arg);
+  auto arg_parse = ubench::string::split_args(arg);
   EXPECT_TRUE(arg_parse);
   if (arg_parse) {
     EXPECT_EQ(arg_parse->size(), l.size());
@@ -40,13 +39,13 @@ TEST(ubench_args, split_args) {
 
 template <typename T>
 auto parse_int_check(std::string arg) -> void {
-  auto value = ubench::args::parse_int<T>(arg);
+  auto value = ubench::string::parse_int<T>(arg);
   EXPECT_FALSE(value);
 }
 
 template <typename T>
 auto parse_int_check(std::string arg, T expected) -> void {
-  auto value = ubench::args::parse_int<T>(arg);
+  auto value = ubench::string::parse_int<T>(arg);
   EXPECT_TRUE(value);
   if (value) {
     EXPECT_EQ(value, expected)

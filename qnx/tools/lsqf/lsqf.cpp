@@ -12,8 +12,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "ubench/args.h"
 #include "ubench/file.h"
+#include "ubench/string.h"
 #include "file.h"
 #include "pids.h"
 
@@ -266,14 +266,14 @@ auto main(int argc, char* argv[]) -> int {
         lsqf.show_self() = true;
         break;
       case 'p': {
-        auto arglist = ubench::args::split_args(optarg);
+        auto arglist = ubench::string::split_args(optarg);
         if (!arglist) {
           std::cerr << "Error: No arguments provided for pid list" << std::endl;
           exit_code = 1;
           break;
         }
         for (const auto& arg : arglist.value()) {
-          auto pid_arg = ubench::args::parse_int<unsigned int>(arg);
+          auto pid_arg = ubench::string::parse_int<unsigned int>(arg);
           if (pid_arg) {
             pids.push_back(*pid_arg);
           } else {

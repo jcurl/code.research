@@ -7,14 +7,13 @@ include(research/check_struct_field_exists)
 
 set(LIBRARY ubench)
 set(SOURCES
-    ../include/ubench/args.h args.cpp
+    ../include/ubench/string.h string.cpp
     ../include/ubench/clock.h
     ../include/ubench/flags.h
     ../include/ubench/file.h
     ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp
     ../include/ubench/os.h
     ../include/ubench/thread.h
-    stringext.h
     sync_event.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
@@ -164,7 +163,7 @@ if(HAVE_STRLCPY)
         set(HAVE_INCLUDE_BSD_STRING_H 1)
     endif()
 else()
-    target_sources(${LIBRARY} PRIVATE stringext.cpp)
+    target_sources(${LIBRARY} PRIVATE string_strlcpy.cpp)
 endif()
 
 # ----------------------------------------------------------------------

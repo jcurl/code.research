@@ -1,6 +1,6 @@
-#include "ubench/args.h"
+#include "ubench/string.h"
 
-namespace ubench::args {
+namespace ubench::string {
 
 auto split_args(std::string_view arg)
     -> std::optional<std::vector<std::string>> {
@@ -19,4 +19,4 @@ auto split_args(std::string_view arg)
   }
 }
 
-}  // namespace ubench::args
+}  // namespace ubench::string
