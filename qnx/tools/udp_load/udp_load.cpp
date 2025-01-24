@@ -49,6 +49,9 @@ auto main(int argc, char* argv[]) -> int {
       case send_mode::mode_sendmmsg:
         talker = std::make_unique<udp_talker_sendmmsg>();
         break;
+      case send_mode::mode_bpf:
+        talker = std::make_unique<udp_talker_bpf>();
+        break;
       default:
         std::cerr << "Error: Unknown sending mode" << std::endl;
         return 1;
@@ -99,6 +102,9 @@ auto main(int argc, char* argv[]) -> int {
       break;
     case send_mode::mode_sendmmsg:
       std::cout << "sendmmsg" << std::endl;
+      break;
+    case send_mode::mode_bpf:
+      std::cout << "bpf" << std::endl;
       break;
     default:
       std::cout << "unknown" << std::endl;

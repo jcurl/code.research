@@ -120,6 +120,7 @@ An example of occasional support for Tier 2 targets are:
 - MacOS-X (non-free, support very limited)
 
 Notes:
+
 - ¹ Build from `scripts` with `make netbsd`
 - ² Build from `scripts` with `make freebsd`
 

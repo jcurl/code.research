@@ -12,15 +12,15 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
-#include <string_view>
 #include <vector>
 
 #include "busy_measurement.h"
 
 /// @brief The class to instantiate when testing.
 enum class send_mode {
-  mode_sendto,   //< Use sendto() for sending packets.
-  mode_sendmmsg  //< use sendmmsg() for sending packets.
+  mode_sendto,    //< Use sendto() for sending packets.
+  mode_sendmmsg,  //< use sendmmsg() for sending packets.
+  mode_bpf,       //< use BPF for sending packets.
 };
 
 /// @brief Executes a period of time in idle for background CPU usage
@@ -209,6 +209,39 @@ class udp_talker_sendmmsg final : public udp_talker_bsd {
 #else
 // The sendmmsg() is not supported.
 using udp_talker_sendmmsg = udp_talker;
+#endif
+
+#if HAVE_BIOCSETIF
+/// @brief Send packets using the sendmmsg() socket call.
+///
+/// The sendmmsg() call allows to send multiple packets in one system call,
+/// allowing for the reduction of overhead for multiple packets in one slot.
+class udp_talker_bpf final : public udp_talker {
+ public:
+  explicit udp_talker_bpf();
+  udp_talker_bpf(const udp_talker_bpf&) = delete;
+  auto operator=(const udp_talker_bpf&) -> udp_talker_bpf& = delete;
+  udp_talker_bpf(udp_talker_bpf&& other) = delete;
+  auto operator=(udp_talker_bpf&&) -> udp_talker_bpf& = delete;
+  ~udp_talker_bpf() override;
+  auto is_supported() noexcept -> bool override { return true; }
+
+ protected:
+  auto init_packets(const struct sockaddr_in& source,
+      const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept
+      -> bool override;
+  auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
+
+ private:
+  int socket_fd_{-1};
+  int writev_errno_{};
+
+  class pkt_details;
+  std::unique_ptr<pkt_details> pkt_;
+};
+#else
+// The /dev/bpf interface constants are not found.
+using udp_talker_bpf = udp_talker;
 #endif
 
 /// @brief Create the benchmark class from the mode.

@@ -1,2 +1,7 @@
-#cmakedefine01 HAVE_SENDMMSG
 #cmakedefine01 HAVE_SO_REUSEPORT
+
+// Enable 'sendmmsg' support.
+#cmakedefine01 HAVE_SENDMMSG
+
+// Enable 'bpf' support.
+#cmakedefine01 HAVE_BIOCSETIF

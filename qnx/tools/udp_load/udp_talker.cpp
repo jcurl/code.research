@@ -27,6 +27,9 @@ auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker> {
     case send_mode::mode_sendmmsg:
       talker = std::make_unique<udp_talker_sendmmsg>();
       break;
+    case send_mode::mode_bpf:
+      talker = std::make_unique<udp_talker_bpf>();
+      break;
     default:
       talker = std::make_unique<udp_talker>();
       break;
@@ -124,6 +127,7 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
   std::uint32_t s = 0;
   std::uint32_t packet_sent_window_count = 0;
   std::uint32_t sent = 0;
+  std::uint32_t total_sent = 0;
 
   std::int64_t expected_time = std::max<std::int64_t>(
       duration.count(), static_cast<std::int64_t>(slots_) * width_);
@@ -177,6 +181,7 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
             send_snapshot - start_time)
                            .count();
         packet_sent_window_count += sent;
+        total_sent += sent;
         r++;
 
         std::uint32_t sf = elapsed_time / width_;
@@ -245,7 +250,7 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
   }
 
   udp_results results = {
-      packets_ * r / slots_,
+      total_sent,
       packets_ * s / slots_,
       std::chrono::duration_cast<std::chrono::milliseconds>(total_wait_time),
       std::chrono::duration_cast<std::chrono::milliseconds>(total_sent_time),

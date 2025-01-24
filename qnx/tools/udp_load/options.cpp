@@ -71,6 +71,11 @@ void print_help(std::string_view prog_name) {
     option = true;
     std::cout << "sendmmsg";
   }
+  if (make_udp_talker(send_mode::mode_bpf)->is_supported()) {
+    if (option) std::cout << ", ";
+    option = true;
+    std::cout << "bpf";
+  }
   if (option) {
     std::cout << "." << std::endl;
   } else {
@@ -199,6 +204,8 @@ options::options(int& argc, char* const argv[]) noexcept {
           mode_ = send_mode::mode_sendto;
         } else if (arg == "sendmmsg") {
           mode_ = send_mode::mode_sendmmsg;
+        } else if (arg == "bpf") {
+          mode_ = send_mode::mode_bpf;
         } else {
           std::cerr << "Error: Invalid test mode " << arg << std::endl;
           return;
