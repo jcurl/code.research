@@ -158,7 +158,7 @@ To enable LSE for ARM (e.g. Raspberry Pi 5), you must add the appropriate
 compiler options, e.g.
 
 ```sh
-cmake -B . -S .. -DCMAKE_CXX_FLAGS="armv8.1-a+lse"
+cmake -B . -S .. -DCMAKE_CXX_FLAGS="-march=armv8.1-a+lse"
 ```
 
 Other Platforms:

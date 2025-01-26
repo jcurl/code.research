@@ -1,4 +1,4 @@
-#include "arm64.h"
+#include "config.h"
 
 #if defined(__aarch64__) && HAVE_CXX_ARM64_LSE
 #if defined(__QNX__)
@@ -11,7 +11,7 @@
 #endif
 #endif
 
-#include "config.h"
+#include "arm64.h"
 
 auto has_arm64_lse() -> bool {
 #if !defined(__aarch64__) || !HAVE_CXX_ARM64_LSE
