@@ -132,6 +132,7 @@ class udp_talker {
   auto virtual init_packets(const struct sockaddr_in& source,
       const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept -> bool;
   auto virtual send_packets(std::uint16_t count) noexcept -> std::uint16_t;
+  auto virtual delay(std::chrono::nanoseconds ns) noexcept -> bool;
 
  private:
   struct sockaddr_in source_ {};
@@ -141,6 +142,8 @@ class udp_talker {
   std::uint16_t size_{0};
   std::uint32_t packets_{0};
   bool init_{false};
+
+  unsigned int delay_count_{0};
 };
 
 /// @brief An intermediate class not for direct instantiation.

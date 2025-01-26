@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -17,6 +18,8 @@
 
 #include "ubench/net.h"
 #include "udp_talker.h"
+
+using namespace std::chrono_literals;
 
 namespace {
 
@@ -80,10 +83,16 @@ class udp_talker_bpf::pkt_details {
   pkt_details(pkt_details&& other) = delete;
   auto operator=(pkt_details&&) -> pkt_details& = delete;
 
-  [[nodiscard]] auto dst_mac() noexcept -> ubench::net::ether_addr& { return dst_mac_; }
-  [[nodiscard]] auto src_mac() noexcept -> ubench::net::ether_addr& { return src_mac_; }
+  [[nodiscard]] auto dst_mac() noexcept -> ubench::net::ether_addr& {
+    return dst_mac_;
+  }
+  [[nodiscard]] auto src_mac() noexcept -> ubench::net::ether_addr& {
+    return src_mac_;
+  }
   [[nodiscard]] auto vlan_id() noexcept -> std::uint16_t& { return vlan_id_; }
-  [[nodiscard]] auto fragmentation_id() noexcept -> std::uint16_t& { return fragmentation_id_; }
+  [[nodiscard]] auto fragmentation_id() noexcept -> std::uint16_t& {
+    return fragmentation_id_;
+  }
   [[nodiscard]] auto ttl() noexcept -> std::uint8_t& { return ttl_; }
   [[nodiscard]] auto dst_ip() noexcept -> in_addr& { return dst_ip_; }
   [[nodiscard]] auto src_ip() noexcept -> in_addr& { return src_ip_; }
@@ -92,7 +101,9 @@ class udp_talker_bpf::pkt_details {
 
   auto reset_pkt() noexcept -> void { reset_ = true; }
 
-  [[nodiscard]] auto pkt_data() noexcept -> std::vector<std::uint8_t>& { return pkt_data_; }
+  [[nodiscard]] auto pkt_data() noexcept -> std::vector<std::uint8_t>& {
+    return pkt_data_;
+  }
 
   /// @brief Build the packet header.
   ///
@@ -157,8 +168,8 @@ class udp_talker_bpf::pkt_details {
   /// @param offset the offset into the buffer hdr where the IPv4 header starts
   ///
   /// @return the IPv4 checksum that can be copied into the checksum field.
-  auto calc_ipv4_cs(const std::vector<std::uint8_t>& hdr, std::ptrdiff_t offset)
-      noexcept -> std::uint16_t;
+  auto calc_ipv4_cs(const std::vector<std::uint8_t>& hdr,
+      std::ptrdiff_t offset) noexcept -> std::uint16_t;
 
   /// @brief Given the IPv4 header for UDP, calculate the UDP checksum
   ///
@@ -441,20 +452,23 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
     // Reset the packet, that the new fragmentation identifier is calculated.
     pkt_->reset_pkt();
 
-    iov[0].iov_base = const_cast<std::uint8_t *>(pkt_->build_pkt_hdr().data());
+    iov[0].iov_base = const_cast<std::uint8_t*>(pkt_->build_pkt_hdr().data());
     iov[0].iov_len = pkt_->build_pkt_hdr().size();
-    iov[1].iov_base = const_cast<std::uint8_t *>(pkt_->pkt_data().data());
+    iov[1].iov_base = const_cast<std::uint8_t*>(pkt_->pkt_data().data());
     iov[1].iov_len = pkt_->pkt_data().size();
 
-    auto result = writev(socket_fd_, iov.data(), iov.size());
-    if (result > 0) {
-      sent++;
-    } else {
-      if (errno != writev_errno_) {
-        writev_errno_ = errno;
+    int result{};
+    do {
+      result = writev(socket_fd_, iov.data(), iov.size());
+      if (result == -1) {
+        if (errno == ENOBUFS) {
+          if (delay(750us)) continue;
+        }
         perror("writev");
+        return sent;
       }
-    }
+    } while(result < 0);
+    sent++;
   }
 
   return sent;

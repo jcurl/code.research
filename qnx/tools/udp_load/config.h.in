@@ -5,3 +5,7 @@
 
 // Enable 'bpf' support.
 #cmakedefine01 HAVE_BIOCSETIF
+
+// Clock on ENOBUFS.
+#cmakedefine01 HAVE_CLOCK_REALTIME_PRECISE
+#cmakedefine01 HAVE_CLOCK_REALTIME

@@ -28,6 +28,11 @@ if (HAVE_BIOCSETIF)
     target_sources(${BINARY} PRIVATE udp_talker_bpf.cpp)
 endif()
 
+# Timeout testing, used on FreeBSD when ENOBUFS are returned for a delay smaller
+# than the scheduling tick time (10ms).
+check_symbol_enum_exists(CLOCK_REALTIME_PRECISE "time.h" HAVE_CLOCK_REALTIME_PRECISE)
+check_symbol_enum_exists(CLOCK_REALTIME "time.h" HAVE_CLOCK_REALTIME)
+
 if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()

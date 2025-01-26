@@ -8,15 +8,17 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include <thread>
 
 #ifndef NDEBUG
-#include <iostream>
 #include <sstream>
 #endif
 
 #include "ubench/clock.h"
+
+using namespace std::chrono_literals;
 
 auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker> {
   std::unique_ptr<udp_talker> talker;
@@ -40,7 +42,7 @@ auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker> {
 auto idle_test(std::chrono::milliseconds duration) noexcept
     -> std::optional<busy_measurement> {
   if (!ubench::chrono::idle_clock::is_available()) return {};
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  std::this_thread::sleep_for(500ms);
   {
     busy_stop_watch measure{};
     std::this_thread::sleep_for(duration);
@@ -102,6 +104,33 @@ auto udp_talker::init_packets(
 auto udp_talker::send_packets([[maybe_unused]] std::uint16_t count) noexcept
     -> std::uint16_t {
   return 0;
+}
+
+auto udp_talker::delay(std::chrono::nanoseconds ns) noexcept -> bool {
+  if (delay_count_ > 5) return false;
+
+  timespec ts = {ns.count() / 1000000000, ns.count() % 1000000000};
+  timespec rm{};
+
+  if (delay_count_ == 0) {
+    std::cout << "." << std::flush;
+  }
+  delay_count_++;
+
+  do {
+#if HAVE_CLOCK_REALTIME_PRECISE
+    int r = clock_nanosleep(CLOCK_REALTIME_PRECISE, 0, &ts, &rm);
+#elif HAVE_CLOCK_REALTIME
+    int r = clock_nanosleep(CLOCK_REALTIME, 0, &ts, &rm);
+#else
+    int r = clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &rm);
+#endif
+    if (r == -1) {
+      if (errno != EINTR) return false;
+      ts = rm;
+    }
+  } while (rm.tv_sec > 0 || rm.tv_nsec > 0);
+  return true;
 }
 
 auto udp_talker::init() noexcept -> bool {
@@ -241,10 +270,14 @@ auto udp_talker::run(std::chrono::milliseconds duration) noexcept
 #endif
 
         if (W >= 4) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(W));
+          std::this_thread::sleep_for(W * 1ms);
           auto wait_snapshot = std::chrono::high_resolution_clock::now();
           total_wait_time += wait_snapshot - send_snapshot;
         }
+
+        // Error handling in routines, reset counter at the end of each
+        // interval.
+        delay_count_ = 0;
       }
     } while (elapsed_time < expected_time);
   }

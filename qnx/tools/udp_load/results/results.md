@@ -10,9 +10,19 @@
     - [2.1.2. QNX 7.1 (io-pkt)](#212-qnx-71-io-pkt)
       - [2.1.2.1. sendto](#2121-sendto)
       - [2.1.2.2. sendmmsg](#2122-sendmmsg)
-    - [2.1.3. QNX 8.0 (io-sock)](#213-qnx-80-io-sock)
+      - [2.1.2.3. BPF interface (Layer 2)](#2123-bpf-interface-layer-2)
+    - [2.1.3. QNX 8.0.2 (io-sock)](#213-qnx-802-io-sock)
       - [2.1.3.1. sendto](#2131-sendto)
       - [2.1.3.2. sendmmsg](#2132-sendmmsg)
+      - [2.1.3.3. BPF interface (Layer 2)](#2133-bpf-interface-layer-2)
+    - [2.1.4. FreeBSD 14.2](#214-freebsd-142)
+      - [2.1.4.1. sendto](#2141-sendto)
+      - [2.1.4.2. sendmmsg](#2142-sendmmsg)
+      - [2.1.4.3. BPF interface (Layer 2)](#2143-bpf-interface-layer-2)
+    - [2.1.5. NetBSD 10.1](#215-netbsd-101)
+      - [2.1.5.1. sendto](#2151-sendto)
+      - [2.1.5.2. sendmmsg](#2152-sendmmsg)
+      - [2.1.5.3. BPF interface (Layer 2)](#2153-bpf-interface-layer-2)
   - [2.2. Raspberry Pi 5](#22-raspberry-pi-5)
     - [2.2.1. Linux](#221-linux)
       - [2.2.1.1. sendto](#2211-sendto)
@@ -137,7 +147,17 @@ The overall bandwidth is not increased significantly.
 
 ![](./images/rpi4_qnx71_sendmmsg_lo.png)
 
-#### 2.1.3. QNX 8.0 (io-sock)
+##### 2.1.2.3. BPF interface (Layer 2)
+
+![](./images/rpi4_qnx71_bpf_eth.png)
+
+The performance is similar to `sendto` and `sendmmsg` with slight degredation
+overall (but slightly better single threaded performance). Software calculates
+the UDP and IPv4 checksums directly on the generated packets.
+
+This interface does not work on the loopback device.
+
+#### 2.1.3. QNX 8.0.2 (io-sock)
 
 ##### 2.1.3.1. sendto
 
@@ -165,6 +185,61 @@ performance of `io-pkt`.
 ![](./images/rpi4_qnx8_sendmmsg_eth.png)
 
 ![](./images/rpi4_qnx8_sendmmsg_lo.png)
+
+##### 2.1.3.3. BPF interface (Layer 2)
+
+![](./images/rpi4_qnx8_bpf_eth.png)
+
+#### 2.1.4. FreeBSD 14.2
+
+FreeBSD will return quite often `ENOBUFS`, which are shown is a period `.` in
+the logs while testing (once per interval).
+
+##### 2.1.4.1. sendto
+
+![](./images/rpi4_fbsd14.2_sendto_eth.png)
+
+![](./images/rpi4_fbsd14.2_sendto_lo.png)
+
+##### 2.1.4.2. sendmmsg
+
+![](./images/rpi4_fbsd14.2_sendmmsg_eth.png)
+
+![](./images/rpi4_fbsd14.2_sendmmsg_lo.png)
+
+##### 2.1.4.3. BPF interface (Layer 2)
+
+![](./images/rpi4_fbsd14.2_bpf_eth.png)
+
+#### 2.1.5. NetBSD 10.1
+
+NetBSD may send `ENOBUFS`, but this is rarer as found in FreeBSD. The CPU load
+is shown as less than 100% in the tests, indicating the methods used for testing
+are not optimised.
+
+##### 2.1.5.1. sendto
+
+Total CPU measurements on NetBSD are not reliable, and so are not shown in the
+graphs. NetBSD is not able to reach full network saturation with the tests.
+
+Even though it is clear that the CPU is not saturated, it is dropping packets
+indicating tuning of the network stack can produce better performance.
+
+![](./images/rpi4_nbsd10.1_sendto_eth.png)
+
+![](./images/rpi4_nbsd10.1_sendto_lo.png)
+
+##### 2.1.5.2. sendmmsg
+
+![](./images/rpi4_nbsd10.1_sendmmsg_eth.png)
+
+![](./images/rpi4_nbsd10.1_sendmmsg_lo.png)
+
+##### 2.1.5.3. BPF interface (Layer 2)
+
+The NetBSD 10.1 deadlocks in the `writev` method when running with more than one
+thread, so there is no data to show. When this occurs, the SSH session usually
+exits also.
 
 ### 2.2. Raspberry Pi 5
 

@@ -21,6 +21,8 @@ user-space program).
       - [1.4.1.1. Understanding the CPU Load Measurements](#1411-understanding-the-cpu-load-measurements)
     - [1.4.2. Running on QNX](#142-running-on-qnx)
       - [1.4.2.1. Understanding the CPU Load Measurements](#1421-understanding-the-cpu-load-measurements)
+    - [1.4.3. Running on FreeBSD 14](#143-running-on-freebsd-14)
+    - [1.4.4. Running on NetBSD 10.1](#144-running-on-netbsd-101)
   - [1.5. Command Line Options and their Usage](#15-command-line-options-and-their-usage)
 - [2. Design](#2-design)
 - [3. Results](#3-results)
@@ -125,6 +127,39 @@ thread).
 The "Process CPU Busy" is the time only spent in the program (when not waiting
 on the network stack).
 
+#### 1.4.3. Running on FreeBSD 14
+
+FreeBSD implements `sendto` and similar API different to Linux, where the
+`sendto`, `sendmmsg` APIs does not block if the network buffers are full. In
+this case, the network stack returns the error `ENOBUFS`. Linux on the other
+hand generally returns no errors and block.
+
+When this error is returned, `clock_nanosleep(CLOCK_REALTIME_PRECISE, 750us)` is
+called. There doesn't seem to be a reliable method for handling stress tests in
+this case. The argumentation is that UDP packets may drop at any time. You may
+want to consult your Operating System documentation to increase the buffers,
+e.g. with `sysctl kern.ipc.nmbufs`.
+
+Unfortunately, when running the test via a `ssh` session, the session may also
+drop with:
+
+```sh
+ssh_dispatch_run_fatal: Connection to 192.168.1.112 port 22: message authentication code incorrect
+```
+
+#### 1.4.4. Running on NetBSD 10.1
+
+The NetBSD stack may return `ENOBUFS` but this doesn't show as frequently as on
+FreeBSD.
+
+The BPF interface is available and works, but when testing with multiple
+threads, sending stops after only a few intervals. The SSH connection typically
+ends. There is no error code returned by `writev`. Testing the socket to be
+non-blocking provides no opportunity to resolve the problem.
+
+I suspect there is a race condition in the BPF driver when multiple file
+descriptors write to the BPF interface simultaneously.
+
 ### 1.5. Command Line Options and their Usage
 
 The tool works by sending out UDP IPv4 packets over regular intervals, measured
@@ -134,7 +169,7 @@ jitter in the system.
 
 For help, see `udp_load -?`:
 
-```
+```sh
 $ udp_load -?
 udp_load [-n<slots>] [-m<width>] [-p<packets>] [-s<size>]
   [-d<duration>] [-T<threads>] [-I] -S<sourceip> -D<destip>

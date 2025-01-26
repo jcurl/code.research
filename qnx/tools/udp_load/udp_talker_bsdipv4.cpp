@@ -4,10 +4,14 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <cstdio>
+#include <ctime>
 
 #include "ubench/net.h"
 #include "udp_talker.h"
+
+using namespace std::chrono_literals;
 
 udp_talker_bsd::~udp_talker_bsd() {
   if (socket_fd_ != -1) close(socket_fd_);
@@ -106,12 +110,18 @@ auto udp_talker_sendto::send_packets(std::uint16_t count) noexcept
   for (std::uint16_t i = 0; i < count; i++) {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     auto dest = reinterpret_cast<const sockaddr *>(&dest_);
-    ssize_t nbytes = sendto(
-        socket_fd_, buffer_.data(), buffer_.size(), 0, dest, sizeof(dest_));
-    if (nbytes < 0) {
-      perror("sendto");
-      return sent;
-    }
+    ssize_t nbytes{};
+    do {
+      nbytes = sendto(
+          socket_fd_, buffer_.data(), buffer_.size(), 0, dest, sizeof(dest_));
+      if (nbytes < 0) {
+        if (errno == ENOBUFS) {
+          if (delay(750us)) continue;
+        }
+        perror("sendto");
+        return sent;
+      }
+    } while (nbytes < 0);
     sent++;
   }
   return sent;
@@ -158,11 +168,17 @@ auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
   std::uint16_t sent = 0;
   while (sent < count) {
     auto remain = std::min(count - sent, 1024);
-    int result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);
-    if (result == -1) {
-      perror("sendmmsg");
-      return sent;
-    }
+    int result{};
+    do {
+      result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);
+      if (result == -1) {
+        if (errno == ENOBUFS) {
+          if (delay(750us)) continue;
+        }
+        perror("sendmmsg");
+        return sent;
+      }
+    } while (result < 0);
     sent += result;
   }
   return sent;
