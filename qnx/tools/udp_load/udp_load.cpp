@@ -27,10 +27,10 @@ auto main(int argc, char* argv[]) -> int {
 
   // Prepare all the threads with the benchmarks.
 
-  std::atomic<std::uint64_t> packets_sent{0};
-  std::atomic<std::uint64_t> packets_expected{0};
-  std::atomic<std::uint64_t> wait_time{0};
-  std::atomic<std::uint64_t> sent_time{0};
+  std::atomic<std::uint32_t> packets_sent{0};
+  std::atomic<std::uint32_t> packets_expected{0};
+  std::atomic<std::uint32_t> wait_time{0};
+  std::atomic<std::uint32_t> sent_time{0};
   std::atomic<std::uint32_t> thread_failures{0};
 
   ubench::thread::sync_event sync{};
