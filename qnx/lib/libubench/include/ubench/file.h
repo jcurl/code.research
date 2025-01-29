@@ -45,7 +45,7 @@ class fdesc {
   ///
   /// @return this object that was assigned.
   auto operator=(int fd) -> fdesc& {
-    if (fd_ != -1) close(fd_);
+    close();
     fd_ = fd;
     return *this;
   }
@@ -72,10 +72,7 @@ class fdesc {
   /// @brief Move constructor.
   ///
   /// @param other The other object being moved to here.
-  fdesc(fdesc&& other) {
-    fd_ = other.fd_;
-    other.fd_ = -1;
-  }
+  fdesc(fdesc&& other) noexcept : fd_{other.fd_} { other.fd_ = -1; }
 
   /// @brief Move assignment operator.
   ///
@@ -86,10 +83,11 @@ class fdesc {
   /// @param other The other object being moved here.
   ///
   /// @return a reference to this object.
-  auto operator=(fdesc&& other) -> fdesc& {
-    if (fd_ != -1) close(fd_);
-
-    fd_ = other.fd_;
+  auto operator=(fdesc&& other) noexcept -> fdesc& {
+    if (fd_ != other.fd_) {
+      close();
+      fd_ = other.fd_;
+    }
     other.fd_ = -1;
     return *this;
   }
@@ -102,6 +100,18 @@ class fdesc {
   /// @return a temporary copy of the file descriptor.
   operator int() const { return fd_; }
 
+  /// @brief Close the socket and mark this descriptor as invalid.
+  ///
+  /// @return true if the handle was closed, false if it was already closed. If
+  /// there was an error, it is ignored and it is assumed that the handle is now
+  /// closed.
+  auto close() -> bool {
+    bool is_opened{fd_ != -1};
+    if (is_opened) ::close(fd_);
+    fd_ = -1;
+    return is_opened;
+  }
+
   /// @brief Set this object to invalid, without closing the file descriptor.
   ///
   /// @return the file descriptor before it is reset.
@@ -111,15 +121,19 @@ class fdesc {
   }
 
   /// @brief Closes the file descriptor.
-  ~fdesc() {
-    if (fd_ != -1) close(fd_);
-    fd_ = -1;
-  }
+  ~fdesc() { close(); }
 
  private:
   int fd_{-1};
 };
 
 }  // namespace ubench::file
+
+/// @brief Close the file descriptor, just the same way as the system close().
+///
+/// @return true if the handle was closed, false if it was already closed. If
+/// there was an error, it is ignored and it is assumed that the handle is now
+/// closed.
+auto inline close(ubench::file::fdesc& fd) -> bool { return fd.close(); }
 
 #endif

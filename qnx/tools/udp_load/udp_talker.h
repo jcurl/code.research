@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include "ubench/file.h"
 #include "busy_measurement.h"
 
 /// @brief The class to instantiate when testing.
@@ -157,7 +158,7 @@ class udp_talker_bsd : public udp_talker {
   auto operator=(const udp_talker_bsd&) -> udp_talker_bsd& = delete;
   udp_talker_bsd(udp_talker_bsd&& other) = delete;
   auto operator=(udp_talker_bsd&&) -> udp_talker_bsd& = delete;
-  ~udp_talker_bsd() override;
+  ~udp_talker_bsd() override = default;
 
  protected:
   auto init_packets(const struct sockaddr_in& source,
@@ -165,7 +166,7 @@ class udp_talker_bsd : public udp_talker {
       -> bool override;
 
  protected:
-  int socket_fd_{-1};
+  ubench::file::fdesc socket_fd_{-1};
   struct sockaddr_in source_ {};
   struct sockaddr_in dest_ {};
 };
@@ -227,6 +228,7 @@ class udp_talker_bpf final : public udp_talker {
   udp_talker_bpf(udp_talker_bpf&& other) = delete;
   auto operator=(udp_talker_bpf&&) -> udp_talker_bpf& = delete;
   ~udp_talker_bpf() override;
+
   auto is_supported() noexcept -> bool override { return true; }
 
  protected:
@@ -236,7 +238,7 @@ class udp_talker_bpf final : public udp_talker {
   auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
 
  private:
-  int socket_fd_{-1};
+  ubench::file::fdesc socket_fd_{-1};
   int writev_errno_{};
 
   class pkt_details;

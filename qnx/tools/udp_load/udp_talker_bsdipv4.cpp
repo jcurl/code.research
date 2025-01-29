@@ -13,44 +13,32 @@
 
 using namespace std::chrono_literals;
 
-udp_talker_bsd::~udp_talker_bsd() {
-  if (socket_fd_ != -1) close(socket_fd_);
-  socket_fd_ = -1;
-}
-
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
     const struct sockaddr_in &dest,
     [[maybe_unused]] std::uint16_t pkt_size) noexcept -> bool {
-  if (socket_fd_ != -1) return false;
+  if (socket_fd_) return false;
 
-  int fd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (fd < 0) return false;
-  socket_fd_ = fd;
+  ubench::file::fdesc fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (!fd) return false;
 
   if (ubench::net::is_multicast(dest.sin_addr)) {
     char loopch = 1;
     if (setsockopt(
             fd, IPPROTO_IP, IP_MULTICAST_LOOP, &loopch, sizeof(loopch))) {
       perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, 1)");
-      close(fd);
-      socket_fd_ = -1;
       return false;
     }
 
     if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &(source.sin_addr),
             sizeof(in_addr))) {
       perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, source)");
-      close(fd);
-      socket_fd_ = -1;
       return false;
     }
 
     unsigned char mttl = 1;
     if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, &mttl, sizeof(mttl))) {
       perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, 1)");
-      close(fd);
-      socket_fd_ = -1;
       return false;
     }
   }
@@ -58,8 +46,6 @@ auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
   int reuseaddr = 1;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr))) {
     perror("setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, 1)");
-    close(fd);
-    socket_fd_ = -1;
     return false;
   }
 
@@ -67,8 +53,6 @@ auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
   int reuseport = 1;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &reuseport, sizeof(reuseport))) {
     perror("setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)");
-    close(fd);
-    socket_fd_ = -1;
     return false;
   }
 #endif
@@ -77,14 +61,14 @@ auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
   if (bind(fd, reinterpret_cast<const sockaddr *>(&source),
           sizeof(sockaddr_in))) {
     perror("bind(fd, source)");
-    close(fd);
-    socket_fd_ = -1;
     return false;
   }
 
   // Remember the settings
   source_ = source;
   dest_ = dest;
+
+  socket_fd_ = std::move(fd);
 
   return true;
 }
@@ -104,7 +88,7 @@ auto udp_talker_sendto::init_packets(const struct sockaddr_in &source,
 
 auto udp_talker_sendto::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
-  if (socket_fd_ == -1) return 0;
+  if (!socket_fd_) return 0;
 
   std::uint16_t sent = 0;
   for (std::uint16_t i = 0; i < count; i++) {
@@ -163,7 +147,7 @@ auto udp_talker_sendmmsg::init_packets(const struct sockaddr_in &source,
 
 auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
-  if (socket_fd_ == -1) return 0;
+  if (!socket_fd_) return 0;
 
   std::uint16_t sent = 0;
   while (sent < count) {

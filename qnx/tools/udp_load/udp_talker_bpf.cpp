@@ -332,20 +332,16 @@ auto udp_talker_bpf::pkt_details::build_pkt_hdr()
   return pkt_hdr_;
 }
 
-udp_talker_bpf::~udp_talker_bpf() {
-  if (socket_fd_ != -1) close(socket_fd_);
-  socket_fd_ = -1;
-}
-
 // For the "pimpl" pattern (using a unique_ptr on a forward declarated class),
 // need to ensure that there is no definition (inline) of the constructor in the
 // header file, else a move of "udp_talker_bpf" will not compile.
+udp_talker_bpf::~udp_talker_bpf() = default;
 udp_talker_bpf::udp_talker_bpf() = default;
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept -> bool {
-  if (socket_fd_ != -1) return false;
+  if (!socket_fd_) return false;
 
   // Padding. Minimum size of an Ethernet packet is 60 bytes. With a pkt_size of
   // zero, there is 18 padding bytes at the end.
@@ -414,12 +410,11 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
   }
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-  int fd = open("/dev/bpf", O_RDWR);
-  if (fd < 0) {
+  ubench::file::fdesc fd = open("/dev/bpf", O_RDWR);
+  if (!socket_fd_) {
     std::cerr << "BPF device interface cannot be opened" << std::endl;
     return false;
   }
-  socket_fd_ = fd;
 
   ifreq ifr{};
   strlcpy(&ifr.ifr_name[0], bpf_intf.c_str(), IFNAMSIZ);
@@ -435,12 +430,13 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     return false;
   }
 
+  socket_fd_ = std::move(fd);
   return true;
 }
 
 auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
-  if (socket_fd_ == -1) return 0;
+  if (!socket_fd_) return 0;
 
   // Note, we don't need to add a trailer of zeroes, as the network stack will
   // extend the size of the Ethernet packet with undefined data to meet the
@@ -467,7 +463,7 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
         perror("writev");
         return sent;
       }
-    } while(result < 0);
+    } while (result < 0);
     sent++;
   }
 
