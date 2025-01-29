@@ -1,5 +1,8 @@
 include(GoogleTest)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 set(NETBENCH_BINARY net_bench)
 set(NETBENCH_SOURCES net_bench.cpp)
 
@@ -12,7 +15,7 @@ set(RCUBENCH_SOURCES rcu_bench.cpp)
 
 add_executable(${RCUBENCH_BINARY} ${RCUBENCH_SOURCES})
 target_compile_features(${RCUBENCH_BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${RCUBENCH_BINARY} PRIVATE ubench)
+target_link_libraries(${RCUBENCH_BINARY} PRIVATE ubench Threads::Threads)
 
 if(QNXNTO)
     # Googletest needs `regex`, QNX has this as a separate library.

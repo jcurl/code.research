@@ -1,6 +1,7 @@
 #include <unistd.h>
 
 #include <charconv>
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <string_view>
@@ -8,6 +9,8 @@
 #include <vector>
 
 #include "ubench/atomics.h"
+
+using namespace std::chrono_literals;
 
 auto print_help(std::string_view prog_name) -> void {
   std::cout << "USAGE: " << prog_name << " [-p <threads>]" << std::endl;
@@ -28,7 +31,7 @@ auto run_stress(unsigned int threads) {
 
   std::thread thread_update([&]() {
     while (!terminate.load()) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(10ms);
       std::unique_ptr new_data(std::make_unique<int>(24));
       bool r = rcu.update(std::move(new_data));
       if (!r) {
@@ -41,12 +44,12 @@ auto run_stress(unsigned int threads) {
 
   std::vector<std::thread> reads;
   for (unsigned int t = 0; t < threads; t++) {
-    reads.emplace_back(std::thread([&]() {
+    reads.emplace_back([&]() {
       while (!terminate.load()) {
         rcu_ptr ptr = rcu.read();
         counter++;
       }
-    }));
+    });
   }
 
   std::this_thread::sleep_for(std::chrono::seconds(30));

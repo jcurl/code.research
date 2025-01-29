@@ -1,3 +1,4 @@
+#include <csignal>
 #include <memory>
 #include <thread>
 
@@ -5,7 +6,7 @@
 
 #include "ubench/atomics.h"
 
-TEST(RcuInitTest, NullPointer) {
+TEST(rcu, init_null_pointer) {
   EXPECT_EXIT(
       {
         // Initialise direct with `nullptr`.
@@ -14,7 +15,7 @@ TEST(RcuInitTest, NullPointer) {
       testing::KilledBySignal(SIGABRT), "");
 }
 
-TEST(RcuInitTest, NullPointerFromReset) {
+TEST(rcu, init_null_pointer_from_reset) {
   std::unique_ptr v = std::make_unique<int>(5);
   v.reset(nullptr);
 
@@ -26,7 +27,7 @@ TEST(RcuInitTest, NullPointerFromReset) {
       testing::KilledBySignal(SIGABRT), "");
 }
 
-TEST(RcuInitTest, DestructorWhenNotFree) {
+TEST(rcu, init_destructor_when_not_free) {
   rcu_ptr<int> p;
 
   EXPECT_EXIT(
@@ -39,7 +40,7 @@ TEST(RcuInitTest, DestructorWhenNotFree) {
       testing::KilledBySignal(SIGABRT), "");
 }
 
-TEST(RcuRead, InitAndRead) {
+TEST(rcu, read_init_and_read) {
   std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
   rcu x{std::move(v)};
@@ -52,7 +53,7 @@ TEST(RcuRead, InitAndRead) {
   EXPECT_EQ(*p, 10);
 }
 
-TEST(RcuRead, ReadTwice) {
+TEST(rcu, read_twice) {
   std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
   rcu x{std::move(v)};
@@ -68,7 +69,7 @@ TEST(RcuRead, ReadTwice) {
   EXPECT_EQ(q.get(), rv);
 }
 
-TEST(RcuRead, ReadTwiceFree) {
+TEST(rcu, read_twice_free) {
   std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
   rcu x{std::move(v)};
@@ -91,7 +92,7 @@ TEST(RcuRead, ReadTwiceFree) {
   EXPECT_EQ(p.get(), rv);
 }
 
-TEST(RcuUpdate, UpdateFirst) {
+TEST(rcu, update_first) {
   std::unique_ptr v = std::make_unique<int>(10);
   rcu x{std::move(v)};
 
@@ -105,7 +106,7 @@ TEST(RcuUpdate, UpdateFirst) {
   EXPECT_EQ(*p, 20);
 }
 
-TEST(RcuUpdate, ReadUpdate) {
+TEST(rcu, read_update) {
   std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
   rcu x{std::move(v)};
@@ -131,7 +132,7 @@ TEST(RcuUpdate, ReadUpdate) {
   EXPECT_EQ(*p, 10);
 }
 
-TEST(RcuUpdate, UpdateTwice) {
+TEST(rcu, update_twice) {
   std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
   rcu x{std::move(v)};
@@ -165,7 +166,7 @@ TEST(RcuUpdate, UpdateTwice) {
   EXPECT_EQ(*p, 10);
 }
 
-TEST(RcuUpdate, UpdateMany) {
+TEST(rcu, update_many) {
   std::unique_ptr v = std::make_unique<int>(10);
   int *rv = v.get();
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
@@ -196,7 +197,7 @@ TEST(RcuUpdate, UpdateMany) {
   EXPECT_EQ(*p, 10);
 }
 
-TEST(RcuUpdate, UpdateFull) {
+TEST(rcu, update_full) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -228,7 +229,7 @@ TEST(RcuUpdate, UpdateFull) {
   EXPECT_EQ(*p5, 4);
 }
 
-TEST(RcuUpdate, UpdateFullWithArray) {
+TEST(rcu, update_full_with_array) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -261,7 +262,7 @@ struct MyData {
   int value_;
 };
 
-TEST(RcuPtr, CopyConstructor) {
+TEST(rcu, ptr_copy_constructor) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -276,7 +277,7 @@ TEST(RcuPtr, CopyConstructor) {
   EXPECT_TRUE(p1c);
 }
 
-TEST(RcuPtr, CopyAssignment) {
+TEST(rcu, ptr_copy_assignment) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -291,7 +292,7 @@ TEST(RcuPtr, CopyAssignment) {
   EXPECT_TRUE(p1c);
 }
 
-TEST(RcuPtr, MoveConstructor) {
+TEST(rcu, ptr_move_constructor) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -309,7 +310,7 @@ TEST(RcuPtr, MoveConstructor) {
   EXPECT_TRUE(p1c);
 }
 
-TEST(RcuPtr, MoveAssignment) {
+TEST(rcu, ptr_move_assignment) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -327,7 +328,7 @@ TEST(RcuPtr, MoveAssignment) {
   EXPECT_TRUE(p1c);
 }
 
-TEST(RcuPtr, CopyAssignmentToEmpty) {
+TEST(rcu, ptr_copy_assignment_to_empty) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -343,7 +344,7 @@ TEST(RcuPtr, CopyAssignmentToEmpty) {
   EXPECT_TRUE(p1c);
 }
 
-TEST(RcuPtr, MoveAssignmentToEmpty) {
+TEST(rcu, ptr_move_assignment_to_empty) {
   std::unique_ptr v = std::make_unique<int>(0);
   rcu<int, std::default_delete<int>, 5> x{std::move(v)};
 
@@ -375,7 +376,7 @@ struct CustomDeleter {
   };
 };
 
-TEST(RcuPtr, CustomDeleter) {
+TEST(rcu, ptr_custom_deleter) {
   std::unique_ptr<int, CustomDeleter> v(new int(0));
 
   {
@@ -403,7 +404,7 @@ TEST(RcuPtr, CustomDeleter) {
 //
 //  rcutest-test --gtest_also_run_disabled_tests
 //    --gtest_filter=RcuStress.DISABLED_ThreadedUpdate
-TEST(RcuStress, DISABLED_ThreadedUpdate) {
+TEST(rcu, DISABLED_stress_threaded_update) {
   std::unique_ptr data(std::make_unique<MyData>(42));
   rcu rcu(std::move(data));
 

@@ -13,59 +13,59 @@ class rcu;
 
 template <class T, class Deleter = std::default_delete<T>>
 class rcu_ptr {
-  using pointer_type = const T *;
-  using element_type = T;
+  using pointer_type = T*;
   using deleter_type = Deleter;
 
  public:
-  rcu_ptr() {}
+  rcu_ptr() = default;
 
   rcu_ptr(const rcu_ptr &obj) : refcount_{obj.refcount_} {
-    if (this->refcount_) {
-      (*this->refcount_)++;
-      this->ptr_ = obj.ptr_;
+    if (refcount_) {
+      (*refcount_)++;
+      ptr_ = obj.ptr_;
     }
   }
 
   auto operator=(const rcu_ptr &obj) -> rcu_ptr & {
-    free();
+    if (this == &obj) return *this;
 
-    this->refcount_ = obj.refcount_;
-    if (this->refcount_) {
-      (*this->refcount_)++;
+    free();
+    refcount_ = obj.refcount_;
+    if (refcount_) {
+      (*refcount_)++;
     }
-    this->ptr_ = this->refcount_ ? obj.ptr_ : nullptr;
+    ptr_ = refcount_ ? obj.ptr_ : nullptr;
     return *this;
   }
 
-  rcu_ptr(rcu_ptr &&rval) : refcount_{rval.refcount_} {
+  rcu_ptr(rcu_ptr &&rval) noexcept : refcount_{rval.refcount_} {
     rval.refcount_ = nullptr;
-    this->ptr_ = this->refcount_ ? rval.ptr_ : nullptr;
+    ptr_ = refcount_ ? rval.ptr_ : nullptr;
     rval.ptr_ = nullptr;
   }
 
-  auto operator=(rcu_ptr &&rval) -> rcu_ptr & {
+  auto operator=(rcu_ptr &&rval) noexcept -> rcu_ptr & {
     auto refcount = rval.refcount_;
     rval.refcount_ = nullptr;
     free();
 
-    this->refcount_ = refcount;
-    this->ptr_ = refcount ? rval.ptr_ : nullptr;
+    refcount_ = refcount;
+    ptr_ = refcount ? rval.ptr_ : nullptr;
     rval.ptr_ = nullptr;
     return *this;
   }
 
-  auto use_count() const -> std::uint32_t {
-    return this->refcount_ ? this->refcount_->load() : 0;
+  [[nodiscard]] auto use_count() const -> std::uint32_t {
+    return refcount_ ? refcount_->load() : 0;
   }
 
-  auto get() const -> const T * { return this->ptr_; }
+  [[nodiscard]] auto get() const -> const T * { return ptr_; }
 
-  auto operator->() const -> const T * { return this->ptr_; }
+  auto operator->() const -> const T * { return ptr_; }
 
-  auto operator*() const -> const T & { return *this->ptr_; }
+  auto operator*() const -> const T & { return *ptr_; }
 
-  explicit operator bool() const { return this->ptr_ != nullptr; }
+  explicit operator bool() const { return ptr_ != nullptr; }
 
   ~rcu_ptr() { free(); }
 
@@ -81,14 +81,14 @@ class rcu_ptr {
       : ptr_{ptr}, refcount_{ptr ? ref : nullptr} {}
 
   auto free() -> void {
-    auto refcount = this->refcount_;
+    auto refcount = refcount_;
     if (!refcount) return;
 
     auto prev_count = refcount->fetch_sub(1);
     if (prev_count == 1) {
       // No more references. As this was the last reference, it can not be
       // incremented.
-      deleter_type{}(const_cast<T *>(this->ptr_));
+      deleter_type{}(ptr_);
     }
 #if !defined(NDEBUG)
     else if (prev_count == 0) {
@@ -100,15 +100,14 @@ class rcu_ptr {
 
     // Only needed if we expect someone might use the object after it's been
     // destructed.
-    this->refcount_ = nullptr;
-    this->ptr_ = nullptr;
+    refcount_ = nullptr;
+    ptr_ = nullptr;
   }
 };
 
 template <class T, class Deleter = std::default_delete<T>, std::size_t N = 10>
 class rcu {
-  using pointer_type = const T *;
-  using element_type = T;
+  using pointer_type = T*;
   using deleter_type = Deleter;
 
  public:
@@ -119,23 +118,27 @@ class rcu {
   rcu(rcu &&) = delete;
   auto operator=(rcu &&) -> rcu & = delete;
 
+  // We explicitly move it out of the unique pointer into a raw pointer to
+  // handle the atomics.
+  //
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   rcu(std::unique_ptr<T, Deleter> &&ptr) {
     if (!ptr) std::abort();
 
-    this->index_.store(0);
-    this->slot_[0].refcount_.store(1);
-    this->slot_[0].ptr_ = ptr.release();
+    index_.store(0);
+    slot_[0].refcount_.store(1);
+    slot_[0].ptr_ = ptr.release();
   }
 
-  auto read() -> rcu_ptr<T, Deleter> {
+  [[nodiscard]] auto read() -> rcu_ptr<T, Deleter> {
     // Find the index, and atomically increment the reference for the active
     // index.
     std::uint32_t i;
     std::uint32_t rc_start;
     std::uint32_t rc;
     do {
-      i = this->index_.load();
-      rc_start = this->slot_[i].refcount_.load();
+      i = index_.load();
+      rc_start = slot_[i].refcount_.load();
 
       // If `update()` is called so that it has freed the slot, then it has
       // already updated the index since we've read it. Need to get the index
@@ -162,38 +165,42 @@ class rcu {
       // index again and try the increment. Note, we'll repeat if the reference
       // was freed or incremented even if not freed, we can't tell.
     } while (rc_start == 0 ||
-             !this->slot_[i].refcount_.compare_exchange_strong(rc_start, rc));
+             !slot_[i].refcount_.compare_exchange_strong(rc_start, rc));
 
     // This `rcu` class own the reference counter, so this class must always
     // live longer than all existing `rcu_ptr` objects. If this class dies, then
     // the `rcu_ptr` will point to a `refcount_` that no longer exists in
     // memory, leading to undefined behaviour.
-    return rcu_ptr<T, Deleter>(this->slot_[i].ptr_, &this->slot_[i].refcount_);
+    return rcu_ptr<T, Deleter>(slot_[i].ptr_, &slot_[i].refcount_);
   }
 
+  // We explicitly move it out of the unique pointer into a raw pointer to
+  // handle the atomics.
+  //
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   auto update(std::unique_ptr<T, Deleter> &&update) -> bool {
     // Don't allow updates to `nullptr`.
     if (!update) return false;
 
-    std::lock_guard<std::mutex> lock(this->write_mutex_);
+    std::lock_guard<std::mutex> lock(write_mutex_);
 
     // Allocate a new position for the pointer and reference counter.
-    std::uint32_t i_start = this->index_.load();
+    std::uint32_t i_start = index_.load();
     std::uint32_t i = i_start;
     std::uint32_t rc;
     do {
       i = (i + 1) % N;
       if (i == i_start) return false;
 
-      rc = this->slot_[i].refcount_.load();
+      rc = slot_[i].refcount_.load();
     } while (rc);
 
     // Index 'i' is an unallocated slot, it can't increment and no one should
     // have a reference (if they do, then they shouldn't do anything with it
     // because they already freed it). This is the only place we update the
     // slot, and it can't happen in parallel with this function due to the lock.
-    this->slot_[i].refcount_.store(1);
-    this->slot_[i].ptr_ = update.release();
+    slot_[i].refcount_.store(1);
+    slot_[i].ptr_ = update.release();
     index_.store(i);
 
     // Decrement the previous reference. If it reaches zero, then no-one else
@@ -209,7 +216,7 @@ class rcu {
     bool success = true;
 #endif
 
-    if (!free(this->index_.load())) {
+    if (!free(index_.load())) {
 #if !defined(NDEBUG)
       std::cout
           << "Abort due to not final free, dangling reference of an `rcu_ptr`"
@@ -220,7 +227,7 @@ class rcu {
 #endif
     } else {
       for (std::uint32_t i = 0; i < N; i++) {
-        if (this->slot_[i].refcount_.load() != 0) {
+        if (slot_[i].refcount_.load() != 0) {
 #if !defined(NDEBUG)
           std::cout << "Abort due to not final free, dangling reference of an "
                        "`rcu_ptr`"
@@ -236,10 +243,10 @@ class rcu {
 
 #if !defined(NDEBUG)
     if (!success) {
-      std::cout << " Owning: " << this->index_ << std::endl;
+      std::cout << " Owning: " << index_ << std::endl;
       for (std::uint32_t x = 0; x < N; x++) {
         std::cout << " slot[" << x
-                  << "].refcount_ = " << this->slot_[x].refcount_.load()
+                  << "].refcount_ = " << slot_[x].refcount_.load()
                   << std::endl;
       }
       std::abort();
@@ -251,11 +258,11 @@ class rcu {
   std::mutex write_mutex_;
 
   auto free(std::uint32_t index) -> bool {
-    std::uint32_t old_count = this->slot_[index].refcount_.fetch_sub(1);
+    std::uint32_t old_count = slot_[index].refcount_.fetch_sub(1);
     if (old_count == 1) {
       // No more references. As this was the last reference (it has reached
       // zero), it can not be incremented.
-      pointer_type ptr = this->slot_[index].ptr_;
+      pointer_type ptr = slot_[index].ptr_;
       deleter_type{}(const_cast<T *>(ptr));
       return true;
     }
