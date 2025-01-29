@@ -7,7 +7,7 @@
 #include <thread>
 #include <vector>
 
-#include "rcu.h"
+#include "ubench/atomics.h"
 
 auto print_help(std::string_view prog_name) -> void {
   std::cout << "USAGE: " << prog_name << " [-p <threads>]" << std::endl;
@@ -71,8 +71,7 @@ auto main(int argc, char* argv[]) -> int {
     switch (c) {
       case 'p': {
         std::string thread_string = optarg;
-        auto [ptr, ec] = std::from_chars(
-            thread_string.data(),
+        auto [ptr, ec] = std::from_chars(thread_string.data(),
             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             thread_string.data() + thread_string.size(), threads);
         if (ec == std::errc()) {

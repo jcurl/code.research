@@ -1,9 +1,9 @@
-#include "rcu.h"
+#include <memory>
+#include <thread>
 
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <thread>
+#include "ubench/atomics.h"
 
 TEST(RcuInitTest, NullPointer) {
   EXPECT_EXIT(

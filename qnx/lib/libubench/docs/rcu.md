@@ -2,135 +2,36 @@
 
 This is a research version of a user-space RCU class (read-copy-update).
 
-- [1. Compilation](#1-compilation)
-  - [1.1. Using CMake](#11-using-cmake)
-    - [1.1.1. Compiler Options](#111-compiler-options)
-    - [1.1.2. Code Coverage](#112-code-coverage)
-  - [1.2. Debugging with Visual Studio Code](#12-debugging-with-visual-studio-code)
-  - [1.3. Clang-Tidy](#13-clang-tidy)
-  - [1.4. Formatting](#14-formatting)
-- [2. Design](#2-design)
-  - [2.1. Initial Investigations](#21-initial-investigations)
-    - [2.1.1. Preallocated Memory and Atomic Behaviour](#211-preallocated-memory-and-atomic-behaviour)
-  - [2.2. Algorithm](#22-algorithm)
-    - [2.2.1. The RCU Pointer](#221-the-rcu-pointer)
-    - [2.2.2. The RCU "Root"](#222-the-rcu-root)
-      - [2.2.2.1. Analysis of Concurrent Behaviour](#2221-analysis-of-concurrent-behaviour)
-      - [2.2.2.2. Freeing Memory](#2222-freeing-memory)
-  - [2.3. References](#23-references)
-    - [2.3.1. White Paper and `shared_ptr<T>`](#231-white-paper-and-shared_ptrt)
-    - [2.3.2. RCU in the Linux Kernel](#232-rcu-in-the-linux-kernel)
-    - [2.3.3. User Space Lock-Free RCU](#233-user-space-lock-free-rcu)
-- [3. Performance Tests](#3-performance-tests)
-  - [3.1. Compilation](#31-compilation)
-    - [3.1.1. Linux Compilation](#311-linux-compilation)
-    - [3.1.2. QNX Compilation and Target Preparation](#312-qnx-compilation-and-target-preparation)
-  - [3.2. Execution](#32-execution)
-  - [3.3. Results](#33-results)
-    - [3.3.1. Test `rcutest`](#331-test-rcutest)
-      - [3.3.1.1. Target: Raspberry Pi4B A72 QNX 7.1.0 (GCC 8.3.0)](#3311-target-raspberry-pi4b-a72-qnx-710-gcc-830)
-      - [3.3.1.2. Target: Raspberry Pi4B A72 QNX 8.0.0 (GCC 12.2.0)](#3312-target-raspberry-pi4b-a72-qnx-800-gcc-1220)
-      - [3.3.1.3. Target: Raspberry Pi4B A72 Linux 6.6.20+rpt-rpi-v8 (GCC 12.2.0)](#3313-target-raspberry-pi4b-a72-linux-6620rpt-rpi-v8-gcc-1220)
-      - [3.3.1.4. Target: Raspberry Pi5 A76 Linux 6.6.31+rpt-rpi-2712 (GCC 12.2.0)](#3314-target-raspberry-pi5-a76-linux-6631rpt-rpi-2712-gcc-1220)
-      - [3.3.1.5. Target: i7-6700T 2.80GHz Linux 6.5.0-45-generic (GCC 11.4.0)](#3315-target-i7-6700t-280ghz-linux-650-45-generic-gcc-1140)
-      - [3.3.1.6. Target: Intel(R) Xeon(R) Silver 4410Y Linux 6.5.0-26-generic (GCC 11.4.0)](#3316-target-intelr-xeonr-silver-4410y-linux-650-26-generic-gcc-1140)
-- [4. Future Work](#4-future-work)
-  - [4.1. Build System](#41-build-system)
-  - [4.2. Implementation](#42-implementation)
+- [1. Design](#1-design)
+  - [1.1. Initial Investigations](#11-initial-investigations)
+    - [1.1.1. Preallocated Memory and Atomic Behaviour](#111-preallocated-memory-and-atomic-behaviour)
+  - [1.2. Algorithm](#12-algorithm)
+    - [1.2.1. The RCU Pointer](#121-the-rcu-pointer)
+    - [1.2.2. The RCU "Root"](#122-the-rcu-root)
+      - [1.2.2.1. Analysis of Concurrent Behaviour](#1221-analysis-of-concurrent-behaviour)
+      - [1.2.2.2. Freeing Memory](#1222-freeing-memory)
+  - [1.3. References](#13-references)
+    - [1.3.1. White Paper and `shared_ptr<T>`](#131-white-paper-and-shared_ptrt)
+    - [1.3.2. RCU in the Linux Kernel](#132-rcu-in-the-linux-kernel)
+    - [1.3.3. User Space Lock-Free RCU](#133-user-space-lock-free-rcu)
+- [2. Performance Tests](#2-performance-tests)
+  - [2.1. Compilation](#21-compilation)
+    - [2.1.1. Linux Compilation](#211-linux-compilation)
+    - [2.1.2. QNX Compilation and Target Preparation](#212-qnx-compilation-and-target-preparation)
+  - [2.2. Execution](#22-execution)
+  - [2.3. Results](#23-results)
+    - [2.3.1. Test `rcutest`](#231-test-rcutest)
+      - [2.3.1.1. Target: Raspberry Pi4B A72 QNX 7.1.0 (GCC 8.3.0)](#2311-target-raspberry-pi4b-a72-qnx-710-gcc-830)
+      - [2.3.1.2. Target: Raspberry Pi4B A72 QNX 8.0.0 (GCC 12.2.0)](#2312-target-raspberry-pi4b-a72-qnx-800-gcc-1220)
+      - [2.3.1.3. Target: Raspberry Pi4B A72 Linux 6.6.20+rpt-rpi-v8 (GCC 12.2.0)](#2313-target-raspberry-pi4b-a72-linux-6620rpt-rpi-v8-gcc-1220)
+      - [2.3.1.4. Target: Raspberry Pi5 A76 Linux 6.6.31+rpt-rpi-2712 (GCC 12.2.0)](#2314-target-raspberry-pi5-a76-linux-6631rpt-rpi-2712-gcc-1220)
+      - [2.3.1.5. Target: i7-6700T 2.80GHz Linux 6.5.0-45-generic (GCC 11.4.0)](#2315-target-i7-6700t-280ghz-linux-650-45-generic-gcc-1140)
+      - [2.3.1.6. Target: Intel(R) Xeon(R) Silver 4410Y Linux 6.5.0-26-generic (GCC 11.4.0)](#2316-target-intelr-xeonr-silver-4410y-linux-650-26-generic-gcc-1140)
+- [3. Future Work](#3-future-work)
+  - [3.1. Build System](#31-build-system)
+  - [3.2. Implementation](#32-implementation)
 
-## 1. Compilation
-
-Instructions provided work for Ubuntu 22.04.
-
-### 1.1. Using CMake
-
-Build (default with Debug Mode) with:
-
-```sh
-mkdir build && cd build
-cmake ..
-make
-```
-
-#### 1.1.1. Compiler Options
-
-Use the following options when building with CMake:
-
-- Build in debug mode.
-
-  ```sh
-  cmake ..
-  ```
-
-- Build in release mode.
-
-  ```sh
-  cmake .. -DCMAKE_BUILD_TYPE=Release
-  ```
-
-  Still compiles unit tests and runs clang-tidy.
-
-- Disable Clang-Tidy (enabled by default)
-
-  ```sh
-  cmake .. -DENABLE_CLANG_TIDY=off
-  ```
-
-- Disable Google Test (enabled by default)
-
-  ```sh
-  cmake .. -DENABLE_TEST=off
-  ```
-
-#### 1.1.2. Code Coverage
-
-Enable code coverage:
-
-```sh
-cmake .. -DENABLE_TEST=on -DCODE_COVERAGE=on
-```
-
-To execute test cases and see coverage (the command is `ccov-<testname>`).
-
-```sh
-make ccov-rcutest-test
-```
-
-Then the output will tell you to open your browser with the correct file.
-
-### 1.2. Debugging with Visual Studio Code
-
-Use the Microsoft C/C++ extension (v1.20.5) which provides a language server and
-debugging capabilities. The `.vscode/launch.json` contains the command to debug
-this RCU binary.
-
-`Ctrl-Shift-B` should build the *debug* binaries.
-
-### 1.3. Clang-Tidy
-
-On Ubuntu 22.04, you need to have installed `clang-tidy` for the checks. It
-would fail on loading the header files, while GCC would compile quite happily.
-
-I had to make sure that
-[`libstdc++-12-dev`](https://askubuntu.com/questions/1443701/clang-cant-find-headers-but-gcc-can)
-was installed. I also installed `libc++abi-dev` but that wasn't enough.
-
-```sh
-sudo apt install libstdc++-12-dev
-```
-
-Then I could compile.
-
-### 1.4. Formatting
-
-```sh
-make clangformat
-```
-
-Ensure that the `CMakeLists.txt` has been updated to also add the files to
-format in the list (not just the target).
-
-## 2. Design
+## 1. Design
 
 The reads must be very fast and also work for multiple threads. It should use
 lock-less programming when available to ensure that on contention the reader is
@@ -151,7 +52,7 @@ As this uses atomic swapping of pointers, this library uses direct pointer
 manipulation underneath, and the `new` and `delete` operator for allocating
 memory.
 
-### 2.1. Initial Investigations
+### 1.1. Initial Investigations
 
 An RCU effectively has three operations to define a read critical region and
 then to update the data in the background while readers might still be in the
@@ -190,7 +91,7 @@ from the `rcu` class. That implies the object from the `rcu` class must outlive
 the lifetime of all other `rcu_ptr` objects that are handed out (else they'll
 access invalid memory).
 
-#### 2.1.1. Preallocated Memory and Atomic Behaviour
+#### 1.1.1. Preallocated Memory and Atomic Behaviour
 
 Using preallocated memory avoids memory allocation during the `read_lock()`
 operation which reduces overhead further. Otherwise, a more complicated
@@ -208,7 +109,7 @@ Even though C++20 introduces atomic shared pointers
 -- Daniel
 Anderson](https://isocpp.org/blog/2023/09/cppcon-2023-lock-free-atomic-shared-pointers-without-a-split-reference-coun)
 
-### 2.2. Algorithm
+### 1.2. Algorithm
 
 Implementing an RCU is similar to a very simplified garbage collector in that:
 
@@ -220,7 +121,7 @@ thread during the `write_copy_update`, or could also be managed by a periodic
 thread to clean up memory (although likely not needed for many use cases where
 the ownership of a read object is usually short).
 
-#### 2.2.1. The RCU Pointer
+#### 1.2.1. The RCU Pointer
 
 Define a `rcu_ptr` that has:
 
@@ -246,7 +147,7 @@ destructor is explicitly called, then it is called again when going out of scope
 due to the implementation of an explicit destructor (that the destructor is not
 "simple" due to dereferencing behaviour required).
 
-#### 2.2.2. The RCU "Root"
+#### 1.2.2. The RCU "Root"
 
 The RCU root is given a `std::unique_ptr<T>` at construction, which it then
 converts to a raw pointer and manages explicitly. Note, in C++17 this must be a
@@ -300,7 +201,7 @@ The `rcu_ptr` destructor Operation:
 The `rcu_ptr` destructor could free memory in a similar way to the `update`
 frees memory.
 
-##### 2.2.2.1. Analysis of Concurrent Behaviour
+##### 1.2.2.1. Analysis of Concurrent Behaviour
 
 No race conditions are believed to exist, with the following assumptions:
 
@@ -309,7 +210,7 @@ No race conditions are believed to exist, with the following assumptions:
 - It is never possible to assign a `nullptr` via `update()`. Code enforces these
   checks.
 
-##### 2.2.2.2. Freeing Memory
+##### 1.2.2.2. Freeing Memory
 
 The current implementation frees memory in either the `rcu.update()` or the
 `~rcu_ptr()` destructor. There might be a small impact on calling the destructor
@@ -323,9 +224,9 @@ deterministic (a writer thread would control when memory is freed).
 The write thread should be protected by a mutex that enforces serialisation of
 the data updates.
 
-### 2.3. References
+### 1.3. References
 
-#### 2.3.1. White Paper and `shared_ptr<T>`
+#### 1.3.1. White Paper and `shared_ptr<T>`
 
 There is a description [High-level C++ Implementation of the Read-Copy-Update
 Pattern](https://martong.github.io/high-level-cpp-rcu_informatics_2017.pdf)
@@ -366,7 +267,7 @@ The code presented is buggy (significant memory leaks), but the usage of the
 `std::unique_ptr<T>` and releases it for a raw pointer in the implementation
 details.
 
-#### 2.3.2. RCU in the Linux Kernel
+#### 1.3.2. RCU in the Linux Kernel
 
 The Linux Kernel implements the RCU in kernel space, but this can't be used in
 user-space, as the final solution may not depend on the Linux kernel. The Linux
@@ -383,7 +284,7 @@ Kernel implements the free of the memory on context switches.
   synchronization](https://sysweb.cs.toronto.edu/publication_files/0000/0159/jpdc07.pdf)
   - May be useful in types of algorithms that are performant, and how to test.
 
-#### 2.3.3. User Space Lock-Free RCU
+#### 1.3.3. User Space Lock-Free RCU
 
 The GitHub repository [Simple and fast user-space RCU
 library](https://github.com/ppetr/lockfree-userspace-rcu) is a C++
@@ -401,7 +302,7 @@ articles in the previous section) as having a thread in the kernel free memory.
 
 One of the goals is to explore if this can be done differently.
 
-## 3. Performance Tests
+## 2. Performance Tests
 
 This section documents the performance test `RcuStress.DISABLED_ReadOps`. The
 test runs for approximately 30 seconds.
@@ -414,11 +315,11 @@ In an additional thread, it will update the value of the pointer to new data, by
 waiting 10ms on every wake. This means that the number of updates is less than
 3000 (because a sleep) only guarantees a minimum sleep time.
 
-### 3.1. Compilation
+### 2.1. Compilation
 
 To compile for linux, compile release mode:
 
-#### 3.1.1. Linux Compilation
+#### 2.1.1. Linux Compilation
 
 ```sh
 mkdir -p build/linux && cd build/linux
@@ -426,7 +327,7 @@ cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
-#### 3.1.2. QNX Compilation and Target Preparation
+#### 2.1.2. QNX Compilation and Target Preparation
 
 To compile for QNX, compile release mode:
 
@@ -450,7 +351,7 @@ And you will need of course need to configure the `LD_LIBRARY_PATH`
 export LD_LIBRARY_PATH=/dev/shmem
 ```
 
-### 3.2. Execution
+### 2.2. Execution
 
 To run the test:
 
@@ -458,11 +359,11 @@ To run the test:
 ./rcutest -p1
 ```
 
-### 3.3. Results
+### 2.3. Results
 
-#### 3.3.1. Test `rcutest`
+#### 2.3.1. Test `rcutest`
 
-##### 3.3.1.1. Target: Raspberry Pi4B A72 QNX 7.1.0 (GCC 8.3.0)
+##### 2.3.1.1. Target: Raspberry Pi4B A72 QNX 7.1.0 (GCC 8.3.0)
 
 | Threads | Updates | Reads     | Reads/sec/thread |
 | ------- | ------- | --------- | ---------------- |
@@ -471,7 +372,7 @@ To run the test:
 | 3       | 2728    | 165420314 | 1838003          |
 | 4       | 2500    | 160741187 | 1339509          |
 
-##### 3.3.1.2. Target: Raspberry Pi4B A72 QNX 8.0.0 (GCC 12.2.0)
+##### 2.3.1.2. Target: Raspberry Pi4B A72 QNX 8.0.0 (GCC 12.2.0)
 
 | Threads | Updates | Reads     | Reads/sec/thread |
 | ------- | ------- | --------- | ---------------- |
@@ -480,7 +381,7 @@ To run the test:
 | 3       | 2728    | 160078564 | 1778650          |
 | 4       | 2664    | 155756803 | 1297973          |
 
-##### 3.3.1.3. Target: Raspberry Pi4B A72 Linux 6.6.20+rpt-rpi-v8 (GCC 12.2.0)
+##### 2.3.1.3. Target: Raspberry Pi4B A72 Linux 6.6.20+rpt-rpi-v8 (GCC 12.2.0)
 
 | Threads | Updates | Reads     | Reads/sec/thread |
 | ------- | ------- | --------- | ---------------- |
@@ -489,7 +390,7 @@ To run the test:
 | 3       | 2983    | 167824639 | 1864718          |
 | 4       | 2981    | 155176172 | 1293134          |
 
-##### 3.3.1.4. Target: Raspberry Pi5 A76 Linux 6.6.31+rpt-rpi-2712 (GCC 12.2.0)
+##### 2.3.1.4. Target: Raspberry Pi5 A76 Linux 6.6.31+rpt-rpi-2712 (GCC 12.2.0)
 
 | Threads | Updates | Reads      | Reads/sec/thread |
 | ------- | ------- | ---------- | ---------------- |
@@ -498,7 +399,7 @@ To run the test:
 | 3       | 2984    | 239748124  | 2663868          |
 | 4       | 2984    | 183437343  | 1528644          |
 
-##### 3.3.1.5. Target: i7-6700T 2.80GHz Linux 6.5.0-45-generic (GCC 11.4.0)
+##### 2.3.1.5. Target: i7-6700T 2.80GHz Linux 6.5.0-45-generic (GCC 11.4.0)
 
 | Threads | Updates | Reads      | Reads/sec/thread |
 | ------- | ------- | ---------- | ---------------- |
@@ -511,7 +412,7 @@ To run the test:
 | 7       | 2984    | 232632030  | 1107771          |
 | 8       | 2984    | 240477582  | 1001989          |
 
-##### 3.3.1.6. Target: Intel(R) Xeon(R) Silver 4410Y Linux 6.5.0-26-generic (GCC 11.4.0)
+##### 2.3.1.6. Target: Intel(R) Xeon(R) Silver 4410Y Linux 6.5.0-26-generic (GCC 11.4.0)
 
 | Threads | Updates | Reads      | Reads/sec/thread |
 | ------- | ------- | ---------- | ---------------- |
@@ -564,13 +465,13 @@ To run the test:
 | 47      | 2981    | 169002080  | 119859           |
 | 48      | 2980    | 163818048  | 113762           |
 
-## 4. Future Work
+## 3. Future Work
 
-### 4.1. Build System
+### 3.1. Build System
 
 - [ ] Update [Sanitizers](https://github.com/arsenm/sanitizers-cmake).
 
-### 4.2. Implementation
+### 3.2. Implementation
 
 Further implementation details should be done:
 

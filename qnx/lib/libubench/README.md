@@ -10,3 +10,7 @@ understand how to fulfill functionality that is common between Operating
 Systems.
 
 See [DEVELOPER](./DEVELOPER.md) for information about the library.
+
+There is some further documentation:
+
+- [Userspace RCU](./docs/rcu.md)

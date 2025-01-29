@@ -7,6 +7,7 @@ set(SOURCES
     flags_test.cpp
     net_test.cpp
     os_test.cpp
+    rcu_test.cpp
     strlcpy_test.cpp
     thread_test.cpp
 )

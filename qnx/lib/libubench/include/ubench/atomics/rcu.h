@@ -4,10 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <string>
 
-#ifndef RCU_H
-#define RCU_H
+#ifndef UBENCH_ATOMICS_RCU_H
+#define UBENCH_ATOMICS_RCU_H
 
 template <class T, class Deleter, std::size_t N>
 class rcu;
@@ -280,4 +279,4 @@ class rcu {
   std::array<ref, N> slot_{};
 };
 
-#endif  // RCU_H
+#endif  // UBENCH_ATOMICS_RCU_H
