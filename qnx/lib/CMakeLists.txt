@@ -3,3 +3,4 @@ if(ENABLE_TEST)
 endif()
 
 add_subdirectory(libubench)
+add_subdirectory(libstdext)

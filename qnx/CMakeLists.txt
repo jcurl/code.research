@@ -108,6 +108,7 @@ target_compile_features(benchmark_main PRIVATE cxx_std_17)
 check_clang_tidy()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libubench/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libstdext/include)
 add_subdirectory(lib)
 
 add_subdirectory(benchmarks)
