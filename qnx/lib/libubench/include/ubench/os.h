@@ -8,8 +8,9 @@
 
 #include <array>
 #include <cstdint>
-#include <optional>
 #include <string>
+
+#include "stdext/expected.h"
 
 namespace ubench::os {
 
@@ -103,7 +104,7 @@ class osbuff {
 /// @param pid the PID of the process to get the name for.
 ///
 /// @return the name of the process.
-auto get_proc_name(pid_t pid) -> std::optional<std::string>;
+auto get_proc_name(pid_t pid) -> stdext::expected<std::string, int>;
 
 }  // namespace ubench::os
 

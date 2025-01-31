@@ -6,10 +6,7 @@
 #include <unistd.h>
 
 #include <filesystem>
-#include <fstream>
-#include <sstream>
 
-#include "ubench/file.h"
 #include "ubench/os.h"
 #include "ubench/string.h"
 
@@ -24,13 +21,14 @@ auto get_filename(std::string path) -> std::string {
 }
 }  // namespace
 
-auto pids::get_name(int pid, bool short_path) -> std::optional<std::string> {
+auto pids::get_name(int pid, bool short_path)
+    -> stdext::expected<std::string, int> {
   if (auto search = pid_names_.find(pid); search != pid_names_.end()) {
     return short_path ? get_filename(search->second) : search->second;
   }
 
   auto proc_name = ubench::os::get_proc_name(pid);
-  if (!proc_name) return {};
+  if (!proc_name) return stdext::unexpected{proc_name.error()};
 
   auto [it, ins] = pid_names_.try_emplace(pid, *proc_name);
   return short_path ? get_filename(it->second) : it->second;

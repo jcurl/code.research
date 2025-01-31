@@ -2,9 +2,10 @@
 #define LSQF_PIDS_H
 
 #include <map>
-#include <optional>
 #include <string>
 #include <vector>
+
+#include "stdext/expected.h"
 
 class pids {
  public:
@@ -22,7 +23,8 @@ class pids {
   /// @param pid The PID of the process to obtain.
   ///
   /// @return The name of the process.
-  auto get_name(int pid, bool short_path = false) -> std::optional<std::string>;
+  auto get_name(int pid, bool short_path = false)
+      -> stdext::expected<std::string, int>;
 
   /// @brief Drop the PID from the cache.
   ///

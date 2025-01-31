@@ -12,7 +12,7 @@ TEST(get_proc_name, check_not_empty) {
   // compiled. Work must be done to port it.
   pid_t self = getpid();
   auto procname = ubench::os::get_proc_name(self);
-  EXPECT_TRUE(procname);
+  EXPECT_TRUE(procname) << "error " << procname.error();
   if (procname) {
     ASSERT_THAT(procname->length(), Gt(0));
     std::cout << *procname << std::endl;

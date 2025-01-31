@@ -3,7 +3,6 @@
 #include <devctl.h>
 #include <unistd.h>
 
-#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -12,11 +11,12 @@
 #include "get_proc_name_common.h"
 
 namespace {
-auto get_name_as(pid_t pid) -> std::optional<std::string> {
+
+auto get_name_as(pid_t pid) -> stdext::expected<std::string, int> {
   std::ostringstream pathstream{};
   pathstream << "/proc/" << pid << "/as";
   ubench::file::fdesc fd{pathstream.str()};
-  if (!fd) return {};
+  if (!fd) return stdext::unexpected{errno};
 
   using procfs_debuginfo_tx = ubench::os::osbuff<procfs_debuginfo, 1024>;
   procfs_debuginfo_tx map{};
@@ -24,7 +24,7 @@ auto get_name_as(pid_t pid) -> std::optional<std::string> {
   // Gets the base address of the binary. This is unsafe.
   int status =
       devctl(fd, DCMD_PROC_MAPDEBUG_BASE, &map(), sizeof(map), nullptr);
-  if (status != EOK) return {};
+  if (status != EOK) return stdext::unexpected{status};
 
   return std::string{map().path};
 }
@@ -33,7 +33,7 @@ auto get_name_as(pid_t pid) -> std::optional<std::string> {
 
 namespace ubench::os {
 
-auto get_proc_name(pid_t pid) -> std::optional<std::string> {
+auto get_proc_name(pid_t pid) -> stdext::expected<std::string, int> {
   auto procname = get_name_as(pid);
   if (procname) return procname;
 

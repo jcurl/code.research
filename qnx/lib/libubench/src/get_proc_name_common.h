@@ -3,12 +3,13 @@
 
 #include <unistd.h>
 
-#include <optional>
 #include <string>
+
+#include "stdext/expected.h"
 
 namespace ubench::os {
 
-auto get_name_cmdline(pid_t pid) -> std::optional<std::string>;
+auto get_name_cmdline(pid_t pid) -> stdext::expected<std::string, int>;
 
 }  // namespace ubench::os
 
