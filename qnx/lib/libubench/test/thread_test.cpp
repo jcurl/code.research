@@ -5,6 +5,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "ubench/string.h"
+
 using ::testing::Eq;
 
 TEST(pin_core, pin_core_no_error) {
@@ -17,5 +19,5 @@ TEST(pin_core, pin_core_no_error) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   });
   thread_pin.join();
-  ASSERT_TRUE(success) << "error " << success.error();
+  ASSERT_TRUE(success) << "error " << ubench::string::perror(success.error());
 }
