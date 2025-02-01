@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -14,6 +15,8 @@
 #include <sys/syspage.h>
 #include <inttypes.h>
 #endif
+
+#include "stdext/expected.h"
 
 template <class TClock>
 auto print_clock_details(std::string_view name) -> void {
@@ -98,11 +101,12 @@ auto qnx_clockcycles()
 #endif
 
 auto clock(clockid_t clockid)
-    -> std::optional<std::chrono::time_point<std::chrono::system_clock,
-        std::chrono::nanoseconds>> {
+    -> stdext::expected<std::chrono::time_point<std::chrono::system_clock,
+                            std::chrono::nanoseconds>,
+        int> {
   struct timespec tp = {};
   int result = clock_gettime(clockid, &tp);
-  if (result) return {};
+  if (result) return stdext::unexpected{errno};
 
   auto duration =
       std::chrono::seconds{tp.tv_sec} + std::chrono::nanoseconds{tp.tv_nsec};

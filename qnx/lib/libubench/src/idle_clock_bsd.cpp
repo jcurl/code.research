@@ -58,6 +58,7 @@ class cp_time_idle_clock : public base_clock {
     clock_ticks_per_sec_ = sysconf(_SC_CLK_TCK);
     if (clock_ticks_per_sec_ <= 0) {
       clock_ticks_per_sec_ = 0;
+      return;
     }
 
     // Allocate dynamic memory only once for getting CPU time information.
@@ -69,7 +70,9 @@ class cp_time_idle_clock : public base_clock {
     mib_cp_times_[1] = KERN_CP_TIME;
 #elif __FreeBSD__
     size_t len = mib_cp_times_.size();
-    sysctlnametomib("kern.cp_times", mib_cp_times_.data(), &len);
+    if (sysctlnametomib("kern.cp_times", mib_cp_times_.data(), &len) == -1) {
+      clock_ticks_per_sec_ = 0;
+    }
 #else
     // We don't know how to get the times, so initialise to unknown.
     clock_ticks_per_sec_ = 0;

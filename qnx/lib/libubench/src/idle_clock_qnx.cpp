@@ -1,8 +1,6 @@
 #include <sys/neutrino.h>
 
 #include <cerrno>
-#include <cinttypes>
-#include <mutex>
 #include <thread>
 #include <vector>
 

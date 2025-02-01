@@ -1,7 +1,5 @@
 #include <sys/neutrino.h>
 
-#include <cinttypes>
-
 #include "ubench/clock.h"
 
 namespace ubench::chrono {
