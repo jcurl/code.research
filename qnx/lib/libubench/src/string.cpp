@@ -1,5 +1,7 @@
 #include "ubench/string.h"
 
+#include <cerrno>
+#include <iostream>
 #include <sstream>
 
 namespace ubench::string {
@@ -27,6 +29,11 @@ auto perror(int err) -> std::string {
   std::stringstream result{};
   result << strerror(err) << " (" << err << ")";
   return std::move(*result.rdbuf()).str();
+}
+
+auto perror(const std::string& msg) -> void {
+  int e = errno;
+  std::cerr << msg << " " << perror(e) << std::endl;
 }
 
 }  // namespace ubench::string

@@ -17,6 +17,7 @@
 #include <iostream>
 
 #include "ubench/net.h"
+#include "ubench/string.h"
 #include "udp_talker.h"
 
 using namespace std::chrono_literals;
@@ -412,21 +413,21 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   ubench::file::fdesc fd = open("/dev/bpf", O_RDWR);
   if (!socket_fd_) {
-    std::cerr << "BPF device interface cannot be opened" << std::endl;
+    ubench::string::perror("BPF device interface cannot be opened");
     return false;
   }
 
   ifreq ifr{};
   strlcpy(&ifr.ifr_name[0], bpf_intf.c_str(), IFNAMSIZ);
   if (ioctl(fd, BIOCSETIF, &ifr) == -1) {
-    std::cerr << "BPF mode can't set the interface " << bpf_intf << std::endl;
+    ubench::string::perror("BPF mode can't set the interface " + bpf_intf);
     return false;
   }
 
   unsigned int hdr_complete = 1;
   if (ioctl(fd, BIOCSHDRCMPLT, &hdr_complete) == -1) {
-    std::cerr << "BPF mode can't set the interface flag BIOCSHDRCOMPLT "
-              << bpf_intf << std::endl;
+    ubench::string::perror(
+        "BPF mode can't set the interface flag BIOCSHDRCOMPLT " + bpf_intf);
     return false;
   }
 
@@ -460,7 +461,7 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
         if (errno == ENOBUFS) {
           if (delay(750us)) continue;
         }
-        perror("writev");
+        ubench::string::perror("writev()");
         return sent;
       }
     } while (result < 0);

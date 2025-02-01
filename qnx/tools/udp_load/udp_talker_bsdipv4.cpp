@@ -9,6 +9,7 @@
 #include <ctime>
 
 #include "ubench/net.h"
+#include "ubench/string.h"
 #include "udp_talker.h"
 
 using namespace std::chrono_literals;
@@ -26,33 +27,35 @@ auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
     char loopch = 1;
     if (setsockopt(
             fd, IPPROTO_IP, IP_MULTICAST_LOOP, &loopch, sizeof(loopch))) {
-      perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, 1)");
+      ubench::string::perror(
+          "setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, 1)");
       return false;
     }
 
     if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &(source.sin_addr),
             sizeof(in_addr))) {
-      perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, source)");
+      ubench::string::perror(
+          "setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, source)");
       return false;
     }
 
     unsigned char mttl = 1;
     if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, &mttl, sizeof(mttl))) {
-      perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, 1)");
+      ubench::string::perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, 1)");
       return false;
     }
   }
 
   int reuseaddr = 1;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr))) {
-    perror("setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, 1)");
+    ubench::string::perror("setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, 1)");
     return false;
   }
 
 #if HAVE_SO_REUSEPORT
   int reuseport = 1;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &reuseport, sizeof(reuseport))) {
-    perror("setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)");
+    ubench::string::perror("setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)");
     return false;
   }
 #endif
@@ -60,7 +63,7 @@ auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (bind(fd, reinterpret_cast<const sockaddr *>(&source),
           sizeof(sockaddr_in))) {
-    perror("bind(fd, source)");
+    ubench::string::perror("bind(fd, source)");
     return false;
   }
 
@@ -102,7 +105,7 @@ auto udp_talker_sendto::send_packets(std::uint16_t count) noexcept
         if (errno == ENOBUFS) {
           if (delay(750us)) continue;
         }
-        perror("sendto");
+        ubench::string::perror("sendto()");
         return sent;
       }
     } while (nbytes < 0);
@@ -159,7 +162,7 @@ auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
         if (errno == ENOBUFS) {
           if (delay(750us)) continue;
         }
-        perror("sendmmsg");
+        ubench::string::perror("sendmmsg()");
         return sent;
       }
     } while (result < 0);
