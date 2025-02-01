@@ -6,6 +6,8 @@
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include <thread>
 
 #include "ubench/thread.h"
@@ -188,8 +190,10 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   ubench::thread::sync_event flag{};
 
   std::thread ping_thread([&]() {
-    if (!ubench::thread::pin_core(ping_core)) {
-      perror("Could not pin 'ping' core");
+    auto success = ubench::thread::pin_core(ping_core);
+    if (!success) {
+      std::cerr << "Could not pin 'ping' core; " << strerror(success.error())
+                << " (" << success.error() << ")" << std::endl;
       std::abort();
     }
     flag.wait();
@@ -199,8 +203,10 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   });
 
   std::thread pong_thread([&]() {
-    if (!ubench::thread::pin_core(pong_core)) {
-      perror("Could not pin 'pong' core");
+    auto success = ubench::thread::pin_core(pong_core);
+    if (!success) {
+      std::cerr << "Could not pin 'pong' core; " << strerror(success.error())
+                << " (" << success.error() << ")" << std::endl;
       std::abort();
     }
     flag.wait();

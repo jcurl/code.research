@@ -1,6 +1,8 @@
 #include "config.h"
 
 #include <pthread.h>
+
+#include "stdext/expected.h"
 #if HAVE_INCLUDE_PTHREAD_NP_H
 // FreeBSD
 #include <pthread_np.h>
@@ -17,17 +19,16 @@
 
 namespace ubench::thread {
 
-auto pin_core(unsigned int core) -> bool {
-  if (core >= std::thread::hardware_concurrency()) {
-    errno = EINVAL;
-    return false;
-  }
+auto pin_core(unsigned int core) -> stdext::expected<void, int> {
+  if (core >= std::thread::hardware_concurrency())
+    return stdext::unexpected{EINVAL};
 
   pthread_t current = pthread_self();
 
 #if defined(__NetBSD__)
+  errno = 0;
   cpuset_t *cpuset = cpuset_create();
-  if (cpuset == nullptr) return false;
+  if (cpuset == nullptr) return stdext::unexpected{errno};
 
   cpuid_t ci = core;
   cpuset_set(ci, cpuset);
@@ -41,10 +42,10 @@ auto pin_core(unsigned int core) -> bool {
   int rc = pthread_setaffinity_np(current, sizeof(cpu_set_t), &cpuset);
 #else
   // Unknown. A port is needed.
-  int rc = -1;
-  errno = ENOSYS;
+  return stdext::unexpected{ENOSYS};
 #endif
-  return rc == 0;
+  if (rc != 0) return stdext::unexpected{rc};
+  return {};
 }
 
 }  // namespace ubench::thread

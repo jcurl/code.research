@@ -4,6 +4,8 @@
 #include <condition_variable>
 #include <mutex>
 
+#include "stdext/expected.h"
+
 namespace ubench::thread {
 
 /// @brief Pin the current thread to core.
@@ -12,7 +14,7 @@ namespace ubench::thread {
 ///
 /// @return true if the core was pinned, false otherwise. Use errno to get the
 /// error.
-auto pin_core(unsigned int core) -> bool;
+auto pin_core(unsigned int core) -> stdext::expected<void, int>;
 
 /// @brief Be able to synchronise waiting for an event.
 class sync_event {

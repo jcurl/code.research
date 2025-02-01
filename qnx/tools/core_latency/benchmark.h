@@ -2,6 +2,7 @@
 #define BENCHMARK_BASE_H
 
 #include <cstdint>
+#include <string>
 
 class benchmark {
  public:
