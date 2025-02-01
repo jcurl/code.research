@@ -5,15 +5,13 @@
 #include <unistd.h>
 
 #include <cerrno>
-#include <charconv>
 #include <cstring>
 #include <iostream>
-#include <map>
-#include <optional>
 #include <string_view>
 
 #include <benchmark/benchmark.h>
 
+#include "ubench/string.h"
 #include "mlock.h"
 
 mallopt_options::mallopt_options(int argc, char **argv) {
@@ -38,9 +36,10 @@ mallopt_options::mallopt_options(int argc, char **argv) {
         break;
       }
       case 'L': {
-        auto error = enable_mlockall();
-        if (error) {
-          std::cout << "Error locking with -L, " << error.value() << std::endl;
+        auto success = enable_mlockall();
+        if (!success) {
+          std::cout << "Error locking with -L, "
+                    << ubench::string::perror(success.error()) << std::endl;
           this->result_ = 1;
           return;
         } else {

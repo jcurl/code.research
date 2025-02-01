@@ -9,6 +9,7 @@
 #include <optional>
 #include <string_view>
 
+#include "ubench/string.h"
 #include "mallopt.h"
 
 namespace {
@@ -86,7 +87,7 @@ auto mallopt_find(std::string_view mallopt_item) -> std::optional<int> {
 }
 
 auto parse_mallopt(std::string_view mallopt_item)
-    -> std::optional<std::string_view> {
+    -> std::optional<std::string> {
   auto kvp_separator = mallopt_item.find('=');
   if (kvp_separator == std::string_view::npos) return "Missing value";
   if (kvp_separator == mallopt_item.size() - 1) return "Value not provided";
@@ -119,13 +120,13 @@ auto parse_mallopt(std::string_view mallopt_item)
     if (value) return {};
   }
   if (result) {
-    if (errno) return strerror(errno);
+    if (errno) return ubench::string::perror(errno);
     std::cout << key << " returns " << value << ". Continuing." << std::endl;
   }
 #else
   // Under Linux: On success, mallopt() returns 1.  On error, it returns 0.
   int result = mallopt(mallopts.at(key), value);
-  if (!result) return strerror(errno);
+  if (!result) return ubench::string::perror(errno);
 #endif
   return {};
 }

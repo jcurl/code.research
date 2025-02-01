@@ -1,5 +1,7 @@
 #include "ubench/string.h"
 
+#include <sstream>
+
 namespace ubench::string {
 
 auto split_args(std::string_view arg)
@@ -17,6 +19,14 @@ auto split_args(std::string_view arg)
     split_args.emplace_back(arg, sz, next - sz);
     sz = next + 1;
   }
+}
+
+auto perror(int err) -> std::string {
+  if (err == 0) return {};
+
+  std::stringstream result{};
+  result << strerror(err) << " (" << err << ")";
+  return std::move(*result.rdbuf()).str();
 }
 
 }  // namespace ubench::string

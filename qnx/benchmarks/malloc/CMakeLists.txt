@@ -13,8 +13,7 @@ set(SOURCES
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} PRIVATE GTest::gtest_main)
-target_link_libraries(${BINARY} PRIVATE benchmark::benchmark)
+target_link_libraries(${BINARY} PRIVATE ubench GTest::gtest_main benchmark::benchmark)
 
 if(IS_DEBUG)
     add_sanitizers(${BINARY})

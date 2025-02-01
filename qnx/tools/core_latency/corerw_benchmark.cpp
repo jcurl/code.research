@@ -8,6 +8,7 @@
 #include <iostream>
 #include <thread>
 
+#include "ubench/string.h"
 #include "ubench/thread.h"
 #include "statistics.h"
 
@@ -34,8 +35,8 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   std::thread pong_thread([&]() {
     auto success = ubench::thread::pin_core(pong_core);
     if (!success) {
-      std::cerr << "Could not pin 'pong' core; " << strerror(success.error())
-                << " (" << success.error() << ")" << std::endl;
+      std::cerr << "Could not pin 'pong' core; "
+                << ubench::string::perror(success.error()) << std::endl;
       std::abort();
     }
     flag.wait();
@@ -53,8 +54,8 @@ auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   std::thread ping_thread([&]() {
     auto success = ubench::thread::pin_core(ping_core);
     if (!success) {
-      std::cerr << "Could not pin 'ping' core; " << strerror(success.error())
-                << " (" << success.error() << ")" << std::endl;
+      std::cerr << "Could not pin 'ping' core; "
+                << ubench::string::perror(success.error()) << std::endl;
       std::abort();
     }
     flag.wait();

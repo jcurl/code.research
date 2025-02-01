@@ -38,6 +38,13 @@ auto parse_int(std::string_view arg) -> std::optional<T> {
   return value;
 }
 
+/// @brief Print a standard error string format.
+///
+/// @param err the error number given by the Operating System.
+///
+/// @return a string in the form of 'string description (errno)'.
+auto perror(int err) -> std::string;
+
 }  // namespace ubench::string
 
 // This works, because the signature is the same. Compilers shouldn't complain
