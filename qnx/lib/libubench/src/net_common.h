@@ -2,9 +2,9 @@
 #define UBENCH_NET_COMMON_H
 
 #include <map>
-#include <optional>
 #include <string>
 
+#include "stdext/expected.h"
 #include "ubench/file.h"
 #include "ubench/net.h"
 
@@ -30,7 +30,7 @@ auto query_net_interfaces_getifaddrs(
 /// @return The friendly name, or std::nullopt if not available.
 [[nodiscard]] auto query_net_interface_friendly_name(
     const ubench::file::fdesc& sock, const std::string& interface)
-    -> std::optional<std::string>;
+    -> stdext::expected<std::string, int>;
 
 /// @brief Query the Ethernet MAC address for a given interface name.
 ///
@@ -42,7 +42,7 @@ auto query_net_interfaces_getifaddrs(
 ///
 /// @return The Ethernet MAC address, or std::nullopt if not available.
 [[nodiscard]] auto query_net_interface_hw_addr(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<ether_addr>;
+    const std::string& interface) -> stdext::expected<ether_addr, int>;
 
 /// @brief Query the interface VLAN settings.
 ///
@@ -54,7 +54,7 @@ auto query_net_interfaces_getifaddrs(
 ///
 /// @return The configuration of the VLAN, or std::nullopt if not available.
 [[nodiscard]] auto query_net_interface_vlan_id(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<if_vlan>;
+    const std::string& interface) -> stdext::expected<if_vlan, int>;
 
 /// @brief Query the status flags for the interface.
 ///
@@ -64,7 +64,7 @@ auto query_net_interfaces_getifaddrs(
 ///
 /// @return The flags for the interface as returned by the Operating System.
 [[nodiscard]] auto query_net_interface_flags(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<unsigned int>;
+    const std::string& interface) -> stdext::expected<unsigned int, int>;
 
 /// @brief Query the maximum transmission unit for the interface.
 ///
@@ -75,7 +75,7 @@ auto query_net_interfaces_getifaddrs(
 /// @return The  maximum transmission unit for the interface as returned by the
 /// Operating System.
 [[nodiscard]] auto query_net_interface_mtu(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<unsigned int>;
+    const std::string& interface) -> stdext::expected<unsigned int, int>;
 
 }  // namespace ubench::net
 

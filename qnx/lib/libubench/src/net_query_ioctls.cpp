@@ -6,25 +6,26 @@
 #include <net/if.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <cstring>
 #include <string>
 
+#include "stdext/expected.h"
 #include "ubench/file.h"
-#include "ubench/net.h"
 #include "ubench/string.h"
 #include "net_common.h"
 
 namespace ubench::net {
 
 auto query_net_interface_flags(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<unsigned int> {
-  if (!sock) return {};
+    const std::string& interface) -> stdext::expected<unsigned int, int> {
+  if (!sock) return stdext::unexpected{EBADF};
 
   ifreq ifr{};
   strlcpy(&ifr.ifr_name[0], interface.c_str(), IFNAMSIZ);
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-  if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) return {};
+  if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) return stdext::unexpected{errno};
 
   // On Linux, the `ifr_flags` is an `int`. On FreeBSD, it's a `short &` (as it
   // is a reference to the first element in an array of `short`). We want to put
@@ -48,14 +49,14 @@ auto query_net_interface_flags(const ubench::file::fdesc& sock,
 }
 
 auto query_net_interface_mtu(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<unsigned int> {
-  if (!sock) return {};
+    const std::string& interface) -> stdext::expected<unsigned int, int> {
+  if (!sock) return stdext::unexpected{EBADF};
 
   ifreq ifr{};
   strlcpy(&ifr.ifr_name[0], interface.c_str(), IFNAMSIZ);
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-  if (ioctl(sock, SIOCGIFMTU, &ifr) < 0) return {};
+  if (ioctl(sock, SIOCGIFMTU, &ifr) < 0) return stdext::unexpected{errno};
 
   return ifr.ifr_mtu;
 }
@@ -79,8 +80,8 @@ auto query_net_interfaces_getifaddrs(
 auto query_net_interface_friendly_name(
     [[maybe_unused]] const ubench::file::fdesc& sock,
     [[maybe_unused]] const std::string& interface)
-    -> std::optional<std::string> {
-  return {};
+    -> stdext::expected<std::string, int> {
+  return stdext::unexpected{ENOSYS};
 }
 #endif
 
@@ -88,16 +89,17 @@ auto query_net_interface_friendly_name(
 auto query_net_interface_hw_addr(
     [[maybe_unused]] const ubench::file::fdesc& sock,
     [[maybe_unused]] const std::string& interface)
-    -> std::optional<ether_addr> {
-  return {};
+    -> stdext::expected<ether_addr, int> {
+  return stdext::unexpected{ENOSYS};
 }
 #endif
 
 #if !HAVE_NET_VLAN
 auto query_net_interface_vlan_id(
     [[maybe_unused]] const ubench::file::fdesc& sock,
-    [[maybe_unused]] const std::string& interface) -> std::optional<if_vlan> {
-  return {};
+    [[maybe_unused]] const std::string& interface)
+    -> stdext::expected<if_vlan, int> {
+  return stdext::unexpected{ENOSYS};
 }
 #endif
 

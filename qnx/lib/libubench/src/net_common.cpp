@@ -8,9 +8,6 @@
 #include <netinet/in.h>
 
 #include <cstdint>
-#include <functional>
-#include <iomanip>
-#include <sstream>
 
 #include "ubench/net.h"
 
@@ -118,13 +115,13 @@ auto query_net_interfaces_filter(std::optional<std::string> query)
       if (!query || *query == interface.first) {
         if (HAVE_NET_SIOCGIFFRNDLYNAM) {
           auto alias = query_net_interface_friendly_name(sock, interface.first);
-          if (alias) interface.second.alias(alias);
+          if (alias) interface.second.alias(*alias);
         }
 
         if (HAVE_NET_SIOCGIFHWADDR) {
           if (!interface.second.hw_addr()) {
             auto hwaddr = query_net_interface_hw_addr(sock, interface.first);
-            if (hwaddr) interface.second.hw_addr(hwaddr);
+            if (hwaddr) interface.second.hw_addr(*hwaddr);
           }
         }
 
@@ -134,7 +131,7 @@ auto query_net_interfaces_filter(std::optional<std::string> query)
             // We can ignore the return value, as it will then be unset, which
             // is required behaviour (the VLAN ID is outside the specified
             // range).
-            (void)interface.second.vlan(vlan);
+            (void)interface.second.vlan(*vlan);
 
             // Fix the HW address. On NetBSD, QNX 7.1, the VLAN interface gets
             // the HW address via AF_LINK. On FreeBSD, QNX 8.0 it's missing so
@@ -154,7 +151,7 @@ auto query_net_interfaces_filter(std::optional<std::string> query)
         }
 
         auto mtu = query_net_interface_mtu(sock, interface.first);
-        if (mtu) interface.second.mtu(mtu);
+        if (mtu) interface.second.mtu(*mtu);
 
 #if __CYGWIN__
         // For Cygwin, we get the flags explicitly. The flags that comes in with

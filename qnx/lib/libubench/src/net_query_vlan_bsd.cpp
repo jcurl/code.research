@@ -17,15 +17,16 @@
 #include <cerrno>
 #include <cstring>
 
+#include "stdext/expected.h"
 #include "ubench/string.h"
 #include "net_common.h"
 
 namespace ubench::net {
 
 auto query_net_interface_vlan_id(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<if_vlan> {
+    const std::string& interface) -> stdext::expected<if_vlan, int> {
   // This implementation is for QNX 7.1 and NetBSD.
-  if (!sock) return {};
+  if (!sock) return stdext::unexpected{EBADF};
 
   ifreq ifr{};
   vlanreq req{};
@@ -40,7 +41,7 @@ auto query_net_interface_vlan_id(const ubench::file::fdesc& sock,
   strlcpy(&ifr.ifr_name[0], interface.c_str(), IFNAMSIZ);
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-  if (ioctl(sock, SIOCGETVLAN, &ifr) < 0) return {};
+  if (ioctl(sock, SIOCGETVLAN, &ifr) < 0) return stdext::unexpected{errno};
 
   if_vlan result{};
   result.parent = std::string{req.vlr_parent};

@@ -12,15 +12,16 @@
 #include <cerrno>
 #include <cstring>
 
+#include "stdext/expected.h"
 #include "ubench/string.h"
 #include "net_common.h"
 
 namespace ubench::net {
 
 auto query_net_interface_vlan_id(const ubench::file::fdesc& sock,
-    const std::string& interface) -> std::optional<if_vlan> {
+    const std::string& interface) -> stdext::expected<if_vlan, int> {
   // This implementation is for Linux.
-  if (!sock) return {};
+  if (!sock) return stdext::unexpected{EBADF};
 
   if_vlan result{};
   vlan_ioctl_args ifv{};
@@ -31,14 +32,14 @@ auto query_net_interface_vlan_id(const ubench::file::fdesc& sock,
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if (ioctl(sock, SIOCGIFVLAN, &ifv) < 0) {
     // Not a VLAN device.
-    return {};
+    return stdext::unexpected{errno};
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access,cppcoreguidelines-pro-bounds-array-to-pointer-decay)
   result.parent = std::string{ifv.u.device2};
 
   ifv.cmd = GET_VLAN_VID_CMD;
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-  if (ioctl(sock, SIOCGIFVLAN, &ifv) < 0) return {};
+  if (ioctl(sock, SIOCGIFVLAN, &ifv) < 0) return stdext::unexpected{errno};
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
   result.id = ifv.u.VID;
 
