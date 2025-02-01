@@ -22,6 +22,13 @@ TEST(process_clock, is_available) {
   // compiled. Work must be done to port it.
   ASSERT_THAT(ubench::chrono::process_clock::is_available(), Eq(true));
 
+  // We want to spin for some time to allow the clock to at least increment
+  // by one tick, so that when we read it, the result is not zero.
+  volatile int cycles = 1000000000;
+  while (ubench::chrono::process_clock::now().time_since_epoch().count() == 0 &&
+         cycles > 0) {
+    --cycles;
+  }
   auto time = ubench::chrono::process_clock::now();
   EXPECT_THAT(time.time_since_epoch().count(), Ne(0));
 }
