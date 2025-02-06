@@ -107,7 +107,7 @@ if [ $REBUILD -ne 0 ]; then
     echo "Can't find file 'docker/$PODVERSION-docker' to build"
     exit 1
   fi
-  podman build --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
+  podman build --squash --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
   if [ $? -ne 0 ]; then
     echo "Error building. Exiting"
     exit 1
