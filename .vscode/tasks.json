@@ -14,7 +14,7 @@
                 "options": {
                     "cwd": "${workspaceFolder}/qnx"
                 },
-                "command": "cmake -E make_directory ${workspaceFolder}/qnx/build/linux-debug && cmake -S ${workspaceFolder}/qnx -B ${workspaceFolder}/qnx/build/linux-debug -DCMAKE_BUILD_TYPE=DEBUG -DENABLE_CLANG_TIDY=on -DSANITIZE_THREAD=Off -DCODE_COVERAGE=off && cmake --build ${workspaceFolder}/qnx/build/linux-debug"
+                "command": "cmake -E make_directory ${workspaceFolder}/qnx/build/linux-debug && cmake -S ${workspaceFolder}/qnx -B ${workspaceFolder}/qnx/build/linux-debug -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_RUN_CLANG_TIDY=on -DSANITIZE_THREAD=Off -DCODE_COVERAGE=off && cmake --build ${workspaceFolder}/qnx/build/linux-debug"
             },
             "problemMatcher": [
                 {
