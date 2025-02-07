@@ -342,7 +342,7 @@ udp_talker_bpf::udp_talker_bpf() = default;
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept -> bool {
-  if (!socket_fd_) return false;
+  if (socket_fd_) return false;
 
   // Padding. Minimum size of an Ethernet packet is 60 bytes. With a pkt_size of
   // zero, there is 18 padding bytes at the end.
@@ -412,7 +412,7 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   ubench::file::fdesc fd = open("/dev/bpf", O_RDWR);
-  if (!socket_fd_) {
+  if (!fd) {
     ubench::string::perror("BPF device interface cannot be opened");
     return false;
   }
