@@ -1,4 +1,4 @@
-#include "pids.h"
+#include "osqnx/pids.h"
 
 #include <sys/procfs.h>
 #include <sys/types.h>
@@ -21,7 +21,7 @@ auto get_filename(std::string path) -> std::string {
 }
 }  // namespace
 
-auto pids::get_name(int pid, bool short_path)
+auto pids::get_name(unsigned int pid, bool short_path)
     -> stdext::expected<std::string, int> {
   if (auto search = pid_names_.find(pid); search != pid_names_.end()) {
     return short_path ? get_filename(search->second) : search->second;
@@ -34,9 +34,9 @@ auto pids::get_name(int pid, bool short_path)
   return short_path ? get_filename(it->second) : it->second;
 }
 
-auto pids::drop(int pid) -> bool { return pid_names_.erase(pid) != 0; }
+auto pids::drop(unsigned int pid) -> bool { return pid_names_.erase(pid) != 0; }
 
-auto pids::get_pids() -> std::vector<int> {
+auto pids::query_pids() -> std::vector<unsigned int> {
   const std::filesystem::path proc{"/proc"};
 
   std::filesystem::directory_iterator dir_it;
@@ -46,11 +46,11 @@ auto pids::get_pids() -> std::vector<int> {
     return {};
   }
 
-  std::vector<int> pids{};
+  std::vector<unsigned int> pids{};
   for (auto const& pid_entry : dir_it) {
     try {
       if (pid_entry.is_directory()) {
-        auto pid = ubench::string::parse_int<int>(
+        auto pid = ubench::string::parse_int<unsigned int>(
             pid_entry.path().filename().string());
         if (pid) {
           pids.push_back(*pid);

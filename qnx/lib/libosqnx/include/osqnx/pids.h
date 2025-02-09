@@ -1,5 +1,5 @@
-#ifndef LSQF_PIDS_H
-#define LSQF_PIDS_H
+#ifndef LIB_OSQNX_PIDS_H
+#define LIB_OSQNX_PIDS_H
 
 #include <map>
 #include <string>
@@ -7,6 +7,7 @@
 
 #include "stdext/expected.h"
 
+/// @brief Maintain a list of avialable PIDs in the system.
 class pids {
  public:
   pids() = default;
@@ -14,6 +15,7 @@ class pids {
   auto operator=(const pids&) -> pids& = default;
   pids(pids&&) = default;
   auto operator=(pids&&) -> pids& = default;
+  virtual ~pids() = default;
 
   /// @brief Gets the name of the process for the given PID.
   ///
@@ -23,7 +25,7 @@ class pids {
   /// @param pid The PID of the process to obtain.
   ///
   /// @return The name of the process.
-  auto get_name(int pid, bool short_path = false)
+  auto get_name(unsigned int pid, bool short_path = false)
       -> stdext::expected<std::string, int>;
 
   /// @brief Drop the PID from the cache.
@@ -34,15 +36,18 @@ class pids {
   /// @param pid The PID to drop from the cache.
   ///
   /// @return true if the PID was present and is removed.
-  auto drop(int pid) -> bool;
+  auto drop(unsigned int pid) -> bool;
 
   /// @brief Query the OS for the list of all PIDs.
   ///
+  /// This method queries the folder /proc for all PIDs. It doesn't cache the
+  /// available PIDs. The returned object is a temporary object.
+  ///
   /// @return A vector of all PIDs known in the system at the time.
-  auto get_pids() -> std::vector<int>;
+  auto query_pids() -> std::vector<unsigned int>;
 
  private:
-  std::map<int, std::string> pid_names_{};
+  std::map<unsigned int, std::string> pid_names_{};
 };
 
 #endif

@@ -10,10 +10,10 @@
 #include <iostream>
 #include <sstream>
 
+#include "osqnx/pids.h"
 #include "ubench/file.h"
 #include "ubench/string.h"
 #include "file.h"
-#include "pids.h"
 
 namespace {
 pids p{};
@@ -245,7 +245,7 @@ auto print_help() -> void {
 
 auto main(int argc, char* argv[]) -> int {
   coids lsqf{};
-  std::vector<int> pids{};
+  std::vector<unsigned int> pids{};
 
   int c = 0;
   bool help = false;
@@ -319,7 +319,7 @@ auto main(int argc, char* argv[]) -> int {
   }
 
   if (pids.size() == 0) {
-    pids = p.get_pids();
+    pids = p.query_pids();
   }
 
   lsqf.print_hdr();
