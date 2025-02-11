@@ -26,40 +26,40 @@ Run on various OSes
 - QNX 7.1.0 1500MHz
 - RPi OS (GCC 12.2.0) 1500MHz
 
-| Benchmark              | QNX 7.1.0 |   Linux |
-| ---------------------- | --------: | ------: |
-| BM_StrToL_byte         |   74.1 ns | 36.0 ns |
-| BM_StrToL_short        |   82.7 ns | 48.0 ns |
-| BM_StrToL_long         |    114 ns | 68.7 ns |
-| BM_StrToL_llong        |    198 ns |  115 ns |
-| BM_StrToL_xlong        |    350 ns |  188 ns |
-| BM_StrToLL_byte        |   70.0 ns | 36.0 ns |
-| BM_StrToLL_short       |   84.6 ns | 48.0 ns |
-| BM_StrToLL_long        |    105 ns | 68.7 ns |
-| BM_StrToLL_llong       |    164 ns |  115 ns |
-| BM_StrToLL_xlong       |    290 ns |  188 ns |
-| BM_StrToUL_byte        |   73.4 ns | 34.7 ns |
-| BM_StrToUL_short       |   80.7 ns | 47.7 ns |
-| BM_StrToUL_long        |    111 ns | 66.1 ns |
-| BM_StrToUL_llong       |    161 ns |  105 ns |
-| BM_StrToUL_xlong       |    347 ns |  179 ns |
-| BM_StrToULL_byte       |   73.0 ns | 37.7 ns |
-| BM_StrToULL_short      |   84.8 ns | 47.7 ns |
-| BM_StrToULL_long       |    102 ns | 66.1 ns |
-| BM_StrToULL_llong      |    158 ns |  105 ns |
-| BM_StrToULL_xlong      |    291 ns |  179 ns |
-| BM_FromChars_byte      |    233 ns | 17.4 ns |
-| BM_FromChars_short     |    283 ns | 25.4 ns |
-| BM_FromChars_long      |    375 ns | 33.4 ns |
-| BM_FromChars_llong     |    553 ns | 49.4 ns |
-| BM_FromChars_xlong     |    836 ns | 87.1 ns |
-| BM_FromCharsHex_ubyte  |    110 ns | 14.0 ns |
-| BM_FromCharsHex_ushort |    143 ns | 18.0 ns |
-| BM_FromCharsHex_ulong  |    204 ns | 24.7 ns |
-| BM_FromCharsHex_ullong |    319 ns | 40.7 ns |
-| BM_FromCharsHex_uxlong |    608 ns | 80.1 ns |
-| BM_FromCharsHex_byte   |    109 ns | 14.0 ns |
-| BM_FromCharsHex_short  |    145 ns | 18.0 ns |
-| BM_FromCharsHex_long   |    204 ns | 24.7 ns |
-| BM_FromCharsHex_llong  |    318 ns | 40.7 ns |
-| BM_FromCharsHex_xlong  |    589 ns | 80.1 ns |
+| Benchmark              | QNX 7.1.0 | QNX 8.0.0 |   Linux |
+| ---------------------- | --------: | --------: | ------: |
+| BM_StrToL_byte         |   74.1 ns |   43.2 ns | 36.0 ns |
+| BM_StrToL_short        |   82.7 ns |   58.4 ns | 48.0 ns |
+| BM_StrToL_long         |    114 ns |   85.6 ns | 68.7 ns |
+| BM_StrToL_llong        |    198 ns |    178 ns |  115 ns |
+| BM_StrToL_xlong        |    350 ns |    339 ns |  188 ns |
+| BM_StrToLL_byte        |   70.0 ns |   40.7 ns | 36.0 ns |
+| BM_StrToLL_short       |   84.6 ns |   54.7 ns | 48.0 ns |
+| BM_StrToLL_long        |    105 ns |   78.7 ns | 68.7 ns |
+| BM_StrToLL_llong       |    164 ns |    150 ns |  115 ns |
+| BM_StrToLL_xlong       |    290 ns |    273 ns |  188 ns |
+| BM_StrToUL_byte        |   73.4 ns |   42.1 ns | 34.7 ns |
+| BM_StrToUL_short       |   80.7 ns |   56.9 ns | 47.7 ns |
+| BM_StrToUL_long        |    111 ns |   83.7 ns | 66.1 ns |
+| BM_StrToUL_llong       |    161 ns |    170 ns |  105 ns |
+| BM_StrToUL_xlong       |    347 ns |    339 ns |  179 ns |
+| BM_StrToULL_byte       |   73.0 ns |   38.7 ns | 37.7 ns |
+| BM_StrToULL_short      |   84.8 ns |   52.7 ns | 47.7 ns |
+| BM_StrToULL_long       |    102 ns |   76.7 ns | 66.1 ns |
+| BM_StrToULL_llong      |    158 ns |    127 ns |  105 ns |
+| BM_StrToULL_xlong      |    291 ns |    271 ns |  179 ns |
+| BM_FromChars_byte      |    233 ns |   12.0 ns | 17.4 ns |
+| BM_FromChars_short     |    283 ns |   18.0 ns | 25.4 ns |
+| BM_FromChars_long      |    375 ns |   30.0 ns | 33.4 ns |
+| BM_FromChars_llong     |    553 ns |   53.4 ns | 49.4 ns |
+| BM_FromChars_xlong     |    836 ns |    118 ns | 87.1 ns |
+| BM_FromCharsHex_ubyte  |    110 ns |   12.7 ns | 14.0 ns |
+| BM_FromCharsHex_ushort |    143 ns |   18.7 ns | 18.0 ns |
+| BM_FromCharsHex_ulong  |    204 ns |   25.4 ns | 24.7 ns |
+| BM_FromCharsHex_ullong |    319 ns |   42.7 ns | 40.7 ns |
+| BM_FromCharsHex_uxlong |    608 ns |   82.7 ns | 80.1 ns |
+| BM_FromCharsHex_byte   |    109 ns |   12.7 ns | 14.0 ns |
+| BM_FromCharsHex_short  |    145 ns |   18.7 ns | 18.0 ns |
+| BM_FromCharsHex_long   |    204 ns |   20.7 ns | 24.7 ns |
+| BM_FromCharsHex_llong  |    318 ns |   42.7 ns | 40.7 ns |
+| BM_FromCharsHex_xlong  |    589 ns |   84.1 ns | 80.1 ns |
