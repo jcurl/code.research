@@ -1,0 +1,49 @@
+lsqf - list open qnx files
+
+lsqf [-c] [-d] [-s] [-v] [-p <pid>]
+
+Options:
+ -c  show side channels. These are shown as an FD with a number, followed by
+     's', like `0s`.
+ -d  show dead connections.
+ -s  show connections to self.
+ -v  add verbosity
+
+The tool best runs as root to get the command line information. If not run as
+root it will attempt other ways to get the file name, but may change the output
+format.
+
+On the output, the following flags are shown:
+- FD number (if a side channel, the upper bits are removed)
+- 'd' indicates a dead connection.
+- 'c' indicates 'CLOEXEC', a file descriptor that is closed on 'exec*()'.
+- 'r' file is open for read (else '-')
+- 'w' file is open for write (else '-')
+
+The following mode information is shown:
+- The first character is one of:
+  - '?' - Unknown
+  - '-' - Regular file
+  - 'b' - Block file
+  - 'c' - Character file
+  - 'd' - Directory
+  - 'l' - Symbolic link
+  - 'n' - Named file (typed memory or shared memory)
+  - 'p' - FIFO / Pipe
+  - 's' - Socket
+- The following characters are the mode of the file, for the user, group and
+  other. The executable bit may also be 'x', 's', 'S' (user/group) or 'x', 't',
+  'T' (other).
+
+Sample output:
+
+$ ./lsqf -cds
+Process (PID)             FD (flags) RsrcMgr (PID)             Mode       Path
+------------------------- ---------- ------------------------- ---------- ----------
+dhclient (344081)         0rw        procnto-smp-instr (1)     crw-rw-rw- /dev/null
+dhclient (344081)         1rw        procnto-smp-instr (1)     crw-rw-rw- /dev/null
+dhclient (344081)         2rw        procnto-smp-instr (1)     crw-rw-rw- /dev/null
+dhclient (344081)         3-w        devb-sdmmc-bcm2711 (12)   -rw-rw-rw- /fs/qnx6/var/db/dhclient.leases
+dhclient (344081)         4crw       io-pkt-v6-hc (303120)     crw-rw---- /dev/bpf
+dhclient (344081)         5crw       io-pkt-v6-hc (303120)     srw-rw-rw- I4UDP  *.68                  *.*
+dhclient (344081)         0s         procnto-smp-instr (1)

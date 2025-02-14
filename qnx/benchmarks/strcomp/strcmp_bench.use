@@ -1,0 +1,12 @@
+strcmp_bench - compare performance of different string routines
+
+Which method of string comparison is faster for a C++ program? This checks:
+- str.substr(0, token_len)
+- str.compare(0, token_len, substr)
+- str.find_first_of(substr, 0)
+
+Is it faster to check the length explicitly in case 'str' is shorter than
+'substr'? What the difference if the string is found or not?
+
+Use these results to estimate the fastest method based on the heuristics of what
+kind of match is expected.

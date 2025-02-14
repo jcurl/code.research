@@ -38,6 +38,7 @@ if(IS_DEBUG)
 endif()
 
 target_clangformat_setup(${BINARY})
+target_use_msg(${BINARY} udp_load.use DESCRIPTION "UDP Stress Test tool")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -60,6 +60,7 @@ endif()
 check_symbol_exists(mlockall "sys/mman.h" HAVE_MLOCKALL)
 
 target_clangformat_setup(${BINARY})
+target_use_msg(${BINARY} malloc_bench.use DESCRIPTION "Google Benchmark for malloc() performance")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

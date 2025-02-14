@@ -1,0 +1,12 @@
+cacheline_bench - do strided copies to estimate the cache-line size
+
+This is a heuristic to estimate the cacheline size. The program itself won't
+calculate it for you, it just provides the performance metrics on how long it
+takes to do a copy.
+
+A stride means every 'nth' byte is read over a large array. The theory is, that
+the time to read every byte in the cache line is the same. But as we read more
+data from other cachelines, the program will be slower as it must now access
+memory and fill in a new cacheline.
+
+Eventually, the effects of L2 and L3 can be seen, if the time can be plotted.

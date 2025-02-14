@@ -1,0 +1,20 @@
+time_compare - Compare the outputs of different clocks
+
+Prints the output of some standard clocks, that they can be compared. This way,
+one can empirically determine the hardware sources for the different clocks.
+
+Sample output:
+
+# ./time_compare
+
+Clock                      Steady  Period
+-------------------------  ------  ------
+High Resolution Clock      No      1/1000000000
+Steady Clock               Yes     1/1000000000
+System Clock               No      1/1000000000
+
+System Clock           Highres Clock          Steady Clock           CLOCK_MONOTONIC        CLOCK_REALTIME
+---------------------- ---------------------- ---------------------- ---------------------- ----------------------
+  1724149953.141134541   1724149953.141134951         1000.209880459         1000.209880734   1724149953.141135797
+  1724149954.141584729   1724149954.141584834         1001.210329995         1001.210330114   1724149954.141585103
+  1724149955.141884151   1724149955.141884323         1002.210629577         1002.210629729   1724149955.141884789

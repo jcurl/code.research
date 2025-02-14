@@ -1,0 +1,34 @@
+udp_load - generate IPv4 traffic load using udp
+
+udp_load [-n<slots>] [-m<width>] [-p<packets>] [-s<size>]
+         [-d<duration>] [-T<threads>] [-I] [-B<mode>]
+         [-S<sourceip[:port]>] [-D<destip[:port]>]
+
+Options:
+ -B<mode>     - sending mode: sendto, sendmmsg, bpf.
+ -n<slots>    - Number of slots in a time window (default 20).
+ -m<width>    - Width of each slot in milliseconds (default 5ms).
+ -p<packets>  - Number of packets to send in a window (n*m duration, default 1000).
+ -s<size>     - Size of each UDP packet (default 1472).
+ -d<duration> - Duration to run the test in milliseconds (default 30,000ms).
+ -T<threads>  - Number of parallel threads (default 1).
+ -S<sourceip> - Source IP address (must be an existing interface).
+ -D<destip>   - Destination IP address (can be unicast or multicast).
+ -I           - Enable IDLE mode test prior.
+ -?           - Display this help.
+
+Run a performance test of the total duration given by option '-d'. If '-I' is
+specified, a 5 second idle test is run first.
+
+During the test, UDPv4 packets are send from the source interface/port defined
+by '-S' to the destination interface/port '-D'. There are '-n' slots per time
+window (used to try and average the data rate sent), with each slot being '-m'
+milliseconds wide. During each slot, try to send '-p' packets (divided by the
+total number of slots, so 1000 packets and 20 slots, is 50 packets per slot).
+
+The test might run on a single thread (default) or multiple threads as given by
+'-T'. The method used to send packets is defined by '-B', e.g.
+
+- bpf: use /dev/bpf and send packets completely constructed in software
+- sendto: use the sendto() library call
+- sendmmsg: use the sendmmsg() library call

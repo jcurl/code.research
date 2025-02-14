@@ -1,0 +1,32 @@
+iplist - list IPv4 addresses on all interfaces
+
+This is a simplified 'ifconfig' tool just to list IP addresses. It is a single
+source code base that shows how to handle the same operations across multiple
+Operating Systems.
+
+It supports multiple IPv4 addresses on the same interface, VLANs. The flags in
+the last column are:
+
+'U' - Interface Low-level UP. Not present on QNX, FreeBSD, NetBSD
+'u' - Interface is up
+'R' - Interface is Running
+'L' - Loopback interface
+'M' - Interface supports multicast
+'A' - Interface supports ARP (the NOARP flag is not set).
+
+Only Ethernet MAC addresses are supported (e.g. Firewire and others will be
+blank).
+
+
+Output:
+
+Interface  HW Address        MTU     VLAN Parent     Type     Address         Net Mask        Broadcast       Destination     UuRLMA
+---------- ----------------- ------- ---- ---------- -------- --------------- --------------- --------------- --------------- ------
+docker0    02:42:92:1a:b8:f3 1500                    AF_INET  172.17.0.1      255.255.0.0     172.17.255.255                  U---MA
+enp0s31f6  40:8d:5c:b1:9e:bf 1500                                                                                             U---MA
+enp4s0     40:8d:5c:b1:9e:bd 1500                    AF_INET  192.168.1.109   255.255.255.0   192.168.1.255                   UuR-MA
+enp4s0     40:8d:5c:b1:9e:bd 1500                    AF_INET  10.0.0.1        255.255.255.0   10.0.0.1                        UuR-MA
+enp4s0.100 40:8d:5c:b1:9e:bd 1500    100  enp4s0     AF_INET  10.0.3.1        255.255.255.0   10.0.3.1                        ----MA
+lo                           65536                   AF_INET  127.0.0.1       255.0.0.0                                       UuRL-A
+virbr0     52:54:00:02:ef:c8 1500                    AF_INET  192.168.122.1   255.255.255.0   192.168.122.255                 U---MA
+wlp5s0     a4:34:d9:12:69:cf 1500                                                                                             ----MA

@@ -1,0 +1,38 @@
+lshmem - list shared memory objects
+
+lshmem [-m] [-s] [-v] [-r] [-p <pid>]
+
+Options:
+ -m  Show the physical memory layout for the process
+ -s  Show physical memory used by other PIDs
+ -r  Show also read-only shared memory objects
+ -p  Show the memory for a PID
+ -v  Add extra verbosity
+
+This is useful to see what programs have the same physical memory mapped into
+their process space. Code regions are not shown.
+
+If neither -m or -s is given, then -s is assumed. Both or one may be given.
+
+When listing for shared memory overlap with -s, all PIDs are queried. When only
+for a single process, only the current PID is queried. If no PID is specified,
+then all PIDs are queried.
+
+Example:
+
+# ./lshmem -p20489 -msr
+PID: 20489 (sbin/pci-server)...
+ Shared Physical Memory Map
+  fd500000,a000,10001,b,407,1,memory
+  1f5680000,11000,20001,3,1,7d774bd0fb7ce7ed,/dev/shmem/slogger2/pci_server.20489
+  1f5694000,11000,20001,3,1,7d774bd0fb7ce1ad,/dev/shmem/slogger2/pci_server.20489..0
+  1f56ad000,1000,1,3,1,7d774bd0fb7ce2fd,/dev/shmem/pci/pci_hw
+  1f56ae000,2000,1,3,1,7d774bd0fb7cf6fd,/dev/shmem/pci/pci_db
+  1f56b0000,1000,1,3,1,7d774bd0fb7cf7bd,/dev/shmem/pci/pci_sync
+ Overlapping Shared Memory Map
+  (10001,b,407,1) <-> 45070: (10001,b,407,1) [memory] length=a000
+  (1,3,1,7d774bd0fb7ce2fd) <-> 45070: (1,3,1,7d774bd0fb7ce2fd) [/dev/shmem/pci/pci_hw] length=1000
+  (1,3,1,7d774bd0fb7cf6fd) <-> 45070: (1,3,1,7d774bd0fb7cf6fd) [/dev/shmem/pci/pci_db] length=2000
+  (1,3,1,7d774bd0fb7cf7bd) <-> 45070: (1,3,1,7d774bd0fb7cf7bd) [/dev/shmem/pci/pci_sync] length=1000
+  (1,3,1,7d774bd0fb7cf6fd) <-> 110605: (1,3,1,7d774bd0fb7cf6fd) [/dev/shmem/pci/pci_db] length=2000
+  (1,3,1,7d774bd0fb7cf7bd) <-> 110605: (1,3,1,7d774bd0fb7cf7bd) [/dev/shmem/pci/pci_sync] length=1000

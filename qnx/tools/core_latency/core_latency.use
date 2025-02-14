@@ -1,0 +1,16 @@
+core_latency - measure the time between each core for memory read/writes
+
+core_latency [-b<mode>] [-s<samples>] [-i<iter>]
+
+Options:
+ -b  Specify the mode of test.
+ -s  An integer on the number of samples
+ -i  An integer on the number of iterations per sample
+
+Run a very tight (assembly optimised) loop when two threads are pinned to
+different cores. One thread sets a value, while the other thread spins waiting
+for the value to change. Then the roles swap in a ping/pong like test.
+
+The resulting time is the number of nanoseconds needed for a change on one core
+to be seen on another core. For Hyper-threading, this is usually very small,
+where between different cores, the number is usually high.

@@ -1,0 +1,11 @@
+malloc_bench - measure the time to allocate small to large blocks of memory
+
+malloc_bench [-mKEY=VALUE]
+
+Options:
+ -m  Specify the KEY given to mallopt() and the value that should be used.
+
+Example:
+ $ malloc_bench mM_TRIM_THRESHOLD=0 \
+     --benchmark_out_format=json \
+     --benchmark_out=${BASE_NAME}.json

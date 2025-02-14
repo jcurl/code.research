@@ -9,5 +9,6 @@ if(IS_DEBUG)
 endif()
 
 target_clangformat_setup(${BINARY})
+target_use_msg(${BINARY} time_compare.use DESCRIPTION "Time source comparison tool")
 
 install(TARGETS ${BINARY} DESTINATION bin)

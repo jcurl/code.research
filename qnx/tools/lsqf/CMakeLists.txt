@@ -13,5 +13,6 @@ if(IS_DEBUG)
 endif()
 
 target_clangformat_setup(${BINARY})
+target_use_msg(${BINARY} lsqf.use DESCRIPTION "list open qnx files (like lsof on Linux)")
 
 install(TARGETS ${BINARY} DESTINATION bin)
