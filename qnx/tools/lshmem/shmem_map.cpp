@@ -1,5 +1,7 @@
 #include "shmem_map.h"
 
+#include "osqnx/asinfo.h"
+
 // There are six ways two memory regions can overlap, given in the diagram
 // below. The compare_and_add() function checks for overlap and adds to the
 // existing vector the amount of overlapping memory.
@@ -26,8 +28,23 @@ auto inline is_same(const map_line& l1, const map_line& l2) -> bool {
          l1.dev == l2.dev && l1.ino == l2.ino && l1.object == l2.object;
 }
 
+auto add_tymem(uintptr_t start, shmem_entry& entry) -> void {
+  auto name = os::qnx::get_tymem_name(start);
+  if (name) {
+    entry.tymem.insert(*name);
+  }
+}
+
 }  // namespace
 
+/// @brief compare the two map lines and add the overlapping section.
+///
+/// @param p1 the first mapping.
+///
+/// @param p2 the second mapping.
+///
+/// @returns the shared memory region modified or created. This is nullptr if
+/// there is no overlap. Use this to add typed memory information.
 auto shmem_map::compare_and_add(const map_line& p1, const map_line& p2)
     -> void {
   auto ostart = std::max(p1.phys_addr, p2.phys_addr);
@@ -40,6 +57,7 @@ auto shmem_map::compare_and_add(const map_line& p1, const map_line& p2)
   for (auto& entry : overlap_) {
     if (is_same(entry.p1, p1) && is_same(entry.p2, p2)) {
       entry.size += olength;
+      add_tymem(ostart, entry);
       return;
     }
   }
@@ -55,4 +73,5 @@ auto shmem_map::compare_and_add(const map_line& p1, const map_line& p2)
   new_entry.p2.ino = p2.ino;
   new_entry.p2.object = p2.object;
   new_entry.size = olength;
+  add_tymem(ostart, new_entry);
 }

@@ -185,7 +185,7 @@ auto main() -> int {
 
   // Print details of the interfaces.
   for (const auto& [name, interface] : interfaces) {
-    if (interface.inet().size() > 0) {
+    if (!interface.inet().empty()) {
       for (const auto& ipv4 : interface.inet()) {
         std::cout << if_details{ifwidth, interface};
         std::cout << ipv4_details(ipv4);

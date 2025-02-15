@@ -1,6 +1,8 @@
 #ifndef BENCHMARK_LSHMEM_SHMEM_MAP_H
 #define BENCHMARK_LSHMEM_SHMEM_MAP_H
 
+#include <set>
+#include <string_view>
 #include <vector>
 
 #include "pid_mapping.h"
@@ -12,6 +14,7 @@ struct shmem_entry {
   map_line p1;
   map_line p2;
   std::size_t size{0};
+  std::set<std::string_view> tymem{};
 };
 
 class shmem_map {

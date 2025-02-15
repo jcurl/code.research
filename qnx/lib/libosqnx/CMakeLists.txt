@@ -1,5 +1,5 @@
 add_subdirectory(src)
 
-# if(ENABLE_TEST)
-#     add_subdirectory(test)
-# endif()
+if(ENABLE_TEST)
+    add_subdirectory(test)
+endif()

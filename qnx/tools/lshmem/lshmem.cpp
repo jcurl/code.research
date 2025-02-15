@@ -1,9 +1,11 @@
 #include <unistd.h>
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <sstream>
 
+#include "osqnx/asinfo.h"
 #include "osqnx/pids.h"
 #include "ubench/string.h"
 #include "options.h"
@@ -18,12 +20,15 @@ auto mapping_file(unsigned int pid) {
 
 auto print_pid(const std::vector<unsigned int>& pids, unsigned int pid)
     -> bool {
+  // The list of pids may not be sorted.
   if (pids.empty()) return true;
   return std::find(pids.cbegin(), pids.cend(), pid) != pids.cend();
 }
 
+using pid_shmem_map = std::map<unsigned int, pid_mapping>;
+
 auto get_shmem(const std::vector<unsigned int>& pids, os::qnx::pids& p,
-    int verbosity, bool read) -> std::map<unsigned int, pid_mapping> {
+    int verbosity, bool read) -> pid_shmem_map {
   std::map<unsigned int, pid_mapping> shmem{};
 
   unsigned int self = getpid();
@@ -53,12 +58,83 @@ auto get_shmem(const std::vector<unsigned int>& pids, os::qnx::pids& p,
   return shmem;
 }
 
+auto print_mem_map(const pid_mapping& mapping) -> void {
+  bool header = true;
+  for (const auto& m : mapping.map()) {
+    if (header) {
+      std::cout << " Shared Physical Memory Map" << std::endl;
+      header = false;
+    }
+    std::cout << "  " << std::hex << m.phys_addr << "," << m.phys_len << ","
+              << m.ri_flags << "," << m.ri_prot << "," << m.dev << "," << m.ino
+              << "," << m.object << std::dec;
+    auto tmem = os::qnx::get_tymem_name(m.phys_addr);
+    if (tmem) {
+      std::cout << "," << *tmem;
+    }
+    std::cout << std::endl;
+  }
+}
+
+auto print_shmem(const pid_shmem_map& shmem, unsigned int pid,
+    const pid_mapping& mapping) -> void {
+  bool header = true;
+  for (const auto& [pid2, mapping2] : shmem) {
+    if (pid != pid2) {
+      shmem_map overlap{};
+      auto i1 = mapping.map().cbegin();
+      auto i2 = mapping2.map().cbegin();
+      while (i1 != mapping.map().cend() && i2 != mapping2.map().cend()) {
+        overlap.compare_and_add(*i1, *i2);
+        if (i1->phys_addr + i1->phys_len < i2->phys_addr + i2->phys_len) {
+          i1 = std::next(i1);
+        } else if (i1->phys_addr + i1->phys_len >
+                   i2->phys_addr + i2->phys_len) {
+          i2 = std::next(i2);
+        } else {
+          i1 = std::next(i1);
+          i2 = std::next(i2);
+        }
+      }
+
+      for (const auto& entry : overlap.overlap()) {
+        if (header) {
+          std::cout << " Overlapping Shared Memory Map" << std::endl;
+          header = false;
+        }
+        std::cout << "  (" << std::hex << entry.p1.ri_flags << ","
+                  << entry.p1.ri_prot << "," << entry.p1.dev << ","
+                  << entry.p1.ino << ") <-> " << std::dec << pid2 << ": ("
+                  << std::hex << entry.p1.ri_flags << "," << entry.p1.ri_prot
+                  << "," << entry.p1.dev << "," << entry.p1.ino << ") ["
+                  << entry.p1.object;
+        if (entry.p1.object == entry.p2.object) {
+          std::cout << "] length=";
+        } else {
+          std::cout << "," << entry.p2.object << "] length=";
+        }
+        std::cout << entry.size;
+        if (!entry.tymem.empty()) {
+          bool first = true;
+          std::cout << " tymem=";
+          for (const auto name : entry.tymem) {
+            if (!first) std::cout << ",";
+            std::cout << name;
+            first = false;
+          }
+        }
+        std::cout << std::endl;
+      }
+    }
+  }
+}
+
 auto main(int argc, char* argv[]) -> int {
   auto options = make_options(argc, argv);
   if (!options) return options.error();
 
   os::qnx::pids p{};
-  std::map<unsigned int, pid_mapping> shmem{};
+  pid_shmem_map shmem{};
   if (options->pids().empty() || options->shared_mem()) {
     shmem =
         get_shmem(p.query_pids(), p, options->verbosity(), options->readable());
@@ -78,58 +154,11 @@ auto main(int argc, char* argv[]) -> int {
     }
 
     if (options->phys_mem()) {
-      bool header = true;
-      for (const auto& m : mapping.map()) {
-        if (header) {
-          std::cout << " Shared Physical Memory Map" << std::endl;
-          header = false;
-        }
-        std::cout << "  " << std::hex << m.phys_addr << "," << m.phys_len << ","
-                  << m.ri_flags << "," << m.ri_prot << "," << m.dev << ","
-                  << m.ino << "," << m.object << std::dec << std::endl;
-      }
+      print_mem_map(mapping);
     }
 
     if (options->shared_mem()) {
-      bool header = true;
-      for (const auto& [pid2, mapping2] : shmem) {
-        if (pid != pid2) {
-          shmem_map overlap{};
-          auto i1 = mapping.map().cbegin();
-          auto i2 = mapping2.map().cbegin();
-          while (i1 != mapping.map().cend() && i2 != mapping2.map().cend()) {
-            overlap.compare_and_add(*i1, *i2);
-            if (i1->phys_addr + i1->phys_len < i2->phys_addr + i2->phys_len) {
-              i1 = std::next(i1);
-            } else if (i1->phys_addr + i1->phys_len >
-                       i2->phys_addr + i2->phys_len) {
-              i2 = std::next(i2);
-            } else {
-              i1 = std::next(i1);
-              i2 = std::next(i2);
-            }
-          }
-
-          for (const auto& entry : overlap.overlap()) {
-            if (header) {
-              std::cout << " Overlapping Shared Memory Map" << std::endl;
-              header = false;
-            }
-            std::cout << "  (" << std::hex << entry.p1.ri_flags << ","
-                      << entry.p1.ri_prot << "," << entry.p1.dev << ","
-                      << entry.p1.ino << ") <-> " << std::dec << pid2 << ": ("
-                      << std::hex << entry.p1.ri_flags << ","
-                      << entry.p1.ri_prot << "," << entry.p1.dev << ","
-                      << entry.p1.ino << ") [" << entry.p1.object;
-            if (entry.p1.object == entry.p2.object) {
-              std::cout << "] length=";
-            } else {
-              std::cout << "," << entry.p2.object << "] length=";
-            }
-            std::cout << entry.size << std::endl;
-          }
-        }
-      }
+      print_shmem(shmem, pid, mapping);
     }
   }
 

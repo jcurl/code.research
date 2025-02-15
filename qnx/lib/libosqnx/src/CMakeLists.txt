@@ -1,6 +1,7 @@
 set(LIBRARY osqnx)
 set(SOURCES
     ../include/osqnx/pids.h pids.cpp
+    ../include/osqnx/asinfo.h asinfo.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 
