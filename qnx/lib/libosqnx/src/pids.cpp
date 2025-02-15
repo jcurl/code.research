@@ -21,6 +21,8 @@ auto get_filename(std::string path) -> std::string {
 }
 }  // namespace
 
+namespace os::qnx {
+
 auto pids::get_name(unsigned int pid, bool short_path)
     -> stdext::expected<std::string, int> {
   if (auto search = pid_names_.find(pid); search != pid_names_.end()) {
@@ -62,3 +64,5 @@ auto pids::query_pids() -> std::vector<unsigned int> {
   }
   return pids;
 }
+
+}  // namespace os::qnx

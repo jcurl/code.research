@@ -22,7 +22,7 @@ auto print_pid(const std::vector<unsigned int>& pids, unsigned int pid)
   return std::find(pids.cbegin(), pids.cend(), pid) != pids.cend();
 }
 
-auto get_shmem(const std::vector<unsigned int>& pids, class pids& p,
+auto get_shmem(const std::vector<unsigned int>& pids, os::qnx::pids& p,
     int verbosity, bool read) -> std::map<unsigned int, pid_mapping> {
   std::map<unsigned int, pid_mapping> shmem{};
 
@@ -57,7 +57,7 @@ auto main(int argc, char* argv[]) -> int {
   auto options = make_options(argc, argv);
   if (!options) return options.error();
 
-  pids p{};
+  os::qnx::pids p{};
   std::map<unsigned int, pid_mapping> shmem{};
   if (options->pids().empty() || options->shared_mem()) {
     shmem =

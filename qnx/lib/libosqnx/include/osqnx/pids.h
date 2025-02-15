@@ -7,6 +7,8 @@
 
 #include "stdext/expected.h"
 
+namespace os::qnx {
+
 /// @brief Maintain a list of avialable PIDs in the system.
 class pids {
  public:
@@ -49,5 +51,7 @@ class pids {
  private:
   std::map<unsigned int, std::string> pid_names_{};
 };
+
+}  // namespace os::qnx
 
 #endif

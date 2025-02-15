@@ -16,7 +16,7 @@
 #include "file.h"
 
 namespace {
-pids p{};
+os::qnx::pids p{};
 
 class coids {
  public:
