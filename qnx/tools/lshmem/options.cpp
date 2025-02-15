@@ -17,6 +17,7 @@ auto print_help(std::string_view prog_name) -> void {
   std::cout << " -m print shared memory for the PID" << std::endl;
   std::cout << " -s print shared memory with other PIDs" << std::endl;
   std::cout << " -r include read-only shared memory" << std::endl;
+  std::cout << " -t print typed memory regions" << std::endl;
   std::cout << " -v increase verbosity" << std::endl;
   std::cout << " -? help" << std::endl;
 }
@@ -39,7 +40,7 @@ auto make_options(int& argc, char* const argv[]) noexcept
 
   int err = 0;
   options o{};
-  while ((c = getopt(argc, argv, "p:msrv?")) != -1) {
+  while ((c = getopt(argc, argv, "p:mrstv?")) != -1) {
     switch (c) {
       case 'v':
         o.verbosity_++;
@@ -72,6 +73,9 @@ auto make_options(int& argc, char* const argv[]) noexcept
       case 'r':
         o.read_ = true;
         break;
+      case 't':
+        o.tymem_ = true;
+        break;
       case '?':
         help = true;
         break;
@@ -98,7 +102,7 @@ auto make_options(int& argc, char* const argv[]) noexcept
   }
 
   // Provide a default if the user didn't provide one.
-  if (!o.phys_mem_ && !o.shared_mem_) {
+  if (!o.phys_mem_ && !o.shared_mem_ && !o.tymem_) {
     o.shared_mem_ = true;
   }
 

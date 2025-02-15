@@ -47,6 +47,11 @@ class options {
   /// @return true if readable shared memory regions should also be dumped.
   [[nodiscard]] auto readable() const -> bool { return read_; }
 
+  /// @brief if we should print the typed memory sorted.
+  ///
+  /// @return true if typed memory should be dumped.
+  [[nodiscard]] auto tymem() const -> bool { return tymem_; }
+
  private:
   options() = default;
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
@@ -58,6 +63,7 @@ class options {
   bool phys_mem_{};
   bool shared_mem_{};
   bool read_{};
+  bool tymem_{};
 };
 
 /// @brief Get options.

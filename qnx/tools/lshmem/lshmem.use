@@ -1,11 +1,12 @@
 lshmem - list shared memory objects
 
-lshmem [-m] [-s] [-v] [-r] [-p <pid>]
+lshmem [-m] [-s] [-v] [-r] [-t] [-p <pid>]
 
 Options:
  -m  Show the physical memory layout for the process
  -s  Show physical memory used by other PIDs
  -r  Show also read-only shared memory objects
+ -t  Show typed memory regions (children)
  -p  Show the memory for a PID
  -v  Add extra verbosity
 
@@ -62,3 +63,20 @@ PID: 225291 (sbin/pci-server)...
   (1,3,1,53880c8c) <-> 253967: (1,3,1,53880c8c) [/dev/shmem/pci/pci_sync] length=1000 tymem=sysram
   (1,3,1,53880dfc) <-> 253967: (1,3,1,53880dfc) [/dev/shmem/pci/pci_db] length=2000 tymem=sysram
   (1,3,1,53880b5c) <-> 253967: (1,3,1,53880b5c) [/dev/shmem/pci/pci_hw] length=1000 tymem=sysram
+
+# ./lshmem -t
+Typed Memory (Sorted):
+0000000000000000 - 0000000000008fff: sysram
+0000000000010000 - 00000000000107ff: hypervisor_vector
+0000000000011000 - 0000000000010fff: sysram
+0000000000015000 - 000000000007ffff: sysram
+0000000000080fa0 - 00000000000990a7: startup
+00000000000990a8 - 00000000017252df: imagefs
+00000000000990a8 - 00000000017252df: bootram
+0000000001726000 - 000000003effffff: sysram
+000000003f000000 - 000000003fffffff: vcram
+0000000040000000 - 00000000fbffffff: sysram
+00000000ff841000 - 00000000ff841fff: gicd
+00000000ff842000 - 00000000ff842fff: gicc
+0000000100000000 - 00000001fa086fff: sysram
+ffffff806001d000 - ffffff80601063c8: vboot

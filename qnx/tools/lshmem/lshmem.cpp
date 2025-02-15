@@ -58,6 +58,24 @@ auto get_shmem(const std::vector<unsigned int>& pids, os::qnx::pids& p,
   return shmem;
 }
 
+auto print_tymem() -> void {
+  auto asinfo = os::qnx::get_asinfo();
+  if (asinfo.empty()) return;
+
+  std::cout << "Typed Memory (Sorted):" << std::endl;
+  std::cout << std::hex;
+  for (const auto& entry : asinfo) {
+    std::cout << std::setfill('0') << std::setw(16) << entry.start << " - "
+              << std::setfill('0') << std::setw(16) << entry.end << ": "
+              << entry.name;
+    if (entry.end + 1 < entry.start) {
+      std::cout << "  ** WARNING: End is before Start.";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::dec;
+}
+
 auto print_mem_map(const pid_mapping& mapping) -> void {
   bool header = true;
   for (const auto& m : mapping.map()) {
@@ -132,6 +150,17 @@ auto print_shmem(const pid_shmem_map& shmem, unsigned int pid,
 auto main(int argc, char* argv[]) -> int {
   auto options = make_options(argc, argv);
   if (!options) return options.error();
+
+  if (options->tymem()) {
+    print_tymem();
+  }
+
+  if (!options->phys_mem() && !options->shared_mem()) {
+    return 0;
+  }
+  if (options->tymem()) {
+    std::cout << std::endl;
+  }
 
   os::qnx::pids p{};
   pid_shmem_map shmem{};
