@@ -264,21 +264,11 @@ auto main(int argc, char* argv[]) -> int {
         lsqf.show_self() = true;
         break;
       case 'p': {
-        auto arglist = ubench::string::split_args(optarg);
-        if (arglist.size() == 0) {
+        pids = ubench::string::split_args_int<unsigned int>(optarg);
+        if (pids.empty()) {
           std::cerr << "Error: No arguments provided for pid list" << std::endl;
           exit_code = 1;
           break;
-        }
-        for (const auto& arg : arglist) {
-          auto pid_arg = ubench::string::parse_int<unsigned int>(arg);
-          if (pid_arg) {
-            pids.push_back(*pid_arg);
-          } else {
-            std::cerr << "Error: PID " << arg << " invalid format" << std::endl;
-            exit_code = 1;
-            break;
-          }
         }
         break;
       }

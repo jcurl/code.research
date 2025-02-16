@@ -47,10 +47,44 @@ TEST(ubench_string, split_args) {
   split_check(",y,z", {"", "y", "z"});
 }
 
+template<typename T>
+auto split_check_int(const std::string& arg, std::initializer_list<T> l) -> void {
+  auto arg_parse = ubench::string::split_args_int<T>(arg);
+  ASSERT_EQ(arg_parse.size(), l.size());
+
+  std::size_t p = 0;
+  for (const auto& a : l) {
+    EXPECT_EQ(arg_parse[p], a);
+    p++;
+  }
+}
+
+TEST(ubench_string, split_args_int) {
+  split_check_int<int>("", { });
+  split_check_int<int>("1", { 1 });
+  split_check_int<int>("1,", { });
+  split_check_int<int>("1,2", { 1, 2 });
+  split_check_int<int>("1,-22", { 1, -22 });
+  split_check_int<int>("-11,2", { -11, 2 });
+  split_check_int<int>("a", { });
+  split_check_int<int>("1,a", { });
+  split_check_int<int>("a,1", { });
+
+  split_check_int<unsigned int>("", { });
+  split_check_int<unsigned int>("1", { 1 });
+  split_check_int<unsigned int>("1,", { });
+  split_check_int<unsigned int>("1,2", { 1, 2 });
+  split_check_int<unsigned int>("1,-22", { });
+  split_check_int<unsigned int>("-11,2", { });
+  split_check_int<unsigned int>("a", { });
+  split_check_int<unsigned int>("1,a", { });
+  split_check_int<unsigned int>("a,1", { });
+}
+
 auto split_check_max_fields(
     const std::string& arg, std::initializer_list<std::string> l) -> void {
   auto arg_parse = ubench::string::split_args(arg, l.size());
-  EXPECT_EQ(arg_parse.size(), l.size());
+  ASSERT_EQ(arg_parse.size(), l.size());
 
   // The output is of `string_view`. For checking, we convert to a `string`.
   std::vector<std::string> args{};

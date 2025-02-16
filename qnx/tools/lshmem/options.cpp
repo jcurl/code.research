@@ -46,21 +46,11 @@ auto make_options(int& argc, char* const argv[]) noexcept
         o.verbosity_++;
         break;
       case 'p': {
-        auto arglist = ubench::string::split_args(optarg);
-        if (arglist.size() == 0) {
+        o.pids_ = ubench::string::split_args_int<unsigned int>(optarg);
+        if (o.pids_.empty()) {
           std::cerr << "Error: No arguments provided for pid list" << std::endl;
           err = 1;
           break;
-        }
-        for (const auto& arg : arglist) {
-          auto pid_arg = ubench::string::parse_int<unsigned int>(arg);
-          if (pid_arg) {
-            o.pids_.push_back(*pid_arg);
-          } else {
-            std::cerr << "Error: PID " << arg << " invalid format" << std::endl;
-            err = 1;
-            break;
-          }
         }
         break;
       }

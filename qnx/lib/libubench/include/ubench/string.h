@@ -9,14 +9,35 @@
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 #include <vector>
 
 namespace ubench::string {
 
+/// @brief Parses the string as a number.
+///
+/// Note, only integer types are supported. On QNX and Clang cmopilers, floating
+/// point types are not supported.
+///
+/// @tparam T The type to convert from the string to.
+///
+/// @param arg The argument given to the program which is to be parsed to an
+/// integer.
+///
+/// @return The value that was read, or no value if there was a parsing error.
+template <typename T, std::enable_if_t<std::is_integral<T>{}, bool> = true>
+auto parse_int(std::string_view arg) -> std::optional<T> {
+  T value;
+  auto [ptr, ec] = std::from_chars(arg.data(), arg.data() + arg.size(), value);
+  if (ec != std::errc{}) return {};
+  if (ptr != arg.data() + arg.size()) return {};
+  return value;
+}
+
 /// @brief Split an argument with commas into individual elements.
 ///
 /// If the string is empty, then a single argument is returned, but it is an
-/// empty string.
+/// empty vector.
 ///
 /// @param arg the argument to split.
 ///
@@ -28,21 +49,33 @@ namespace ubench::string {
 auto split_args(std::string_view arg, unsigned int fields = 0)
     -> std::vector<std::string_view>;
 
-/// @brief Parses the string as an unsigned integer.
+/// @brief Split an argument with commas into individual elements.
 ///
-/// @tparam T The type to convert from the string to.
+/// If the string is empty, then a single argument is returned, but it is an
+/// empty vector.
 ///
-/// @param arg The argument given to the program which is to be parsed to an
-/// integer.
+/// @param arg the argument to split.
 ///
-/// @return The value that was read, or no value if there was a parsing error.
-template <typename T>
-auto parse_int(std::string_view arg) -> std::optional<T> {
-  T value;
-  auto [ptr, ec] = std::from_chars(arg.data(), arg.data() + arg.size(), value);
-  if (ec != std::errc{}) return {};
-  if (ptr != arg.data() + arg.size()) return {};
-  return value;
+/// @return a vector of split arguments converted to the type requested.
+template <typename T, std::enable_if_t<std::is_integral<T>{}, bool> = true>
+auto split_args_int(std::string_view arg) -> std::vector<T> {
+  std::vector<T> split_args{};
+
+  std::string::size_type sz = 0;
+  while (true) {
+      std::string_view::size_type next = arg.find_first_of(',', sz);
+      if (next == std::string_view::npos) {
+        auto v = parse_int<T>(std::string_view{arg.data() + sz,arg.size() - sz });
+        if (!v) return {};
+        split_args.emplace_back(*v);
+        return split_args;
+      }
+
+      auto v = parse_int<T>(std::string_view{arg.data() + sz, next - sz });
+      if (!v) return {};
+      split_args.emplace_back(*v);
+      sz = next + 1;
+  }
 }
 
 /// @brief convert a hex string to an integer.
