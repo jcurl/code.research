@@ -63,18 +63,18 @@ auto split_args_int(std::string_view arg) -> std::vector<T> {
 
   std::string::size_type sz = 0;
   while (true) {
-      std::string_view::size_type next = arg.find_first_of(',', sz);
-      if (next == std::string_view::npos) {
-        auto v = parse_int<T>(std::string_view{arg.data() + sz,arg.size() - sz });
-        if (!v) return {};
-        split_args.emplace_back(*v);
-        return split_args;
-      }
-
-      auto v = parse_int<T>(std::string_view{arg.data() + sz, next - sz });
+    std::string_view::size_type next = arg.find_first_of(',', sz);
+    if (next == std::string_view::npos) {
+      auto v = parse_int<T>(std::string_view{arg.data() + sz, arg.size() - sz});
       if (!v) return {};
       split_args.emplace_back(*v);
-      sz = next + 1;
+      return split_args;
+    }
+
+    auto v = parse_int<T>(std::string_view{arg.data() + sz, next - sz});
+    if (!v) return {};
+    split_args.emplace_back(*v);
+    sz = next + 1;
   }
 }
 
