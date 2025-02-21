@@ -13,7 +13,7 @@ class rcu;
 
 template <class T, class Deleter = std::default_delete<T>>
 class rcu_ptr {
-  using pointer_type = T*;
+  using pointer_type = T *;
   using deleter_type = Deleter;
 
  public:
@@ -107,7 +107,7 @@ class rcu_ptr {
 
 template <class T, class Deleter = std::default_delete<T>, std::size_t N = 10>
 class rcu {
-  using pointer_type = T*;
+  using pointer_type = T *;
   using deleter_type = Deleter;
 
  public:
@@ -246,8 +246,7 @@ class rcu {
       std::cout << " Owning: " << index_ << std::endl;
       for (std::uint32_t x = 0; x < N; x++) {
         std::cout << " slot[" << x
-                  << "].refcount_ = " << slot_[x].refcount_.load()
-                  << std::endl;
+                  << "].refcount_ = " << slot_[x].refcount_.load() << std::endl;
       }
       std::abort();
     }

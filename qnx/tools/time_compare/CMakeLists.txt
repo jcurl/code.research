@@ -8,7 +8,7 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat_setup(${BINARY})
+target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} time_compare.use DESCRIPTION "Time source comparison tool")
 
 install(TARGETS ${BINARY} DESTINATION bin)

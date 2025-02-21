@@ -23,10 +23,4 @@ target_code_coverage(${BINARY}
     ${CMAKE_BINARY_DIR}/build/*
 )
 
-target_clangformat_setup(${BINARY})
-
-# Access the source directories under test.
-#
-# Ensure we can access private implementations within the src directory also,
-# which needs "config.h" in addition.
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+target_clangformat(TARGET ${BINARY} DIR .)

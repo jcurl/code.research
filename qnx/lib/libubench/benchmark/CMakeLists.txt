@@ -30,6 +30,4 @@ if(IS_DEBUG)
     add_sanitizers(${STRBENCH_BINARY})
 endif()
 
-target_clangformat_setup(${NETBENCH_BINARY})
-target_clangformat_setup(${RCUBENCH_BINARY})
-target_clangformat_setup(${STRBENCH_BINARY})
+target_clangformat(TARGET ubench_benchmarks SOURCE ${NETBENCH_SOURCES} ${STRBENCH_SOURCES} ${RCUBENCH_SOURCES})

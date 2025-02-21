@@ -24,7 +24,7 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat_setup(${BINARY})
+target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} core_latency.use DESCRIPTION "measure core-to-core latency for memory read/writes")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)

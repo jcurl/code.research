@@ -5,7 +5,8 @@
 
 namespace ubench::thread {
 
-auto pin_core([[maybe_unused]] unsigned int core) -> stdext::expected<void, int> {
+auto pin_core([[maybe_unused]] unsigned int core)
+    -> stdext::expected<void, int> {
   return stdext::unexpected{ENOSYS};
 }
 

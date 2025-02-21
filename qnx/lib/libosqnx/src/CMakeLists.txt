@@ -4,7 +4,6 @@ set(SOURCES
     ../include/osqnx/asinfo.h asinfo.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
-
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 target_link_libraries(${LIBRARY} ubench)
 
@@ -17,4 +16,4 @@ if(IS_DEBUG)
     add_sanitizers(${LIBRARY})
 endif()
 
-target_clangformat_setup(${LIBRARY})
+target_clangformat(TARGET ${LIBRARY} DIR . DIR_RECURSE ../include/osqnx)

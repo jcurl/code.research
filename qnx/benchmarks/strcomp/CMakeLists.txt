@@ -12,9 +12,7 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat_setup(${BINARY})
-
-include_directories(${CMAKE_SOURCE_DIR}/benchmarks/strcomp)
+target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} strcmp_bench.use DESCRIPTION "Google Benchmark comparing string performance")
 
 install(TARGETS ${BINARY} DESTINATION bin)

@@ -26,7 +26,7 @@ function(check_symbol_lib_exists SYMBOL FILES VARIABLE)
 
     set(_options FATAL)
     set(_singleargs TARGET LIB)
-    cmake_parse_arguments(PARSE_ARGV 0 arg "${_options}" "${_singleargs}" "")
+    cmake_parse_arguments(PARSE_ARGV 3 arg "${_options}" "${_singleargs}" "")
 
     # ${VARIABLE}
     #   = 1 if found

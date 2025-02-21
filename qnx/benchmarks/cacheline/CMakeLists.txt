@@ -12,9 +12,7 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat_setup(${BINARY})
-
-include_directories(${CMAKE_SOURCE_DIR}/benchmarks/cacheline)
+target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} cacheline_bench.use DESCRIPTION "Google Benchmark measuring strided reads of memory")
 
 install(TARGETS ${BINARY} DESTINATION bin)

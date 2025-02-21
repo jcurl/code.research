@@ -20,5 +20,4 @@ target_code_coverage(${BINARY}
     ${CMAKE_BINARY_DIR}/build/*
 )
 
-target_clangformat_setup(${BINARY})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+target_clangformat(TARGET ${BINARY} DIR .)

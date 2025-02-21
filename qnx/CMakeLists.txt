@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(benchmarks CXX)
+project(benchmarks C CXX)
 
 include(GNUInstallDirs)
 
@@ -43,6 +43,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/sanitizers" ${CMAKE_
 find_package(Sanitizers)
 
 include(research/clang-format)
+target_clangformat(VERSION 10.0)
 
 if("${CMAKE_CXX_FLAGS}" STREQUAL "")
     if((CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang") OR

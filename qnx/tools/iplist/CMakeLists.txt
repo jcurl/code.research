@@ -9,7 +9,7 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat_setup(${BINARY})
+target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} iplist.use DESCRIPTION "show all IPv4 addresses")
 
 install(TARGETS ${BINARY} DESTINATION bin)

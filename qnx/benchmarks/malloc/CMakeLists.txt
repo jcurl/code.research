@@ -19,9 +19,6 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/benchmarks/malloc)
-
-install(TARGETS ${BINARY} DESTINATION bin)
 
 # Search for `mallopt()` features that can be used to customise the test.
 check_symbol_exists(mallopt "malloc.h" HAVE_MALLOPT)
@@ -59,8 +56,9 @@ endif()
 
 check_symbol_exists(mlockall "sys/mman.h" HAVE_MLOCKALL)
 
-target_clangformat_setup(${BINARY})
+target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} malloc_bench.use DESCRIPTION "Google Benchmark for malloc() performance")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+install(TARGETS ${BINARY} DESTINATION bin)

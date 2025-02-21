@@ -9,4 +9,4 @@ set(SOURCES
 # We don't want to format these files, to keep them similar to the original to
 # make it easier to compare.
 #
-# clangformat_setup(${SOURCES})
+# target_clangformat(TARGET ${LIBRARY})
