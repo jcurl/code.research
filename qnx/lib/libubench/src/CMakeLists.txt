@@ -23,7 +23,7 @@ add_library(${LIBRARY} STATIC ${SOURCES})
 string(TOUPPER "${CMAKE_SYSTEM_NAME}" upper_CMAKE_SYSTEM_NAME)
 
 # Clocks
-if (QNXNTO)
+if(QNXNTO)
     target_sources(${LIBRARY} PRIVATE idle_clock_qnx.cpp     process_clock_qnx.cpp)
 elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
     target_sources(${LIBRARY} PRIVATE idle_clock_cygwin.cpp  process_clock_cygwin.cpp)
@@ -36,7 +36,7 @@ else()
 endif()
 
 # Process Name
-if (QNXNTO)
+if(QNXNTO)
     target_sources(${LIBRARY} PRIVATE get_proc_name_qnx.cpp   get_proc_name_common.cpp get_proc_name_common.h)
 elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN" OR
        upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
@@ -49,8 +49,20 @@ else()
     target_sources(${LIBRARY} PRIVATE get_proc_name_null.cpp)
 endif()
 
+# Syspage Size
+if(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+    target_sources(${LIBRARY} PRIVATE syspage_windows.cpp)
+else()
+    check_symbol_enum_exists(_SC_PAGESIZE "unistd.h" HAVE_SC_PAGESIZE)
+    if(HAVE_SC_PAGESIZE)
+        target_sources(${LIBRARY} PRIVATE syspage_sysconf.cpp)
+    else()
+        target_sources(${LIBRARY} PRIVATE syspage_none.cpp)
+    endif()
+endif()
+
 # Thread Affinity
-if (QNXNTO)
+if(QNXNTO)
     target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
 else()
     # We need to be able to set the affinity of a thread to a particular CPU

@@ -20,3 +20,10 @@ TEST(get_proc_name, check_not_empty) {
     std::cout << *procname << std::endl;
   }
 }
+
+TEST(get_page_size, check_not_zero_or_error) {
+  auto page_size = ubench::os::get_syspage_size();
+  ASSERT_TRUE(page_size);
+  EXPECT_NE(*page_size, 0);
+  std::cout << *page_size << std::endl;
+}

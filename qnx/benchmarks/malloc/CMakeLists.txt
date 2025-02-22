@@ -8,7 +8,6 @@ set(SOURCES
     mallopt.h mallopt.cpp
     allocator.h allocator.cpp
     mlock.h mlock.cpp
-    syspage.h syspage.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

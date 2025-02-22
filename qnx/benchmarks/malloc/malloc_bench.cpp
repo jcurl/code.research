@@ -12,11 +12,11 @@
 
 #include <benchmark/benchmark.h>
 
+#include "ubench/os.h"
 #include "ubench/string.h"
 #include "allocator.h"
 #include "mallopt.h"
 #include "mlock.h"
-#include "syspage.h"
 
 // NOLINTBEGIN
 
@@ -98,12 +98,17 @@ static void BM_MallocWalkFreeBench(benchmark::State& state) {
   // Perform setup here
   std::size_t alloc_size = state.range(0);
 
+  auto page_size = ubench::os::get_syspage_size();
+  if (!page_size) {
+    std::cerr << "Can't get the system page size: "
+              << ubench::string::perror(page_size.error());
+    return;
+  }
   for (auto _ : state) {
     // This code gets timed
     auto p = static_cast<std::uint8_t*>(malloc(alloc_size));
     if (p) {
-      auto page_size = get_syspage_size();
-      for (std::size_t i = 0; i < alloc_size; i += page_size) {
+      for (std::size_t i = 0; i < alloc_size; i += *page_size) {
         p[i] = 0;
       }
       free(p);
@@ -128,14 +133,19 @@ static void BM_MallocClearFreeBench(benchmark::State& state) {
 static void BM_MallocClearWalkFreeBench(benchmark::State& state) {
   // Perform setup here
   std::size_t alloc_size = state.range(0);
+  auto page_size = ubench::os::get_syspage_size();
+  if (!page_size) {
+    std::cerr << "Can't get the system page size: "
+              << ubench::string::perror(page_size.error());
+    return;
+  }
 
   for (auto _ : state) {
     // This code gets timed
     auto p = static_cast<std::uint8_t*>(malloc(alloc_size));
     if (p) {
       memset(p, 0, alloc_size);
-      auto page_size = get_syspage_size();
-      for (std::size_t i = 0; i < alloc_size; i += page_size) {
+      for (std::size_t i = 0; i < alloc_size; i += *page_size) {
         p[i] = 0;
       }
       free(p);
@@ -235,7 +245,12 @@ auto main(int argc, char** argv) -> int {
   }
 #endif
 
-  std::cout << "System Page Size: " << get_syspage_size() << std::endl;
+  auto page_size = ubench::os::get_syspage_size();
+  if (!page_size) {
+    std::cout << "System Page Size: UNKNOWN" << std::endl;
+  } else {
+    std::cout << "System Page Size: " << *page_size << std::endl;
+  }
 
   std::size_t init_alloc = get_allocated_localmem();
   benchmark::RunSpecifiedBenchmarks();

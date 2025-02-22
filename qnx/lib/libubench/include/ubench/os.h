@@ -106,6 +106,11 @@ class osbuff {
 /// @return the name of the process.
 auto get_proc_name(pid_t pid) -> stdext::expected<std::string, int>;
 
+/// @brief Get the page size of the system.
+///
+/// @return the page size, in bytes, or an error.
+auto get_syspage_size() -> stdext::expected<unsigned int, int>;
+
 }  // namespace ubench::os
 
 #endif
