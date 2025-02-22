@@ -1,4 +1,9 @@
+#include "config.h"
+
 #include <unistd.h>
+#if HAVE_MALLOPT
+#include <malloc.h>
+#endif
 
 #include <cstdint>
 #include <cstdlib>
@@ -7,8 +12,10 @@
 
 #include <benchmark/benchmark.h>
 
+#include "ubench/string.h"
 #include "allocator.h"
 #include "mallopt.h"
+#include "mlock.h"
 #include "syspage.h"
 
 // NOLINTBEGIN
@@ -175,8 +182,58 @@ auto main(int argc, char** argv) -> int {
   benchmark::Initialize(&argc, argv);
 
   // User specific options. All google-benchmark options have been stripped.
-  mallopt_options options(argc, argv);
-  if (!options.do_run()) return options.result();
+  auto options = make_options(argc, argv);
+  if (!options) return options.error();
+
+  if (options->mlock_all()) {
+    auto success = enable_mlockall();
+    if (!success) {
+      std::cout << "Error locking with -L, "
+                << ubench::string::perror(success.error()) << std::endl;
+      return 1;
+    } else {
+      std::cout << "Memory Locking ENABLED" << std::endl;
+    }
+  }
+
+#if HAVE_MALLOPT
+  if (!options->mallopts().empty()) {
+    for (const auto& opt : options->mallopts()) {
+      int result = mallopt(std::get<0>(opt), std::get<1>(opt));
+#ifdef __QNX__
+      // Under QNX: 0 on success, or -1 if an error occurs (errno is set).
+      if (std::get<0>(opt) == MALLOC_ARENA_SIZE) {
+        // For `MALLOC_ARENA_SIZE`, if value is 0, `mallopt()` returns the
+        // current arena size; if value is any other value, `mallopt()` returns
+        // the previous size.
+        result = 0;
+      }
+      if (result) {
+        if (errno) {
+          std::cout << ubench::string::perror(errno) << std::endl;
+        }
+        std::cout << "mallopt(" << std::get<2>(opt) << ", " << std::get<1>(opt)
+                  << ")"
+                  << " returns " << result << ". Continuing." << std::endl;
+      }
+#else
+      // Under Linux: On success, mallopt() returns 1.  On error, it returns 0.
+      if (!result) {
+        if (errno) {
+          std::cout << ubench::string::perror(errno) << std::endl;
+        }
+        std::cout << "mallopt(" << std::get<2>(opt) << ", " << std::get<1>(opt)
+                  << ")"
+                  << " returns " << result << ". Continuing." << std::endl;
+      }
+#endif
+      else {
+        std::cout << "mallopt(" << std::get<2>(opt) << ", " << std::get<1>(opt)
+                  << ") is set." << std::endl;
+      }
+    }
+  }
+#endif
 
   std::cout << "System Page Size: " << get_syspage_size() << std::endl;
 

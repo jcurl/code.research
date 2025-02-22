@@ -19,7 +19,6 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-
 # Search for `mallopt()` features that can be used to customise the test.
 check_symbol_exists(mallopt "malloc.h" HAVE_MALLOPT)
 if(HAVE_MALLOPT)

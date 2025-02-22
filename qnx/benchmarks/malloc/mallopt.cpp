@@ -2,6 +2,7 @@
 
 #include "mallopt.h"
 
+#include <malloc.h>
 #include <unistd.h>
 
 #include <cerrno>
@@ -11,80 +12,15 @@
 
 #include <benchmark/benchmark.h>
 
-#include "ubench/string.h"
-#include "mlock.h"
+#include "stdext/expected.h"
+#include "mallopt.h"
 
-mallopt_options::mallopt_options(int argc, char **argv) {
-  bool help = false;
-  int c = 0;
+namespace {
 
-  std::string options{};
-  if (HAVE_MALLOPT) {
-    options += "m:";
-  }
-  if (HAVE_MLOCKALL) {
-    options += "L";
-  }
-  options += "?";
-
-  while ((c = getopt(argc, argv, options.c_str())) != -1) {
-    switch (c) {
-      case 'm': {
-        if (!parse_mallopt_arg(std::string_view(optarg))) {
-          this->result_ = 1;
-        }
-        break;
-      }
-      case 'L': {
-        auto success = enable_mlockall();
-        if (!success) {
-          std::cout << "Error locking with -L, "
-                    << ubench::string::perror(success.error()) << std::endl;
-          this->result_ = 1;
-          return;
-        } else {
-          std::cout << "Memory Locking ENABLED" << std::endl;
-        }
-        break;
-      }
-      case '?':
-        help = true;
-        if (optopt) this->result_ = 1;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        this->result_ = 1;
-        help = true;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        this->result_ = 1;
-        help = true;
-        break;
-    }
-  }
-
-  if (help) {
-    if (this->result_) std::cerr << std::endl;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    print_help(std::string_view(argv[0]));
-    this->do_run_ = false;
-  }
-
-  if (this->result_) this->do_run_ = false;
-}
-
-auto mallopt_options::result() -> int { return this->result_; }
-
-auto mallopt_options::do_run() -> bool { return this->do_run_; }
-
-auto mallopt_options::print_help(std::string_view prog_name) -> void {
+auto print_help(std::string_view prog_name) -> void {
   std::cout << "USAGE: " << prog_name;
   if (HAVE_MALLOPT) std::cout << " [-mOPTION=n]";
   if (HAVE_MLOCKALL) std::cout << " [-L]";
-  std::cout << std::endl;
-
   std::cout << std::endl;
 
   std::cout << "Run a malloc benchmark." << std::endl;
@@ -99,9 +35,71 @@ auto mallopt_options::print_help(std::string_view prog_name) -> void {
                  "and a value."
               << std::endl;
     std::cout << std::endl;
-    print_mallopt_help();
+    impl::print_mallopt_help();
   }
 
   std::cout << std::endl;
   benchmark::PrintDefaultHelp();
+}
+
+}  // namespace
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+auto make_options(int& argc, char* const argv[]) noexcept
+    -> stdext::expected<mallopt_options, int> {
+  bool help = false;
+  int c = 0;
+  int err = 0;
+
+  std::string options{};
+  if (HAVE_MALLOPT) {
+    options += "m:";
+  }
+  if (HAVE_MLOCKALL) {
+    options += "L";
+  }
+  options += "?";
+
+  mallopt_options o{};
+  while ((c = getopt(argc, argv, options.c_str())) != -1) {
+    switch (c) {
+      case 'm': {
+        auto mallopts = impl::parse_mallopt_arg(std::string_view(optarg));
+        if (mallopts.empty()) {
+          err = 1;
+        }
+        o.mallopts_.insert(
+            std::end(o.mallopts_), std::begin(mallopts), std::end(mallopts));
+        break;
+      }
+      case 'L': {
+        o.mlock_all_ = true;
+        break;
+      }
+      case '?':
+        help = true;
+        if (optopt) err = 1;
+        break;
+      case ':':
+        std::cerr << "Error: Option -" << optopt << " requires an operand"
+                  << std::endl;
+        err = 1;
+        help = true;
+        break;
+      default:
+        std::cerr << "Error: Unknown option -" << optopt << std::endl;
+        err = 1;
+        help = true;
+        break;
+    }
+  }
+
+  if (help) {
+    if (err) std::cerr << std::endl;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    print_help(std::string_view(argv[0]));
+    return stdext::unexpected{err};
+  }
+
+  return o;
 }

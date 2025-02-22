@@ -6,42 +6,17 @@
 #include <chrono>
 #include <cstdint>
 
+#include "stdext/expected.h"
 #include "udp_talker.h"
 
-/// @brief Decode the command line and present the options to the user.
+/// @brief User options.
 class options {
  public:
-  /// @brief Constructor
-  ///
-  /// The command line options are parsed and the fields of this class are
-  /// updated accordingly. In case the user provides an error, or a value out of
-  /// range for an option, then this class will automatically tell the user of
-  /// the error on the console. The is_valid() property will indicate false.
-  ///
-  /// In cases where no option is provided, either a default value will be given
-  /// (as documented in the method), or zero will be returned indicating that no
-  /// option was provided. As there was no error, the property is_valid() will
-  /// return true.
-  ///
-  /// If the user provides '-?' then help is printed.
-  ///
-  /// @param argc [in, out] Reference to the number of arguments
-  ///
-  /// @param argv [in, out] Pointer to the argument vector array
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-  options(int& argc, char* const argv[]) noexcept;
-  options(const options& other) = delete;
-  auto operator=(const options& other) -> options& = delete;
-  options(options&& other) = delete;
-  auto operator=(options&& other) -> options& = delete;
+  options(const options&) = delete;
+  auto operator=(const options&) -> options& = delete;
+  options(options&&) = default;
+  auto operator=(options&&) -> options& = default;
   ~options() = default;
-
-  /// @brief Returns if the configuration options provided by the user is valid
-  /// or not.
-  ///
-  /// @return true if the configuration is valid. false if the user provided an
-  /// error in the arguments, and the program should abort.
-  [[nodiscard]] auto is_valid() const noexcept -> bool { return is_valid_; }
 
   /// @brief The test mode that should be used.
   ///
@@ -170,7 +145,11 @@ class options {
   [[nodiscard]] auto enable_idle_test() const noexcept -> bool { return idle_; }
 
  private:
-  bool is_valid_{false};
+  options() = default;
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+  friend auto make_options(int& argc, char* const argv[]) noexcept
+      -> stdext::expected<options, int>;
+
   send_mode mode_{send_mode::mode_sendto};
   bool idle_{false};
   struct sockaddr_in source_ {};
@@ -182,5 +161,28 @@ class options {
   std::uint32_t duration_{30000};
   std::uint16_t threads_{1};
 };
+
+/// @brief Get options.
+///
+/// The command line options are parsed and the fields of this class are updated
+/// accordingly. In case the user provides an error, or a value out of range for
+/// an option, then this class will automatically tell the user of the error on
+/// the console.
+///
+/// In cases where no option is provided, either a default value will be given
+/// (as documented in the method), or zero will be returned indicating that no
+/// option was provided.
+///
+/// If the user provides '-?' then help is printed.
+///
+/// @param argc [in, out] Reference to the number of arguments
+///
+/// @param argv [in, out] Pointer to the argument vector array
+///
+/// @return The options object, or an error code. An error code of zero
+/// indicates no options, but the user requested help.
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
+[[nodiscard]] auto make_options(int& argc, char* const argv[]) noexcept
+    -> stdext::expected<options, int>;
 
 #endif

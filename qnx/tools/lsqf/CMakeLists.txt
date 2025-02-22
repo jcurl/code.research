@@ -2,6 +2,7 @@ set(BINARY lsqf)
 set(SOURCES
     lsqf.cpp
     file.h file.cpp
+    options.h options.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

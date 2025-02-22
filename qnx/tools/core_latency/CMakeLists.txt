@@ -7,6 +7,7 @@ set(SOURCES core_latency.cpp
     corerw_benchmark.h corerw_benchmark.cpp
     statistics.h statistics.cpp
     arm64.h arm64.cpp
+    options.h options.cpp
 )
 
 # Sets HAVE_ARM64_LSE

@@ -1,7 +1,10 @@
 include(GoogleTest)
 
 set(BINARY cacheline_bench)
-set(SOURCES cacheline_bench.cpp)
+set(SOURCES
+    cacheline_bench.cpp
+    options.h options.cpp
+)
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)

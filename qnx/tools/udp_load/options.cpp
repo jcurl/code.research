@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string_view>
 
+#include "stdext/expected.h"
 #include "ubench/string.h"
 
 namespace {
@@ -110,9 +111,11 @@ void print_help(std::string_view prog_name) {
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-options::options(int& argc, char* const argv[]) noexcept {
+auto make_options(int& argc, char* const argv[]) noexcept
+    -> stdext::expected<options, int> {
   int c = 0;
   bool help = false;
+  int err = 0;
 
   std::string_view prog_name{};
   if (argc >= 1) {
@@ -122,6 +125,7 @@ options::options(int& argc, char* const argv[]) noexcept {
     prog_name = std::string_view("udp_load");
   }
 
+  options o{};
   while ((c = getopt(argc, argv, "n:m:p:s:d:B:T:S:D:I?")) != -1) {
     switch (c) {
       case 'n': {
@@ -129,15 +133,15 @@ options::options(int& argc, char* const argv[]) noexcept {
         if (!n) {
           std::cerr << "Error: Invalid value for the number of slots - "
                     << optarg << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         if (*n < 1) {
           std::cerr << "Error: Invalid value for the number of slots, must be "
                        "one or more, got "
                     << *n << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        slots_ = *n;
+        o.slots_ = *n;
         break;
       }
       case 'm': {
@@ -145,15 +149,15 @@ options::options(int& argc, char* const argv[]) noexcept {
         if (!m) {
           std::cerr << "Error: Invalid value for width - " << optarg
                     << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         if (*m < 1) {
           std::cerr << "Error: Invalid value for the slot width, must be one "
                        "or more, got "
                     << *m << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        width_ = *m;
+        o.width_ = *m;
         break;
       }
       case 'p': {
@@ -161,15 +165,15 @@ options::options(int& argc, char* const argv[]) noexcept {
         if (!p) {
           std::cerr << "Error: Invalid value for packets per window - "
                     << optarg << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         if (*p < 1) {
           std::cerr << "Error: Invalid value for packets per window, must be "
                        "one or more, got "
                     << *p << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        packets_ = *p;
+        o.packets_ = *p;
         break;
       }
       case 's': {
@@ -177,9 +181,9 @@ options::options(int& argc, char* const argv[]) noexcept {
         if (!s) {
           std::cerr << "Error: Invalid value for packet size - " << optarg
                     << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        size_ = *s;
+        o.size_ = *s;
         break;
       }
       case 'd': {
@@ -187,33 +191,33 @@ options::options(int& argc, char* const argv[]) noexcept {
         if (!t) {
           std::cerr << "Error: Invalid value for duration - " << optarg
                     << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         if (*t < 1000) {
           std::cerr << "Error: Invalid value for duration, should be at least "
                        "1000ms, got "
                     << *t << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        duration_ = *t;
+        o.duration_ = *t;
         break;
       }
       case 'B': {
         auto arg = std::string_view{optarg};
         if (arg == "sendto") {
-          mode_ = send_mode::mode_sendto;
+          o.mode_ = send_mode::mode_sendto;
         } else if (arg == "sendmmsg") {
-          mode_ = send_mode::mode_sendmmsg;
+          o.mode_ = send_mode::mode_sendmmsg;
         } else if (arg == "bpf") {
-          mode_ = send_mode::mode_bpf;
+          o.mode_ = send_mode::mode_bpf;
         } else {
           std::cerr << "Error: Invalid test mode " << arg << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        auto talker = make_udp_talker(mode_);
+        auto talker = make_udp_talker(o.mode_);
         if (!talker->is_supported()) {
           std::cerr << "Error: Unsupported test mode " << arg << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         break;
       }
@@ -222,67 +226,67 @@ options::options(int& argc, char* const argv[]) noexcept {
         if (!t) {
           std::cerr << "Error: Invalid value for number of threads - " << optarg
                     << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         if (*t < 1 || *t > 255) {
           std::cerr << "Error: Invalid value for number of threads, should be "
                        "in the range 1..255, got "
                     << *t << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
-        threads_ = *t;
+        o.threads_ = *t;
         break;
       }
       case 'S': {
-        if (!parse_sockaddr(std::string_view{optarg}, source_)) {
+        if (!parse_sockaddr(std::string_view{optarg}, o.source_)) {
           std::cerr << "Error: Invalid source address - " << optarg
                     << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         break;
       }
       case 'D': {
-        if (!parse_sockaddr(std::string_view{optarg}, dest_)) {
+        if (!parse_sockaddr(std::string_view{optarg}, o.dest_)) {
           std::cerr << "Error: Invalid destination address - " << optarg
                     << std::endl;
-          return;
+          return stdext::unexpected{1};
         }
         break;
       }
       case 'I':
-        idle_ = true;
+        o.idle_ = true;
         break;
       case '?':
+        if (optopt) err = 1;
         help = true;
         break;
       case ':':
         std::cerr << "Error: Option -" << optopt << " requires an operand"
                   << std::endl;
-        help = true;
+        err = 1;
         break;
       default:
         std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        help = true;
+        err = 1;
         break;
     }
   }
 
-  if (help) {
-    if (is_valid_) std::cerr << std::endl;
+  if (err || help) {
     print_help(prog_name);
-    return;
+    return stdext::unexpected{err};
   }
 
-  if (source_.sin_addr.s_addr == 0) {
+  if (o.source_.sin_addr.s_addr == 0) {
     std::cerr << "Error: No source address provided with option -S"
               << std::endl;
-    return;
+    return stdext::unexpected{1};
   }
-  if (dest_.sin_addr.s_addr == 0) {
+  if (o.dest_.sin_addr.s_addr == 0) {
     std::cerr << "Error: No destination address provided with option -D"
               << std::endl;
-    return;
+    return stdext::unexpected{1};
   }
 
-  is_valid_ = true;
+  return o;
 }

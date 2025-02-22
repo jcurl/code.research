@@ -14,16 +14,16 @@
 auto main(int argc, char* argv[]) -> int {
   // Initialisation.
 
-  options options(argc, argv);
-  if (!options.is_valid()) return 1;
+  auto options = make_options(argc, argv);
+  if (!options) return options.error();
 
-  struct sockaddr_in saddr = options.source_addr();
+  struct sockaddr_in saddr = options->source_addr();
   if (saddr.sin_port == 0) saddr.sin_port = htons(3499);
-  struct sockaddr_in daddr = options.dest_addr();
+  struct sockaddr_in daddr = options->dest_addr();
   if (daddr.sin_port == 0) daddr.sin_port = htons(3500);
 
   std::uint32_t packets =
-      std::max<std::uint32_t>(options.packets(), options.threads());
+      std::max<std::uint32_t>(options->packets(), options->threads());
 
   // Prepare all the threads with the benchmarks.
 
@@ -35,14 +35,14 @@ auto main(int argc, char* argv[]) -> int {
 
   ubench::thread::sync_event sync{};
   std::vector<std::thread> runners{};
-  for (auto i = 0; i < options.threads(); i++) {
-    std::uint32_t packets_thread =
-        (i + 1) * packets / options.threads() - i * packets / options.threads();
+  for (auto i = 0; i < options->threads(); i++) {
+    std::uint32_t packets_thread = (i + 1) * packets / options->threads() -
+                                   i * packets / options->threads();
 
     // The options has checked beforehand if the talker mode makes sense or not,
     // so we don't check if it is supported again here.
     std::unique_ptr<udp_talker> talker{};
-    switch (options.mode()) {
+    switch (options->mode()) {
       case send_mode::mode_sendto:
         talker = std::make_unique<udp_talker_sendto>();
         break;
@@ -58,7 +58,7 @@ auto main(int argc, char* argv[]) -> int {
     }
 
     talker->set_shaping(
-        options.slots(), options.width(), packets_thread, options.size());
+        options->slots(), options->width(), packets_thread, options->size());
     if (!talker->set_source_addr(saddr)) {
       std::cerr << "Error: Invalid source address" << std::endl;
       return 1;
@@ -89,14 +89,14 @@ auto main(int argc, char* argv[]) -> int {
     };
 
     // Starts the thread.
-    runners.emplace_back(runner, std::move(talker), options.duration());
+    runners.emplace_back(runner, std::move(talker), options->duration());
   }
 
   // Diagnostics to the User.
 
   std::cout << "UDP Talker Parameters:" << std::endl;
   std::cout << " Mode: ";
-  switch (options.mode()) {
+  switch (options->mode()) {
     case send_mode::mode_sendto:
       std::cout << "sendto" << std::endl;
       break;
@@ -112,20 +112,20 @@ auto main(int argc, char* argv[]) -> int {
   }
   std::cout << " Source: " << saddr << std::endl;
   std::cout << " Destination: " << daddr << std::endl;
-  std::cout << " Slots (n): " << options.slots() << std::endl;
-  std::cout << " Width (m): " << options.width() << " (ms)" << std::endl;
+  std::cout << " Slots (n): " << options->slots() << std::endl;
+  std::cout << " Width (m): " << options->width() << " (ms)" << std::endl;
   std::cout << " Packets (p): " << packets << std::endl;
-  std::cout << " Size (s): " << options.size() << std::endl;
-  std::cout << " Threads: " << options.threads() << std::endl;
+  std::cout << " Size (s): " << options->size() << std::endl;
+  std::cout << " Threads: " << options->threads() << std::endl;
 
-  std::uint32_t t = options.slots() * options.width();
+  std::uint32_t t = options->slots() * options->width();
   std::cout << " Packets/sec: " << packets * 1000 / t << std::endl;
   std::cout << std::endl;
 
   // Run optional IDLE test.
 
   std::optional<busy_measurement> idle_measurement{};
-  if (options.enable_idle_test()) {
+  if (options->enable_idle_test()) {
     std::cout << "Performing IDLE test for 5s... " << std::flush;
     idle_measurement = idle_test(std::chrono::milliseconds(5000));
     if (idle_measurement) {
@@ -161,7 +161,7 @@ auto main(int argc, char* argv[]) -> int {
   // Calculate busy time in units of 0.01%. The busy time is the total time
   // over all cores, which is why we must divide the result by the number of
   // cores, to get the system load.
-  if (options.enable_idle_test() && idle_measurement) {
+  if (options->enable_idle_test() && idle_measurement) {
     std::uint32_t baseline = idle_measurement->busy_time.count() * 10000 /
                              idle_measurement->run_time.count();
     std::cout << "Total CPU Busy (Idle Test): " << baseline / 100 << "."

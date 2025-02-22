@@ -15,6 +15,26 @@
 #include "arm64.h"
 #include "statistics.h"
 
+namespace {
+
+static const std::unordered_map<std::string_view, cas_type> supported_ = {
+    {"default", cas_type::cpp},
+#if defined(i386) || defined(__i386__) || defined(__i386)
+    {"cas", cas_type::x86},
+#endif
+#if defined(__x86_64__)
+    {"cas", cas_type::x86_64},
+#endif
+#if defined(__aarch64__)
+    {"llsc", cas_type::arm64},
+#endif
+#if defined(__aarch64__) && HAVE_CXX_ARM64_LSE
+    {"lse", cas_type::arm64_lse},
+#endif
+};
+
+}  // namespace
+
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define UNUSED(expr) \
   do {               \
@@ -155,10 +175,23 @@ auto cas(cas_type ctype, std::size_t iter, std::atomic<std::uint32_t> &flag)
 
 }  // namespace
 
+auto core_benchmark::supported() noexcept
+    -> const std::unordered_map<std::string_view, cas_type> & {
+  return supported_;
+}
+
+auto core_benchmark::mode(std::string_view benchmark) noexcept
+    -> std::optional<cas_type> {
+  auto it = core_benchmark::supported().find(benchmark);
+  if (it == core_benchmark::supported().end()) return {};
+
+  return it->second;
+}
+
 auto core_benchmark::name() const -> std::string {
   switch (ctype_) {
     case cas_type::cpp:
-      return {"CAS"};
+      return {"CAS (CPP)"};
     case cas_type::x86:
       return {"CAS_x86"};
     case cas_type::x86_64:

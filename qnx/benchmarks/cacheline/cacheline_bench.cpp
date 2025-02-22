@@ -1,15 +1,12 @@
-#include <unistd.h>
+// #include <unistd.h>
 
-#include <charconv>
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <vector>
 
 #include <benchmark/benchmark.h>
 
-#include "ubench/string.h"
+#include "options.h"
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::uint32_t buffer_size = 0;
@@ -62,72 +59,14 @@ __attribute__((noinline)) static void BM_CopyStride(benchmark::State& state) {
 // Register the function as a benchmark
 BENCHMARK(BM_CopyStride)->DenseRange(16, 512, 1);
 
-auto print_help(std::string_view prog_name) -> void {
-  std::cout << "USAGE: " << prog_name << " [-b <buffer>]" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Execute strided copy test for <buffer> MB (default is 256MB)."
-            << std::endl;
-
-  std::cout << std::endl;
-  benchmark::PrintDefaultHelp();
-}
-
 auto main(int argc, char** argv) -> int {
   benchmark::Initialize(&argc, argv);
+  auto options = make_options(argc, argv);
+  if (!options) return options.error();
 
-  // User specific options. All google-benchmark options have been stripped.
-  bool help = false;
-  int c = 0;
-  int exit_code = 0;
-  std::uint32_t buffer_size_opt = 256;
-
-  while ((c = getopt(argc, argv, "b:?")) != -1) {
-    switch (c) {
-      case 'b': {
-        auto buffer_arg = ubench::string::parse_int<std::uint32_t>(optarg);
-        if (buffer_arg) {
-          buffer_size_opt = *buffer_arg;
-          if (buffer_size_opt < 1 || buffer_size_opt > 512) {
-            std::cerr
-                << "Error: Buffer size should be from 1 to 512 (units of MB)"
-                << std::endl;
-            exit_code = 1;
-            help = true;
-          }
-        } else {
-          std::cerr << "Error: Specify a buffer sizse as a number" << std::endl;
-          exit_code = 1;
-          help = true;
-        }
-        break;
-      }
-      case '?':
-        help = true;
-        if (optopt) exit_code = 1;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        exit_code = 1;
-        help = true;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        exit_code = 1;
-        help = true;
-        break;
-    }
-  }
-
-  if (help) {
-    if (exit_code) std::cerr << std::endl;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    print_help(std::string_view(argv[0]));
-    return exit_code;
-  }
-
-  buffer_size = buffer_size_opt * 1 << 20;
-  std::cout << "Using buffer size of: " << buffer_size_opt << std::endl;
+  buffer_size = options->buffer_size() << 20;
+  std::cout << "Using buffer size of: " << options->buffer_size() << "MB"
+            << std::endl;
   benchmark::RunSpecifiedBenchmarks();
   benchmark::Shutdown();
 }

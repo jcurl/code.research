@@ -1,10 +1,15 @@
 #include <iostream>
-#include <string_view>
+#include <string>
 
 #include "mallopt.h"
 
-auto mallopt_options::parse_mallopt_arg(std::string_view) -> bool {
-  return false;
+namespace impl {
+
+auto parse_mallopt_arg([[maybe_unused]] std::string_view mallopt_arg)
+    -> std::vector<std::tuple<int, int, std::string>> {
+  return {};
 }
 
-auto mallopt_options::print_mallopt_help() -> void { std::cout << std::endl; }
+auto print_mallopt_help() -> void { std::cout << std::endl; }
+
+}  // namespace impl

@@ -1,11 +1,11 @@
-#ifndef BENCHMARK_LSHMEM_OPTIONS_H
-#define BENCHMARK_LSHMEM_OPTIONS_H
+#ifndef LSQF_OPTIONS_H
+#define LSQF_OPTIONS_H
 
 #include <vector>
 
 #include "stdext/expected.h"
 
-/// @brief Decode the command line and present the options to the user.
+/// @brief User options.
 class options {
  public:
   options(const options&) = delete;
@@ -13,6 +13,23 @@ class options {
   options(options&&) = default;
   auto operator=(options&&) -> options& = default;
   ~options() = default;
+
+  /// @brief If the output should show sidechannel connections.
+  ///
+  /// @return true if the output should show sidechannel connections.
+  [[nodiscard]] auto show_sidechannels() const noexcept -> bool {
+    return show_sidechannels_;
+  }
+
+  /// @brief If the output should show dead connections.
+  ///
+  /// @return true if the output should show dead connections.
+  [[nodiscard]] auto show_dead() const noexcept -> bool { return show_dead_; }
+
+  /// @brief If the output should show internal (self) connections.
+  ///
+  /// @return true if the output should show internal connections.
+  [[nodiscard]] auto show_self() const noexcept -> bool { return show_self_; }
 
   /// @brief Get the verbosity level.
   ///
@@ -32,38 +49,17 @@ class options {
     return pids_;
   }
 
-  /// @brief If the groups of physical memory should be dumped.
-  ///
-  /// @return true if physical memory should be dumped.
-  [[nodiscard]] auto phys_mem() const noexcept -> bool { return phys_mem_; }
-
-  /// @brief if the groups of shared memory with other PIDs should be dumped.
-  ///
-  /// @return true if shared memory should be dumped.
-  [[nodiscard]] auto shared_mem() const noexcept -> bool { return shared_mem_; }
-
-  /// @brief if readable shared memory regions should also be dumped.
-  ///
-  /// @return true if readable shared memory regions should also be dumped.
-  [[nodiscard]] auto readable() const noexcept -> bool { return read_; }
-
-  /// @brief if we should print the typed memory sorted.
-  ///
-  /// @return true if typed memory should be dumped.
-  [[nodiscard]] auto tymem() const noexcept -> bool { return tymem_; }
-
  private:
   options() = default;
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   friend auto make_options(int& argc, char* const argv[]) noexcept
       -> stdext::expected<options, int>;
 
+  bool show_sidechannels_{};
+  bool show_dead_{};
+  bool show_self_{};
   int verbosity_{};
   std::vector<unsigned int> pids_{};
-  bool phys_mem_{};
-  bool shared_mem_{};
-  bool read_{};
-  bool tymem_{};
 };
 
 /// @brief Get options.

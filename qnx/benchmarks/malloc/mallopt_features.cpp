@@ -3,13 +3,13 @@
 #include <malloc.h>
 
 #include <charconv>
-#include <cstring>
 #include <iostream>
 #include <map>
 #include <optional>
 #include <string_view>
+#include <tuple>
 
-#include "ubench/string.h"
+#include "stdext/expected.h"
 #include "mallopt.h"
 
 namespace {
@@ -87,53 +87,39 @@ auto mallopt_find(std::string_view mallopt_item) -> std::optional<int> {
 }
 
 auto parse_mallopt(std::string_view mallopt_item)
-    -> std::optional<std::string> {
+    -> stdext::expected<std::tuple<int, int, std::string>, std::string> {
   auto kvp_separator = mallopt_item.find('=');
-  if (kvp_separator == std::string_view::npos) return "Missing value";
-  if (kvp_separator == mallopt_item.size() - 1) return "Value not provided";
+  if (kvp_separator == std::string_view::npos)
+    return stdext::unexpected{"Missing value"};
+  if (kvp_separator == mallopt_item.size() - 1)
+    return stdext::unexpected{"Value not provided"};
 
   auto key = trim(mallopt_item.substr(0, kvp_separator));
-  if (key.size() == 0) return "Key name empty";
+  if (key.size() == 0) return stdext::unexpected{"Key name empty"};
 
   auto value_str = trim(mallopt_item.substr(kvp_separator + 1));
-  if (value_str.size() == 0) return "Value empty";
+  if (value_str.size() == 0) return stdext::unexpected{"Value empty"};
 
   int value = 0;
   auto [ptr, ec] = std::from_chars(
       value_str.data(), value_str.data() + value_str.size(), value);
-  if (ec != std::errc{}) return "Value not a number";
+  if (ec != std::errc{}) return stdext::unexpected{"Value not a number"};
 
   auto mallopt_param = mallopt_find(key);
   if (!mallopt_param) {
-    return "Unknown key";
+    return stdext::unexpected{"Unknown key"};
   }
 
-  std::cout << "Setting mallopt(" << key << ", " << value << ");" << std::endl;
-#ifdef __QNX__
-  // Under QNX: 0 on success, or -1 if an error occurs (errno is set).
-  int opt = mallopts.at(key);
-  int result = mallopt(mallopts.at(key), value);
-  if (opt == MALLOC_ARENA_SIZE) {
-    // For `MALLOC_ARENA_SIZE`, if value is 0, `mallopt()` returns the current
-    // arena size; if value is any other value, `mallopt()` returns the previous
-    // size.
-    if (value) return {};
-  }
-  if (result) {
-    if (errno) return ubench::string::perror(errno);
-    std::cout << key << " returns " << value << ". Continuing." << std::endl;
-  }
-#else
-  // Under Linux: On success, mallopt() returns 1.  On error, it returns 0.
-  int result = mallopt(mallopts.at(key), value);
-  if (!result) return ubench::string::perror(errno);
-#endif
-  return {};
+  return std::make_tuple(mallopts.at(key), value, std::string{key});
 }
 
 }  // namespace
 
-auto mallopt_options::parse_mallopt_arg(std::string_view mallopt_arg) -> bool {
+namespace impl {
+
+auto parse_mallopt_arg(std::string_view mallopt_arg)
+    -> std::vector<std::tuple<int, int, std::string>> {
+  std::vector<std::tuple<int, int, std::string>> mallopts{};
   std::string_view::size_type last{std::string_view::npos};
   do {
     std::string_view::size_type start = last + 1;
@@ -146,14 +132,16 @@ auto mallopt_options::parse_mallopt_arg(std::string_view mallopt_arg) -> bool {
       mallopt_item = mallopt_arg.substr(start);
     }
 
-    auto error = parse_mallopt(mallopt_item);
-    if (error) {
-      std::cout << "Invalid option -m" << mallopt_item << " (" << error.value()
+    auto opt = parse_mallopt(mallopt_item);
+    if (!opt) {
+      std::cout << "Invalid option -m" << mallopt_item << " (" << opt.error()
                 << ")" << std::endl;
-      return false;
+      return {};
     }
+
+    mallopts.emplace_back(*opt);
   } while (last != std::string_view::npos);
-  return true;
+  return mallopts;
 }
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
@@ -162,7 +150,7 @@ auto mallopt_options::parse_mallopt_arg(std::string_view mallopt_arg) -> bool {
     std::cout << " - " #feature_name << std::endl; \
   }
 
-auto mallopt_options::print_mallopt_help() -> void {
+auto print_mallopt_help() -> void {
   std::cout << "Options supported by '-m' are:" << std::endl;
   PRINT_OPTION(M_ARENA_MAX)
   PRINT_OPTION(M_ARENA_TEST)
@@ -183,3 +171,5 @@ auto mallopt_options::print_mallopt_help() -> void {
   PRINT_OPTION(MALLOC_VERIFY_ON)
   PRINT_OPTION(M_GRANULARITY)
 }
+
+}  // namespace impl

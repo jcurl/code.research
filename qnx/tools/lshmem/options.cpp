@@ -67,23 +67,22 @@ auto make_options(int& argc, char* const argv[]) noexcept
         o.tymem_ = true;
         break;
       case '?':
+        if (optopt) err = 1;
         help = true;
         break;
       case ':':
         std::cerr << "Error: Option -" << optopt << " requires an operand"
                   << std::endl;
         err = 1;
-        help = true;
         break;
       default:
         std::cerr << "Error: Unknown option -" << optopt << std::endl;
         err = 1;
-        help = true;
         break;
     }
   }
 
-  if (help) {
+  if (err || help) {
     print_help(prog_name);
 
     // Even if there was no error, we send an unexpected, but the result will be

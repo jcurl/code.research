@@ -12,8 +12,8 @@
 
 #include "osqnx/pids.h"
 #include "ubench/file.h"
-#include "ubench/string.h"
 #include "file.h"
+#include "options.h"
 
 namespace {
 os::qnx::pids p{};
@@ -211,105 +211,25 @@ class coids {
   }
 };
 
-auto print_short() -> void {
-  std::cout << "lsqf [-c] [-d] [-s] [-v] [-p <pid>]" << std::endl;
-  std::cout << std::endl;
-  std::cout << "List open files on QNX in tabular form." << std::endl;
-  std::cout << std::endl;
-  std::cout << "-? : Help" << std::endl;
-}
-
-auto print_help() -> void {
-  print_short();
-  std::cout << "-p <pid> : List open files for <pid> (comma separated list), "
-               "or all pids"
-            << std::endl;
-  std::cout << "-c : Show side channels" << std::endl;
-  std::cout << "-d : Show dead connections" << std::endl;
-  std::cout << "-s : Show connections to self" << std::endl;
-  std::cout << "-v : Verbose output" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Output is in tabular form." << std::endl;
-  std::cout << "- Process (PID) : The process queried" << std::endl;
-  std::cout << "- FD (Flags) : The FD number and flags as" << std::endl;
-  std::cout << "  'c' - close on exec" << std::endl;
-  std::cout << "  's' - side channel" << std::endl;
-  std::cout << "  'r' - opened for reading" << std::endl;
-  std::cout << "  'w' - opened for writing" << std::endl;
-  std::cout << "- RsrcMgr (PID) : Resource Manager connected to" << std::endl;
-  std::cout << "- Mode : Unix mode for FD opened" << std::endl;
-  std::cout << "- Path : Path or Socket of FD" << std::endl;
-  std::cout << std::endl;
-}
 }  // namespace
 
 auto main(int argc, char* argv[]) -> int {
   coids lsqf{};
   std::vector<unsigned int> pids{};
 
-  int c = 0;
-  bool help = false;
-  int exit_code = 0;
-  int verbose = 0;
-
-  while ((c = getopt(argc, argv, "cdp:sv?")) != -1) {
-    switch (c) {
-      case 'c':
-        lsqf.show_side_channel() = true;
-        break;
-      case 'd':
-        lsqf.show_dead() = true;
-        break;
-      case 's':
-        lsqf.show_self() = true;
-        break;
-      case 'p': {
-        pids = ubench::string::split_args_int<unsigned int>(optarg);
-        if (pids.empty()) {
-          std::cerr << "Error: No arguments provided for pid list" << std::endl;
-          exit_code = 1;
-          break;
-        }
-        break;
-      }
-      case 'v':
-        verbose++;
-        if (verbose == 1) {
-          lsqf.show_full_path() = true;
-        }
-        break;
-      case '?':
-        if (optopt != '?') {
-          exit_code = 1;
-        } else {
-          help = true;
-        }
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        exit_code = 1;
-        help = true;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        exit_code = 1;
-        help = true;
-        break;
-    }
+  auto options = make_options(argc, argv);
+  if (!options) return options.error();
+  lsqf.show_side_channel() = options->show_sidechannels();
+  lsqf.show_dead() = options->show_dead();
+  lsqf.show_self() = options->show_self();
+  if (options->verbosity() >= 1) {
+    lsqf.show_full_path() = true;
   }
 
-  if (help || exit_code) {
-    if (help) {
-      print_help();
-    } else {
-      print_short();
-    }
-    return exit_code;
-  }
-
-  if (pids.size() == 0) {
+  if (options->pids().empty()) {
     pids = p.query_pids();
+  } else {
+    pids = options->pids();
   }
 
   lsqf.print_hdr();
