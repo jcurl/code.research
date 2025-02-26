@@ -202,7 +202,7 @@ function(target_use_msg TARGET USEFILE)
                 ARGS -f "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}_info.use" "$<TARGET_FILE:${TARGET}>"
                 VERBATIM
             )
-            target_sources(${BINARY} PRIVATE ${_qnx_usemsg_file})
+            target_sources(${TARGET} PRIVATE ${_qnx_usemsg_file})
         endif()
     endif()
 endfunction()
