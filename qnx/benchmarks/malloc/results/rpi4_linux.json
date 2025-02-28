@@ -6,4 +6,3 @@
     "Locked": "rpi4_linux/rpi4_linux_mlockall.json",
     "MMAP Locked": "rpi4_linux/rpi4_linux_mmap_mlockall.json"
 }
-

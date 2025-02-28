@@ -1,0 +1,782 @@
+----------------------------------------------------------------------
+i7-6700k_CygwinWin10.console.txt
+System Page Size: 4096
+---------------------------------------------------------------------------------
+Benchmark                                       Time             CPU   Iterations
+---------------------------------------------------------------------------------
+BM_MallocFreeBench/4096                      92.8 ns         92.1 ns      7466667
+BM_MallocFreeBench/8192                      92.6 ns         92.1 ns      7466667
+BM_MallocFreeBench/16384                     92.6 ns         92.1 ns      7466667
+BM_MallocFreeBench/32768                     92.6 ns         94.2 ns      7466667
+BM_MallocFreeBench/65536                     92.7 ns         94.2 ns      7466667
+BM_MallocFreeBench/131072                    92.6 ns         94.2 ns      7466667
+BM_MallocFreeBench/262144                   18130 ns        18415 ns        40727
+BM_MallocFreeBench/524288                   22773 ns        22496 ns        29867
+BM_MallocFreeBench/1048576                  31326 ns        31390 ns        22400
+BM_MallocFreeBench/2097152                  56112 ns        55804 ns        11200
+BM_MallocFreeBench/4194304                  97438 ns        98349 ns         7467
+BM_MallocFreeBench/8388608                 183037 ns       179983 ns         3733
+BM_MallocFreeBench/16777216                347980 ns       353021 ns         2036
+BM_MallocFreeBench/33554432                677302 ns       683594 ns         1120
+BM_MallocFreeBench/67108864               1336347 ns      1339286 ns          560
+BM_MallocFreeBench/134217728              2658924 ns      2663352 ns          264
+BM_MallocFreeBench/268435456              5279782 ns      5312500 ns          100
+BM_MallocFreeBench/536870912             10545872 ns     10498047 ns           64
+BM_MallocFreeBench/1073741824            21132044 ns     20996094 ns           32
+BM_MallocBench/4096                          1015 ns         1004 ns       746667
+BM_MallocBench/8192                          1016 ns         1039 ns       692083
+BM_MallocBench/16384                         1013 ns         1050 ns       640000
+BM_MallocBench/32768                         1012 ns          854 ns       640000
+BM_MallocBench/65536                         1013 ns          837 ns       896000
+BM_MallocBench/131072                        1011 ns         1004 ns       746667
+BM_MallocBench/262144                       11166 ns        11440 ns       112000
+BM_MallocBench/524288                       12784 ns        11719 ns        74667
+BM_MallocBench/1048576                      16112 ns        13672 ns        56000
+BM_MallocBench/2097152                      23697 ns        24902 ns        32000
+BM_MallocBench/4194304                      37378 ns        32087 ns        19478
+BM_MallocBench/8388608                      64546 ns        76730 ns         8960
+BM_MallocBench/16777216                    118256 ns       128348 ns         5600
+BM_MallocBench/33554432                    227519 ns       251116 ns         4480
+BM_MallocBench/67108864                    443265 ns       531250 ns         1000
+BM_MallocBench/134217728                   876594 ns       837054 ns         1120
+BM_MallocBench/268435456                  1743739 ns      1851155 ns          498
+BM_MallocBench/536870912                  3475097 ns      3760027 ns          187
+BM_MallocBench/1073741824                 6952643 ns      7343750 ns          100
+BM_MFreeBench/4096                           1013 ns         1046 ns       896000
+BM_MFreeBench/8192                           1014 ns         1025 ns       746667
+BM_MFreeBench/16384                          1013 ns          816 ns       746667
+BM_MFreeBench/32768                          1015 ns         1029 ns       896000
+BM_MFreeBench/65536                          1015 ns         1025 ns       640000
+BM_MFreeBench/131072                         1013 ns         1088 ns       746667
+BM_MFreeBench/262144                        10314 ns        13184 ns        64000
+BM_MFreeBench/524288                        13076 ns        13044 ns        40727
+BM_MFreeBench/1048576                       18491 ns        20717 ns        40727
+BM_MFreeBench/2097152                       35889 ns        35889 ns        21333
+BM_MFreeBench/4194304                       63492 ns        60938 ns        10000
+BM_MFreeBench/8388608                      118727 ns       122070 ns         4480
+BM_MFreeBench/16777216                     231452 ns       237847 ns         4073
+BM_MFreeBench/33554432                     454980 ns       460379 ns         1120
+BM_MFreeBench/67108864                     896690 ns       953125 ns         1000
+BM_MFreeBench/134217728                   1780165 ns      1672241 ns          299
+BM_MFreeBench/268435456                   3552165 ns      2906977 ns          172
+BM_MFreeBench/536870912                   7103406 ns      7393973 ns          112
+BM_MFreeBench/1073741824                 14206906 ns     14375000 ns           50
+BM_CallocFreeBench/4096                       176 ns          173 ns      4072727
+BM_CallocFreeBench/8192                       229 ns          230 ns      3733333
+BM_CallocFreeBench/16384                      324 ns          320 ns      2635294
+BM_CallocFreeBench/32768                      569 ns          562 ns      1723077
+BM_CallocFreeBench/65536                     1169 ns         1161 ns       497778
+BM_CallocFreeBench/131072                    2509 ns         2539 ns       320000
+BM_CallocFreeBench/262144                   18206 ns        17997 ns        37333
+BM_CallocFreeBench/524288                   22636 ns        22949 ns        32000
+BM_CallocFreeBench/1048576                  31283 ns        31390 ns        22400
+BM_CallocFreeBench/2097152                  56271 ns        55804 ns        11200
+BM_CallocFreeBench/4194304                  97593 ns        98349 ns         7467
+BM_CallocFreeBench/8388608                 180364 ns       179983 ns         3733
+BM_CallocFreeBench/16777216                346644 ns       345346 ns         2036
+BM_CallocFreeBench/33554432                677383 ns       683594 ns         1120
+BM_CallocFreeBench/67108864               1335891 ns      1339286 ns          560
+BM_CallocFreeBench/134217728              2651583 ns      2663352 ns          264
+BM_CallocFreeBench/268435456              5309188 ns      5301339 ns          112
+BM_CallocFreeBench/536870912             10559847 ns     10498047 ns           64
+BM_CallocFreeBench/1073741824            21079085 ns     21139706 ns           34
+BM_CallocBench/4096                          1109 ns         1367 ns       560000
+BM_CallocBench/8192                          1142 ns         1088 ns       746667
+BM_CallocBench/16384                         1210 ns         1062 ns       588575
+BM_CallocBench/32768                         1665 ns         1821 ns       497778
+BM_CallocBench/65536                         2142 ns         2009 ns       248889
+BM_CallocBench/131072                        3469 ns         3882 ns       213333
+BM_CallocBench/262144                       11253 ns        10431 ns        62916
+BM_CallocBench/524288                       12814 ns        13253 ns        44800
+BM_CallocBench/1048576                      16106 ns        15346 ns        40727
+BM_CallocBench/2097152                      23761 ns        24483 ns        34462
+BM_CallocBench/4194304                      37549 ns        35993 ns        18667
+BM_CallocBench/8388608                      64591 ns        65625 ns        10000
+BM_CallocBench/16777216                    119128 ns       141941 ns         4073
+BM_CallocBench/33554432                    227953 ns       260864 ns         4073
+BM_CallocBench/67108864                    443810 ns       607589 ns         1723
+BM_CallocBench/134217728                   877848 ns       976562 ns          640
+BM_CallocBench/268435456                  1741867 ns      1721014 ns          345
+BM_CallocBench/536870912                  3475416 ns      3264925 ns          201
+BM_CallocBench/1073741824                 6915782 ns      6944444 ns           90
+BM_CFreeBench/4096                           1012 ns         1099 ns       497778
+BM_CFreeBench/8192                           1012 ns         1004 ns       746667
+BM_CFreeBench/16384                          1045 ns          977 ns       640000
+BM_CFreeBench/32768                          1096 ns         1109 ns       746667
+BM_CFreeBench/65536                          1107 ns         1134 ns       896000
+BM_CFreeBench/131072                         1111 ns         1127 ns       651637
+BM_CFreeBench/262144                        10268 ns        10463 ns        74667
+BM_CFreeBench/524288                        12995 ns        13672 ns        56000
+BM_CFreeBench/1048576                       18466 ns        16636 ns        49778
+BM_CFreeBench/2097152                       35801 ns        37666 ns        16593
+BM_CFreeBench/4194304                       63560 ns        69754 ns         8960
+BM_CFreeBench/8388608                      118660 ns       131138 ns         5600
+BM_CFreeBench/16777216                     231334 ns       219727 ns         3200
+BM_CFreeBench/33554432                     454403 ns       515625 ns         1000
+BM_CFreeBench/67108864                     898068 ns       875000 ns         1000
+BM_CFreeBench/134217728                   1784079 ns      1630435 ns          345
+BM_CFreeBench/268435456                   3557177 ns      3610322 ns          264
+BM_CFreeBench/536870912                   7206629 ns      7393973 ns          112
+BM_CFreeBench/1073741824                 14163016 ns     13888889 ns           45
+BM_MallocWalkFreeBench/4096                  93.1 ns         94.2 ns      8960000
+BM_MallocWalkFreeBench/8192                  95.2 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/16384                 92.4 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/32768                  126 ns          125 ns      6400000
+BM_MallocWalkFreeBench/65536                  132 ns          132 ns      4977778
+BM_MallocWalkFreeBench/131072                 155 ns          153 ns      4480000
+BM_MallocWalkFreeBench/262144               80764 ns        81961 ns         8960
+BM_MallocWalkFreeBench/524288              145937 ns       144385 ns         4978
+BM_MallocWalkFreeBench/1048576             276472 ns       276215 ns         2489
+BM_MallocWalkFreeBench/2097152             546500 ns       544085 ns         1120
+BM_MallocWalkFreeBench/4194304            1115735 ns      1123047 ns          640
+BM_MallocWalkFreeBench/8388608            2703638 ns      2722538 ns          264
+BM_MallocWalkFreeBench/16777216           5841900 ns      5859375 ns          112
+BM_MallocWalkFreeBench/33554432          11677772 ns     11718750 ns           64
+BM_MallocWalkFreeBench/67108864          23838307 ns     23995536 ns           28
+BM_MallocWalkFreeBench/134217728         50291100 ns     50000000 ns           10
+BM_MallocWalkFreeBench/268435456        103273771 ns    102678571 ns            7
+BM_MallocWalkFreeBench/536870912        207434200 ns    208333333 ns            3
+BM_MallocWalkFreeBench/1073741824       415677750 ns    414062500 ns            2
+BM_MallocClearFreeBench/4096                  175 ns          176 ns      4977778
+BM_MallocClearFreeBench/8192                  229 ns          227 ns      3446154
+BM_MallocClearFreeBench/16384                 325 ns          329 ns      2800000
+BM_MallocClearFreeBench/32768                 586 ns          562 ns      1723077
+BM_MallocClearFreeBench/65536                1140 ns         1130 ns       497778
+BM_MallocClearFreeBench/131072               2520 ns         2490 ns       320000
+BM_MallocClearFreeBench/262144              18243 ns        18415 ns        37333
+BM_MallocClearFreeBench/524288              22656 ns        22496 ns        29867
+BM_MallocClearFreeBench/1048576             31385 ns        30692 ns        22400
+BM_MallocClearFreeBench/2097152             56141 ns        55804 ns        11200
+BM_MallocClearFreeBench/4194304             97456 ns        97656 ns         6400
+BM_MallocClearFreeBench/8388608            180724 ns       180303 ns         4073
+BM_MallocClearFreeBench/16777216           346319 ns       345346 ns         2036
+BM_MallocClearFreeBench/33554432           677096 ns       683594 ns         1120
+BM_MallocClearFreeBench/67108864          1336226 ns      1339286 ns          560
+BM_MallocClearFreeBench/134217728         2664244 ns      2663352 ns          264
+BM_MallocClearFreeBench/268435456         5297237 ns      5312500 ns          100
+BM_MallocClearFreeBench/536870912        10685616 ns     10833333 ns           75
+BM_MallocClearFreeBench/1073741824       21063059 ns     21139706 ns           34
+BM_MallocClearWalkFreeBench/4096              160 ns          159 ns      3733333
+BM_MallocClearWalkFreeBench/8192              191 ns          190 ns      3200000
+BM_MallocClearWalkFreeBench/16384             252 ns          249 ns      2133333
+BM_MallocClearWalkFreeBench/32768             588 ns          594 ns      1000000
+BM_MallocClearWalkFreeBench/65536            1130 ns         1144 ns       560000
+BM_MallocClearWalkFreeBench/131072           2561 ns         2588 ns       320000
+BM_MallocClearWalkFreeBench/262144          80810 ns        79517 ns         7467
+BM_MallocClearWalkFreeBench/524288         146902 ns       146484 ns         4480
+BM_MallocClearWalkFreeBench/1048576        276156 ns       278700 ns         2635
+BM_MallocClearWalkFreeBench/2097152        545083 ns       544085 ns         1120
+BM_MallocClearWalkFreeBench/4194304       1117890 ns      1123047 ns          640
+BM_MallocClearWalkFreeBench/8388608       2684042 ns      2722538 ns          264
+BM_MallocClearWalkFreeBench/16777216      5750853 ns      5719866 ns          112
+BM_MallocClearWalkFreeBench/33554432     11616755 ns     11718750 ns           64
+BM_MallocClearWalkFreeBench/67108864     24107363 ns     23958333 ns           30
+BM_MallocClearWalkFreeBench/134217728    50545682 ns     49715909 ns           11
+BM_MallocClearWalkFreeBench/268435456   103493250 ns    104166667 ns            6
+BM_MallocClearWalkFreeBench/536870912   208230067 ns    208333333 ns            3
+BM_MallocClearWalkFreeBench/1073741824  416283750 ns    414062500 ns            2
+Used total local memory 1860624 of 8388608 bytes.
+Used by benchmarks 1825296
+----------------------------------------------------------------------
+i7-6700k_CygwinWin10_threshold0.console.txt
+mallopt(M_TRIM_THRESHOLD, 0) is set.
+System Page Size: 4096
+---------------------------------------------------------------------------------
+Benchmark                                       Time             CPU   Iterations
+---------------------------------------------------------------------------------
+BM_MallocFreeBench/4096                      92.5 ns         94.2 ns      7466667
+BM_MallocFreeBench/8192                      92.6 ns         94.2 ns      7466667
+BM_MallocFreeBench/16384                     92.9 ns         94.2 ns      7466667
+BM_MallocFreeBench/32768                     93.1 ns         94.2 ns      7466667
+BM_MallocFreeBench/65536                     3425 ns         3453 ns       203636
+BM_MallocFreeBench/131072                    3781 ns         3749 ns       179200
+BM_MallocFreeBench/262144                   18186 ns        18415 ns        37333
+BM_MallocFreeBench/524288                   22538 ns        22496 ns        29867
+BM_MallocFreeBench/1048576                  31353 ns        31390 ns        22400
+BM_MallocFreeBench/2097152                  56097 ns        56250 ns        10000
+BM_MallocFreeBench/4194304                  97344 ns        98349 ns         7467
+BM_MallocFreeBench/8388608                 180092 ns       180303 ns         4073
+BM_MallocFreeBench/16777216                346298 ns       345346 ns         2036
+BM_MallocFreeBench/33554432                677137 ns       683594 ns         1120
+BM_MallocFreeBench/67108864               1337645 ns      1339286 ns          560
+BM_MallocFreeBench/134217728              4228460 ns      2900095 ns          264
+BM_MallocFreeBench/268435456              7628427 ns      6250000 ns          100
+BM_MallocFreeBench/536870912             11699196 ns     11439732 ns           56
+BM_MallocFreeBench/1073741824            21409403 ns     21484375 ns           32
+BM_MallocBench/4096                          1013 ns         1004 ns       746667
+BM_MallocBench/8192                          1015 ns         1031 ns      1000000
+BM_MallocBench/16384                         1025 ns          924 ns       896000
+BM_MallocBench/32768                         3061 ns         3223 ns       203636
+BM_MallocBench/65536                         3062 ns         3013 ns       248889
+BM_MallocBench/131072                        3105 ns         3453 ns       203636
+BM_MallocBench/262144                       11210 ns        10463 ns        74667
+BM_MallocBench/524288                       12830 ns        11963 ns        64000
+BM_MallocBench/1048576                      16104 ns        19950 ns        40727
+BM_MallocBench/2097152                      23668 ns        29820 ns        29867
+BM_MallocBench/4194304                      37305 ns        50000 ns        10000
+BM_MallocBench/8388608                      64457 ns        65625 ns        10000
+BM_MallocBench/16777216                    119123 ns       121367 ns         7467
+BM_MallocBench/33554432                    226936 ns       287705 ns         2987
+BM_MallocBench/67108864                    443739 ns       515625 ns         1000
+BM_MallocBench/134217728                   877187 ns       765625 ns         1000
+BM_MallocBench/268435456                  1749500 ns      1801273 ns          373
+BM_MallocBench/536870912                  3460859 ns      3317039 ns          179
+BM_MallocBench/1073741824                 6968043 ns      7465278 ns           90
+BM_MFreeBench/4096                           1021 ns         1004 ns       746667
+BM_MFreeBench/8192                           2450 ns         2145 ns       298667
+BM_MFreeBench/16384                          2471 ns         2588 ns       320000
+BM_MFreeBench/32768                          2457 ns         2469 ns       385969
+BM_MFreeBench/65536                          2117 ns         2490 ns       320000
+BM_MFreeBench/131072                         2780 ns         3013 ns       248889
+BM_MFreeBench/262144                        10294 ns        10324 ns       112000
+BM_MFreeBench/524288                        13036 ns        13253 ns        44800
+BM_MFreeBench/1048576                       18437 ns        21763 ns        56000
+BM_MFreeBench/2097152                       36002 ns        38148 ns        20070
+BM_MFreeBench/4194304                       63489 ns        69754 ns         8960
+BM_MFreeBench/8388608                      119177 ns       128348 ns         5600
+BM_MFreeBench/16777216                     231415 ns       240187 ns         3643
+BM_MFreeBench/33554432                     453050 ns       455097 ns         1545
+BM_MFreeBench/67108864                     895990 ns      1098633 ns          896
+BM_MFreeBench/134217728                   1780756 ns      1848493 ns          448
+BM_MFreeBench/268435456                   3552033 ns      3707627 ns          236
+BM_MFreeBench/536870912                   7098888 ns      7187500 ns          100
+BM_MFreeBench/1073741824                 14138331 ns     13888889 ns           45
+BM_CallocFreeBench/4096                       160 ns          159 ns      3733333
+BM_CallocFreeBench/8192                       190 ns          190 ns      3200000
+BM_CallocFreeBench/16384                      252 ns          249 ns      2133333
+BM_CallocFreeBench/32768                      560 ns          562 ns      1000000
+BM_CallocFreeBench/65536                    11898 ns        11963 ns        64000
+BM_CallocFreeBench/131072                   33236 ns        32959 ns        21333
+BM_CallocFreeBench/262144                   18219 ns        17997 ns        37333
+BM_CallocFreeBench/524288                   22612 ns        22496 ns        29867
+BM_CallocFreeBench/1048576                  31267 ns        31390 ns        22400
+BM_CallocFreeBench/2097152                  56410 ns        55804 ns        11200
+BM_CallocFreeBench/4194304                  97636 ns        98349 ns         7467
+BM_CallocFreeBench/8388608                 179825 ns       179983 ns         3733
+BM_CallocFreeBench/16777216                347689 ns       344905 ns         1948
+BM_CallocFreeBench/33554432                677735 ns       680106 ns          896
+BM_CallocFreeBench/67108864               1343293 ns      1339286 ns          560
+BM_CallocFreeBench/134217728              2654472 ns      2663352 ns          264
+BM_CallocFreeBench/268435456              5282589 ns      5312500 ns          100
+BM_CallocFreeBench/536870912             10589378 ns     10742188 ns           64
+BM_CallocFreeBench/1073741824            21114909 ns     20996094 ns           32
+BM_CallocBench/4096                          1121 ns         1241 ns       793297
+BM_CallocBench/8192                          1165 ns         1235 ns       746667
+BM_CallocBench/16384                         1224 ns         1186 ns       448000
+BM_CallocBench/32768                         6615 ns         7499 ns        89600
+BM_CallocBench/65536                        16373 ns        16497 ns        40727
+BM_CallocBench/131072                       33140 ns        32226 ns        20364
+BM_CallocBench/262144                       11236 ns        12556 ns        44800
+BM_CallocBench/524288                       12861 ns        13253 ns        44800
+BM_CallocBench/1048576                      16067 ns        18136 ns        44800
+BM_CallocBench/2097152                      23686 ns        25705 ns        40727
+BM_CallocBench/4194304                      37247 ns        31807 ns        18667
+BM_CallocBench/8388608                      64433 ns        60938 ns        10000
+BM_CallocBench/16777216                    118901 ns       176108 ns         5146
+BM_CallocBench/33554432                    227376 ns       235781 ns         3446
+BM_CallocBench/67108864                    443651 ns       656250 ns         1000
+BM_CallocBench/134217728                   875191 ns       878906 ns         1120
+BM_CallocBench/268435456                  1735055 ns      1947464 ns          345
+BM_CallocBench/536870912                  3468934 ns      3724093 ns          193
+BM_CallocBench/1073741824                 6984100 ns      6770833 ns           90
+BM_CFreeBench/4096                           1018 ns          858 ns       746667
+BM_CFreeBench/8192                           1026 ns         1062 ns      1000000
+BM_CFreeBench/16384                          1045 ns         1099 ns       696888
+BM_CFreeBench/32768                          1102 ns         1172 ns       640000
+BM_CFreeBench/65536                          3003 ns         2675 ns       344615
+BM_CFreeBench/131072                         6623 ns         5625 ns       100000
+BM_CFreeBench/262144                        10313 ns        10986 ns        89600
+BM_CFreeBench/524288                        13015 ns        12242 ns        49778
+BM_CFreeBench/1048576                       18497 ns        18415 ns        40727
+BM_CFreeBench/2097152                       35872 ns        38365 ns        22400
+BM_CFreeBench/4194304                       63595 ns        66964 ns        11200
+BM_CFreeBench/8388608                      118960 ns       106720 ns         4978
+BM_CFreeBench/16777216                     230991 ns       262277 ns         2800
+BM_CFreeBench/33554432                     455022 ns       384304 ns         1545
+BM_CFreeBench/67108864                     897909 ns       849895 ns         1434
+BM_CFreeBench/134217728                   1782415 ns      1574017 ns          407
+BM_CFreeBench/268435456                   3548477 ns      3814554 ns          213
+BM_CFreeBench/536870912                   7080635 ns      6696429 ns          112
+BM_CFreeBench/1073741824                 14129353 ns     14583333 ns           45
+BM_MallocWalkFreeBench/4096                  93.3 ns         94.2 ns      7466667
+BM_MallocWalkFreeBench/8192                  93.1 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/16384                 92.5 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/32768                 3430 ns         3453 ns       203636
+BM_MallocWalkFreeBench/65536                10796 ns        10742 ns        64000
+BM_MallocWalkFreeBench/131072               25962 ns        25670 ns        28000
+BM_MallocWalkFreeBench/262144               81730 ns        81961 ns         8960
+BM_MallocWalkFreeBench/524288              146470 ns       147524 ns         4978
+BM_MallocWalkFreeBench/1048576             275735 ns       278700 ns         2635
+BM_MallocWalkFreeBench/2097152             543938 ns       544085 ns         1120
+BM_MallocWalkFreeBench/4194304            1123926 ns      1098633 ns          640
+BM_MallocWalkFreeBench/8388608            2678350 ns      2722538 ns          264
+BM_MallocWalkFreeBench/16777216           5830533 ns      5719866 ns          112
+BM_MallocWalkFreeBench/33554432          11617641 ns     11439732 ns           56
+BM_MallocWalkFreeBench/67108864          23951350 ns     23958333 ns           30
+BM_MallocWalkFreeBench/134217728         50499664 ns     49715909 ns           11
+BM_MallocWalkFreeBench/268435456        103641100 ns    104166667 ns            6
+BM_MallocWalkFreeBench/536870912        207771733 ns    208333333 ns            3
+BM_MallocWalkFreeBench/1073741824       415851450 ns    414062500 ns            2
+BM_MallocClearFreeBench/4096                  175 ns          178 ns      4480000
+BM_MallocClearFreeBench/8192                  223 ns          226 ns      3733333
+BM_MallocClearFreeBench/16384                3697 ns         3767 ns       186667
+BM_MallocClearFreeBench/32768               10229 ns        10254 ns        64000
+BM_MallocClearFreeBench/65536               20535 ns        20403 ns        34462
+BM_MallocClearFreeBench/131072              41187 ns        41853 ns        17920
+BM_MallocClearFreeBench/262144              18418 ns        18415 ns        37333
+BM_MallocClearFreeBench/524288              22623 ns        22496 ns        29867
+BM_MallocClearFreeBench/1048576             31293 ns        31390 ns        22400
+BM_MallocClearFreeBench/2097152             56524 ns        57812 ns        10000
+BM_MallocClearFreeBench/4194304             97355 ns        95215 ns         6400
+BM_MallocClearFreeBench/8388608            179991 ns       180303 ns         4073
+BM_MallocClearFreeBench/16777216           346018 ns       345346 ns         2036
+BM_MallocClearFreeBench/33554432           677133 ns       669643 ns         1120
+BM_MallocClearFreeBench/67108864          1334523 ns      1317771 ns          498
+BM_MallocClearFreeBench/134217728         2654809 ns      2663352 ns          264
+BM_MallocClearFreeBench/268435456         5286605 ns      5312500 ns          100
+BM_MallocClearFreeBench/536870912        10566648 ns     10742188 ns           64
+BM_MallocClearFreeBench/1073741824       21129271 ns     21139706 ns           34
+BM_MallocClearWalkFreeBench/4096              176 ns          174 ns      4480000
+BM_MallocClearWalkFreeBench/8192              225 ns          226 ns      3733333
+BM_MallocClearWalkFreeBench/16384             324 ns          324 ns      2800000
+BM_MallocClearWalkFreeBench/32768             588 ns          589 ns      1672533
+BM_MallocClearWalkFreeBench/65536            8371 ns         8371 ns        89600
+BM_MallocClearWalkFreeBench/131072          29823 ns        30134 ns        24889
+BM_MallocClearWalkFreeBench/262144          81524 ns        79517 ns         7467
+BM_MallocClearWalkFreeBench/524288         146133 ns       147524 ns         4978
+BM_MallocClearWalkFreeBench/1048576        275120 ns       276215 ns         2489
+BM_MallocClearWalkFreeBench/2097152        546250 ns       544085 ns         1120
+BM_MallocClearWalkFreeBench/4194304       1116908 ns      1123047 ns          640
+BM_MallocClearWalkFreeBench/8388608       2671605 ns      2663352 ns          264
+BM_MallocClearWalkFreeBench/16777216      5762104 ns      5719866 ns          112
+BM_MallocClearWalkFreeBench/33554432     11593772 ns     11718750 ns           64
+BM_MallocClearWalkFreeBench/67108864     23833664 ns     23437500 ns           28
+BM_MallocClearWalkFreeBench/134217728    50873709 ns     49715909 ns           11
+BM_MallocClearWalkFreeBench/268435456   103430900 ns    104166667 ns            6
+BM_MallocClearWalkFreeBench/536870912   207525833 ns    208333333 ns            3
+BM_MallocClearWalkFreeBench/1073741824  418383600 ns    414062500 ns            2
+Used total local memory 1858496 of 8388608 bytes.
+Used by benchmarks 1820672
+----------------------------------------------------------------------
+i7-6700k_CygwinWin10_pad0.console.txt
+mallopt(M_TRIM_THRESHOLD, 0) is set.
+mallopt(M_TOP_PAD, 0) returns 0. Continuing.
+System Page Size: 4096
+---------------------------------------------------------------------------------
+Benchmark                                       Time             CPU   Iterations
+---------------------------------------------------------------------------------
+BM_MallocFreeBench/4096                      92.5 ns         92.1 ns      7466667
+BM_MallocFreeBench/8192                      93.1 ns         90.0 ns      7466667
+BM_MallocFreeBench/16384                     92.5 ns         92.1 ns      7466667
+BM_MallocFreeBench/32768                     92.4 ns         92.1 ns      7466667
+BM_MallocFreeBench/65536                     3427 ns         3453 ns       203636
+BM_MallocFreeBench/131072                    3783 ns         3749 ns       179200
+BM_MallocFreeBench/262144                   18136 ns        18415 ns        40727
+BM_MallocFreeBench/524288                   22577 ns        22496 ns        29867
+BM_MallocFreeBench/1048576                  31314 ns        31390 ns        22400
+BM_MallocFreeBench/2097152                  56315 ns        56250 ns        10000
+BM_MallocFreeBench/4194304                  97491 ns        98349 ns         7467
+BM_MallocFreeBench/8388608                 179590 ns       179983 ns         3733
+BM_MallocFreeBench/16777216                347803 ns       353021 ns         2036
+BM_MallocFreeBench/33554432                680902 ns       680106 ns          896
+BM_MallocFreeBench/67108864               1335959 ns      1339286 ns          560
+BM_MallocFreeBench/134217728              2655955 ns      2663352 ns          264
+BM_MallocFreeBench/268435456              5317414 ns      5301339 ns          112
+BM_MallocFreeBench/536870912             10708753 ns     10833333 ns           75
+BM_MallocFreeBench/1073741824            24051919 ns     22460938 ns           32
+BM_MallocBench/4096                          1018 ns          903 ns       640000
+BM_MallocBench/8192                          1021 ns          952 ns       640000
+BM_MallocBench/16384                         1030 ns         1070 ns       729833
+BM_MallocBench/32768                         3048 ns         3348 ns       186667
+BM_MallocBench/65536                         3047 ns         3247 ns       235789
+BM_MallocBench/131072                        3113 ns         2839 ns       203636
+BM_MallocBench/262144                       11152 ns        12939 ns        64000
+BM_MallocBench/524288                       12788 ns        10603 ns        56000
+BM_MallocBench/1048576                      16025 ns        14997 ns        44800
+BM_MallocBench/2097152                      23667 ns        25112 ns        28000
+BM_MallocBench/4194304                      37235 ns        33901 ns        24889
+BM_MallocBench/8388608                      64305 ns        57199 ns        11200
+BM_MallocBench/16777216                    118328 ns       115095 ns         8960
+BM_MallocBench/33554432                    226828 ns       207162 ns         2489
+BM_MallocBench/67108864                    442921 ns       374930 ns         1792
+BM_MallocBench/134217728                   871521 ns       823103 ns         1120
+BM_MallocBench/268435456                  1738671 ns      1478795 ns          560
+BM_MallocBench/536870912                  3461935 ns      3521127 ns          213
+BM_MallocBench/1073741824                 6908095 ns      7386364 ns          110
+BM_MFreeBench/4096                           1020 ns         1099 ns       896000
+BM_MFreeBench/8192                           2451 ns         2905 ns       263529
+BM_MFreeBench/16384                          2482 ns         2539 ns       320000
+BM_MFreeBench/32768                          2474 ns         2588 ns       320000
+BM_MFreeBench/65536                          2452 ns         2075 ns       263529
+BM_MFreeBench/131072                         2831 ns         3128 ns       194783
+BM_MFreeBench/262144                        10287 ns         9766 ns        64000
+BM_MFreeBench/524288                        13092 ns        10529 ns        62330
+BM_MFreeBench/1048576                       18492 ns        20089 ns        37333
+BM_MFreeBench/2097152                       35847 ns        35784 ns        23579
+BM_MFreeBench/4194304                       63620 ns        71150 ns        11200
+BM_MFreeBench/8388608                      118869 ns       102534 ns         7467
+BM_MFreeBench/16777216                     231661 ns       251105 ns         2489
+BM_MFreeBench/33554432                     456348 ns       527426 ns         1659
+BM_MFreeBench/67108864                     897664 ns       903320 ns          640
+BM_MFreeBench/134217728                   1785783 ns      1759383 ns          373
+BM_MFreeBench/268435456                   3558603 ns      3365385 ns          195
+BM_MFreeBench/536870912                   7131395 ns      7031250 ns          100
+BM_MFreeBench/1073741824                 14160438 ns     14236111 ns           45
+BM_CallocFreeBench/4096                       175 ns          174 ns      4480000
+BM_CallocFreeBench/8192                       225 ns          226 ns      3733333
+BM_CallocFreeBench/16384                      324 ns          324 ns      2800000
+BM_CallocFreeBench/32768                      567 ns          562 ns      1723077
+BM_CallocFreeBench/65536                    11866 ns        11719 ns        56000
+BM_CallocFreeBench/131072                   32169 ns        32226 ns        20364
+BM_CallocFreeBench/262144                   18208 ns        17997 ns        37333
+BM_CallocFreeBench/524288                   22538 ns        22461 ns        32000
+BM_CallocFreeBench/1048576                  31230 ns        31390 ns        22400
+BM_CallocFreeBench/2097152                  56106 ns        55804 ns        11200
+BM_CallocFreeBench/4194304                  97911 ns        97656 ns         6400
+BM_CallocFreeBench/8388608                 179786 ns       179983 ns         3733
+BM_CallocFreeBench/16777216                352026 ns       345346 ns         2036
+BM_CallocFreeBench/33554432                686787 ns       683594 ns         1120
+BM_CallocFreeBench/67108864               1339130 ns      1317771 ns          498
+BM_CallocFreeBench/134217728              2672666 ns      2722538 ns          264
+BM_CallocFreeBench/268435456              5329829 ns      5312500 ns          100
+BM_CallocFreeBench/536870912             10565498 ns     10498047 ns           64
+BM_CallocFreeBench/1073741824            21185109 ns     20996094 ns           32
+BM_CallocBench/4096                          1116 ns         1074 ns       640000
+BM_CallocBench/8192                          1147 ns         1203 ns       896000
+BM_CallocBench/16384                         1278 ns         1402 ns       746667
+BM_CallocBench/32768                         6625 ns         6452 ns        89600
+BM_CallocBench/65536                        15836 ns        15486 ns        37333
+BM_CallocBench/131072                       33074 ns        33551 ns        17231
+BM_CallocBench/262144                       11226 ns        10254 ns        64000
+BM_CallocBench/524288                       12793 ns        12033 ns        89600
+BM_CallocBench/1048576                      16054 ns        15869 ns        64000
+BM_CallocBench/2097152                      23636 ns        22670 ns        34462
+BM_CallocBench/4194304                      37232 ns        43735 ns        20364
+BM_CallocBench/8388608                      64264 ns        66961 ns         7467
+BM_CallocBench/16777216                    118400 ns       114397 ns         5600
+BM_CallocBench/33554432                    226646 ns       217285 ns         6400
+BM_CallocBench/67108864                    442812 ns       442661 ns         1659
+BM_CallocBench/134217728                   875420 ns       976562 ns         1120
+BM_CallocBench/268435456                  1733366 ns      1801273 ns          373
+BM_CallocBench/536870912                  3469920 ns      3521127 ns          213
+BM_CallocBench/1073741824                 6915225 ns      6666667 ns           75
+BM_CFreeBench/4096                           1020 ns         1087 ns       675771
+BM_CFreeBench/8192                           1021 ns         1067 ns       497778
+BM_CFreeBench/16384                          1055 ns          949 ns       560000
+BM_CFreeBench/32768                          1104 ns         1116 ns       896000
+BM_CFreeBench/65536                          3007 ns         2637 ns       248889
+BM_CFreeBench/131072                         6654 ns         6562 ns       100000
+BM_CFreeBench/262144                        10301 ns         9766 ns        56000
+BM_CFreeBench/524288                        13008 ns        12242 ns        49778
+BM_CFreeBench/1048576                       18494 ns        19183 ns        40727
+BM_CFreeBench/2097152                       35965 ns        36901 ns        19478
+BM_CFreeBench/4194304                       63934 ns        65625 ns        10000
+BM_CFreeBench/8388608                      119331 ns       117711 ns         7168
+BM_CFreeBench/16777216                     232611 ns       228795 ns         2800
+BM_CFreeBench/33554432                     457534 ns       485437 ns         1545
+BM_CFreeBench/67108864                     895947 ns       662667 ns          896
+BM_CFreeBench/134217728                   1791539 ns      1801273 ns          373
+BM_CFreeBench/268435456                   3551595 ns      3361192 ns          172
+BM_CFreeBench/536870912                   7162851 ns      7187500 ns          100
+BM_CFreeBench/1073741824                 14252604 ns     14930556 ns           45
+BM_MallocWalkFreeBench/4096                  92.8 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/8192                  92.9 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/16384                 92.3 ns         92.1 ns      7466667
+BM_MallocWalkFreeBench/32768                 3381 ns         3376 ns       203636
+BM_MallocWalkFreeBench/65536                10781 ns        10742 ns        64000
+BM_MallocWalkFreeBench/131072               26674 ns        26681 ns        26353
+BM_MallocWalkFreeBench/262144               82260 ns        81609 ns         7467
+BM_MallocWalkFreeBench/524288              145303 ns       147524 ns         4978
+BM_MallocWalkFreeBench/1048576             274427 ns       276215 ns         2489
+BM_MallocWalkFreeBench/2097152             542976 ns       544085 ns         1120
+BM_MallocWalkFreeBench/4194304            1112832 ns      1116071 ns          560
+BM_MallocWalkFreeBench/8388608            2671618 ns      2663352 ns          264
+BM_MallocWalkFreeBench/16777216           5761664 ns      5719866 ns          112
+BM_MallocWalkFreeBench/33554432          11561511 ns     11718750 ns           64
+BM_MallocWalkFreeBench/67108864          23775718 ns     23437500 ns           28
+BM_MallocWalkFreeBench/134217728         50209727 ns     49715909 ns           11
+BM_MallocWalkFreeBench/268435456        103340950 ns    101562500 ns            6
+BM_MallocWalkFreeBench/536870912        207350367 ns    208333333 ns            3
+BM_MallocWalkFreeBench/1073741824       415450750 ns    414062500 ns            2
+BM_MallocClearFreeBench/4096                  159 ns          161 ns      4072727
+BM_MallocClearFreeBench/8192                  190 ns          190 ns      3200000
+BM_MallocClearFreeBench/16384                3832 ns         3850 ns       194783
+BM_MallocClearFreeBench/32768               10234 ns        10254 ns        74667
+BM_MallocClearFreeBench/65536               20477 ns        20508 ns        37333
+BM_MallocClearFreeBench/131072              42219 ns        42725 ns        17920
+BM_MallocClearFreeBench/262144              18191 ns        17997 ns        37333
+BM_MallocClearFreeBench/524288              22603 ns        22949 ns        32000
+BM_MallocClearFreeBench/1048576             31247 ns        31390 ns        22400
+BM_MallocClearFreeBench/2097152             56478 ns        55804 ns        11200
+BM_MallocClearFreeBench/4194304             97211 ns        98349 ns         7467
+BM_MallocClearFreeBench/8388608            179515 ns       179983 ns         3733
+BM_MallocClearFreeBench/16777216           345565 ns       345346 ns         2036
+BM_MallocClearFreeBench/33554432           678117 ns       683594 ns         1120
+BM_MallocClearFreeBench/67108864          1334668 ns      1339286 ns          560
+BM_MallocClearFreeBench/134217728         2646980 ns      2663352 ns          264
+BM_MallocClearFreeBench/268435456         5281096 ns      5312500 ns          100
+BM_MallocClearFreeBench/536870912        10539728 ns     10498047 ns           64
+BM_MallocClearFreeBench/1073741824       21197978 ns     20996094 ns           32
+BM_MallocClearWalkFreeBench/4096              160 ns          159 ns      3733333
+BM_MallocClearWalkFreeBench/8192              191 ns          190 ns      3200000
+BM_MallocClearWalkFreeBench/16384             252 ns          249 ns      2133333
+BM_MallocClearWalkFreeBench/32768             588 ns          594 ns      1000000
+BM_MallocClearWalkFreeBench/65536            8357 ns         8371 ns        89600
+BM_MallocClearWalkFreeBench/131072          29483 ns        29297 ns        22400
+BM_MallocClearWalkFreeBench/262144          81721 ns        81961 ns         8960
+BM_MallocClearWalkFreeBench/524288         145767 ns       147524 ns         4978
+BM_MallocClearWalkFreeBench/1048576        275128 ns       278700 ns         2635
+BM_MallocClearWalkFreeBench/2097152        544018 ns       544085 ns         1120
+BM_MallocClearWalkFreeBench/4194304       1115091 ns      1116071 ns          560
+BM_MallocClearWalkFreeBench/8388608       2680117 ns      2663352 ns          264
+BM_MallocClearWalkFreeBench/16777216      5775139 ns      5781250 ns          100
+BM_MallocClearWalkFreeBench/33554432     11732879 ns     11718750 ns           56
+BM_MallocClearWalkFreeBench/67108864     23906229 ns     23437500 ns           28
+BM_MallocClearWalkFreeBench/134217728    50421309 ns     49715909 ns           11
+BM_MallocClearWalkFreeBench/268435456   103206533 ns    104166667 ns            6
+BM_MallocClearWalkFreeBench/536870912   207107267 ns    208333333 ns            3
+BM_MallocClearWalkFreeBench/1073741824  415408950 ns    414062500 ns            2
+Used total local memory 1859088 of 8388608 bytes.
+Used by benchmarks 1821168
+----------------------------------------------------------------------
+i7-6700k_CygwinWin10_mmap.console.txt
+mallopt(M_MMAP_THRESHOLD, 0) is set.
+System Page Size: 4096
+---------------------------------------------------------------------------------
+Benchmark                                       Time             CPU   Iterations
+---------------------------------------------------------------------------------
+BM_MallocFreeBench/4096                      92.6 ns         92.1 ns      7466667
+BM_MallocFreeBench/8192                      93.3 ns         92.1 ns      7466667
+BM_MallocFreeBench/16384                     6542 ns         6557 ns       112000
+BM_MallocFreeBench/32768                     6558 ns         6452 ns        89600
+BM_MallocFreeBench/65536                     7540 ns         7499 ns        89600
+BM_MallocFreeBench/131072                    8641 ns         8719 ns        89600
+BM_MallocFreeBench/262144                   10822 ns        10742 ns        64000
+BM_MallocFreeBench/524288                   15202 ns        14997 ns        44800
+BM_MallocFreeBench/1048576                  23812 ns        24065 ns        29867
+BM_MallocFreeBench/2097152                  49915 ns        50000 ns        10000
+BM_MallocFreeBench/4194304                  91048 ns        89979 ns         7467
+BM_MallocFreeBench/8388608                 173818 ns       172631 ns         4073
+BM_MallocFreeBench/16777216                339836 ns       337672 ns         2036
+BM_MallocFreeBench/33554432                672536 ns       662667 ns          896
+BM_MallocFreeBench/67108864               1335228 ns      1317771 ns          498
+BM_MallocFreeBench/134217728              2642190 ns      2663352 ns          264
+BM_MallocFreeBench/268435456              5292175 ns      5312500 ns          100
+BM_MallocFreeBench/536870912             10553091 ns     10498047 ns           64
+BM_MallocFreeBench/1073741824            21118219 ns     20996094 ns           32
+BM_MallocBench/4096                          5809 ns         5469 ns       100000
+BM_MallocBench/8192                          6125 ns         6250 ns       100000
+BM_MallocBench/16384                         6436 ns         6836 ns       112000
+BM_MallocBench/32768                         6914 ns         5885 ns       111503
+BM_MallocBench/65536                         7394 ns         7150 ns        89600
+BM_MallocBench/131072                        8156 ns         8438 ns       100000
+BM_MallocBench/262144                        9319 ns         8545 ns        89600
+BM_MallocBench/524288                       12948 ns        13114 ns        56000
+BM_MallocBench/1048576                      15065 ns        12733 ns        57673
+BM_MallocBench/2097152                      24503 ns        26088 ns        26353
+BM_MallocBench/4194304                      37573 ns        36994 ns        18584
+BM_MallocBench/8388608                      65258 ns        59989 ns        11200
+BM_MallocBench/16777216                    120033 ns       109858 ns         4978
+BM_MallocBench/33554432                    228466 ns       219544 ns         3345
+BM_MallocBench/67108864                    445214 ns       500078 ns         3187
+BM_MallocBench/134217728                   878657 ns       920759 ns         1120
+BM_MallocBench/268435456                  1744902 ns      1532596 ns          418
+BM_MallocBench/536870912                  3460617 ns      3069196 ns          224
+BM_MallocBench/1073741824                 6963702 ns      6770833 ns           90
+BM_MFreeBench/4096                           7714 ns         6875 ns       100000
+BM_MFreeBench/8192                           7862 ns         9347 ns       112000
+BM_MFreeBench/16384                          7995 ns         7188 ns       100000
+BM_MFreeBench/32768                          8157 ns         6696 ns       112000
+BM_MFreeBench/65536                          8901 ns         8545 ns        64000
+BM_MFreeBench/131072                         9746 ns        10463 ns        74667
+BM_MFreeBench/262144                        13832 ns        15346 ns        56000
+BM_MFreeBench/524288                        14051 ns        13811 ns        49778
+BM_MFreeBench/1048576                       21416 ns        21205 ns        23579
+BM_MFreeBench/2097152                       38073 ns        39674 ns        19298
+BM_MFreeBench/4194304                       65837 ns        76730 ns        11200
+BM_MFreeBench/8388608                      121260 ns       118583 ns         4480
+BM_MFreeBench/16777216                     232343 ns       229492 ns         3200
+BM_MFreeBench/33554432                     453219 ns       370467 ns         1434
+BM_MFreeBench/67108864                     897254 ns       920759 ns         1120
+BM_MFreeBench/134217728                   1777776 ns      1778739 ns          448
+BM_MFreeBench/268435456                   3549161 ns      3447770 ns          213
+BM_MFreeBench/536870912                   7062004 ns      6975446 ns          112
+BM_MFreeBench/1073741824                 14198740 ns     14583333 ns           45
+BM_CallocFreeBench/4096                     23773 ns        24065 ns        29867
+BM_CallocFreeBench/8192                     24363 ns        24588 ns        29867
+BM_CallocFreeBench/16384                    24717 ns        24554 ns        28000
+BM_CallocFreeBench/32768                    25189 ns        25112 ns        28000
+BM_CallocFreeBench/65536                    26210 ns        26088 ns        26353
+BM_CallocFreeBench/131072                   27629 ns        27867 ns        26353
+BM_CallocFreeBench/262144                   30268 ns        29924 ns        20364
+BM_CallocFreeBench/524288                   35494 ns        36062 ns        20364
+BM_CallocFreeBench/1048576                  44311 ns        43493 ns        15448
+BM_CallocFreeBench/2097152                  70849 ns        71150 ns        11200
+BM_CallocFreeBench/4194304                 112894 ns       112305 ns         6400
+BM_CallocFreeBench/8388608                 195331 ns       196725 ns         3733
+BM_CallocFreeBench/16777216                360261 ns       360947 ns         1948
+BM_CallocFreeBench/33554432                690304 ns       680106 ns          896
+BM_CallocFreeBench/67108864               1354427 ns      1317771 ns          498
+BM_CallocFreeBench/134217728              2660912 ns      2663352 ns          264
+BM_CallocFreeBench/268435456              5292886 ns      5301339 ns          112
+BM_CallocFreeBench/536870912             10558725 ns     10625000 ns           75
+BM_CallocFreeBench/1073741824            21140366 ns     20996094 ns           32
+BM_CallocBench/4096                         22573 ns        21763 ns        34462
+BM_CallocBench/8192                         22876 ns        21868 ns        40727
+BM_CallocBench/16384                        23197 ns        22879 ns        28000
+BM_CallocBench/32768                        23600 ns        21205 ns        28000
+BM_CallocBench/65536                        23430 ns        17787 ns        29867
+BM_CallocBench/131072                       24123 ns        26367 ns        37333
+BM_CallocBench/262144                       27120 ns        25111 ns        29867
+BM_CallocBench/524288                       27430 ns        27832 ns        23579
+BM_CallocBench/1048576                      31022 ns        27902 ns        22400
+BM_CallocBench/2097152                      39520 ns        41854 ns        14933
+BM_CallocBench/4194304                      53182 ns        55804 ns         8960
+BM_CallocBench/8388608                      80722 ns        76730 ns        11200
+BM_CallocBench/16777216                    135614 ns       141602 ns         6400
+BM_CallocBench/33554432                    243455 ns       284630 ns         2635
+BM_CallocBench/67108864                    459311 ns       500000 ns         1000
+BM_CallocBench/134217728                   892739 ns       864955 ns         1120
+BM_CallocBench/268435456                  1760278 ns      1757812 ns          640
+BM_CallocBench/536870912                  3500732 ns      3521127 ns          213
+BM_CallocBench/1073741824                 6993878 ns      7031250 ns          100
+BM_CFreeBench/4096                          14162 ns        13184 ns        64000
+BM_CFreeBench/8192                          14193 ns        11608 ns        49803
+BM_CFreeBench/16384                         14442 ns        15381 ns        64000
+BM_CFreeBench/32768                         14572 ns        13602 ns        44800
+BM_CFreeBench/65536                         15260 ns        15695 ns        49778
+BM_CFreeBench/131072                        16160 ns        18834 ns        44800
+BM_CFreeBench/262144                        17598 ns        17578 ns        32000
+BM_CFreeBench/524288                        23634 ns        24902 ns        32000
+BM_CFreeBench/1048576                       25912 ns        28250 ns        29867
+BM_CFreeBench/2097152                       44378 ns        51271 ns        14933
+BM_CFreeBench/4194304                       72150 ns        71498 ns         8960
+BM_CFreeBench/8388608                      128079 ns       123460 ns         7467
+BM_CFreeBench/16777216                     238336 ns       240626 ns         2987
+BM_CFreeBench/33554432                     461294 ns       502344 ns         1493
+BM_CFreeBench/67108864                     900493 ns       924247 ns          896
+BM_CFreeBench/134217728                   1787868 ns      1604353 ns          448
+BM_CFreeBench/268435456                   3557166 ns      3815407 ns          172
+BM_CFreeBench/536870912                   7100568 ns      6597222 ns           90
+BM_CFreeBench/1073741824                 14188180 ns     14062500 ns           50
+BM_MallocWalkFreeBench/4096                 45749 ns        46527 ns        15448
+BM_MallocWalkFreeBench/8192                 47529 ns        48132 ns        14933
+BM_MallocWalkFreeBench/16384                50013 ns        48828 ns        11200
+BM_MallocWalkFreeBench/32768                54556 ns        54688 ns        10000
+BM_MallocWalkFreeBench/65536                61935 ns        61384 ns        11200
+BM_MallocWalkFreeBench/131072               78988 ns        78474 ns         8960
+BM_MallocWalkFreeBench/262144              111957 ns       112305 ns         6400
+BM_MallocWalkFreeBench/524288              177034 ns       175797 ns         3733
+BM_MallocWalkFreeBench/1048576             309563 ns       313895 ns         2240
+BM_MallocWalkFreeBench/2097152             584202 ns       585938 ns         1120
+BM_MallocWalkFreeBench/4194304            1163947 ns      1171875 ns          640
+BM_MallocWalkFreeBench/8388608            2757010 ns      2761044 ns          249
+BM_MallocWalkFreeBench/16777216           5808881 ns      5719866 ns          112
+BM_MallocWalkFreeBench/33554432          11680080 ns     11718750 ns           56
+BM_MallocWalkFreeBench/67108864          23919386 ns     23995536 ns           28
+BM_MallocWalkFreeBench/134217728         50507980 ns     50000000 ns           10
+BM_MallocWalkFreeBench/268435456        103555383 ns    104166667 ns            6
+BM_MallocWalkFreeBench/536870912        207515467 ns    208333333 ns            3
+BM_MallocWalkFreeBench/1073741824       415885700 ns    421875000 ns            2
+BM_MallocClearFreeBench/4096                51331 ns        51562 ns        10000
+BM_MallocClearFreeBench/8192                51891 ns        51562 ns        10000
+BM_MallocClearFreeBench/16384               52050 ns        51562 ns        10000
+BM_MallocClearFreeBench/32768               52637 ns        53125 ns        10000
+BM_MallocClearFreeBench/65536               52249 ns        51618 ns        11200
+BM_MallocClearFreeBench/131072              53804 ns        53125 ns        10000
+BM_MallocClearFreeBench/262144              58830 ns        58594 ns        11200
+BM_MallocClearFreeBench/524288              60988 ns        61384 ns        11200
+BM_MallocClearFreeBench/1048576             75527 ns        76730 ns         8960
+BM_MallocClearFreeBench/2097152             96821 ns        95215 ns         6400
+BM_MallocClearFreeBench/4194304            137879 ns       138108 ns         4978
+BM_MallocClearFreeBench/8388608            220196 ns       219727 ns         3200
+BM_MallocClearFreeBench/16777216           388547 ns       384976 ns         1867
+BM_MallocClearFreeBench/33554432           716423 ns       714983 ns          896
+BM_MallocClearFreeBench/67108864          1370868 ns      1380522 ns          498
+BM_MallocClearFreeBench/134217728         2696117 ns      2663352 ns          264
+BM_MallocClearFreeBench/268435456         5334421 ns      5312500 ns          100
+BM_MallocClearFreeBench/536870912        10588192 ns     10498047 ns           64
+BM_MallocClearFreeBench/1073741824       21199224 ns     21139706 ns           34
+BM_MallocClearWalkFreeBench/4096            57807 ns        56250 ns        10000
+BM_MallocClearWalkFreeBench/8192            59282 ns        58594 ns        11200
+BM_MallocClearWalkFreeBench/16384           61531 ns        61384 ns        11200
+BM_MallocClearWalkFreeBench/32768           66285 ns        66267 ns         8960
+BM_MallocClearWalkFreeBench/65536           73034 ns        73242 ns         8960
+BM_MallocClearWalkFreeBench/131072          89843 ns        89979 ns         7467
+BM_MallocClearWalkFreeBench/262144         123062 ns       122768 ns         5600
+BM_MallocClearWalkFreeBench/524288         188060 ns       188354 ns         3733
+BM_MallocClearWalkFreeBench/1048576        321076 ns       314991 ns         2133
+BM_MallocClearWalkFreeBench/2097152        596707 ns       599888 ns         1120
+BM_MallocClearWalkFreeBench/4194304       1175885 ns      1196289 ns          640
+BM_MallocClearWalkFreeBench/8388608       2779188 ns      2781723 ns          264
+BM_MallocClearWalkFreeBench/16777216      5835449 ns      5719866 ns          112
+BM_MallocClearWalkFreeBench/33554432     11688500 ns     11718750 ns           56
+BM_MallocClearWalkFreeBench/67108864     23995029 ns     23995536 ns           28
+BM_MallocClearWalkFreeBench/134217728    50757010 ns     51562500 ns           10
+BM_MallocClearWalkFreeBench/268435456   103527017 ns    101562500 ns            6
+BM_MallocClearWalkFreeBench/536870912   207530433 ns    208333333 ns            3
+BM_MallocClearWalkFreeBench/1073741824  415825250 ns    414062500 ns            2
+Used total local memory 1839680 of 8388608 bytes.
+Used by benchmarks 1801856
+----------------------------------------------------------------------
+i7-6700k_CygwinWin10_mlockall.console.txt
+USAGE: ./benchmarks/malloc/malloc_bench[-M<bytes>] [-mOPTION=n]
+Run a malloc benchmark.
+
+ -M: Specify upper range for test in bytes. Default is 1073741824 (1GB)
+ -mOPTION=value: a comma separated list of mallopt options and a value.
+
+Options supported by '-m' are:
+ - M_MMAP_MAX
+ - M_MMAP_THRESHOLD
+ - M_MXFAST
+ - M_TOP_PAD
+ - M_TRIM_THRESHOLD
+
+benchmark [--benchmark_list_tests={true|false}]
+          [--benchmark_filter=<regex>]
+          [--benchmark_min_time=`<integer>x` OR `<float>s` ]
+          [--benchmark_min_warmup_time=<min_warmup_time>]
+          [--benchmark_repetitions=<num_repetitions>]
+          [--benchmark_enable_random_interleaving={true|false}]
+          [--benchmark_report_aggregates_only={true|false}]
+          [--benchmark_display_aggregates_only={true|false}]
+          [--benchmark_format=<console|json|csv>]
+          [--benchmark_out=<filename>]
+          [--benchmark_out_format=<json|console|csv>]
+          [--benchmark_color={auto|true|false}]
+          [--benchmark_counters_tabular={true|false}]
+          [--benchmark_context=<key>=<value>,...]
+          [--benchmark_time_unit={ns|us|ms|s}]
+          [--v=<verbosity>]
+----------------------------------------------------------------------
+i7-6700k_CygwinWin10_mmap.console.txt
+USAGE: ./benchmarks/malloc/malloc_bench[-M<bytes>] [-mOPTION=n]
+Run a malloc benchmark.
+
+ -M: Specify upper range for test in bytes. Default is 1073741824 (1GB)
+ -mOPTION=value: a comma separated list of mallopt options and a value.
+
+Options supported by '-m' are:
+ - M_MMAP_MAX
+ - M_MMAP_THRESHOLD
+ - M_MXFAST
+ - M_TOP_PAD
+ - M_TRIM_THRESHOLD
+
+benchmark [--benchmark_list_tests={true|false}]
+          [--benchmark_filter=<regex>]
+          [--benchmark_min_time=`<integer>x` OR `<float>s` ]
+          [--benchmark_min_warmup_time=<min_warmup_time>]
+          [--benchmark_repetitions=<num_repetitions>]
+          [--benchmark_enable_random_interleaving={true|false}]
+          [--benchmark_report_aggregates_only={true|false}]
+          [--benchmark_display_aggregates_only={true|false}]
+          [--benchmark_format=<console|json|csv>]
+          [--benchmark_out=<filename>]
+          [--benchmark_out_format=<json|console|csv>]
+          [--benchmark_color={auto|true|false}]
+          [--benchmark_counters_tabular={true|false}]
+          [--benchmark_context=<key>=<value>,...]
+          [--benchmark_time_unit={ns|us|ms|s}]
+          [--v=<verbosity>]

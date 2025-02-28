@@ -87,10 +87,9 @@ Measures the time on the "default" usage of the `malloc` c-library call.
 
 Other Platforms:
 
-- (X) MacOS-X: Generates invalid results.
 - (!) Cygwin (Windows): No customisations for malloc parameters supported.
 - (!) NetBSD 10.1: No customisations for malloc parameters supported.
-- (X) FreeBSD 14.2: Generates invalid results (similar to MacOS-X)
+- (!) FreeBSD 14.2: No customisations for malloc parameters supported.
 
 #### 2.1.2. Cache Line
 

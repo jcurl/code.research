@@ -1,0 +1,4 @@
+{
+    "Default": "rpi4_netbsd10.1/rpi4-netbsd101.json",
+    "Lock": "rpi4_netbsd10.1/rpi4-netbsd101_locked.json"
+}

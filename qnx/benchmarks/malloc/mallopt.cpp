@@ -13,18 +13,22 @@
 #include <benchmark/benchmark.h>
 
 #include "stdext/expected.h"
+#include "ubench/string.h"
 #include "mallopt.h"
 
 namespace {
 
 auto print_help(std::string_view prog_name) -> void {
-  std::cout << "USAGE: " << prog_name;
+  std::cout << "USAGE: " << prog_name << "[-M<bytes>]";
   if (HAVE_MALLOPT) std::cout << " [-mOPTION=n]";
   if (HAVE_MLOCKALL) std::cout << " [-L]";
   std::cout << std::endl;
 
   std::cout << "Run a malloc benchmark." << std::endl;
   std::cout << std::endl;
+  std::cout << " -M: Specify upper range for test in bytes. Default is "
+               "1073741824 (1GB)"
+            << std::endl;
 
   if (HAVE_MLOCKALL) {
     std::cout << " -L: Enable locking with mlockall()." << std::endl;
@@ -58,13 +62,13 @@ auto make_options(int& argc, char* const argv[]) noexcept
   if (HAVE_MLOCKALL) {
     options += "L";
   }
-  options += "?";
+  options += "M:?";
 
   mallopt_options o{};
   while ((c = getopt(argc, argv, options.c_str())) != -1) {
     switch (c) {
       case 'm': {
-        auto mallopts = impl::parse_mallopt_arg(std::string_view(optarg));
+        auto mallopts = impl::parse_mallopt_arg(optarg);
         if (mallopts.empty()) {
           err = 1;
         }
@@ -72,8 +76,19 @@ auto make_options(int& argc, char* const argv[]) noexcept
             std::end(o.mallopts_), std::begin(mallopts), std::end(mallopts));
         break;
       }
-      case 'L': {
+      case 'L':
         o.mlock_all_ = true;
+        break;
+      case 'M': {
+        auto max = ubench::string::parse_int<unsigned int>(optarg);
+        if (max) {
+          o.max_ = *max;
+        } else {
+          std::cerr << "Error: Option -" << optopt << " requires an integer"
+                    << std::endl;
+          err = 1;
+          help = true;
+        }
         break;
       }
       case '?':

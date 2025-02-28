@@ -1,0 +1,4 @@
+{
+    "Default": "rpi4_freebsd14.2/rpi4_freebsd142.json",
+    "Lock": "rpi4_freebsd14.2/rpi4_freebsd142_locked.json"
+}

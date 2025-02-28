@@ -13,11 +13,14 @@ a configuration file you can modify in the notebook, and finally
   - [1.2. Bar Graphs](#12-bar-graphs)
 - [2. Linux Results](#2-linux-results)
   - [2.1. Conclusions](#21-conclusions)
-  - [2.2. Intel i9-13950HX - 32GB (Ubuntu 22.04; GCC 11.4.0; Linux 6.8.0-40-generic; Ubuntu GLIBC 2.35-0ubuntu3.8)](#22-intel-i9-13950hx---32gb-ubuntu-2204-gcc-1140-linux-680-40-generic-ubuntu-glibc-235-0ubuntu38)
-  - [2.3. Raspberry Pi 4 - 8GB (Linux)](#23-raspberry-pi-4---8gb-linux)
-  - [2.4. Raspberry Pi 4 - 2GB (QNX 7.1.0)](#24-raspberry-pi-4---2gb-qnx-710)
-  - [2.5. Raspberry Pi 4 - 2GB (QNX 8.0.0)](#25-raspberry-pi-4---2gb-qnx-800)
-  - [2.6. Raspberry Pi 5 - 8GB (Linux)](#26-raspberry-pi-5---8gb-linux)
+  - [2.2. Intel i9-13980HX - 32GB (Ubuntu 22.04; GCC 11.4.0; Linux 6.8.0-40-generic; Ubuntu GLIBC 2.35-0ubuntu3.8)](#22-intel-i9-13980hx---32gb-ubuntu-2204-gcc-1140-linux-680-40-generic-ubuntu-glibc-235-0ubuntu38)
+  - [2.3. Intel i7-6700K - 32GB (Cygwin Windows 10)](#23-intel-i7-6700k---32gb-cygwin-windows-10)
+  - [2.4. Raspberry Pi 4 - 8GB (Linux)](#24-raspberry-pi-4---8gb-linux)
+  - [2.5. Raspberry Pi 4 - 8GB (QNX 7.1.0)](#25-raspberry-pi-4---8gb-qnx-710)
+  - [2.6. Raspberry Pi 4 - 8GB (QNX 8.0.0)](#26-raspberry-pi-4---8gb-qnx-800)
+  - [2.7. Raspberry Pi 4 - 8GB (FreeBSD 14.2)](#27-raspberry-pi-4---8gb-freebsd-142)
+  - [2.8. Raspberry Pi 4 - 8GB (NetBSD 10.1)](#28-raspberry-pi-4---8gb-netbsd-101)
+  - [2.9. Raspberry Pi 5 - 8GB (Linux)](#29-raspberry-pi-5---8gb-linux)
 
 ## 1. Linux Measurements
 
@@ -149,22 +152,32 @@ giving to the application.
 Locked memory is much faster when accessing and walking obviously (no page
 faults), but cost more time to allocate upfront.
 
-### 2.2. Intel i9-13950HX - 32GB (Ubuntu 22.04; GCC 11.4.0; Linux 6.8.0-40-generic; Ubuntu GLIBC 2.35-0ubuntu3.8)
+### 2.2. Intel i9-13980HX - 32GB (Ubuntu 22.04; GCC 11.4.0; Linux 6.8.0-40-generic; Ubuntu GLIBC 2.35-0ubuntu3.8)
 
 ```sh
 sudo cpupower frequency-set --governor performance
 taskset -c 1 malloc_bench --benchmark_out_format=json --benchmark_out=i9-13950hx_XXXX.json
 ```
 
-![](./i9-13950hx_Linux/malloc.png)
+![](./i9-13980hx_Linux/malloc.png)
 
-![](./i9-13950hx_Linux/calloc.png)
+![](./i9-13980hx_Linux/calloc.png)
 
-![](./i9-13950hx_Linux/mallocwalk.png)
+![](./i9-13980hx_Linux/mallocwalk.png)
 
-![](./i9-13950hx_Linux/memsetwalk.png)
+![](./i9-13980hx_Linux/memsetwalk.png)
 
-### 2.3. Raspberry Pi 4 - 8GB (Linux)
+### 2.3. Intel i7-6700K - 32GB (Cygwin Windows 10)
+
+![](./i7-6700k_CygwinWin10/malloc.png)
+
+![](./i7-6700k_CygwinWin10/calloc.png)
+
+![](./i7-6700k_CygwinWin10/mallocwalk.png)
+
+![](./i7-6700k_CygwinWin10/memsetwalk.png)
+
+### 2.4. Raspberry Pi 4 - 8GB (Linux)
 
 To ensure that the results are comparable with the QNX Operating System, the
 frequency of the cores were set to 1500MHz by adding the section to
@@ -186,7 +199,7 @@ allocate larger chunks of memory with locking.
 
 ![](./rpi4_linux/memsetwalk.png)
 
-### 2.4. Raspberry Pi 4 - 2GB (QNX 7.1.0)
+### 2.5. Raspberry Pi 4 - 8GB (QNX 7.1.0)
 
 The kernel `procnto-smp-instr` is started with the default configuration, except
 for *Superlocking* which enables the option `-mL`.
@@ -199,7 +212,11 @@ for *Superlocking* which enables the option `-mL`.
 
 ![](./rpi4_qnx710/memsetwalk.png)
 
-### 2.5. Raspberry Pi 4 - 2GB (QNX 8.0.0)
+Results in previous test runs on a Raspberry Pi4 with 2GB show different
+behaviour with `MALLOC_MEMORY_HOLD=1`, which is due to the `malloc()` routines
+not honouring the flag in low memory situations.
+
+### 2.6. Raspberry Pi 4 - 8GB (QNX 8.0.0)
 
 The kernel `procnto-smp-instr` is started with the default configuration, except
 for *Superlocking* which enables the option `-mL`.
@@ -212,7 +229,27 @@ for *Superlocking* which enables the option `-mL`.
 
 ![](./rpi4_qnx800/memsetwalk.png)
 
-### 2.6. Raspberry Pi 5 - 8GB (Linux)
+### 2.7. Raspberry Pi 4 - 8GB (FreeBSD 14.2)
+
+![](./rpi4_freebsd14.2/malloc.png)
+
+![](./rpi4_freebsd14.2/calloc.png)
+
+![](./rpi4_freebsd14.2/mallocwalk.png)
+
+![](./rpi4_freebsd14.2/memsetwalk.png)
+
+### 2.8. Raspberry Pi 4 - 8GB (NetBSD 10.1)
+
+![](./rpi4_netbsd10.1/malloc.png)
+
+![](./rpi4_netbsd10.1/calloc.png)
+
+![](./rpi4_netbsd10.1/mallocwalk.png)
+
+![](./rpi4_netbsd10.1/memsetwalk.png)
+
+### 2.9. Raspberry Pi 5 - 8GB (Linux)
 
 ![](./rpi5_linux/malloc.png)
 

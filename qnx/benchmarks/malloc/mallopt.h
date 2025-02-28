@@ -31,6 +31,13 @@ class mallopt_options {
     return mallopts_;
   }
 
+  /// @brief Get the maximum amount of memory to alloc in the benchmark range.
+  ///
+  /// @return the maximum amount of memory to alloc in the benchmark range.
+  [[nodiscard]] auto max_malloc() const noexcept -> unsigned int {
+    return max_;
+  }
+
  private:
   mallopt_options() = default;
 
@@ -39,6 +46,7 @@ class mallopt_options {
       -> stdext::expected<mallopt_options, int>;
 
   bool mlock_all_{};
+  unsigned int max_{1 << 30};
   std::vector<std::tuple<int, int, std::string>> mallopts_{};
 };
 

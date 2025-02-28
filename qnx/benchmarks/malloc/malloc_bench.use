@@ -1,9 +1,12 @@
 malloc_bench - measure the time to allocate small to large blocks of memory
 
-malloc_bench [-mKEY=VALUE]
+malloc_bench [-mKEY=VALUE] [-L] [-M<bytes>]
 
 Options:
  -m  Specify the KEY given to mallopt() and the value that should be used.
+ -L  Use mlock_all()
+ -M  Give an upper range of bytes for testing. Default is 1073741824 which
+     is 1GB.
 
 Example:
  $ malloc_bench mM_TRIM_THRESHOLD=0 \

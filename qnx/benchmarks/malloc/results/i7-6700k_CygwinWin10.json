@@ -1,0 +1,6 @@
+{
+    "Default": "i7-6700k_CygwinWin10/i7-6700k_CygwinWin10.json",
+    "TRIM_THRESHOLD=0": "i7-6700k_CygwinWin10/i7-6700k_CygwinWin10_threshold0.json",
+    "TOP_PAD=0": "i7-6700k_CygwinWin10/i7-6700k_CygwinWin10_pad0.json",
+    "MMAP": "i7-6700k_CygwinWin10/i7-6700k_CygwinWin10_mmap.json"
+}

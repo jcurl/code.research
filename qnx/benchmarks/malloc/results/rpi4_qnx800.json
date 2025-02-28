@@ -3,6 +3,5 @@
     "TRIM_THRESHOLD=0": "rpi4_qnx800/rpi4-qnx800_threshold0.json",
     "MMAP_THRESHOLD=0": "rpi4_qnx800/rpi4-qnx800_mmap0.json",
     "GRANULARITY=16M": "rpi4_qnx800/rpi4-qnx800_gran16M.json",
-    "SuperLock": "rpi4_qnx800/rpi4-qnx800sl.json"
+    "Locked": "rpi4_qnx800/rpi4-qnx800_mlockall.json"
 }
-

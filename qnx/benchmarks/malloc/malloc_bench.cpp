@@ -27,6 +27,7 @@ static void BM_MallocFreeBench(benchmark::State& state) {
   for (auto _ : state) {
     // This code gets timed
     void* p = malloc(alloc_size);
+    benchmark::DoNotOptimize(p);
     if (p) free(p);
   }
 }
@@ -38,6 +39,7 @@ static void BM_CallocFreeBench(benchmark::State& state) {
   for (auto _ : state) {
     // This code gets timed
     void* p = calloc(alloc_size >> 4, 16);
+    benchmark::DoNotOptimize(p);
     if (p) free(p);
   }
 }
@@ -50,6 +52,7 @@ static void BM_MallocBench(benchmark::State& state) {
     // This code gets timed
     void* p = malloc(alloc_size);
     state.PauseTiming();
+    benchmark::DoNotOptimize(p);
     if (p) free(p);
     state.ResumeTiming();
   }
@@ -63,6 +66,7 @@ static void BM_CallocBench(benchmark::State& state) {
     // This code gets timed
     void* p = calloc(alloc_size >> 4, 16);
     state.PauseTiming();
+    benchmark::DoNotOptimize(p);
     if (p) free(p);
     state.ResumeTiming();
   }
@@ -77,6 +81,7 @@ static void BM_MFreeBench(benchmark::State& state) {
     state.PauseTiming();
     void* p = malloc(alloc_size);
     state.ResumeTiming();
+    benchmark::DoNotOptimize(p);
     if (p) free(p);
   }
 }
@@ -90,6 +95,7 @@ static void BM_CFreeBench(benchmark::State& state) {
     state.PauseTiming();
     void* p = calloc(alloc_size >> 4, 16);
     state.ResumeTiming();
+    benchmark::DoNotOptimize(p);
     if (p) free(p);
   }
 }
@@ -111,6 +117,7 @@ static void BM_MallocWalkFreeBench(benchmark::State& state) {
       for (std::size_t i = 0; i < alloc_size; i += *page_size) {
         p[i] = 0;
       }
+      benchmark::DoNotOptimize(p);
       free(p);
     }
   }
@@ -125,6 +132,7 @@ static void BM_MallocClearFreeBench(benchmark::State& state) {
     auto p = static_cast<std::uint8_t*>(malloc(alloc_size));
     if (p) {
       memset(p, 0, alloc_size);
+      benchmark::DoNotOptimize(p);
       free(p);
     }
   }
@@ -148,6 +156,7 @@ static void BM_MallocClearWalkFreeBench(benchmark::State& state) {
       for (std::size_t i = 0; i < alloc_size; i += *page_size) {
         p[i] = 0;
       }
+      benchmark::DoNotOptimize(p);
       free(p);
     }
   }
@@ -157,43 +166,44 @@ static void BM_MallocClearWalkFreeBench(benchmark::State& state) {
 // being benchmarked.
 
 auto main(int argc, char** argv) -> int {
-  // By doing the registration here, we'll use our overrides for new/delete for
-  // deterministic memory allocation (rather than it being done by the static
-  // initialiser).
-  benchmark::RegisterBenchmark("BM_MallocFreeBench", BM_MallocFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_MallocBench", BM_MallocBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_MFreeBench", BM_MFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_CallocFreeBench", BM_CallocFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_CallocBench", BM_CallocBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_CFreeBench", BM_CFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark("BM_MallocWalkFreeBench", BM_MallocWalkFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark(
-      "BM_MallocClearFreeBench", BM_MallocClearFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
-  benchmark::RegisterBenchmark(
-      "BM_MallocClearWalkFreeBench", BM_MallocClearWalkFreeBench)
-      ->RangeMultiplier(2)
-      ->Range(4096, 1 << 30);
   benchmark::Initialize(&argc, argv);
 
   // User specific options. All google-benchmark options have been stripped.
   auto options = make_options(argc, argv);
   if (!options) return options.error();
+
+  // By doing the registration here, we'll use our overrides for new/delete for
+  // deterministic memory allocation (rather than it being done by the static
+  // initialiser).
+  benchmark::RegisterBenchmark("BM_MallocFreeBench", BM_MallocFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark("BM_MallocBench", BM_MallocBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark("BM_MFreeBench", BM_MFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark("BM_CallocFreeBench", BM_CallocFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark("BM_CallocBench", BM_CallocBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark("BM_CFreeBench", BM_CFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark("BM_MallocWalkFreeBench", BM_MallocWalkFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark(
+      "BM_MallocClearFreeBench", BM_MallocClearFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
+  benchmark::RegisterBenchmark(
+      "BM_MallocClearWalkFreeBench", BM_MallocClearWalkFreeBench)
+      ->RangeMultiplier(2)
+      ->Range(4096, options->max_malloc());
 
   if (options->mlock_all()) {
     auto success = enable_mlockall();
@@ -218,20 +228,19 @@ auto main(int argc, char** argv) -> int {
         // the previous size.
         result = 0;
       }
-      if (result) {
+      if (result == -1) {
         if (errno) {
           std::cout << ubench::string::perror(errno) << std::endl;
         }
+      } else if (result) {
         std::cout << "mallopt(" << std::get<2>(opt) << ", " << std::get<1>(opt)
                   << ")"
                   << " returns " << result << ". Continuing." << std::endl;
       }
 #else
       // Under Linux: On success, mallopt() returns 1.  On error, it returns 0.
-      if (!result) {
-        if (errno) {
-          std::cout << ubench::string::perror(errno) << std::endl;
-        }
+      // On error, errno is not set.
+      if (result != 1) {
         std::cout << "mallopt(" << std::get<2>(opt) << ", " << std::get<1>(opt)
                   << ")"
                   << " returns " << result << ". Continuing." << std::endl;

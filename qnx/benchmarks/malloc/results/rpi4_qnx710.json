@@ -1,6 +1,6 @@
 {
     "Default": "rpi4_qnx710/rpi4-qnx710.json",
     "MemHold": "rpi4_qnx710/rpi4-qnx710_memhold.json",
+    "Locked": "rpi4_qnx710/rpi4-qnx710_mlockall.json",
     "SuperLock": "rpi4_qnx710/rpi4-qnx710sl.json"
 }
-

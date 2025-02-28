@@ -23,3 +23,7 @@ taskset -c 1 ./benchmarks/malloc/malloc_bench -mM_MMAP_THRESHOLD=0 --benchmark_o
 echo ----------------------------------------------------------------------
 echo ${BASE_NAME}_mlockall.console.txt
 taskset -c 1 ./benchmarks/malloc/malloc_bench -L --benchmark_out_format=json --benchmark_out=${BASE_NAME}_mlockall.json
+
+echo ----------------------------------------------------------------------
+echo ${BASE_NAME}_mmap.console.txt
+taskset -c 1 ./benchmarks/malloc/malloc_bench -L -mM_MMAP_THRESHOLD=0 --benchmark_out_format=json --benchmark_out=${BASE_NAME}_mmap_mlockall.json
