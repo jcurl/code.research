@@ -108,32 +108,8 @@ auto inline merge_mapline(map_line& line, map_line& merge) -> bool {
 }  // namespace
 
 auto pid_mapping::string_intern(std::string_view str) -> const std::string& {
-  // A datastructure must be chosen that won't change the references returned by
-  // this function. This precludes std::vector<> as adding elements may move the
-  // objects in memory.
-  //
-  // We store std::string but need to compare against std::string_view. We can't
-  // use an std::unordered_set<> because what we store and what we compare are
-  // different (it can't hash and find the objects).
-  //
-  // We expect the number of strings is expected to be small, a linear search
-  // repeatedly over a std::forward_list<> may not be too bad. When parsing the
-  // "mappings" file, the object names we're interning tend to be in groups, so
-  // by caching the last entry interned, we're likely to just use the previous
-  // value and then we have O(1).
-
-  if (last_ && *last_ == str) return *last_;
-
-  for (const auto& interned : strings_) {
-    if (interned == str) {
-      last_ = &interned;
-      return *last_;
-    }
-  }
-
-  auto& ref = strings_.emplace_front(str);
-  last_ = &ref;
-  return *last_;
+  auto result = strings_.emplace(str);
+  return *result.first;
 }
 
 auto pid_mapping::fix_intern() -> void {

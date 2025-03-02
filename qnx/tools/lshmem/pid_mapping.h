@@ -6,9 +6,9 @@
 #include <unistd.h>
 
 #include <filesystem>
-#include <forward_list>
 #include <list>
 #include <string_view>
+#include <unordered_set>
 
 #include "stdext/expected.h"
 
@@ -49,7 +49,6 @@ class pid_mapping final {
     if (this == &other) return *this;
     map_ = other.map_;
     strings_ = other.strings_;
-    last_ = {};  // Cache only, not valid on copy.
     fix_intern();
     return *this;
   }
@@ -69,8 +68,7 @@ class pid_mapping final {
 
  private:
   std::list<map_line> map_{};
-  const std::string* last_{};
-  std::forward_list<std::string> strings_{};
+  std::unordered_set<std::string> strings_{};
 
   /// @brief Given a string view, return an interned string.
   ///
