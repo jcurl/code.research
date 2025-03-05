@@ -18,7 +18,8 @@
     - [2.2.2. Core Latency](#222-core-latency)
     - [2.2.3. Network Performance with UDP Load](#223-network-performance-with-udp-load)
     - [2.2.4. List QNX Files](#224-list-qnx-files)
-    - [2.2.5. List Interfaces and IPv4 Addresses](#225-list-interfaces-and-ipv4-addresses)
+    - [2.2.5. List Shared Memory](#225-list-shared-memory)
+    - [2.2.6. List Interfaces and IPv4 Addresses](#226-list-interfaces-and-ipv4-addresses)
 
 ## 1. Compilation
 
@@ -191,7 +192,15 @@ Show all files opened by a process under QNX, like in `pidin`.
 - Supported: QNX 7.1, QNX 8.0
 - [Documentation](./tools/lsqf.md)
 
-#### 2.2.5. List Interfaces and IPv4 Addresses
+#### 2.2.5. List Shared Memory
+
+Check the mapping for all PIDs and look for shared memory pages.
+
+- Tool: `lshmem`
+- Supported: QNX 7.1, QNX 9.0
+- [Documentation](./tools/lshmem.md)
+
+#### 2.2.6. List Interfaces and IPv4 Addresses
 
 Uses the library abstraction to list all interfaces and the properties.
 
