@@ -29,6 +29,8 @@ namespace ubench::file {
 /// wrong file).
 class fdesc {
  public:
+  fdesc() = default;
+
   /// @brief Instantiate an fdesc from an integer file descriptor.
   ///
   /// Operations that return a file descriptor can be given to this class. When

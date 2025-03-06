@@ -124,7 +124,7 @@ auto main(int argc, char* argv[]) -> int {
 
   // Run optional IDLE test.
 
-  std::optional<busy_measurement> idle_measurement{};
+  std::optional<ubench::measure::busy_measurement> idle_measurement{};
   if (options->enable_idle_test()) {
     std::cout << "Performing IDLE test for 5s... " << std::flush;
     idle_measurement = idle_test(std::chrono::milliseconds(5000));
@@ -139,9 +139,9 @@ auto main(int argc, char* argv[]) -> int {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   std::cout << "Performing TEST... " << std::flush;
-  busy_measurement run_measurement{};
+  ubench::measure::busy_measurement run_measurement{};
   {
-    busy_stop_watch run{};
+    ubench::measure::busy_stop_watch run{};
     sync.set();
     for (auto& t : runners) {
       t.join();

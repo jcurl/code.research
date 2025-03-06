@@ -16,7 +16,7 @@
 #include <sstream>
 #endif
 
-#include "ubench/clock.h"
+#include "ubench/measure/busy_measurement.h"
 
 using namespace std::chrono_literals;
 
@@ -40,11 +40,11 @@ auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker> {
 }
 
 auto idle_test(std::chrono::milliseconds duration) noexcept
-    -> std::optional<busy_measurement> {
+    -> std::optional<ubench::measure::busy_measurement> {
   if (!ubench::chrono::idle_clock::is_available()) return {};
   std::this_thread::sleep_for(500ms);
   {
-    busy_stop_watch measure{};
+    ubench::measure::busy_stop_watch measure{};
     std::this_thread::sleep_for(duration);
 
     auto idle_measurement = measure.measure();

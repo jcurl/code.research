@@ -5,6 +5,7 @@ set(SOURCES
     string_test.cpp
     clock_test.cpp
     flags_test.cpp
+    measure/print_test.cpp
     net_test.cpp
     os_test.cpp
     rcu_test.cpp
@@ -27,4 +28,4 @@ target_code_coverage(${BINARY}
     ${CMAKE_BINARY_DIR}/build/*
 )
 
-target_clangformat(TARGET ${BINARY} DIR .)
+target_clangformat(TARGET ${BINARY} DIR_RECURSE .)

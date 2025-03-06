@@ -14,6 +14,8 @@ set(SOURCES
     ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp
     ../include/ubench/os.h
     ../include/ubench/thread.h
+    ../include/ubench/measure/busy_measurement.h measure/busy_measurement.cpp
+    ../include/ubench/measure/print.h measure/print.cpp
     sync_event.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
@@ -186,7 +188,7 @@ if(IS_DEBUG)
     add_sanitizers(${LIBRARY})
 endif()
 
-target_clangformat(TARGET ${LIBRARY} DIR . DIR_RECURSE ../include/ubench)
+target_clangformat(TARGET ${LIBRARY} DIR_RECURSE . DIR_RECURSE ../include/ubench)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

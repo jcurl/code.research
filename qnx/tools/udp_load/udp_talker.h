@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "ubench/file.h"
-#include "busy_measurement.h"
+#include "ubench/measure/busy_measurement.h"
 
 /// @brief The class to instantiate when testing.
 enum class send_mode {
@@ -32,7 +32,7 @@ enum class send_mode {
 /// @return The success of the measurement. If the idle time cannot be
 /// measured, false is returned immediately.
 auto idle_test(std::chrono::milliseconds duration) noexcept
-    -> std::optional<busy_measurement>;
+    -> std::optional<ubench::measure::busy_measurement>;
 
 /// @brief Results of a measurement.
 struct udp_results {

@@ -7,7 +7,6 @@ find_package(Threads REQUIRED)
 set(BINARY udp_load)
 set(SOURCES
     udp_load.cpp
-    busy_measurement.cpp busy_measurement.h
     udp_talker.cpp udp_talker_bsdipv4.cpp udp_talker.h
     options.cpp options.h
 )

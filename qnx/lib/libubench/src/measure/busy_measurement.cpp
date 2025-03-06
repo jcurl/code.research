@@ -1,8 +1,12 @@
-#include "busy_measurement.h"
+#include "ubench/measure/busy_measurement.h"
 
 #include <thread>
 
-busy_stop_watch::busy_stop_watch() noexcept {
+namespace ubench::measure {
+
+busy_stop_watch::busy_stop_watch() noexcept { reset(); }
+
+auto busy_stop_watch::reset() -> void {
   start_idle_ = ubench::chrono::idle_clock::now();
   start_proc_ = ubench::chrono::process_clock::now();
   start_time_ = std::chrono::high_resolution_clock::now();
@@ -41,3 +45,5 @@ auto busy_stop_watch::measure() const noexcept -> busy_measurement {
       std::chrono::duration_cast<std::chrono::milliseconds>(time_span);
   return result;
 }
+
+}  // namespace ubench::measure

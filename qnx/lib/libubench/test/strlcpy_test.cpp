@@ -1,5 +1,3 @@
-#include <array>
-
 #include <gtest/gtest.h>
 
 #include "ubench/string.h"

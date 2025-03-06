@@ -1,0 +1,20 @@
+str_intern - Benchmark test various str interning implementations
+
+str_intern [-B<impl>] <file>
+
+Options:
+ -B<impl>     - The intern implementation to test.
+
+Test a specific implementation. This is useful during the development of the
+str_intern class for 'libubench'. Various implementations are provided.
+
+Implementations are:
+
+none
+   No string interning
+forward_list
+   Put data into a forward_list.
+set
+   Put data into an ordered set.
+unordered_set
+   Put data into an unordered set.
