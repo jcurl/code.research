@@ -18,3 +18,12 @@ set
    Put data into an ordered set.
 unordered_set
    Put data into an unordered set.
+fixed_set_128k
+fixed_set_256k
+fixed_set_512k
+fixed_set_1m
+   Custom implementation of a set.
+   - 131072 buckets
+   - 262144 buckets
+   - 524288 buckets
+   - 1048576 buckets

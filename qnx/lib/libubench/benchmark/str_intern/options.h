@@ -6,10 +6,14 @@
 #include "stdext/expected.h"
 
 enum class strintern_impl {
-  none,           //< No interning function.
-  flist,          //< Forward list.
-  set,            //< Use a set.
-  unordered_set,  //< Use an unordered set.
+  none,            //< No interning function.
+  flist,           //< Forward list.
+  set,             //< Use a set.
+  unordered_set,   //< Use an unordered set.
+  fixed_set_128k,  //< Custom fixed size set of 131072 buckets.
+  fixed_set_256k,  //< Custom fixed size set of 262144 buckets.
+  fixed_set_512k,  //< Custom fixed size set of 524288 buckets.
+  fixed_set_1m,    //< Custom fixed size set of 1048576 buckets.
 };
 
 /// @brief User options.

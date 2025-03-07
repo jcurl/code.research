@@ -33,6 +33,18 @@ auto main(int argc, char* argv[]) -> int {
     case strintern_impl::unordered_set:
       intern = std::make_unique<intern_unordered_set>();
       break;
+    case strintern_impl::fixed_set_128k:
+      intern = std::make_unique<intern_fixed_set>(131072);
+      break;
+    case strintern_impl::fixed_set_256k:
+      intern = std::make_unique<intern_fixed_set>(262144);
+      break;
+    case strintern_impl::fixed_set_512k:
+      intern = std::make_unique<intern_fixed_set>(524288);
+      break;
+    case strintern_impl::fixed_set_1m:
+      intern = std::make_unique<intern_fixed_set>(1048576);
+      break;
     default:
       std::cerr << "Unknown intern implementation to test with." << std::endl;
       return 2;

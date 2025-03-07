@@ -22,6 +22,10 @@ const std::unordered_map<std::string, strintern_impl> mode = {
     {"forward_list", strintern_impl::flist},
     {"set", strintern_impl::set},
     {"unordered_set", strintern_impl::unordered_set},
+    {"fixed_set_128k", strintern_impl::fixed_set_128k},
+    {"fixed_set_256k", strintern_impl::fixed_set_256k},
+    {"fixed_set_512k", strintern_impl::fixed_set_512k},
+    {"fixed_set_1m", strintern_impl::fixed_set_1m},
 };
 
 }  // namespace

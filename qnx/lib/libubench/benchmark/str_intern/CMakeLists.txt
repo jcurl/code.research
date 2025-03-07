@@ -9,6 +9,7 @@ set(STRINTERN_SOURCES
     intern_forward_list.cpp
     intern_none.cpp
     intern_set.cpp
+    intern_fixedset.cpp
 )
 
 add_executable(${STRINTERN_BINARY} ${STRINTERN_SOURCES})
