@@ -22,8 +22,12 @@ fixed_set_128k
 fixed_set_256k
 fixed_set_512k
 fixed_set_1m
-   Custom implementation of a set.
+   Custom implementation of a set with fixed number of buckets.
    - 131072 buckets
    - 262144 buckets
    - 524288 buckets
    - 1048576 buckets
+var_set
+   Custom implementation of a set with buckets growing on demand. A
+   "max_load_factor" of 1.0 is chosen, with up to 8 million buckets
+   for hashing.

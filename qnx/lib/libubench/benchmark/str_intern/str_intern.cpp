@@ -45,6 +45,11 @@ auto main(int argc, char* argv[]) -> int {
     case strintern_impl::fixed_set_1m:
       intern = std::make_unique<intern_fixed_set>(1048576);
       break;
+    case strintern_impl::var_set: {
+      // 8 million buckets. Use the default load factor of 1.0.
+      intern = std::make_unique<intern_var_set>(4096, 1 << 23);
+      break;
+    }
     default:
       std::cerr << "Unknown intern implementation to test with." << std::endl;
       return 2;

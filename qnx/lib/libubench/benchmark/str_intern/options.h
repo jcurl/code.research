@@ -14,6 +14,7 @@ enum class strintern_impl {
   fixed_set_256k,  //< Custom fixed size set of 262144 buckets.
   fixed_set_512k,  //< Custom fixed size set of 524288 buckets.
   fixed_set_1m,    //< Custom fixed size set of 1048576 buckets.
+  var_set,         //< Custom variable bucket size.
 };
 
 /// @brief User options.

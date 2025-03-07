@@ -10,6 +10,7 @@ set(STRINTERN_SOURCES
     intern_none.cpp
     intern_set.cpp
     intern_fixedset.cpp
+    intern_varset.cpp
 )
 
 add_executable(${STRINTERN_BINARY} ${STRINTERN_SOURCES})
