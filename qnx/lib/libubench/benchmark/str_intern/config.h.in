@@ -1,0 +1,2 @@
+// QNX 7.1 only has PMR under the experimental namespace
+#cmakedefine01 HAVE_CXX_EXPERIMENTAL_MEMORY_RESOURCE

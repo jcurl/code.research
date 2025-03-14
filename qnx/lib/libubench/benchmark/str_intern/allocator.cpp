@@ -17,6 +17,8 @@ struct mem_block {
   int block;
 };
 
+// The offset is used so that we can store the size of the block in the memory
+// region, so when it's freed, we can account for it.
 constexpr ptrdiff_t OFFSET = std::max<ptrdiff_t>(16, sizeof(mem_block));
 
 auto alloc(mem_metrics &metrics, int size) -> void {

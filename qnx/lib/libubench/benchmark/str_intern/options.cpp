@@ -27,6 +27,7 @@ const std::unordered_map<std::string, strintern_impl> mode = {
     {"fixed_set_512k", strintern_impl::fixed_set_512k},
     {"fixed_set_1m", strintern_impl::fixed_set_1m},
     {"var_set", strintern_impl::var_set},
+    {"var_set_pmr", strintern_impl::var_set_pmr},
 };
 
 }  // namespace

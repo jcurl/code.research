@@ -31,3 +31,6 @@ var_set
    Custom implementation of a set with buckets growing on demand. A
    "max_load_factor" of 1.0 is chosen, with up to 8 million buckets
    for hashing.
+var_set_pmr
+   Custom implementation extending "var_set" to use PMR memory allocation. PMR
+   is polymorphic memory resource.
