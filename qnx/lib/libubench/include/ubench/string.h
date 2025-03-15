@@ -1,5 +1,5 @@
-#ifndef UBENCH_ARGS_H
-#define UBENCH_ARGS_H
+#ifndef UBENCH_STRING_H
+#define UBENCH_STRING_H
 
 #include <array>
 #include <charconv>

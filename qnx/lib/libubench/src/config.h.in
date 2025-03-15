@@ -67,3 +67,9 @@
 
 // Derived defines based on identified features
 #define HAVE_NET_VLAN (HAVE_NET_SIOCGIFVLAN || HAVE_NET_SIOCGETVLAN)
+
+// --------------------------------------------------------------------
+// String Interning
+// --------------------------------------------------------------------
+
+#cmakedefine01 HAVE_CXX_EXPERIMENTAL_MEMORY_RESOURCE

@@ -7,18 +7,21 @@ include(research/check_struct_field_exists)
 
 set(LIBRARY ubench)
 set(SOURCES
-    ../include/ubench/string.h string.cpp
     ../include/ubench/clock.h
     ../include/ubench/flags.h
     ../include/ubench/file.h
     ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp
     ../include/ubench/os.h
+    ../include/ubench/string.h string.cpp
+    ../include/ubench/str_intern.h str_intern.cpp
     ../include/ubench/thread.h
     ../include/ubench/measure/busy_measurement.h measure/busy_measurement.cpp
     ../include/ubench/measure/print.h measure/print.cpp
     sync_event.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
+
+target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 
 # BSD Variable only available in CMake 3.25 or later.
 # LINUX Variable not available in CMake 3.16 (Ubuntu 20.04)
@@ -169,6 +172,8 @@ endif()
 # Check for FreeBSD that flags is over two fields.
 check_struct_field_exists("ifreq" "ifr_flagshigh" "net/if.h" NET_IFR_FLAGS_HIGH)
 
+# ----------------------------------------------------------------------
+
 # Check for strlcpy.
 check_symbol_lib_exists(strlcpy "string.h" HAVE_STRLCPY)
 check_symbol_lib_exists(strlcpy "bsd/string.h" HAVE_STRLCPY LIB bsd TARGET ${LIBRARY})
@@ -180,9 +185,14 @@ else()
     target_sources(${LIBRARY} PRIVATE string_strlcpy.cpp)
 endif()
 
-# ----------------------------------------------------------------------
-
-target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
+# String Interning
+check_type_exists("std::pmr::memory_resource" "memory_resource" HAVE_CXX_MEMORY_RESOURCE)
+if(NOT HAVE_CXX_MEMORY_RESOURCE)
+    check_type_exists("std::experimental::pmr::memory_resource" "experimental/memory_resource" HAVE_CXX_EXPERIMENTAL_MEMORY_RESOURCE)
+    if(NOT HAVE_CXX_EXPERIMENTAL_MEMORY_RESOURCE)
+        message(FATAL_ERROR "No PMR resources available")
+    endif()
+endif()
 
 if(IS_DEBUG)
     add_sanitizers(${LIBRARY})

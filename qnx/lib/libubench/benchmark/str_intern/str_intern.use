@@ -34,3 +34,5 @@ var_set
 var_set_pmr
    Custom implementation extending "var_set" to use PMR memory allocation. PMR
    is polymorphic memory resource.
+ubench
+   Custom implementation as offered in libubench.

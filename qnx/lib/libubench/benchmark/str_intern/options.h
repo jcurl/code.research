@@ -16,6 +16,7 @@ enum class strintern_impl {
   fixed_set_1m,    //< Custom fixed size set of 1048576 buckets.
   var_set,         //< Custom variable bucket size.
   var_set_pmr,     //< Custom variable bucket size with PMR.
+  ubench,          //< Use implementation in libubench.
 };
 
 /// @brief User options.

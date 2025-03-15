@@ -14,8 +14,8 @@ class str_intern {
   str_intern() = default;
   str_intern(const str_intern&) = delete;
   auto operator=(const str_intern&) -> str_intern& = delete;
-  str_intern(str_intern&&) = default;
-  auto operator=(str_intern&&) -> str_intern& = default;
+  str_intern(str_intern&&) = delete;
+  auto operator=(str_intern&&) -> str_intern& = delete;
   virtual ~str_intern() = default;
 
   /// @brief intern a given string and return the interned string.
@@ -116,8 +116,8 @@ class intern_fixed_set : public str_intern {
   intern_fixed_set() = delete;
   intern_fixed_set(const intern_fixed_set&) = delete;
   auto operator=(const intern_fixed_set&) -> intern_fixed_set& = delete;
-  intern_fixed_set(intern_fixed_set&&) = default;
-  auto operator=(intern_fixed_set&&) -> intern_fixed_set& = default;
+  intern_fixed_set(intern_fixed_set&&) = delete;
+  auto operator=(intern_fixed_set&&) -> intern_fixed_set& = delete;
   ~intern_fixed_set() override;
 
   /// @brief instantiate with a fixed number of buckets.
@@ -152,8 +152,8 @@ class intern_var_set : public str_intern {
   intern_var_set() = delete;
   intern_var_set(const intern_var_set&) = delete;
   auto operator=(const intern_var_set&) -> intern_var_set& = delete;
-  intern_var_set(intern_var_set&&) = default;
-  auto operator=(intern_var_set&&) -> intern_var_set& = default;
+  intern_var_set(intern_var_set&&) = delete;
+  auto operator=(intern_var_set&&) -> intern_var_set& = delete;
   ~intern_var_set() override;
 
   /// @brief instantiate with a fixed number of buckets.
@@ -195,8 +195,8 @@ class intern_var_set : public str_intern {
   ///
   /// When changing the load factor so that more buckets are needed, the next
   /// interning operation will result in a rehash. When changing the load factor
-  /// so that less buckets are needed (e.g. the value incrases), then the number
-  /// of buckets remains as it was.
+  /// so that less buckets are needed (e.g. the value increases), then the
+  /// number of buckets remains as it was.
   ///
   /// @param ml the new max load factor.
   auto max_load_factor(float ml) -> void;
@@ -213,8 +213,8 @@ class intern_var_set_pmr : public str_intern {
   intern_var_set_pmr() = delete;
   intern_var_set_pmr(const intern_var_set_pmr&) = delete;
   auto operator=(const intern_var_set_pmr&) -> intern_var_set_pmr& = delete;
-  intern_var_set_pmr(intern_var_set_pmr&&) = default;
-  auto operator=(intern_var_set_pmr&&) -> intern_var_set_pmr& = default;
+  intern_var_set_pmr(intern_var_set_pmr&&) = delete;
+  auto operator=(intern_var_set_pmr&&) -> intern_var_set_pmr& = delete;
   ~intern_var_set_pmr() override;
 
   /// @brief instantiate with a fixed number of buckets.
@@ -256,8 +256,8 @@ class intern_var_set_pmr : public str_intern {
   ///
   /// When changing the load factor so that more buckets are needed, the next
   /// interning operation will result in a rehash. When changing the load factor
-  /// so that less buckets are needed (e.g. the value incrases), then the number
-  /// of buckets remains as it was.
+  /// so that less buckets are needed (e.g. the value increases), then the
+  /// number of buckets remains as it was.
   ///
   /// @param ml the new max load factor.
   auto max_load_factor(float ml) -> void;
