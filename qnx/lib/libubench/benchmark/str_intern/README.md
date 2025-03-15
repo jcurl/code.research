@@ -17,13 +17,16 @@ simple rules (a space between any character separates to create a new token).
 
 - [1. Implementations](#1-implementations)
 - [2. Results](#2-results)
-  - [2.1. None](#21-none)
-  - [2.2. Forward List](#22-forward-list)
-  - [2.3. Set](#23-set)
-  - [2.4. Unordered Set](#24-unordered-set)
-  - [2.5. Fixed Set](#25-fixed-set)
-  - [2.6. Variable Set](#26-variable-set)
-  - [2.7. Variable Set with PMR](#27-variable-set-with-pmr)
+  - [2.1. Comparison of Operating Systems](#21-comparison-of-operating-systems)
+  - [2.2. Comparison of Compilers (and standard libraries)](#22-comparison-of-compilers-and-standard-libraries)
+- [3. Test Implementations](#3-test-implementations)
+  - [3.1. None](#31-none)
+  - [3.2. Forward List](#32-forward-list)
+  - [3.3. Set](#33-set)
+  - [3.4. Unordered Set](#34-unordered-set)
+  - [3.5. Fixed Set](#35-fixed-set)
+  - [3.6. Variable Set](#36-variable-set)
+  - [3.7. Variable Set with PMR](#37-variable-set-with-pmr)
 
 ## 1. Implementations
 
@@ -35,6 +38,7 @@ simple rules (a space between any character separates to create a new token).
 | `unordered_set` | Use an `unordered_set`                                                                                |
 | `fixed_set_XX`  | Custom implementation of a set optimised for storing `std::string` with a `std::string_view` as a key |
 | `var_set`       | Custom implementation of a set with dynamic bucket sizes based on a `max_load_factor` of 1.0          |
+| `var_set_pmr`   | Custom implementation of a set with dynamic bucket sizes using C++17 PMR for memory                   |
 
 ## 2. Results
 
@@ -45,7 +49,19 @@ interning generally has very few unique words and lots of repetitions. Thus the
 search complexity will have an influence in predicting the performance in other
 scenarios.
 
-This was tested on an Intel Skylake i7-6700T on Ubuntu 22.04.5 (GCC)
+### 2.1. Comparison of Operating Systems
+
+| Toolchain        | Compiler                              | PMR                    |
+| ---------------- | ------------------------------------- | ---------------------- |
+| Ubuntu 22.04.5   | GCC 11.4.0                            | std::pmr               |
+| QNX 7.1.0        | GCC 8.3.0                             | std::experimental::pmr |
+| QNX 8.0.0        | GCC 12.2.0                            | std::pmr               |
+| NetBSD 10.1      | GCC 10.5.0                            | std::pmr               |
+| FreeBSD 14.2     | Clang 14.0.0                          | std::pmr               |
+| RPiOS-12.10 RPi4 | GCC 12.2.0, GLIBC 2.36-9+rpt2+deb12u9 | std::pmr               |
+| RPiOS-12.10 RPi5 | GCC 12.2.0, GLIBC 2.36-9+rpt2+deb12u9 | std::pmr               |
+
+This was tested on an Intel Skylake i7-6700T on Ubuntu 22.04.5
 
 | Metric                      |       none | forward_list |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
 | --------------------------- | ---------: | -----------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
@@ -61,7 +77,7 @@ This was tested on an Intel Skylake i7-6700T on Ubuntu 22.04.5 (GCC)
 | System Time (ms)            |        464 |   16,558,119 |       4,508 |         1,591 |          1,234 |          1,059 |          1,006 |          940 |      1,185 |       1,002 |
 | Elapsed Time (ms)           |        408 |   16,180,343 |       4,352 |         1,507 |          1,155 |            992 |            907 |          871 |      1,046 |         932 |
 
-For QNX 7.1.0 on Raspberry Pi 4B 8GB
+For QNX 7.1.0 on Raspberry Pi 4B 8GB (no superlocking)
 
 | Metric                      |       none | forward_list |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
 | --------------------------- | ---------: | -----------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
@@ -109,12 +125,206 @@ For NetBSD 10.1 on Raspberry Pi 4B 8GB (GCC)
 | System Time (ms)            |      3,233 |              |      35,208 |        11,347 |          9,761 |          8,790 |          8,131 |        7,813 |      8,353 |       7,809 |
 | Elapsed Time (ms)           |      3,240 |              |      35,262 |        11,351 |          9,752 |          8,785 |          8,137 |        7,833 |      8,360 |       7,799 |
 
-### 2.1. None
+For FreeBSD 14.2 on Raspberry Pi 4B 8GB (Clang)
+
+| Metric                      |       none | forward_list |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | -----------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |              |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |   11847,228 |
+| Interned Words              |          0 |              |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |              |  18,939,764 |    16,830,380 |     19,988,380 |     21,036,956 |     23,134,108 |   27,328,412 | 23,134,132 |   27429,508 |
+| Max Allocated Mem (bytes)   |          8 |              |  18,939,852 |    16,830,452 |     19,988,380 |     21,036,956 |     23,134,108 |   27,328,412 | 23,134,132 |   33844,720 |
+| Total Allocated Mem (bytes) |          8 |              | 663,569,562 |   480,597,666 |     19,988,380 |     21,036,956 |     23,134,108 |   27,328,412 | 39,780,276 |   48992,276 |
+| Total Freed Mem (bytes)     |          0 |              | 644,629,798 |   463,767,286 |              0 |              0 |              0 |            0 | 16,646,144 |   21562,768 |
+| Allocation Count            |          1 |              |  11,850,438 |    11,850,456 |        676,220 |        676,220 |        676,220 |      676,220 |  1,196,419 |       1,295 |
+| Free Count                  |          0 |              |  11,511,821 |    11,511,838 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |      1,390 |              |      11,805 |         5,379 |          4,368 |          3,725 |          3,365 |        3,311 |      4,121 |       3,976 |
+| System Time (ms)            |      1,579 |              |      12,729 |         5,673 |          4,340 |          4,020 |          3,604 |        3,442 |      4,399 |       4,298 |
+| Elapsed Time (ms)           |      1,390 |              |      11,805 |         5,379 |          4,368 |          3,725 |          3,365 |        3,311 |      4,121 |       3,976 |
+
+For RPiOS 12.10 on Raspberry Pi 4B 8GB (GCC)
+
+| Metric                      |       none | forward_list |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | -----------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |              |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |              |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |              |  21,851,384 |    19,258,264 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  30,392,976 |
+| Max Allocated Mem (bytes)   |          8 |              |  21,851,475 |    19,258,339 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  36,238,277 |
+| Total Allocated Mem (bytes) |          8 |              | 758,821,533 |   574,800,861 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 42,691,872 |  51,955,744 |
+| Total Freed Mem (bytes)     |          0 |              | 736,970,149 |   555,542,597 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |              |  11,876,595 |    11,876,610 |        687,779 |        687,779 |        687,779 |      687,779 |  1,207,978 |      12,875 |
+| Free Count                  |          0 |              |  11,526,419 |    11,526,433 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |      1,179 |              |      14,572 |         5,278 |          4,139 |          3,516 |          3,253 |        3,114 |      3,915 |       3,690 |
+| System Time (ms)            |      1,180 |              |      14,582 |         5,293 |          4,140 |          3,527 |          3,256 |        3,120 |      3,921 |       3,724 |
+| Elapsed Time (ms)           |      1,179 |              |      14,573 |         5,278 |          4,140 |          3,516 |          3,254 |        3,115 |      3,915 |       3,691 |
+
+For RPiOS 12.10 on Raspberry Pi 5 8GB with LLSC instructions
+
+| Metric                      |       none | forward_list |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | -----------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |              |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |              |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |              |  21,851,384 |    19,258,264 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  30,392,976 |
+| Max Allocated Mem (bytes)   |          8 |              |  21,851,475 |    19,258,339 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  36,238,277 |
+| Total Allocated Mem (bytes) |          8 |              | 758,821,533 |   574,800,861 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 42,691,872 |  51,955,744 |
+| Total Freed Mem (bytes)     |          0 |              | 736,970,149 |   555,542,597 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |              |  11,876,595 |    11,876,610 |        687,779 |        687,779 |        687,779 |      687,779 |  1,207,978 |      12,875 |
+| Free Count                  |          0 |              |  11,526,419 |    11,526,433 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        522 |              |       5,491 |         2,207 |          1,732 |          1,496 |          1,375 |        1,301 |      1,690 |       1,516 |
+| System Time (ms)            |        530 |              |       5,534 |         2,211 |          1,773 |          1,497 |          1,371 |        1,297 |      1,690 |       1,516 |
+| Elapsed Time (ms)           |        522 |              |       5,496 |         2,207 |          1,735 |          1,496 |          1,375 |        1,301 |      1,690 |       1,516 |
+
+For RPiOS 12.10 on Raspberry Pi 5 8GB with LSE instructions (`-march=native`)
+
+| Metric                      |       none | forward_list |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | -----------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |              |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |   11847,228 |
+| Interned Words              |          0 |              |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |              |  21,851,384 |    19,258,264 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |   30392,976 |
+| Max Allocated Mem (bytes)   |          8 |              |  21,851,475 |    19,258,339 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |   36238,277 |
+| Total Allocated Mem (bytes) |          8 |              | 758,821,533 |   574,800,861 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 42,691,872 |   51955,744 |
+| Total Freed Mem (bytes)     |          0 |              | 736,970,149 |   555,542,597 |              0 |              0 |              0 |            0 | 16,646,144 |   21562,768 |
+| Allocation Count            |          1 |              |  11,876,595 |    11,876,610 |        687,779 |        687,779 |        687,779 |      687,779 |  1,207,978 |      12,875 |
+| Free Count                  |          0 |              |  11,526,419 |    11,526,433 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        522 |              |       5,483 |         2,199 |          1,733 |          1,483 |          1,361 |        1,299 |      1,682 |       1,517 |
+| System Time (ms)            |        529 |              |       5,484 |         2,196 |          1,733 |          1,525 |          1,364 |        1,297 |      1,690 |       1,521 |
+| Elapsed Time (ms)           |        522 |              |       5,483 |         2,199 |          1,733 |          1,483 |          1,361 |        1,299 |      1,682 |       1,517 |
+
+### 2.2. Comparison of Compilers (and standard libraries)
+
+The following tables are tests on a Skylake 6th Gen i7-6700T @ 2.80GHz run from
+Podman containers with the kernel from Ubuntu 22.04.05, 6.8.0-52-generic
+#53~22.04.1-Ubuntu.
+
+| Container           | Compiler     | LibC                     | PMR                    |
+| ------------------- | ------------ | ------------------------ | ---------------------- |
+| alpine-latest-clang | Clang 19.1.4 | musl libc (x86_64) 1.2.5 | std::pmr               |
+| ubuntu-focal        | GCC 9.4.0    | GLIBC 2.31-0ubuntu9.17   | std::pmr               |
+| ubuntu-focal-clang  | Clang 10.0.0 | GLIBC 2.31-0ubuntu9.17   | std::experimental::pmr |
+| ubuntu-jammy        | GCC 11.4.0   | GLIBC 2.35-0ubuntu3.9    | std::pmr               |
+| ubuntu-jammy-clang  | Clang 14.0.0 | GLIBC 2.35-0ubuntu3.9    | std::experimental::pmr |
+| ubuntu-noble        | 13.3.0       | GLIBC 2.39-0ubuntu8.4    | std::pmr               |
+| ubuntu-noble-clang  | Clang 18.1.3 | GLIBC 2.39-0ubuntu8.4    | std::pmr               |
+
+For alpine-latest-clang
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  18,939,764 |    16,830,380 |     19,988,380 |     21,036,956 |     23,134,108 |   27,328,412 | 23,134,132 |  27,429,508 |
+| Max Allocated Mem (bytes)   |          8 |  18,939,852 |    16,830,452 |     19,988,380 |     21,036,956 |     23,134,108 |   27,328,412 | 23,134,132 |  33,844,720 |
+| Total Allocated Mem (bytes) |          8 | 663,569,562 |   480,597,666 |     19,988,380 |     21,036,956 |     23,134,108 |   27,328,412 | 39,780,276 |  48,992,276 |
+| Total Freed Mem (bytes)     |          0 | 644,629,798 |   463,767,286 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |  11,850,438 |    11,850,456 |        676,220 |        676,220 |        676,220 |      676,220 |  1,196,419 |       1,295 |
+| Free Count                  |          0 |  11,511,821 |    11,511,838 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        318 |       4,395 |         2,074 |          1,445 |          1,047 |            951 |          918 |      1,043 |         905 |
+| System Time (ms)            |        375 |       4,522 |         2,173 |          1,814 |          1,124 |          1,003 |          990 |      1,127 |         943 |
+| Elapsed Time (ms)           |        318 |       4,397 |         2,076 |          1,445 |          1,048 |            951 |          918 |      1,043 |         905 |
+
+For ubuntu-focal
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  21,851,384 |    19,258,264 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  30,392,976 |
+| Max Allocated Mem (bytes)   |          8 |  21,851,475 |    19,258,339 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  36,238,277 |
+| Total Allocated Mem (bytes) |          8 | 758,821,533 |   574,800,861 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 42,691,872 |  51,955,744 |
+| Total Freed Mem (bytes)     |          0 | 736,970,149 |   555,542,597 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |  11,876,595 |    11,876,610 |        687,779 |        687,779 |        687,779 |      687,779 |  1,207,978 |      12,875 |
+| Free Count                  |          0 |  11,526,419 |    11,526,433 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        370 |       4,026 |         1,364 |          1,101 |            940 |            850 |          813 |        971 |         869 |
+| System Time (ms)            |        403 |       4,137 |         1,424 |          1,176 |            993 |            917 |          875 |      1,025 |         933 |
+| Elapsed Time (ms)           |        370 |       4,027 |         1,364 |          1,102 |            940 |            850 |          813 |        971 |         869 |
+
+For ubuntu-focal-clang
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  18,942,760 |    16,833,376 |     19,991,376 |     21,039,952 |     23,137,104 |   27,331,408 | 23,137,128 |  27,432,504 |
+| Max Allocated Mem (bytes)   |          8 |  18,942,848 |    16,833,448 |     19,991,376 |     21,039,952 |     23,137,104 |   27,331,408 | 23,137,128 |  33,846,856 |
+| Total Allocated Mem (bytes) |          8 | 663,581,680 |   480,609,784 |     19,991,376 |     21,039,952 |     23,137,104 |   27,331,408 | 39,783,272 |  48,995,272 |
+| Total Freed Mem (bytes)     |          0 | 644,638,920 |   463,776,408 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |  11,850,438 |    11,850,456 |        676,220 |        676,220 |        676,220 |      676,220 |  1,196,419 |       1,295 |
+| Free Count                  |          0 |  11,511,821 |    11,511,838 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        288 |       3,138 |         1,442 |            963 |            805 |            696 |          651 |        797 |         703 |
+| System Time (ms)            |        317 |       3,258 |         1,520 |          1,009 |            856 |            742 |          682 |        847 |         737 |
+| Elapsed Time (ms)           |        288 |       3,138 |         1,442 |            963 |            805 |            696 |          651 |        797 |         703 |
+
+For ubuntu-jammy
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  21,851,384 |    19,258,264 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  30,392,976 |
+| Max Allocated Mem (bytes)   |          8 |  21,851,475 |    19,258,339 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  36,238,277 |
+| Total Allocated Mem (bytes) |          8 | 758,821,533 |   574,800,861 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 42,691,872 |  51,955,744 |
+| Total Freed Mem (bytes)     |          0 | 736,970,149 |   555,542,597 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |  11,876,595 |    11,876,610 |        687,779 |        687,779 |        687,779 |      687,779 |  1,207,978 |      12,875 |
+| Free Count                  |          0 |  11,526,419 |    11,526,433 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        373 |       4,326 |         1,493 |          1,154 |            969 |            889 |          855 |      1,039 |         925 |
+| System Time (ms)            |        416 |       4,490 |         1,561 |          1,239 |          1,037 |            949 |          923 |      1,097 |         977 |
+| Elapsed Time (ms)           |        373 |       4,327 |         1,493 |          1,154 |            969 |            889 |          855 |      1,039 |         925 |
+
+For ubuntu-jammy-clang
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  18,942,760 |    16,833,376 |     19,991,376 |     21,039,952 |     23,137,104 |   27,331,408 | 23,137,128 |  19,043,896 |
+| Max Allocated Mem (bytes)   |          8 |  18,942,848 |    16,833,448 |     19,991,376 |     21,039,952 |     23,137,104 |   27,331,408 | 23,137,128 |  21,263,944 |
+| Total Allocated Mem (bytes) |          8 | 663,581,680 |   480,609,784 |     19,991,376 |     21,039,952 |     23,137,104 |   27,331,408 | 39,783,272 |  32,283,592 |
+| Total Freed Mem (bytes)     |          0 | 644,638,920 |   463,776,408 |              0 |              0 |              0 |            0 | 16,646,144 |  13,239,696 |
+| Allocation Count            |          1 |  11,850,438 |    11,850,456 |        676,220 |        676,220 |        676,220 |      676,220 |  1,196,419 |       1,287 |
+| Free Count                  |          0 |  11,511,821 |    11,511,838 |              0 |              0 |              0 |            0 |    520,199 |         122 |
+| Process Time (ms)           |        247 |       3,307 |         1,471 |            976 |            809 |            770 |          685 |        825 |         739 |
+| System Time (ms)            |        277 |       3,451 |         1,542 |          1,031 |            862 |          1,259 |          727 |        873 |         805 |
+| Elapsed Time (ms)           |        247 |       3,307 |         1,471 |            976 |            809 |            771 |          685 |        825 |         739 |
+
+For ubuntu-noble
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  21,851,384 |    19,258,264 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  30,392,976 |
+| Max Allocated Mem (bytes)   |          8 |  21,851,475 |    19,258,339 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 26,045,728 |  36,238,277 |
+| Total Allocated Mem (bytes) |          8 | 758,821,533 |   574,800,861 |     22,899,976 |     23,948,552 |     26,045,704 |   30,240,008 | 42,691,872 |  51,955,744 |
+| Total Freed Mem (bytes)     |          0 | 736,970,149 |   555,542,597 |              0 |              0 |              0 |            0 | 16,646,144 |  21,562,768 |
+| Allocation Count            |          1 |  11,876,595 |    11,876,610 |        687,779 |        687,779 |        687,779 |      687,779 |  1,207,978 |      12,875 |
+| Free Count                  |          0 |  11,526,419 |    11,526,433 |              0 |              0 |              0 |            0 |    520,199 |         129 |
+| Process Time (ms)           |        363 |       4,317 |         1,457 |          1,147 |            988 |            903 |          857 |      1,029 |         923 |
+| System Time (ms)            |        401 |       4,452 |         1,539 |          1,230 |          1,040 |            946 |          908 |      1,084 |         986 |
+| Elapsed Time (ms)           |        363 |       4,317 |         1,457 |          1,147 |            988 |            903 |          857 |      1,029 |         923 |
+
+For ubuntu-noble-clang
+
+| Metric                      |       none |         set | unordered_set | fixed_set_128k | fixed_set_256k | fixed_set_512k | fixed_set_1m |    var_set | var_set_pmr |
+| --------------------------- | ---------: | ----------: | ------------: | -------------: | -------------: | -------------: | -----------: | ---------: | ----------: |
+| Words                       | 11,847,228 |  11,847,228 |    11,847,228 |     11,847,228 |     11,847,228 |     11,847,228 |   11,847,228 | 11,847,228 |  11,847,228 |
+| Interned Words              |          0 |     337,601 |       337,601 |        337,601 |        337,601 |        337,601 |      337,601 |    337,601 |     337,601 |
+| Currently Allocated (bytes) |          8 |  18,939,510 |    16,830,126 |     19,988,126 |     21,036,702 |     23,133,854 |   27,328,158 | 23,133,878 |  19,040,646 |
+| Max Allocated Mem (bytes)   |          8 |  18,939,598 |    16,830,198 |     19,988,126 |     21,036,702 |     23,133,854 |   27,328,158 | 23,133,878 |  21,261,612 |
+| Total Allocated Mem (bytes) |          8 | 663,568,981 |   480,597,085 |     19,988,126 |     21,036,702 |     23,133,854 |   27,328,158 | 39,780,022 |  32,280,342 |
+| Total Freed Mem (bytes)     |          0 | 644,629,471 |   463,766,959 |              0 |              0 |              0 |            0 | 16,646,144 |  13,239,696 |
+| Allocation Count            |          1 |  11,850,438 |    11,850,456 |        676,220 |        676,220 |        676,220 |      676,220 |  1,196,419 |       1,287 |
+| Free Count                  |          0 |  11,511,821 |    11,511,838 |              0 |              0 |              0 |            0 |    520,199 |         122 |
+| Process Time (ms)           |        252 |       3,479 |         1,385 |            933 |            797 |            703 |          672 |        817 |         708 |
+| System Time (ms)            |        286 |       3,651 |         1,519 |            989 |            838 |            737 |          721 |      1,162 |         751 |
+| Elapsed Time (ms)           |        252 |       3,480 |         1,386 |            933 |            797 |            703 |          672 |        817 |         708 |
+
+## 3. Test Implementations
+
+### 3.1. None
 
 The base line. No words are interned, the file is read. On the machine (using
 68MB file, 32GB RAM in the system, reading from an external HDD).
 
-### 2.2. Forward List
+### 3.2. Forward List
 
 A simple, forward search every time a word is added.
 
@@ -128,7 +338,7 @@ Complexity analysis:
 - Insert is O(1).
 - Interning a file is then O(n^2 + m), where m is the number of unique words.
 
-### 2.3. Set
+### 3.3. Set
 
 A simple set. The `string_view` is provided and stored as a `string`.
 
@@ -146,7 +356,7 @@ Complexity analysis:
 - See [Stack
   Overflow](https://stackoverflow.com/questions/2558153/what-is-the-underlying-data-structure-of-a-stl-set-in-c/51944661#51944661)
 
-### 2.4. Unordered Set
+### 3.4. Unordered Set
 
 Same as using a set, but the structure is stored in an
 `unordered_set<std::string>`.
@@ -161,7 +371,7 @@ Same as using a set, but the structure is stored in an
 - See [Stack
   Overflow](https://stackoverflow.com/questions/2558153/what-is-the-underlying-data-structure-of-a-stl-set-in-c/51944661#51944661)
 
-### 2.5. Fixed Set
+### 3.5. Fixed Set
 
 This is a custom implementation of a set using a fixed number of buckets. The
 value is the number of buckets.
@@ -173,7 +383,7 @@ value is the number of buckets.
 
 The time decreases as the buckets increase as there are fewer collisions.
 
-### 2.6. Variable Set
+### 3.6. Variable Set
 
 A custom implementation extending the fixed set. There are initially 4096
 buckets in the test. Every time the load factor reaches 1.0 (the number of
@@ -193,7 +403,7 @@ the memory usage).
 
 The lookup time is fast. The insertion time is slower due to the reallocation.
 
-### 2.7. Variable Set with PMR
+### 3.7. Variable Set with PMR
 
 An extension of "Variable Set", but a custom allocator is used. The custom
 allocator is a monotonic memory resource, but instead of a fixed size array, it

@@ -20,6 +20,11 @@
     - [2.2.4. List QNX Files](#224-list-qnx-files)
     - [2.2.5. List Shared Memory](#225-list-shared-memory)
     - [2.2.6. List Interfaces and IPv4 Addresses](#226-list-interfaces-and-ipv4-addresses)
+- [3. Further Benchmarks for Testing](#3-further-benchmarks-for-testing)
+  - [3.1. String Interning](#31-string-interning)
+  - [3.2. Conversion of Hexadecimal String to Integer](#32-conversion-of-hexadecimal-string-to-integer)
+  - [3.3. Printing of Network Strings](#33-printing-of-network-strings)
+  - [3.4. Read/Copy/Update Userspace Implementation](#34-readcopyupdate-userspace-implementation)
 
 ## 1. Compilation
 
@@ -213,3 +218,32 @@ Other Platforms:
 - (/) Cygwin (Windows): Gets the alias names from the GUIDs. No VLANs.
 - (/) NetBSD 10.1: Works.
 - (/) FreeBSD 14.2: Works.
+
+## 3. Further Benchmarks for Testing
+
+### 3.1. String Interning
+
+Various implementations for string interning are implemented.
+
+See [README.md](./lib/libubench/benchmark/str_intern/README.md)
+
+### 3.2. Conversion of Hexadecimal String to Integer
+
+A general implementation with lookups for a fast conversion of a hex string to a
+number.
+
+See [README.md](./lib/libubench/benchmark/README.md)
+
+### 3.3. Printing of Network Strings
+
+What is the more "generic" way to convert a MAC address and an IPv4 address to a
+string.
+
+See [netbench.cpp comments](./lib/libubench/benchmark/net_bench.cpp)
+
+### 3.4. Read/Copy/Update Userspace Implementation
+
+Shows performance of updates for an RCU. You'll see that it serializes to the
+speed of one core (expected).
+
+See [rcu.md](./lib/libubench/docs/rcu.md)
