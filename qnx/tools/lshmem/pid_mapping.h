@@ -7,10 +7,11 @@
 
 #include <filesystem>
 #include <list>
+#include <memory>
 #include <string_view>
-#include <unordered_set>
 
 #include "stdext/expected.h"
+#include "ubench/str_intern.h"
 
 /// @brief describes a contiguous physical memory region.
 struct map_line {
@@ -26,32 +27,10 @@ struct map_line {
 /// @brief List of contiguous physical memory regions.
 class pid_mapping final {
  public:
-  pid_mapping() = default;
-
-  /// @brief Copy constructor.
-  ///
-  /// Copying is slow as the intern strings all need to be updated.
-  ///
-  /// @param other the other object to copy.
-  pid_mapping(const pid_mapping& other)
-      : map_{other.map_}, strings_{other.strings_} {
-    fix_intern();
-  }
-
-  /// @brief Copy assignment operator.
-  ///
-  /// Copying is slow as the intern strings all need to be updated.
-  ///
-  /// @param other the other object to copy.
-  ///
-  /// @return a reference to this.
-  auto operator=(const pid_mapping& other) -> pid_mapping& {
-    if (this == &other) return *this;
-    map_ = other.map_;
-    strings_ = other.strings_;
-    fix_intern();
-    return *this;
-  }
+  pid_mapping(std::shared_ptr<ubench::string::str_intern> strings)
+      : strings_{std::move(strings)} {}
+  pid_mapping(const pid_mapping& other) = default;
+  auto operator=(const pid_mapping& other) -> pid_mapping& = default;
   pid_mapping(pid_mapping&&) noexcept = default;
   auto operator=(pid_mapping&& other) noexcept -> pid_mapping& = default;
   ~pid_mapping() = default;
@@ -68,22 +47,7 @@ class pid_mapping final {
 
  private:
   std::list<map_line> map_{};
-  std::unordered_set<std::string> strings_{};
-
-  /// @brief Given a string view, return an interned string.
-  ///
-  /// @param str The string_view that should be interned.
-  ///
-  /// @return A reference to a string that is interned.
-  auto string_intern(std::string_view str) -> const std::string&;
-
-  /// @brief Fix all copies of strings in map_ to point to the corect intern.
-  ///
-  /// When copying this object, the map_ will have strings pointing to the old
-  /// copy that aren't updated (because the references aren't copied, they're
-  /// assumed to be valid). All the strings in the intern were moved though, so
-  /// just need to update them all.
-  auto fix_intern() -> void;
+  std::shared_ptr<ubench::string::str_intern> strings_{};
 };
 
 /// @brief Load a mappings file.
@@ -93,7 +57,8 @@ class pid_mapping final {
 /// @param read check also read-only mappings.
 ///
 /// @return the map, or the error code.
-auto load_mapping(std::filesystem::path mapping, bool read)
+auto load_mapping(std::filesystem::path mapping, bool read,
+    std::shared_ptr<ubench::string::str_intern> strings)
     -> stdext::expected<pid_mapping, int>;
 
 #endif

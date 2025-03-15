@@ -6,9 +6,11 @@
 #include <cstdint>
 #include <fstream>
 #include <locale>
+#include <memory>
 #include <tuple>
 
 #include "stdext/expected.h"
+#include "ubench/str_intern.h"
 #include "ubench/string.h"
 
 namespace {
@@ -107,17 +109,6 @@ auto inline merge_mapline(map_line& line, map_line& merge) -> bool {
 
 }  // namespace
 
-auto pid_mapping::string_intern(std::string_view str) -> const std::string& {
-  auto result = strings_.emplace(str);
-  return *result.first;
-}
-
-auto pid_mapping::fix_intern() -> void {
-  for (auto& line : map_) {
-    line.object = string_intern(line.object);
-  }
-}
-
 auto pid_mapping::insert(map_line&& line) -> void {
   bool first = true;
   for (auto it = map_.begin(); it != map_.end(); it = std::next(it)) {
@@ -144,7 +135,7 @@ auto pid_mapping::insert(map_line&& line) -> void {
           if (merge_mapline(prev, line)) return;
         }
         // Otherwise new entry that can't be merged.
-        line.object = string_intern(line.object);
+        line.object = strings_->intern(line.object);
         map_.insert(it, std::move(line));
       }
       return;
@@ -157,11 +148,12 @@ auto pid_mapping::insert(map_line&& line) -> void {
     map_line& prev = *std::prev(map_.end());
     if (merge_mapline(prev, line)) return;
   }
-  line.object = string_intern(line.object);
+  line.object = strings_->intern(line.object);
   map_.push_back(std::move(line));
 }
 
-auto load_mapping(std::filesystem::path mapping, bool read)
+auto load_mapping(std::filesystem::path mapping, bool read,
+    std::shared_ptr<ubench::string::str_intern> strings)
     -> stdext::expected<pid_mapping, int> {
   std::ifstream file{};
   file.open(mapping);
@@ -184,7 +176,7 @@ auto load_mapping(std::filesystem::path mapping, bool read)
   if (col_index.size() == 0) return stdext::unexpected{EINVAL};
 
   // Parse each memory map line.
-  pid_mapping map{};
+  pid_mapping map{std::move(strings)};
   while (true) {
     std::string line;
     if (!std::getline(file, line)) {

@@ -3,14 +3,19 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <sstream>
 
 #include "osqnx/asinfo.h"
 #include "osqnx/pids.h"
+#include "ubench/str_intern.h"
 #include "ubench/string.h"
 #include "options.h"
 #include "pid_mapping.h"
 #include "shmem_map.h"
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+auto strings = std::make_shared<ubench::string::str_intern>();
 
 auto mapping_file(unsigned int pid) {
   std::ostringstream pathstream{};
@@ -44,7 +49,7 @@ auto get_shmem(const std::vector<unsigned int>& pids, os::qnx::pids& p,
       }
     }
     auto file = mapping_file(pid);
-    auto mapping = load_mapping(file, read);
+    auto mapping = load_mapping(file, read, strings);
     if (!mapping) {
       std::cerr << "Error: File: " << file << "; "
                 << ubench::string::perror(mapping.error()) << std::endl;
