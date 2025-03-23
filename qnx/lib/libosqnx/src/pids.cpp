@@ -1,7 +1,7 @@
 #include "osqnx/pids.h"
 
-#include <sys/procfs.h>
 #include <sys/types.h>
+#include <sys/procfs.h>
 #include <devctl.h>
 #include <unistd.h>
 

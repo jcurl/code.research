@@ -1,8 +1,8 @@
 #include "config.h"
 
+#include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 
 #if HAVE_NET_INCLUDE_LINUX_SOCKIOS_H
 #include <linux/if_vlan.h>

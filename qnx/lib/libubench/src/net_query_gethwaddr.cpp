@@ -1,15 +1,15 @@
 #include "config.h"
 
+#include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <net/if.h>
-#include <unistd.h>
 #if HAVE_NET_INCLUDE_NET_ETHERNET_H
 // Present on Linux, provides ::ether_addr
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 #endif
+#include <unistd.h>
 
 #include <cerrno>
 #include <cstring>

@@ -1,8 +1,8 @@
 #ifndef UBENCH_OS_H
 #define UBENCH_OS_H
 
-#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 

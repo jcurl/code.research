@@ -87,33 +87,50 @@ IncludeCategories:
     Priority:        -1000
     CaseSensitive:   false
   - Regex:           '^<ext/.*\.h>'
-    Priority:        3
+    Priority:        200
+    CaseSensitive:   false
+  - Regex:           '^<sys/types\.h>'
+    Priority:        100
+    SortPriority:    100
     CaseSensitive:   false
   - Regex:           '^<sys/.*\.h>'
-    Priority:        1
-    SortPriority:    1
+    Priority:        100
+    SortPriority:    101
+    CaseSensitive:   false
+  - Regex:           '^<netinet/.*\.h>'
+    Priority:        100
+    SortPriority:    110
+    CaseSensitive:   false
+  - Regex:           '^<net/.*\.h>'
+    Priority:        100
+    SortPriority:    111
     CaseSensitive:   false
   - Regex:           '^<benchmark/.*'
-    Priority:        5
+    Priority:        400
     CaseSensitive:   false
   - Regex:           '^<gtest/.*'
-    Priority:        5
+    Priority:        400
     CaseSensitive:   false
   - Regex:           '^<gmock/.*'
-    Priority:        5
+    Priority:        400
+    CaseSensitive:   false
+  - Regex:           '^<.*/.*\.h>'
+    Priority:        100
+    SortPriority:    180
     CaseSensitive:   false
   - Regex:           '^<.*\.h>'
-    Priority:        1
-    SortPriority:    2
+    Priority:        100
+    SortPriority:    190
     CaseSensitive:   false
   - Regex:           '^<.*'
-    Priority:        4
+    Priority:        300
     CaseSensitive:   false
   - Regex:           '".*/.*\.h"'
-    Priority:        10
-    SortPriority:    9
-  - Regex:           '.*'
-    Priority:        10
+    Priority:        500
+    SortPriority:    500
+  - Regex:           '".*"'
+    Priority:        500
+    SortPriority:    501
     CaseSensitive:   false
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IncludeIsMainSourceRegex: ''

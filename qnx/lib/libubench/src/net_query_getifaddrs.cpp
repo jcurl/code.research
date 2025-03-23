@@ -1,9 +1,9 @@
 #include "config.h"
 
-#include <sys/socket.h>
 #include <sys/types.h>
-#include <ifaddrs.h>
+#include <sys/socket.h>
 #include <net/if.h>
+#include <ifaddrs.h>
 #if HAVE_NET_SOCKADDR_DL
 #include <net/if_dl.h>
 #if HAVE_NET_IFT_ETHER

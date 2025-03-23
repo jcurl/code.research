@@ -2,9 +2,9 @@
 #define UBENCH_NET_H
 
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <net/if.h>
 #include <netinet/in.h>
+#include <net/if.h>
+#include <arpa/inet.h>
 #if HAVE_NET_INCLUDE_LINUX_IF_H
 #include <linux/if.h>
 #endif

@@ -1,3 +1,4 @@
+#include <sys/types.h>
 #include <sys/proc.h>
 #include <sys/sched.h>
 #include <sys/sysctl.h>

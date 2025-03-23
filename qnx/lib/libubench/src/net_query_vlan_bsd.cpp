@@ -1,17 +1,17 @@
 #include "config.h"
 
+#include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 
 #if HAVE_NET_INCLUDE_NET_IF_VLANVAR_H
-#include "net/if_ether.h"
-#include "net/if_vlanvar.h"
+#include <net/if_ether.h>
+#include <net/if_vlanvar.h>
 #endif
 
 #if HAVE_NET_INCLUDE_NET_IF_VLAN_VAR_H
-#include "net/if.h"
-#include "net/if_vlan_var.h"
+#include <net/if.h>
+#include <net/if_vlan_var.h>
 #endif
 
 #include <cerrno>

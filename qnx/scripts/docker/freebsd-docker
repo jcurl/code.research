@@ -26,7 +26,7 @@ RUN (apt update -y || \
 RUN mkdir -p /opt/freebsd/${FREEBSD_VERSION}/aarch64/src \
   && mkdir -p /opt/freebsd/${FREEBSD_VERSION}/aarch64/sysroot \
   && cd /opt/freebsd/${FREEBSD_VERSION}/aarch64/src \
-  && wget --no-check-certificate -nc -nv http://ftp.freebsd.org/pub/FreeBSD/releases/arm64/14.2-RELEASE/base.txz
+  && wget --no-check-certificate -nc -nv http://ftp.freebsd.org/pub/FreeBSD/releases/arm64/${FREEBSD_VERSION}-RELEASE/base.txz
 
 # Put this on a new line, so we don't need to keep downloading the sources.
 # Extract the sources, build it, and then remove the sources and intermediate

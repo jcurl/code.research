@@ -1,12 +1,12 @@
+#include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
-#include <fcntl.h>
+#include <netinet/in.h>
 #include <net/bpf.h>
 #include <net/if.h>
-#include <netinet/in.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <cerrno>

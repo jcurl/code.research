@@ -1,8 +1,8 @@
 #ifndef BENCHMARK_LSHMEM_PID_MAPPING_H
 #define BENCHMARK_LSHMEM_PID_MAPPING_H
 
-#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include <filesystem>
