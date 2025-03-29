@@ -2,7 +2,6 @@
 
 #include <array>
 #include <cstddef>
-#include <cstdint>
 #include <iostream>
 #include <new>
 
@@ -16,20 +15,23 @@
 namespace {
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
-static std::array<std::uint8_t, localmemsize> localmem{};
+static std::array<std::byte, localmemsize> localmem{};
 static std::size_t offset{0};
 // NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
 
-}  // namespace
+// The size of 'mem_block' rounded up, so adding this to the initial
+// pointer maintains the alignment
+auto next_align(std::size_t offset, std::size_t align) noexcept -> std::size_t {
+  return (offset + align - 1) & (~align + 1);
+}
 
-auto get_allocated_localmem() -> std::size_t { return offset; }
-
-auto operator new(std::size_t size) noexcept(false) -> void * {
-  std::size_t p = offset;
-  offset += (size + 15) & ~0xF;
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+auto alloc(std::size_t size, std::size_t al) noexcept -> void * {
+  std::size_t p = next_align(offset, al);
+  offset = p + size;
   if (offset > localmemsize) {
     std::cout << "Out of memory" << std::endl;
-    std::abort();
+    return nullptr;
   }
 
 #ifndef NDEBUG
@@ -42,30 +44,25 @@ auto operator new(std::size_t size) noexcept(false) -> void * {
 #endif
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-  void *n = &localmem[p];
-  return n;
+  return &localmem[p];
 }
 
-auto operator new[](std::size_t size) noexcept(false) -> void * {
-  std::size_t p = offset;
-  offset += (size + 15) & ~0xF;
-  if (offset > localmemsize) {
-    std::cout << "Out of memory" << std::endl;
-    std::abort();
-  }
+}  // namespace
 
-#ifndef NDEBUG
-  std::size_t pb = p & ~0x3FFFFFF;
-  std::size_t ob = offset & ~0x3FFFFFF;
-  if (pb != ob) {
-    std::cout << "Allocated: " << offset << " bytes of a total " << localmemsize
-              << std::endl;
-  }
-#endif
+auto get_allocated_localmem() -> std::size_t { return offset; }
 
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-  void *n = &localmem[p];
-  return n;
+auto operator new(std::size_t size, const std::nothrow_t &) noexcept -> void * {
+  return alloc(size, sizeof(std::max_align_t));
+}
+
+auto operator new(std::size_t size) -> void * {
+  auto p = alloc(size, sizeof(std::max_align_t));
+  if (!p) throw std::bad_alloc{};
+  return p;
+}
+
+auto operator delete(void *, const std::nothrow_t &) noexcept -> void {
+  // Don't free anything.
 }
 
 auto operator delete(void *) noexcept -> void {
@@ -76,10 +73,73 @@ auto operator delete(void *, std::size_t) noexcept -> void {
   // Don't free anything.
 }
 
+auto operator new[](std::size_t size, const std::nothrow_t &) noexcept
+    -> void * {
+  return alloc(size, sizeof(std::max_align_t));
+}
+
+auto operator new[](std::size_t size) -> void * {
+  auto p = alloc(size, sizeof(std::max_align_t));
+  if (!p) throw std::bad_alloc{};
+  return p;
+}
+
+auto operator delete[](void *, const std::nothrow_t &) noexcept -> void {
+  // Don't free anything.
+}
+
 auto operator delete[](void *) noexcept -> void {
   // Don't free anything.
 }
 
 auto operator delete[](void *, std::size_t) noexcept -> void {
+  // Don't free anything.
+}
+
+auto operator new(std::size_t size, std::align_val_t al,
+    const std::nothrow_t &) noexcept -> void * {
+  return alloc(size, static_cast<std::size_t>(al));
+}
+
+auto operator new(std::size_t size, std::align_val_t al) -> void * {
+  auto p = alloc(size, static_cast<std::size_t>(al));
+  if (!p) throw std::bad_alloc{};
+  return p;
+}
+
+auto operator delete(void *, std::align_val_t, const std::nothrow_t &) noexcept
+    -> void {
+  // Don't free anything.
+}
+
+auto operator delete(void *, std::align_val_t) noexcept -> void {
+  // Don't free anything.
+}
+
+auto operator delete(void *, std::size_t, std::align_val_t) noexcept -> void {
+  // Don't free anything.
+}
+
+auto operator new[](std::size_t size, std::align_val_t al,
+    const std::nothrow_t &) noexcept -> void * {
+  return alloc(size, static_cast<std::size_t>(al));
+}
+
+auto operator new[](std::size_t size, std::align_val_t al) -> void * {
+  auto p = alloc(size, static_cast<std::size_t>(al));
+  if (!p) throw std::bad_alloc{};
+  return p;
+}
+
+auto operator delete[](
+    void *, std::align_val_t, const std::nothrow_t &) noexcept -> void {
+  // Don't free anything.
+}
+
+auto operator delete[](void *, std::align_val_t) noexcept -> void {
+  // Don't free anything.
+}
+
+auto operator delete[](void *, std::size_t, std::align_val_t) noexcept -> void {
   // Don't free anything.
 }

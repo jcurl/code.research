@@ -4,12 +4,12 @@
 #include <cstdint>
 
 struct mem_metrics {
-  std::int64_t total_alloc{};    //< Total bytes requested for allocation.
-  std::int64_t total_free{};     //< Total bytes requested for free.
-  std::int64_t max_alloc{};      //< Maximum bytes at a time allocated.
+  std::uint64_t total_alloc{};   //< Total bytes requested for allocation.
+  std::uint64_t total_free{};    //< Total bytes requested for free.
+  std::uint64_t max_alloc{};     //< Maximum bytes at a time allocated.
   std::int64_t current_alloc{};  //< Current bytes actually allocated.
-  std::int64_t allocs{};
-  std::int64_t frees{};
+  std::uint64_t allocs{};
+  std::uint64_t frees{};
 };
 
 /// @brief Reset statistics.
