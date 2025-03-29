@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 #ifndef UBENCH_ATOMICS_RCU_H
 #define UBENCH_ATOMICS_RCU_H
@@ -27,32 +28,22 @@ class rcu_ptr {
   }
 
   auto operator=(const rcu_ptr &obj) -> rcu_ptr & {
-    if (this == &obj) return *this;
-
-    free();
-    refcount_ = obj.refcount_;
-    if (refcount_) {
-      (*refcount_)++;
-    }
-    ptr_ = refcount_ ? obj.ptr_ : nullptr;
+    rcu_ptr{obj}.swap(*this);
     return *this;
   }
 
-  rcu_ptr(rcu_ptr &&rval) noexcept : refcount_{rval.refcount_} {
-    rval.refcount_ = nullptr;
-    ptr_ = refcount_ ? rval.ptr_ : nullptr;
-    rval.ptr_ = nullptr;
+  rcu_ptr(rcu_ptr &&rval) noexcept
+      : ptr_{std::exchange(rval.ptr_, nullptr)},
+        refcount_(std::exchange(rval.refcount_, nullptr)) {}
+
+  auto operator=(rcu_ptr &&rval) noexcept -> rcu_ptr& {
+    rcu_ptr{std::move(rval)}.swap(*this);
+    return *this;
   }
 
-  auto operator=(rcu_ptr &&rval) noexcept -> rcu_ptr & {
-    auto refcount = rval.refcount_;
-    rval.refcount_ = nullptr;
-    free();
-
-    refcount_ = refcount;
-    ptr_ = refcount ? rval.ptr_ : nullptr;
-    rval.ptr_ = nullptr;
-    return *this;
+  auto swap(rcu_ptr &other) noexcept -> void {
+    std::swap(ptr_, other.ptr_);
+    std::swap(refcount_, other.refcount_);
   }
 
   [[nodiscard]] auto use_count() const -> std::uint32_t {
