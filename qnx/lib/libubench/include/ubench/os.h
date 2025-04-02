@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include <array>
-#include <cstdint>
+#include <new>
 #include <string>
 
 #include "stdext/expected.h"
@@ -81,7 +81,7 @@ class osbuff {
   /// @return a reference to the operating system object.
   auto operator()() -> T& {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    return *reinterpret_cast<T*>(&buffer_);
+    return *std::launder(reinterpret_cast<T*>(&buffer_));
   }
 
   /// @brief Get a constant reference to the underlying storage as the OS type.
@@ -89,11 +89,11 @@ class osbuff {
   /// @return a constant reference to the operating system object.
   auto operator()() const -> const T& {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    return *reinterpret_cast<T*>(&buffer_);
+    return *std::launder(reinterpret_cast<T*>(&buffer_));
   }
 
  private:
-  alignas(T) std::array<std::uint8_t, sizeof(T) + N> buffer_{};
+  alignas(T) std::array<std::byte, sizeof(T) + N> buffer_{};
 };
 
 /// @brief Get the name of the process for the given pid.
