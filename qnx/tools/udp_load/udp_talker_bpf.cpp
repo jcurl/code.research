@@ -263,7 +263,7 @@ auto udp_talker_bpf::pkt_details::calc_udp_cs(
 
   // If the payload is an odd number of bytes, pad to an even number of bytes.
   if (udp_len % 2 == 1) {
-    cs += payload[udp_len - 1] << 8;
+    cs += payload[udp_len - UDP_HDR_LEN - 1] << 8;
   }
 
   while (cs > 0xFFFF) {

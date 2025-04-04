@@ -113,6 +113,7 @@ add_subdirectory(lib)
 
 add_subdirectory(benchmarks)
 add_subdirectory(tools)
+add_subdirectory(poc)
 
 if(ENABLE_TEST)
     message(STATUS "Test suite enabled with -DENABLE_TEST=on (execute with make && ctest)")

@@ -25,6 +25,8 @@
   - [3.2. Conversion of Hexadecimal String to Integer](#32-conversion-of-hexadecimal-string-to-integer)
   - [3.3. Printing of Network Strings](#33-printing-of-network-strings)
   - [3.4. Read/Copy/Update Userspace Implementation](#34-readcopyupdate-userspace-implementation)
+- [4. Proof of Concept Code](#4-proof-of-concept-code)
+  - [4.1. UDPv4 with Fragmentation](#41-udpv4-with-fragmentation)
 
 ## 1. Compilation
 
@@ -247,3 +249,17 @@ Shows performance of updates for an RCU. You'll see that it serializes to the
 speed of one core (expected).
 
 See [rcu.md](./lib/libubench/docs/rcu.md)
+
+## 4. Proof of Concept Code
+
+Proof of Concept code is a small binary to test a particular idea, or to check
+functionality across operating systems to observe their behaviour.
+
+### 4.1. UDPv4 with Fragmentation
+
+Extended from the tool `udp_load`, constructs a UDP packet and sends it over a
+BPF interface. It demonstrates how to create IPv4 checksums and do packet
+fragmentation. Operating systems that don't have the BSD BPF interface do the
+same thing with the network stack.
+
+See [README.md](./poc/bpf_udp4/docs/README.md)

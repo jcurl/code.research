@@ -1,0 +1,28 @@
+bpf_udp4 - a proof of concept how to send a small and large UDP packet using
+BPF and doing everything in software.
+
+USAGE
+
+ bpf_udp4 [-s<size>] -S<sourceip> -D<destip> [-B<mode>]
+
+DESCRIPTION
+
+ On systems that supports '/dev/bpf', it will open that interface and send out a
+ UDP packet, fragmentation is dependent on the detected MTU and the size
+ requested (default of 1472 bytes for an MTU of 1500).
+
+EXAMPLES
+
+ Send a single packet with random data from the interface 192.168.1.100 (using
+ an automatically assigned port number to send from), to the multicast address
+ 224.0.0.1 on port 3500 (must be provided) with a packet size of 500 bytes.
+
+  ./bpf_udp4 -S192.168.1.100 -D224.0.0.1:3500 -s500
+
+ Send multiple packets with random data using IPv4 fragmentation.
+
+  ./bpf_udp4 -S192.168.1.100:2500 -D224.0.0.1:3500 -s9000
+
+ Send data using the BPF interface instead of the IPv4 stack
+
+  ./bpf_udp4 -S192.168.1.100:3500 -D224.0.0.1:3500 -Bbpf -s9000
