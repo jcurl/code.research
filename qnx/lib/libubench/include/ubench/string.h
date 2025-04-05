@@ -134,17 +134,28 @@ auto from_chars_hex(const char *first, const char *last, T &value)
       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  // F0 -
       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  //      FF
   };
-  value = 0;
+
+  // Do all calculations on the unsigned type version to avoid undefined
+  // behaviour when the value might overflow. In later standards (C++) we might
+  // want to use a std::bit_cast<T> at the end instead.
+  using unsigned_T = std::make_unsigned_t<T>;
+  unsigned_T uvalue = 0;
+
   std::uint8_t v{};
   do {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
     v = hexval[static_cast<uint8_t>(*first)];
-    if (v == 0xFF) return {first, std::errc::invalid_argument};
-    value = (value << 4) | v;
+    if (v == 0xFF) {
+      value = static_cast<T>(uvalue);
+      return {first, std::errc::invalid_argument};
+    }
+    uvalue = (uvalue << 4) | v;
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     first++;
   } while (v != 0xFF && first != last);
+
+  value = static_cast<T>(uvalue);
   return {first, std::errc{}};
 }
 
