@@ -36,7 +36,7 @@ class rcu_ptr {
       : ptr_{std::exchange(rval.ptr_, nullptr)},
         refcount_(std::exchange(rval.refcount_, nullptr)) {}
 
-  auto operator=(rcu_ptr &&rval) noexcept -> rcu_ptr& {
+  auto operator=(rcu_ptr &&rval) noexcept -> rcu_ptr & {
     rcu_ptr{std::move(rval)}.swap(*this);
     return *this;
   }
@@ -114,6 +114,11 @@ class rcu {
   //
   // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   rcu(std::unique_ptr<T, Deleter> &&ptr) {
+#ifdef __clang_analyzer__
+    // Until we find a better way to supporess false-positives for
+    // clang-analyzer-cplusplus.NewDeleteLeaks.
+    std::abort();
+#endif
     if (!ptr) std::abort();
 
     index_.store(0);
@@ -124,9 +129,9 @@ class rcu {
   [[nodiscard]] auto read() -> rcu_ptr<T, Deleter> {
     // Find the index, and atomically increment the reference for the active
     // index.
-    std::uint32_t i;
-    std::uint32_t rc_start;
-    std::uint32_t rc;
+    std::uint32_t i{};
+    std::uint32_t rc_start{};
+    std::uint32_t rc{};
     do {
       i = index_.load();
       rc_start = slot_[i].refcount_.load();
@@ -170,6 +175,11 @@ class rcu {
   //
   // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   auto update(std::unique_ptr<T, Deleter> &&update) -> bool {
+#ifdef __clang_analyzer__
+    // Until we find a better way to supporess false-positives for
+    // clang-analyzer-cplusplus.NewDeleteLeaks.
+    std::abort();
+#endif
     // Don't allow updates to `nullptr`.
     if (!update) return false;
 
@@ -178,7 +188,7 @@ class rcu {
     // Allocate a new position for the pointer and reference counter.
     std::uint32_t i_start = index_.load();
     std::uint32_t i = i_start;
-    std::uint32_t rc;
+    std::uint32_t rc{};
     do {
       i = (i + 1) % N;
       if (i == i_start) return false;
