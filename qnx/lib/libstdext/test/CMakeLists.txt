@@ -14,7 +14,7 @@ target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
 if(IS_DEBUG)
-    add_sanitizers(rcutest)
+    add_sanitizers(${BINARY})
 endif()
 
 target_code_coverage(${BINARY}
