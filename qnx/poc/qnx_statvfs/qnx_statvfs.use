@@ -1,0 +1,9 @@
+qnx_statvfs - a small tool to get the block sizes
+
+USAGE
+
+ qnx_statvfs <device>
+
+DESCRIPTION
+
+ Open the device, issue a DCMD_FSYS_STATVFS command and report the results.
