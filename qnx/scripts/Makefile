@@ -5,7 +5,7 @@ linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-j
 netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb
 
 .PHONY: freebsd
-freebsd: freebsd14.2-aarch64 freebsd13.5-aarch64
+freebsd: freebsd14.3-aarch64 freebsd14.2-aarch64 freebsd13.5-aarch64
 
 .PHONY: all
 all: linux netbsd freebsd
@@ -51,3 +51,5 @@ freebsd13.5-aarch64:
 freebsd14.2-aarch64:
 	@./build.sh -dfreebsd -c14.2 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS}"
 
+freebsd14.3-aarch64:
+	@./build.sh -dfreebsd -c14.3 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.3-aarch64.cmake && cmake --build . -j${NUM_CPUS}"

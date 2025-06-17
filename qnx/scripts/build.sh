@@ -13,9 +13,10 @@ INTERACTIVE=0
 ROOT=0
 CODENAME=jammy
 REBUILD=0
+DEBUG=0
 
 CODENAMESET=0
-OPTSTRING="c:d:firv:?"
+OPTSTRING="c:d:firv:D?"
 while getopts $OPTSTRING OPTION; do
   case $OPTION in
   i)
@@ -40,6 +41,10 @@ while getopts $OPTSTRING OPTION; do
   f)
     REBUILD=1
     ;;
+  D)
+    DEBUG=1
+    REBUILD=1
+    ;;
   ?)
     echo "build.sh -i [-r] [-d DISTRO] [-c CODENAME] [-v VAR]"
     echo "  Run in interactive mode for Ubuntu container \$CODENAME"
@@ -58,6 +63,10 @@ while getopts $OPTSTRING OPTION; do
     echo "      start the shell)"
     echo " -r - Start in the container as root. Note, that the container is"
     echo "      dropped when finished, so changes are not permanent."
+    echo ""
+    echo " -f - Force rebuild. If the container exists, try to rebuild again anyway"
+    echo " -D - Debug. Don't squash the container. Implies '-f' to force rebuild on"
+    echo "      run. Useful when debugging and testing a Dockerfile."
     echo ""
     echo "Example:"
     echo "  $ build.sh -cjammy 'cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && make -j8'"
@@ -107,7 +116,11 @@ if [ $REBUILD -ne 0 ]; then
     echo "Can't find file 'docker/$PODVERSION-docker' to build"
     exit 1
   fi
-  podman build --squash --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
+  SQUASH=--squash
+  if [ $DEBUG -ne 0 ]; then
+    SQUASH=
+  fi
+  podman build $SQUASH --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
   if [ $? -ne 0 ]; then
     echo "Error building. Exiting"
     exit 1
