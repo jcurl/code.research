@@ -1,5 +1,6 @@
 include(CheckSymbolExists)
 include(CMakePushCheckState)
+include(CheckIncludeFiles)
 include(research/check_type_exists)
 include(research/check_symbol_enum_exists)
 include(research/check_symbol_lib_exists)
@@ -11,6 +12,7 @@ set(SOURCES
     ../include/ubench/flags.h
     ../include/ubench/file.h
     ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp
+    ../include/ubench/options.h options.cpp
     ../include/ubench/os.h
     ../include/ubench/string.h string.cpp
     ../include/ubench/str_intern.h str_intern.cpp
