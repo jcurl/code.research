@@ -57,6 +57,11 @@ if("${CMAKE_CXX_FLAGS}" STREQUAL "")
     endif()
 endif()
 
+# This is for tests that are specific to the correct functioning and debugging
+# of this repository, not necessarily expected to be used for comparison on
+# targets.
+option(ENABLE_TEST "Enable building repository tests" ON)
+
 # Checking if we should enable coverage. Only do so in DEBUG and if testing is enabled
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/coverage" ${CMAKE_MODULE_PATH})
 include(code-coverage)
@@ -64,11 +69,6 @@ add_code_coverage()
 if(CODE_COVERAGE)
     add_compile_options(-O0)
 endif()
-
-# This is for tests that are specific to the correct functioning and debugging
-# of this repository, not necessarily expected to be used for comparison on
-# targets.
-option(ENABLE_TEST "Enable building repository tests" ON)
 
 # The `make install` target shouldn't install GTEST/GMOCK.
 set(INSTALL_GMOCK OFF)
