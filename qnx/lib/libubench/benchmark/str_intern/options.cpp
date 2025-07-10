@@ -1,12 +1,11 @@
 #include "options.h"
 
-#include <unistd.h>
-
 #include <iostream>
 #include <string>
 #include <unordered_map>
 
 #include "stdext/expected.h"
+#include "ubench/options.h"
 
 namespace {
 void print_help(std::string_view prog_name) {
@@ -17,7 +16,7 @@ void print_help(std::string_view prog_name) {
       << std::endl;
 }
 
-const std::unordered_map<std::string, strintern_impl> mode = {
+const std::unordered_map<std::string_view, strintern_impl> mode = {
     {"none", strintern_impl::none},
     {"forward_list", strintern_impl::flist},
     {"set", strintern_impl::set},
@@ -34,63 +33,55 @@ const std::unordered_map<std::string, strintern_impl> mode = {
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-auto make_options(int& argc, char* const argv[]) noexcept
+auto make_options(int argc, const char* const argv[]) noexcept
     -> stdext::expected<options, int> {
-  int c = 0;
   bool help = false;
   int err = 0;
 
-  std::string_view prog_name{};
-  if (argc >= 1) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    prog_name = std::string_view(argv[0]);
-  } else {
-    prog_name = std::string_view("str_intern");
-  }
-
   options o{};
-  while ((c = getopt(argc, argv, "B:?")) != -1) {
-    switch (c) {
-      case 'B': {
-        auto it = mode.find(optarg);
-        if (it != mode.end()) {
-          o.mode_ = it->second;
-          o.mode_s_ = std::string{optarg};
-        } else {
-          std::cerr << "Error: Unknown implementation to test: " << optarg
-                    << std::endl;
-          err = 1;
+  ubench::options opts{argc, argv, "B:?"};
+  for (const auto& opt : opts) {
+    if (opt) {
+      switch (opt->get_option()) {
+        case 'B': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto it = mode.find(arg);
+          if (it != mode.end()) {
+            o.mode_ = it->second;
+            o.mode_s_ = std::string{arg};
+          } else {
+            err = 1;
+            std::cerr << "Error: Unknown implementation to test: " << arg
+                      << std::endl;
+          }
+          break;
         }
-        break;
+        case '?':
+          help = true;
+          break;
+        default:
+          err = 1;
+          ubench::options::print_error(opt->get_option());
+          break;
       }
-      case '?':
-        if (optopt) err = 1;
-        help = true;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        err = 1;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        err = 1;
-        break;
+    } else {
+      err = 1;
+      ubench::options::print_error(opt.error());
     }
   }
 
-  if (argc - optind != 1) {
+  if (opts.args().size() != 1) {
+    err = 1;
     std::cerr << "Error: Must provide exactly one single file to read"
               << std::endl;
-    err = 1;
   } else {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    o.input_ = argv[optind];
+    o.input_ = opts.args()[0];
   }
 
   if (err || help) {
     if (err) std::cerr << std::endl;
-    print_help(prog_name);
+    print_help(opts.prog_name());
     return stdext::unexpected{err};
   }
 

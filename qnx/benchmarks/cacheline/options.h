@@ -26,7 +26,7 @@ class options {
  private:
   options() = default;
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-  friend auto make_options(int& argc, char* const argv[]) noexcept
+  friend auto make_options(int argc, const char* const argv[]) noexcept
       -> stdext::expected<options, int>;
 
   unsigned int buffer_size_{256};
@@ -52,7 +52,7 @@ class options {
 /// @return The options object, or an error code. An error code of zero
 /// indicates no options, but the user requested help.
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-[[nodiscard]] auto make_options(int& argc, char* const argv[]) noexcept
+[[nodiscard]] auto make_options(int argc, const char* const argv[]) noexcept
     -> stdext::expected<options, int>;
 
 #endif

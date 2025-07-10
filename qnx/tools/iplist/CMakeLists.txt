@@ -3,7 +3,7 @@ set(SOURCES iplist.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} ubench)
+target_link_libraries(${BINARY} PRIVATE ubench)
 
 if(IS_DEBUG)
     add_sanitizers(${BINARY})

@@ -42,7 +42,7 @@ class mallopt_options {
   mallopt_options() = default;
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-  friend auto make_options(int& argc, char* const argv[]) noexcept
+  friend auto make_options(int argc, const char* const argv[]) noexcept
       -> stdext::expected<mallopt_options, int>;
 
   bool mlock_all_{};
@@ -70,7 +70,7 @@ class mallopt_options {
 /// @return The options object, or an error code. An error code of zero
 /// indicates no options, but the user requested help.
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-[[nodiscard]] auto make_options(int& argc, char* const argv[]) noexcept
+[[nodiscard]] auto make_options(int argc, const char* const argv[]) noexcept
     -> stdext::expected<mallopt_options, int>;
 
 namespace impl {

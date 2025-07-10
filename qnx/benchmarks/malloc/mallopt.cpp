@@ -3,7 +3,6 @@
 #include "mallopt.h"
 
 #include <malloc.h>
-#include <unistd.h>
 
 #include <cerrno>
 #include <cstring>
@@ -13,6 +12,7 @@
 #include <benchmark/benchmark.h>
 
 #include "stdext/expected.h"
+#include "ubench/options.h"
 #include "ubench/string.h"
 #include "mallopt.h"
 
@@ -49,10 +49,9 @@ auto print_help(std::string_view prog_name) -> void {
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-auto make_options(int& argc, char* const argv[]) noexcept
+auto make_options(int argc, const char* const argv[]) noexcept
     -> stdext::expected<mallopt_options, int> {
   bool help = false;
-  int c = 0;
   int err = 0;
 
   std::string options{};
@@ -65,54 +64,52 @@ auto make_options(int& argc, char* const argv[]) noexcept
   options += "M:?";
 
   mallopt_options o{};
-  while ((c = getopt(argc, argv, options.c_str())) != -1) {
-    switch (c) {
-      case 'm': {
-        auto mallopts = impl::parse_mallopt_arg(optarg);
-        if (mallopts.empty()) {
-          err = 1;
+  ubench::options opts{argc, argv, options.c_str()};
+  for (const auto& opt : opts) {
+    if (opt) {
+      switch (opt->get_option()) {
+        case 'm': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto mallopts = impl::parse_mallopt_arg(*opt->argument());
+          if (mallopts.empty()) {
+            err = 1;
+          }
+          o.mallopts_.insert(
+              std::end(o.mallopts_), std::begin(mallopts), std::end(mallopts));
+          break;
         }
-        o.mallopts_.insert(
-            std::end(o.mallopts_), std::begin(mallopts), std::end(mallopts));
-        break;
-      }
-      case 'L':
-        o.mlock_all_ = true;
-        break;
-      case 'M': {
-        auto max = ubench::string::parse_int<unsigned int>(optarg);
-        if (max) {
-          o.max_ = *max;
-        } else {
-          std::cerr << "Error: Option -" << optopt << " requires an integer"
-                    << std::endl;
-          err = 1;
+        case 'L':
+          o.mlock_all_ = true;
+          break;
+        case 'M': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto max = ubench::string::parse_int<unsigned int>(*opt->argument());
+          if (max) {
+            o.max_ = *max;
+          } else {
+            err = 1;
+            std::cerr << "Error: Option -" << opt->get_option()
+                      << " requires an integer" << std::endl;
+          }
+          break;
+        }
+        case '?':
           help = true;
-        }
-        break;
+          break;
+        default:
+          err = 1;
+          ubench::options::print_error(opt->get_option());
+          break;
       }
-      case '?':
-        help = true;
-        if (optopt) err = 1;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        err = 1;
-        help = true;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        err = 1;
-        help = true;
-        break;
+    } else {
+      err = 1;
+      ubench::options::print_error(opt.error());
     }
   }
 
-  if (help) {
+  if (err | help) {
     if (err) std::cerr << std::endl;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    print_help(std::string_view(argv[0]));
+    print_help(opts.prog_name());
     return stdext::unexpected{err};
   }
 

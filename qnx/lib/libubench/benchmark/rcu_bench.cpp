@@ -1,5 +1,3 @@
-#include <unistd.h>
-
 #include <charconv>
 #include <chrono>
 #include <cstring>
@@ -9,6 +7,7 @@
 #include <vector>
 
 #include "ubench/atomics.h"
+#include "ubench/options.h"
 
 using namespace std::chrono_literals;
 
@@ -65,56 +64,52 @@ auto run_stress(unsigned int threads) {
 }
 
 auto main(int argc, char* argv[]) -> int {
-  int c = 0;
   unsigned int threads = 0;
   bool help = false;
   int exit_code = 0;
 
-  while ((c = getopt(argc, argv, "p:?")) != -1) {
-    switch (c) {
-      case 'p': {
-        std::string thread_string = optarg;
-        auto [ptr, ec] = std::from_chars(thread_string.data(),
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            thread_string.data() + thread_string.size(), threads);
-        if (ec == std::errc()) {
-          if (threads < 1 || threads > std::thread::hardware_concurrency()) {
-            std::cerr
-                << "Error: Specify a minimum of 1 thread and not more than "
-                << std::thread::hardware_concurrency() << " threads"
-                << std::endl;
-            exit_code = 1;
-            help = true;
-          }
-        } else {
-          std::cerr << "Error: Specify a thread count as a number" << std::endl;
-          exit_code = 1;
-          help = true;
-        }
-        break;
-      }
-      case '?':
-        help = true;
-        if (optopt) exit_code = 1;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
+  ubench::options opts{argc, argv, "p:?"};
+  for (const auto& opt : opts) {
+    if (opt) {
+      switch (opt->get_option()) {
+        case 'p': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          std::string thread_string{*opt->argument()};
+          auto [ptr, ec] = std::from_chars(thread_string.data(),
+              // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+              thread_string.data() + thread_string.size(), threads);
+          if (ec == std::errc()) {
+            if (threads < 1 || threads > std::thread::hardware_concurrency()) {
+              exit_code = 1;
+              std::cerr
+                  << "Error: Specify a minimum of 1 thread and not more than "
+                  << std::thread::hardware_concurrency() << " threads"
                   << std::endl;
-        exit_code = 1;
-        help = true;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        exit_code = 1;
-        help = true;
-        break;
+            }
+          } else {
+            exit_code = 1;
+            std::cerr << "Error: Specify a thread count as a number"
+                      << std::endl;
+          }
+          break;
+        }
+        case '?':
+          help = true;
+          break;
+        default:
+          exit_code = 1;
+          ubench::options::print_error(opt->get_option());
+          break;
+      }
+    } else {
+      exit_code = 1;
+      ubench::options::print_error(opt.error());
     }
   }
 
-  if (help) {
+  if (exit_code || help) {
     if (exit_code) std::cerr << std::endl;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    print_help(std::string_view(argv[0]));
+    print_help(opts.prog_name());
     return exit_code;
   }
 

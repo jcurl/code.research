@@ -2,12 +2,12 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 
 #include <iostream>
 #include <string_view>
 
 #include "stdext/expected.h"
+#include "ubench/options.h"
 #include "ubench/string.h"
 
 namespace {
@@ -74,84 +74,83 @@ void print_help(std::string_view prog_name) {
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-auto make_options(int& argc, char* const argv[]) noexcept
+auto make_options(int argc, const char* const argv[]) noexcept
     -> stdext::expected<options, int> {
-  int c = 0;
   bool help = false;
   int err = 0;
 
-  std::string_view prog_name{};
-  if (argc >= 1) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    prog_name = std::string_view(argv[0]);
-  } else {
-    prog_name = std::string_view("udp_load");
-  }
-
   options o{};
-  while ((c = getopt(argc, argv, "s:S:D:B:?")) != -1) {
-    switch (c) {
-      case 'B': {
-        auto arg = std::string_view{optarg};
-        if (arg == "sendto") {
-          o.mode_ = send_mode::mode_sendto;
-        } else if (arg == "bpf") {
-          o.mode_ = send_mode::mode_bpf;
-        } else {
-          std::cerr << "Error: Invalid test mode " << arg << std::endl;
-          return stdext::unexpected{1};
+  ubench::options opts{argc, argv, "s:S:D:B:?"};
+  for (const auto& opt : opts) {
+    if (opt) {
+      switch (opt->get_option()) {
+        case 'B': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = std::string_view{*opt->argument()};
+          if (arg == "sendto") {
+            o.mode_ = send_mode::mode_sendto;
+          } else if (arg == "bpf") {
+            o.mode_ = send_mode::mode_bpf;
+          } else {
+            std::cerr << "Error: Invalid test mode " << arg << std::endl;
+            return stdext::unexpected{1};
+          }
+          break;
         }
-        break;
+        case 's': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto s = ubench::string::parse_int<std::uint16_t>(arg);
+          if (!s) {
+            std::cerr << "Error: Invalid value for packet size - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          if (*s > 65527) {
+            std::cerr
+                << "Error: Size of packet cannot be more than 65527 bytes."
+                << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.size_ = *s;
+          break;
+        }
+        case 'S': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          if (!parse_sockaddr(arg, o.source_)) {
+            std::cerr << "Error: Invalid source address - " << arg << std::endl;
+            return stdext::unexpected{1};
+          }
+          break;
+        }
+        case 'D': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          if (!parse_sockaddr(arg, o.dest_)) {
+            std::cerr << "Error: Invalid destination address - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          break;
+        }
+        case '?':
+          help = true;
+          break;
+        default:
+          err = 1;
+          ubench::options::print_error(opt->get_option());
+          break;
       }
-      case 's': {
-        auto s = ubench::string::parse_int<std::uint16_t>(optarg);
-        if (!s) {
-          std::cerr << "Error: Invalid value for packet size - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        if (*s > 65527) {
-          std::cerr << "Error: Size of packet cannot be more than 65527 bytes."
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        o.size_ = *s;
-        break;
-      }
-      case 'S': {
-        if (!parse_sockaddr(std::string_view{optarg}, o.source_)) {
-          std::cerr << "Error: Invalid source address - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        break;
-      }
-      case 'D': {
-        if (!parse_sockaddr(std::string_view{optarg}, o.dest_)) {
-          std::cerr << "Error: Invalid destination address - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        break;
-      }
-      case '?':
-        if (optopt) err = 1;
-        help = true;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        err = 1;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        err = 1;
-        break;
+    } else {
+      err = 1;
+      ubench::options::print_error(opt.error());
     }
   }
 
   if (err || help) {
-    print_help(prog_name);
+    if (err) std::cerr << std::endl;
+    print_help(opts.prog_name());
     return stdext::unexpected{err};
   }
 

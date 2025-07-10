@@ -1,10 +1,9 @@
 #include "options.h"
 
-#include <unistd.h>
-
 #include <iostream>
 #include <string_view>
 
+#include "ubench/options.h"
 #include "ubench/string.h"
 
 namespace {
@@ -43,54 +42,50 @@ auto print_help() -> void {
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-auto make_options(int& argc, char* const argv[]) noexcept
+auto make_options(int argc, const char* const argv[]) noexcept
     -> stdext::expected<options, int> {
-  int c = 0;
   bool help = false;
   int err = 0;
-  options o{};
 
-  while ((c = getopt(argc, argv, "cdp:sv?")) != -1) {
-    switch (c) {
-      case 'c':
-        o.show_sidechannels_ = true;
-        break;
-      case 'd':
-        o.show_dead_ = true;
-        break;
-      case 's':
-        o.show_self_ = true;
-        break;
-      case 'p': {
-        o.pids_ = ubench::string::split_args_int<unsigned int>(optarg);
-        if (o.pids_.empty()) {
-          std::cerr << "Error: No arguments provided for pid list" << std::endl;
-          err = 1;
+  options o{};
+  ubench::options opts{argc, argv, "cdp:sv?"};
+  for (const auto& opt : opts) {
+    if (opt) {
+      switch (opt->get_option()) {
+        case 'c':
+          o.show_sidechannels_ = true;
+          break;
+        case 'd':
+          o.show_dead_ = true;
+          break;
+        case 's':
+          o.show_self_ = true;
+          break;
+        case 'p': {
+          o.pids_ =
+              // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+              ubench::string::split_args_int<unsigned int>(*opt->argument());
+          if (o.pids_.empty()) {
+            err = 1;
+            std::cerr << "Error: No arguments provided for pid list"
+                      << std::endl;
+          }
           break;
         }
-        break;
-      }
-      case 'v':
-        o.verbosity_++;
-        break;
-      case '?':
-        if (optopt != '?') {
-          err = 1;
-        } else {
+        case 'v':
+          o.verbosity_++;
+          break;
+        case '?':
           help = true;
-        }
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        err = 1;
-        help = true;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        err = 1;
-        help = true;
-        break;
+          break;
+        default:
+          err = 1;
+          ubench::options::print_error(opt->get_option());
+          break;
+      }
+    } else {
+      err = 1;
+      ubench::options::print_error(opt.error());
     }
   }
 

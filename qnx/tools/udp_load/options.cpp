@@ -2,12 +2,12 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 
 #include <iostream>
 #include <string_view>
 
 #include "stdext/expected.h"
+#include "ubench/options.h"
 #include "ubench/string.h"
 
 namespace {
@@ -111,170 +111,171 @@ void print_help(std::string_view prog_name) {
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
-auto make_options(int& argc, char* const argv[]) noexcept
+auto make_options(int argc, char* const argv[]) noexcept
     -> stdext::expected<options, int> {
-  int c = 0;
-  bool help = false;
-  int err = 0;
-
-  std::string_view prog_name{};
-  if (argc >= 1) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    prog_name = std::string_view(argv[0]);
-  } else {
-    prog_name = std::string_view("udp_load");
-  }
-
   options o{};
-  while ((c = getopt(argc, argv, "n:m:p:s:d:B:T:S:D:I?")) != -1) {
-    switch (c) {
-      case 'n': {
-        auto n = ubench::string::parse_int<std::uint16_t>(optarg);
-        if (!n) {
-          std::cerr << "Error: Invalid value for the number of slots - "
-                    << optarg << std::endl;
-          return stdext::unexpected{1};
+  ubench::options opts{argc, argv, "n:m:p:s:d:B:T:S:D:I?"};
+  for (const auto& opt : opts) {
+    if (opt) {
+      switch (opt->get_option()) {
+        case 'n': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto n = ubench::string::parse_int<std::uint16_t>(arg);
+          if (!n) {
+            std::cerr << "Error: Invalid value for the number of slots - "
+                      << arg << std::endl;
+            return stdext::unexpected{1};
+          }
+          if (*n < 1) {
+            std::cerr
+                << "Error: Invalid value for the number of slots, must be "
+                   "one or more, got "
+                << *n << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.slots_ = *n;
+          break;
         }
-        if (*n < 1) {
-          std::cerr << "Error: Invalid value for the number of slots, must be "
-                       "one or more, got "
-                    << *n << std::endl;
-          return stdext::unexpected{1};
+        case 'm': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto m = ubench::string::parse_int<std::uint16_t>(arg);
+          if (!m) {
+            std::cerr << "Error: Invalid value for width - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          if (*m < 1) {
+            std::cerr << "Error: Invalid value for the slot width, must be one "
+                         "or more, got "
+                      << *m << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.width_ = *m;
+          break;
         }
-        o.slots_ = *n;
-        break;
+        case 'p': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto p = ubench::string::parse_int<std::uint32_t>(arg);
+          if (!p) {
+            std::cerr << "Error: Invalid value for packets per window - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          if (*p < 1) {
+            std::cerr << "Error: Invalid value for packets per window, must be "
+                         "one or more, got "
+                      << *p << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.packets_ = *p;
+          break;
+        }
+        case 's': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto s = ubench::string::parse_int<std::uint16_t>(arg);
+          if (!s) {
+            std::cerr << "Error: Invalid value for packet size - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.size_ = *s;
+          break;
+        }
+        case 'd': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto t = ubench::string::parse_int<std::uint32_t>(arg);
+          if (!t) {
+            std::cerr << "Error: Invalid value for duration - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          if (*t < 1000) {
+            std::cerr
+                << "Error: Invalid value for duration, should be at least "
+                   "1000ms, got "
+                << *t << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.duration_ = *t;
+          break;
+        }
+        case 'B': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          if (arg == "sendto") {
+            o.mode_ = send_mode::mode_sendto;
+          } else if (arg == "sendmmsg") {
+            o.mode_ = send_mode::mode_sendmmsg;
+          } else if (arg == "bpf") {
+            o.mode_ = send_mode::mode_bpf;
+          } else {
+            std::cerr << "Error: Invalid test mode " << arg << std::endl;
+            return stdext::unexpected{1};
+          }
+          auto talker = make_udp_talker(o.mode_);
+          if (!talker->is_supported()) {
+            std::cerr << "Error: Unsupported test mode " << arg << std::endl;
+            return stdext::unexpected{1};
+          }
+          break;
+        }
+        case 'T': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          auto t = ubench::string::parse_int<std::uint16_t>(arg);
+          if (!t) {
+            std::cerr << "Error: Invalid value for number of threads - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          if (*t < 1 || *t > 255) {
+            std::cerr
+                << "Error: Invalid value for number of threads, should be "
+                   "in the range 1..255, got "
+                << *t << std::endl;
+            return stdext::unexpected{1};
+          }
+          o.threads_ = *t;
+          break;
+        }
+        case 'S': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          if (!parse_sockaddr(std::string_view{arg}, o.source_)) {
+            std::cerr << "Error: Invalid source address - " << arg << std::endl;
+            return stdext::unexpected{1};
+          }
+          break;
+        }
+        case 'D': {
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          auto arg = *opt->argument();
+          if (!parse_sockaddr(std::string_view{arg}, o.dest_)) {
+            std::cerr << "Error: Invalid destination address - " << arg
+                      << std::endl;
+            return stdext::unexpected{1};
+          }
+          break;
+        }
+        case 'I':
+          o.idle_ = true;
+          break;
+        case '?':
+          print_help(opts.prog_name());
+          return stdext::unexpected{0};
+        default:
+          ubench::options::print_error(opt->get_option());
+          return stdext::unexpected{1};
       }
-      case 'm': {
-        auto m = ubench::string::parse_int<std::uint16_t>(optarg);
-        if (!m) {
-          std::cerr << "Error: Invalid value for width - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        if (*m < 1) {
-          std::cerr << "Error: Invalid value for the slot width, must be one "
-                       "or more, got "
-                    << *m << std::endl;
-          return stdext::unexpected{1};
-        }
-        o.width_ = *m;
-        break;
-      }
-      case 'p': {
-        auto p = ubench::string::parse_int<std::uint32_t>(optarg);
-        if (!p) {
-          std::cerr << "Error: Invalid value for packets per window - "
-                    << optarg << std::endl;
-          return stdext::unexpected{1};
-        }
-        if (*p < 1) {
-          std::cerr << "Error: Invalid value for packets per window, must be "
-                       "one or more, got "
-                    << *p << std::endl;
-          return stdext::unexpected{1};
-        }
-        o.packets_ = *p;
-        break;
-      }
-      case 's': {
-        auto s = ubench::string::parse_int<std::uint16_t>(optarg);
-        if (!s) {
-          std::cerr << "Error: Invalid value for packet size - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        o.size_ = *s;
-        break;
-      }
-      case 'd': {
-        auto t = ubench::string::parse_int<std::uint32_t>(optarg);
-        if (!t) {
-          std::cerr << "Error: Invalid value for duration - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        if (*t < 1000) {
-          std::cerr << "Error: Invalid value for duration, should be at least "
-                       "1000ms, got "
-                    << *t << std::endl;
-          return stdext::unexpected{1};
-        }
-        o.duration_ = *t;
-        break;
-      }
-      case 'B': {
-        auto arg = std::string_view{optarg};
-        if (arg == "sendto") {
-          o.mode_ = send_mode::mode_sendto;
-        } else if (arg == "sendmmsg") {
-          o.mode_ = send_mode::mode_sendmmsg;
-        } else if (arg == "bpf") {
-          o.mode_ = send_mode::mode_bpf;
-        } else {
-          std::cerr << "Error: Invalid test mode " << arg << std::endl;
-          return stdext::unexpected{1};
-        }
-        auto talker = make_udp_talker(o.mode_);
-        if (!talker->is_supported()) {
-          std::cerr << "Error: Unsupported test mode " << arg << std::endl;
-          return stdext::unexpected{1};
-        }
-        break;
-      }
-      case 'T': {
-        auto t = ubench::string::parse_int<std::uint16_t>(optarg);
-        if (!t) {
-          std::cerr << "Error: Invalid value for number of threads - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        if (*t < 1 || *t > 255) {
-          std::cerr << "Error: Invalid value for number of threads, should be "
-                       "in the range 1..255, got "
-                    << *t << std::endl;
-          return stdext::unexpected{1};
-        }
-        o.threads_ = *t;
-        break;
-      }
-      case 'S': {
-        if (!parse_sockaddr(std::string_view{optarg}, o.source_)) {
-          std::cerr << "Error: Invalid source address - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        break;
-      }
-      case 'D': {
-        if (!parse_sockaddr(std::string_view{optarg}, o.dest_)) {
-          std::cerr << "Error: Invalid destination address - " << optarg
-                    << std::endl;
-          return stdext::unexpected{1};
-        }
-        break;
-      }
-      case 'I':
-        o.idle_ = true;
-        break;
-      case '?':
-        if (optopt) err = 1;
-        help = true;
-        break;
-      case ':':
-        std::cerr << "Error: Option -" << optopt << " requires an operand"
-                  << std::endl;
-        err = 1;
-        break;
-      default:
-        std::cerr << "Error: Unknown option -" << optopt << std::endl;
-        err = 1;
-        break;
+    } else {
+      ubench::options::print_error(opt.error());
+      return stdext::unexpected{1};
     }
-  }
-
-  if (err || help) {
-    print_help(prog_name);
-    return stdext::unexpected{err};
   }
 
   if (o.source_.sin_addr.s_addr == 0) {
