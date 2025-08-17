@@ -52,6 +52,8 @@ function(get_qnx_version)
         string(REPLACE "<CMAKE_CXX_COMPILER> -lang-c++" "<CMAKE_CXX_COMPILER>" CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE})
         set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE} PARENT_SCOPE)
     endif()
+
+    add_compile_definitions(_QNX_SOURCE)
 endfunction(get_qnx_version)
 
 function(_get_qnx_version_try_compile_c_cxx QNX_VERSION)
