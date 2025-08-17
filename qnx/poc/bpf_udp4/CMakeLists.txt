@@ -14,7 +14,7 @@ set(SOURCES
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} ubench)
+target_link_libraries(${BINARY} PRIVATE ubench)
 
 check_symbol_lib_exists(socket "sys/socket.h" HAVE_SOCKET LIB "socket" TARGET ${BINARY} FATAL)
 check_symbol_enum_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)

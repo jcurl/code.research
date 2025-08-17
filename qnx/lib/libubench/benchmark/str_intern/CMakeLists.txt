@@ -17,7 +17,7 @@ set(STRINTERN_SOURCES
 
 add_executable(${STRINTERN_BINARY} ${STRINTERN_SOURCES})
 target_compile_features(${STRINTERN_BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${STRINTERN_BINARY} ubench)
+target_link_libraries(${STRINTERN_BINARY} PRIVATE ubench)
 
 check_type_exists("std::pmr::memory_resource" "memory_resource" HAVE_CXX_MEMORY_RESOURCE)
 if(NOT HAVE_CXX_MEMORY_RESOURCE)
@@ -29,7 +29,7 @@ endif()
 
 if (QNXNTO AND CMAKE_SYSTEM_VERSION VERSION_LESS 8.0)
     # QNX 8.0 and later automatically include the std::filesystem extensions
-    target_link_libraries(${STRINTERN_BINARY} c++fs)
+    target_link_libraries(${STRINTERN_BINARY} PRIVATE c++fs)
 endif()
 
 if(IS_DEBUG)
