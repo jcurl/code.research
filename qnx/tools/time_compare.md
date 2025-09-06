@@ -77,7 +77,59 @@ The following observations can be made:
 
 ### QNX 8.0
 
-A sample captured from QNX 8.0 on a Rasbperry Pi4.
+A sample captured from QNX 8.0 on a Rasbperry Pi4 and x86 on QNX 8.0.3.
+
+```txt
+# ./time_compare
+Time Comparison Tool
+
+Clock                      Steady  Period
+-------------------------  ------  ------
+High Resolution Clock      Yes     1/1000000000
+Steady Clock               Yes     1/1000000000
+System Clock               No      1/1000000
+
+QNX Clock Details (pidin syspage=qtime)
+- cycles_per_sec:  54000000
+- nsec_tod_adjust: 0
+- nsec_inc:        1000000
+- boot_time:       0
+- adjust:          tick_nsec_inc=0; tick_count=0
+- interrupt:       27
+- boot_cc:         11548565
+- tick_period_cc:  54000
+- Flags
+  [X] QTIME_FLAG_CHECK_STABLE
+  [-] QTIME_FLAG_TICKLESS
+  [-] QTIME_FLAG_GLOBAL_CLOCKCYCLES
+
+System Clock           Highres Clock          Steady Clock           CLOCK_MONOTONIC        CLOCK_REALTIME         ClockCycles()
+---------------------- ---------------------- ---------------------- ---------------------- ---------------------- ----------------------
+         418.566008000          418.566008778          418.566009130          418.566009000          418.566009000          418.779872203
+         419.567007000          419.567008204          419.567008759          419.567009000          419.567009000          419.780871629
+         420.568008000          420.568008519          420.568008870          420.568009000          420.568009000          420.781872092
+         421.569009000          421.569009778          421.569010093          421.569010000          421.569010000          421.782873185
+         422.570007000          422.570008148          422.570008481          422.570008000          422.570008000          422.783871259
+         423.571007000          423.571007926          423.571008278          423.571008000          423.571008000          423.784871277
+         424.572011000          424.572012833          424.572013185          424.572013000          424.572014000          424.785876574
+         425.573006000          425.573007611          425.573007944          425.573008000          425.573008000          425.786870833
+         426.574008000          426.574008815          426.574009019          426.574009000          426.574009000          426.787871851
+         427.575008000          427.575008426          427.575008759          427.575009000          427.575009000          427.788871629
+         428.576007000          428.576008278          428.576008500          428.576008000          428.576008000          428.789871370
+         429.577007000          429.577007611          429.577008037          429.577008000          429.577008000          429.790870888
+         430.578007000          430.578007574          430.578007926          430.578008000          430.578008000          430.791870907
+```
+
+We see that the all system clocks, except `ClockCycles()` have the same time
+base. Only `ClockCycles()` has an offset which is derived from the `boot cc`
+parameter.
+
+A `boot cc` of `11548565` is 0.213862315 seconds offset.
+
+Earlier releases of QNX 8.0 (here 8.0.1), with results obtained on September
+2024, show slightly different. In older versions, the
+`std::chrono::high_resolution_clock` didn't take into about the `boot cc`
+parameter and was the same as the `ClockCycles().`
 
 ```txt
 Time Comparison Tool
