@@ -19,7 +19,6 @@ set(SOURCES
     ../include/ubench/thread.h
     ../include/ubench/measure/busy_measurement.h measure/busy_measurement.cpp
     ../include/ubench/measure/print.h measure/print.cpp
-    sync_event.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 

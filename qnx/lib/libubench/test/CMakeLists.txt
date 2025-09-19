@@ -12,6 +12,7 @@ set(SOURCES
     string_test.cpp
     strlcpy_test.cpp
     str_intern_test.cpp
+    sync_event_test.cpp
     thread_test.cpp
 )
 
