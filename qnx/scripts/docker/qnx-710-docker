@@ -1,0 +1,39 @@
+FROM ubuntu:noble
+LABEL MAINTAINER="Jason Curl <jcurl@arcor.de>"
+
+# We need to make the install non-interactive, so that we don't get asked for
+# tzdata. We don't need DEBIAN_FRONTEND after the build, so we don't make it an
+# explicit variable.
+ARG DEBIAN_FRONTEND=noninteractive
+
+# And if we happen to build an unsupported release that doesn't receive updates
+# anymore, just update the apt sources and continue.
+RUN (apt update -y || \
+      sed -i -re 's/([a-z]{2}\.)?archive.ubuntu.com|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list \
+      && apt update -y) \
+    && apt install -y --no-install-recommends \
+      build-essential doxygen \
+      lsb-release cmake git-core \
+      clang clang-tidy clang-format llvm-runtime \
+      libc++-dev libc++abi-dev lld llvm-dev libclang-rt-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# QNX script "qnxsdp-env.sh" doesn't like 'dash'.
+RUN ln -sf /bin/bash /bin/sh
+
+# The build must mount this for us. Preparing the tarball upfront, and un-tar
+# the file from the mount into our image is fast and doesn't result in overhead
+# on every build.
+ARG TARBALL=none.tar.bz2
+RUN mkdir /opt/qnx && \
+    tar --no-same-owner --no-same-permissions -C /opt/qnx -xjvf /opt/qnxsdp/${TARBALL} || true
+
+RUN mkdir /source
+RUN mkdir /build
+RUN mkdir /home/user
+COPY qnx/profile /home/user/.profile
+COPY qnx/profile /root/.profile
+
+WORKDIR /home/user
+CMD [ "bash", "--login" ]

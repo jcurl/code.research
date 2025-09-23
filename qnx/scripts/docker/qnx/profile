@@ -1,0 +1,4 @@
+if [ -e /opt/qnx/qnxsdp-env.sh ]; then
+    . /opt/qnx/qnxsdp-env.sh
+fi
+cd /build

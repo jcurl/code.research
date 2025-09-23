@@ -7,6 +7,9 @@ netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb
 .PHONY: freebsd
 freebsd: freebsd14.3-aarch64 freebsd14.2-aarch64 freebsd13.5-aarch64
 
+.PHONY: qnx
+qnx: qnx-710-aarch64 qnx-710-x64 qnx-800-aarch64 qnx-800-x64
+
 .PHONY: all
 all: linux netbsd freebsd
 
@@ -53,3 +56,35 @@ freebsd14.2-aarch64:
 
 freebsd14.3-aarch64:
 	@./build.sh -dfreebsd -c14.3 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.3-aarch64.cmake && cmake --build . -j${NUM_CPUS}"
+
+qnx-710-aarch64:
+	@# https://github.com/containers/podman/blob/1855765/docs/tutorials/performance.md
+	@#
+	@# Performance guide says that using --userns=keepid is really slow when
+	@# running rootless. The `-r` option runs as root, so the first run is much
+	@# faster.
+	@./build.sh -r -dqnx -c710 -varm64 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS}"
+
+qnx-710-x64:
+	@# https://github.com/containers/podman/blob/1855765/docs/tutorials/performance.md
+	@#
+	@# Performance guide says that using --userns=keepid is really slow when
+	@# running rootless. The `-r` option runs as root, so the first run is much
+	@# faster.
+	@./build.sh -r -dqnx -c710 -vx64 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS}"
+
+qnx-800-aarch64:
+	@# https://github.com/containers/podman/blob/1855765/docs/tutorials/performance.md
+	@#
+	@# Performance guide says that using --userns=keepid is really slow when
+	@# running rootless. The `-r` option runs as root, so the first run is much
+	@# faster.
+	@./build.sh -r -dqnx -c800 -varm64 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS}"
+
+qnx-800-x64:
+	@# https://github.com/containers/podman/blob/1855765/docs/tutorials/performance.md
+	@#
+	@# Performance guide says that using --userns=keepid is really slow when
+	@# running rootless. The `-r` option runs as root, so the first run is much
+	@# faster.
+	@./build.sh -r -dqnx -c800 -vx64 "rm -rf * & cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS}"

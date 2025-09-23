@@ -1,12 +1,14 @@
 # Scripts <!-- omit in toc -->
 
 - [1. Podman Container - build.sh](#1-podman-container---buildsh)
-  - [1.1. Building Ubuntu](#11-building-ubuntu)
-  - [1.2. Building Alpine](#12-building-alpine)
-  - [1.3. Building NetBSD](#13-building-netbsd)
-  - [1.4. Building FreeBSD](#14-building-freebsd)
-  - [1.5. Using the build.sh script](#15-using-the-buildsh-script)
-  - [1.6. Removing ALL podman containers](#16-removing-all-podman-containers)
+  - [1.1. Using the build.sh script](#11-using-the-buildsh-script)
+    - [1.1.1. Removing ALL podman containers](#111-removing-all-podman-containers)
+  - [1.2. Using build.sh](#12-using-buildsh)
+    - [1.2.1. Building Ubuntu](#121-building-ubuntu)
+    - [1.2.2. Building Alpine](#122-building-alpine)
+    - [1.2.3. Building NetBSD](#123-building-netbsd)
+    - [1.2.4. Building FreeBSD](#124-building-freebsd)
+    - [1.2.5. Building QNX](#125-building-qnx)
 - [2. Building using Makefile](#2-building-using-makefile)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
 
@@ -19,7 +21,43 @@ that installs the necessary build tools.
 It is used to simplify the testing of the repository against current and older
 (supported) distributions.
 
-### 1.1. Building Ubuntu
+### 1.1. Using the build.sh script
+
+To see how to use the `build.sh` script, run the current version with the help
+option.
+
+```sh
+$ ./build.sh -?
+```
+
+It will provide you instructions on its use.
+
+#### 1.1.1. Removing ALL podman containers
+
+If your machine is only uses podman for this repository, you can easily remove
+all containers on podman with this instruction:
+
+```sh
+podman system prune --all --force && podman rmi --all --force
+```
+
+or
+
+```sh
+podman system reset
+```
+
+Running `make all` will reconstruct all repositories.
+
+**WARNING**: Because the containers depend on external resources out side of
+this repository, rebuilding may likely generate different images. The
+Dockerfiles may not work! This is due to changes on how external resources
+manage their URLs and package dependencies (e.g. with `alpine-latest` image,
+packages may be refactored at any time, less likely with the `ubuntu-*` images).
+
+### 1.2. Using build.sh
+
+#### 1.2.1. Building Ubuntu
 
 The `build.sh` script can be run that:
 
@@ -57,7 +95,7 @@ populate the repository. Note, that running in root mode will let you modify the
 container, but the `build.sh` script uses the `--rm` option to delete the
 container when finished, so your results are not persisted.
 
-### 1.2. Building Alpine
+#### 1.2.2. Building Alpine
 
 Alpine is an alternative distribution with a smaller footprint. It always builds
 against latest (so you'll need to remove the image and rebuild at periodic
@@ -80,7 +118,7 @@ $ podman image rm coderesearch:alpine-latest
 
 Then on the next invocation of the `Makefile`, the image will be regenerated.
 
-### 1.3. Building NetBSD
+#### 1.2.3. Building NetBSD
 
 NetBSD supports a large number of target architectures. It is interesting as the
 network stack `io-pkt` from QNX is similar to NetBSD.
@@ -108,7 +146,7 @@ system](https://www.netbsd.org/docs/guide/en/chap-fetch.html). It should be
 trivial to extend the Dockerfile to support other architectures (e.g. MIPS,
 SH4), but ARM64 bit is chosen to compare on the Raspbery Pi 4.
 
-### 1.4. Building FreeBSD
+#### 1.2.4. Building FreeBSD
 
 FreeBSD is not as minimalistic as NetBSD and has a few forks and more software
 support, but supports fewer targets. It is interesting as the network stack
@@ -124,33 +162,59 @@ $ ./build.sh -dfreebsd -c14.2
 The `Makefile` and toolchain file `freebsd14.2-aarch64.cmake` depend on version
 14.2.
 
-### 1.5. Using the build.sh script
+#### 1.2.5. Building QNX
 
-To see how to use the `build.sh` script, run the current version with the help
-option.
+These instructions have been tested on QNX 7.1 and QNX 8.0.
+
+When building the container for the first time, you must first set the QNX
+environment variables. These environment variables are necessary by the script
+to find the folders and mount paths. When the container is built, the contents
+of the QNX binaries in the host and target directories are *copied* into the
+container.
+
+You must have made sure prior that your QNX SDP works and you can compile the
+sources manually.
+
+After the container is built, the QNX environment variables are no longer needed
+to be set before building. They will be set automatically inside the container.
 
 ```sh
-$ ./build.sh -?
+$ . ~/qnx/qnx800/qnxsdp-env.sh
+QNX_HOST=/home/jcurl/qnx/qnx800/host/linux/x86_64
+QNX_TARGET=/home/jcurl/qnx/qnx800/target/qnx
+MAKEFLAGS=-I/home/jcurl/qnx/qnx800/target/qnx/usr/include
 ```
 
-It will provide you instructions on its use.
-
-### 1.6. Removing ALL podman containers
-
-If your machine is only uses podman for this repository, you can easily remove
-all containers on podman with this instruction:
+The use the make file to build the image the first time:
 
 ```sh
-podman system prune --all --force && podman rmi --all --force
+$ make qnx-800-aarch64le
 ```
 
-Running `make all` will reconstruct all repositories.
+or build the container manually, and enter interactive mode.
 
-**WARNING**: Because the containers depend on external resources out side of
-this repository, rebuilding may likely generate different images. The
-Dockerfiles may not work! This is due to changes on how external resources
-manage their URLs and package dependencies (e.g. with `alpine-latest` image,
-packages may be refactored at any time, less likely with the `ubuntu-*` images).
+```sh
+$ ./build.sh -dqnx -c800 -i
+```
+
+During the build, the contents of where your QNX installation is copied into the
+folder `./qnx/scripts/docker/qnx/tar`. This contains the binaries and host tools
+that you've installed using the QNX software centre. If you destroy the
+container and rebuild, this tarball is reused, speeding up the next build.
+
+Alternatively, if you have a tarball from another installation, you can copy it
+here with the same name (e.g. `qnx-800.tar.bz2`) and it will be extracted into
+the container at `/opt/qnx`.
+
+Because the QNX images are about 15-20GB (when almost everything is installed),
+the initial creation of the containers are slow and can take a lot of memory
+(~25GB with ~55GB needed during the container build). You might want to consider
+your podman storage configuration.
+
+The containers for QNX are configured to run as root (the `build.sh -r` option).
+This speeds up considerably the first run of QNX, as it won't rewrite all the
+overlay containers. See [Performance - Choosing a Storage
+Driver](https://github.com/containers/podman/blob/1855765/docs/tutorials/performance.md#choosing-a-storage-driver).
 
 ## 2. Building using Makefile
 
