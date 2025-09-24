@@ -129,67 +129,7 @@ if [ $REBUILD -ne 0 ]; then
     SQUASH=
   fi
 
-  # When building check for distro specific settings.
-  case $DISTRO in
-  qnx)
-    # QNX specific additions.
-    #  DISTRO should be "qnx"
-    #  CODENAME is the version - we can't get this from the command line. And we
-    #   don't use this in any scripting, so that the user can have multiple
-    #   images (e.g. even QOS or other custom images).
-    #
-    # The user should have run ". ./qnxsdp-env.sh" prior to building the first
-    # time.
-    echo "QNX_CONFIGURATION = $QNX_CONFIGURATION"
-    echo "QNX_HOST          = $QNX_HOST"
-    echo "QNX_TARGET        = $QNX_TARGET"
-
-    # Search for the QNX base directory.
-    QNX_BASE=""
-    if [ ! -z $QNX_HOST ]; then
-      QNXDIR=$(realpath $QNX_HOST)
-      while [ "$QNXDIR" != "/" -a x"$QNX_BASE" == x ]; do
-        if [ -f "$QNXDIR/qnxsdp-env.sh" ]; then
-          QNX_BASE=$QNXDIR
-        fi
-        QNXDIR=$(dirname "$QNXDIR")
-      done
-    fi
-    echo "QNX_BASE          = $QNX_BASE"
-    if [ -z "$QNX_BASE" ]; then
-      echo "Can't find QNX_BASE"
-      exit 1
-    fi
-
-    # It is assumed that the user has the QNX image installed in their home dir.
-    if [ ! -f $BASEDIR/qnx/scripts/docker/qnx/tar/$PODVERSION.tar.bz2 ]; then
-      # By creating a tarball, we speed up the recreation process by unpacking
-      # the tarball into the container, instead of copying a large number of
-      # files. Under Podman, when using `COPY` or `ADD` for the directory, it
-      # takes a very long time, even if the original contents didn't change,
-      # slowing down the iterative process of debugging the Dockerfile.
-      #
-      # Of course here, we don't know if the QNX image didn't change, but if it
-      # exists, then we assume it's what the user wants.
-      echo "Creating tarball from $QNX_BASE"
-      trap 'rm $BASEDIR/qnx/scripts/docker/qnx/tar/$PODVERSION.tar.bz2' INT
-      BZIP2=--fast tar -C $QNX_BASE -cjf $BASEDIR/qnx/scripts/docker/qnx/tar/$PODVERSION.tar.bz2 .
-      trap INT
-      if [ ! -f $BASEDIR/qnx/scripts/docker/qnx/tar/$PODVERSION.tar.bz2 ]; then
-        echo "Tarball not created. Exiting."
-        exit 1
-      fi
-    else
-      echo "Using existing tarball $PODVERSION.tar.bz2"
-    fi
-    podman build $SQUASH --build-arg TARBALL=$PODVERSION.tar.bz2 -t "coderesearch:$PODVERSION" -v "$PWD/$BASEDIR/qnx/scripts/docker/qnx/tar":/opt/qnxsdp:ro  $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
-    ;;
-  *)
-    # No specific settings. We build.
-    podman build $SQUASH --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
-    ;;
-  esac
-
+  podman build $SQUASH --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
   if [ $? -ne 0 ]; then
     echo "Error building. Exiting"
     exit 1
@@ -246,27 +186,42 @@ PODMAN_HOST=$PODVERSION-$(tr -d '[:space:]' < /etc/machine-id | cut -c 1-6)
 # Set up any special mounts in the container when starting.
 case $DISTRO in
 qnx)
+  # Determine where the user's SDP is. We mount this path, rather than copy it
+  # into the container, as it can be quite large, making the build very slow.
+  QNXSDP_VAR=`echo QNXSDP_${CODENAME}`
+  if [ -z "${!QNXSDP_VAR}" ]; then
+    echo The variable \'${QNXSDP_VAR}\' is empty. Ensure this is set before starting
+    echo the container, and it is defined to where the \'qnxsdp-env.sh\' file can be
+    echo found. Exiting.
+    exit 1
+  fi
+  if [ ! -f "${!QNXSDP_VAR}/qnxsdp-env.sh" ]; then
+    echo The file ${!QNXSDP_VAR}/qnxsdp-env.sh doesn\'t exist. Exiting.
+    exit 1
+  fi
+  PODMAN_MOUNT="-v ${!QNXSDP_VAR}:/opt/qnx:ro"
+
   # Under QNX we need to mount the configuration file, so that the licensing
   # path can be found.
   if [ -z "$QNX_CONFIGURATION" ]; then
-    CONFIG_MOUNT="-v $HOME/.qnx:$PODMAN_HOME/.qnx"
+    PODMAN_MOUNT="$PODMAN_MOUNT -v $HOME/.qnx:$PODMAN_HOME/.qnx"
   else
     REL=$(realpath --relative-to="$HOME" "$QNX_CONFIGURATION")
-    CONFIG_MOUNT="-v $QNX_CONFIGURATION:$PODMAN_HOME/$REL:rw"
+    PODMAN_MOUNT="$PODMAN_MOUNT -v $QNX_CONFIGURATION:$PODMAN_HOME/$REL:rw"
   fi
-  echo "CONFIG_MOUNT      = $CONFIG_MOUNT"
+  echo "PODMAN_MOUNT      = $PODMAN_MOUNT"
   ;;
 esac
 
 # Run the image
 if [ ${INTERACTIVE} -ne 0 ]; then
-  podman run -it --rm $ROOTOPT -e USER=$PODMAN_USERNAME -h $PODMAN_HOST -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw $CONFIG_MOUNT --tmpfs /tmp "coderesearch:$PODVERSION"
+  podman run -it --rm $ROOTOPT -e USER=$PODMAN_USERNAME -h $PODMAN_HOST -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw $PODMAN_MOUNT --tmpfs /tmp "coderesearch:$PODVERSION"
 else
   if [ "x$OTHERARGS" = "x" ]; then
     echo "No command, doing nothing..."
   else
     echo "Non-Interactive"
     echo "$OTHERARGS"
-    podman run -t --rm $ROOTOPT -e USER=$PODMAN_USERNAME -h $PODMAN_HOST -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw $CONFIG_MOUNT --tmpfs /tmp "coderesearch:$PODVERSION" sh -l -c "$OTHERARGS"
+    podman run -t --rm $ROOTOPT -e USER=$PODMAN_USERNAME -h $PODMAN_HOST -v $PWD/$BASEDIR:/source:${SOURCE} -v "$PWD/$BASEDIR/qnx/build/$BUILDDIR":/build:rw $PODMAN_MOUNT --tmpfs /tmp "coderesearch:$PODVERSION" sh -l -c "$OTHERARGS"
   fi
 fi

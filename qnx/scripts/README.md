@@ -164,57 +164,25 @@ The `Makefile` and toolchain file `freebsd14.2-aarch64.cmake` depend on version
 
 #### 1.2.5. Building QNX
 
-These instructions have been tested on QNX 7.1 and QNX 8.0.
-
-When building the container for the first time, you must first set the QNX
-environment variables. These environment variables are necessary by the script
-to find the folders and mount paths. When the container is built, the contents
-of the QNX binaries in the host and target directories are *copied* into the
+These instructions have been tested on QNX 7.1 and QNX 8.0. The QNX installation
+is *mounted* into the container, and not copied. This speeds up significantly
+the build and first run and reduces significantly the amount of space required
+on your filesystem. It also means updates to the QNX installation via the QNX
+software centre are mirrored in the container without having to update the
 container.
 
-You must have made sure prior that your QNX SDP works and you can compile the
-sources manually.
+Before running builds for QNX, you must set the the environment variable
+`QNXSDP_$CODENAME` to the path where your QNX installation is (so that the file
+`qnxsdp-env.sh` can be found).
 
-After the container is built, the QNX environment variables are no longer needed
-to be set before building. They will be set automatically inside the container.
-
-```sh
-$ . ~/qnx/qnx800/qnxsdp-env.sh
-QNX_HOST=/home/jcurl/qnx/qnx800/host/linux/x86_64
-QNX_TARGET=/home/jcurl/qnx/qnx800/target/qnx
-MAKEFLAGS=-I/home/jcurl/qnx/qnx800/target/qnx/usr/include
-```
-
-The use the make file to build the image the first time:
+For example, when building for QNX 7.1.0 and QNX 8.0.0, the parameter given to
+`-cCODENAME` is used to identify the environment variable.
 
 ```sh
-$ make qnx-800-aarch64le
+$ export QNXSDP_710=/home/<user>/qnx/qnx710
+$ export QNXSDP_800=/home/<user>/qnx/qnx800
+$ build.sh -dqnx -c710 -i
 ```
-
-or build the container manually, and enter interactive mode.
-
-```sh
-$ ./build.sh -dqnx -c800 -i
-```
-
-During the build, the contents of where your QNX installation is copied into the
-folder `./qnx/scripts/docker/qnx/tar`. This contains the binaries and host tools
-that you've installed using the QNX software centre. If you destroy the
-container and rebuild, this tarball is reused, speeding up the next build.
-
-Alternatively, if you have a tarball from another installation, you can copy it
-here with the same name (e.g. `qnx-800.tar.bz2`) and it will be extracted into
-the container at `/opt/qnx`.
-
-Because the QNX images are about 15-20GB (when almost everything is installed),
-the initial creation of the containers are slow and can take a lot of memory
-(~25GB with ~55GB needed during the container build). You might want to consider
-your podman storage configuration.
-
-The containers for QNX are configured to run as root (the `build.sh -r` option).
-This speeds up considerably the first run of QNX, as it won't rewrite all the
-overlay containers. See [Performance - Choosing a Storage
-Driver](https://github.com/containers/podman/blob/1855765/docs/tutorials/performance.md#choosing-a-storage-driver).
 
 ## 2. Building using Makefile
 

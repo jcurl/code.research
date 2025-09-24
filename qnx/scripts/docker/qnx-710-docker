@@ -22,13 +22,6 @@ RUN (apt update -y || \
 # QNX script "qnxsdp-env.sh" doesn't like 'dash'.
 RUN ln -sf /bin/bash /bin/sh
 
-# The build must mount this for us. Preparing the tarball upfront, and un-tar
-# the file from the mount into our image is fast and doesn't result in overhead
-# on every build.
-ARG TARBALL=none.tar.bz2
-RUN mkdir /opt/qnx && \
-    tar --no-same-owner --no-same-permissions -C /opt/qnx -xjvf /opt/qnxsdp/${TARBALL} || true
-
 RUN mkdir /source
 RUN mkdir /build
 RUN mkdir /home/user
