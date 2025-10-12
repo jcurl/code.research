@@ -21,3 +21,5 @@ target_code_coverage(${BINARY}
 )
 
 target_clangformat(TARGET ${BINARY} DIR .)
+
+add_subdirectory(resmgr)

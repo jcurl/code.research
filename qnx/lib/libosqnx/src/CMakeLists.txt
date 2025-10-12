@@ -1,7 +1,9 @@
 set(LIBRARY osqnx)
 set(SOURCES
-    ../include/osqnx/pids.h pids.cpp
     ../include/osqnx/asinfo.h asinfo.cpp
+    ../include/osqnx/pids.h pids.cpp
+    ../include/osqnx/qnxver.h
+    ../include/osqnx/resmgr/device.h resmgr/device.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
@@ -16,4 +18,4 @@ if(IS_DEBUG)
     add_sanitizers(${LIBRARY})
 endif()
 
-target_clangformat(TARGET ${LIBRARY} DIR . DIR_RECURSE ../include/osqnx)
+target_clangformat(TARGET ${LIBRARY} DIR . DIR_RECURSE ../include/osqnx resmgr)

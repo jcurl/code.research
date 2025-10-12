@@ -47,6 +47,12 @@ class sync_event {
 
   /// @brief Wait on another thread calling set() or timeout.
   ///
+  /// @tparam Rep an arithmetic type, or a class emulating an arithmetic type,
+  /// representing the number of ticks.
+  ///
+  /// @tparam Period a std::ratio representing the tick period (i.e. the number
+  /// of second's fractions per tick).
+  ///
   /// @return true if the condition was satisfied, false if not set().
   template <class Rep, class Period>
   [[nodiscard]] auto wait_for(
