@@ -13,6 +13,7 @@
     - [2.1.1. Memory Allocation](#211-memory-allocation)
     - [2.1.2. Cache Line](#212-cache-line)
     - [2.1.3. String Comparison](#213-string-comparison)
+    - [2.1.4. QNX Message Passing](#214-qnx-message-passing)
   - [2.2. Tools](#22-tools)
     - [2.2.1. Time Comparison](#221-time-comparison)
     - [2.2.2. Core Latency](#222-core-latency)
@@ -130,6 +131,17 @@ Other Platforms:
 - (/) Cygwin (Windows): Runs.
 - (/) NetBSD 10.1: Runs.
 - (/) FreeBSD 14.2: Runs.
+
+#### 2.1.4. QNX Message Passing
+
+Show how many messages can be passed per second on QNX 7.1 or QNX 8.0. Can show
+how the microkernel scales by adding threads who do message passing as fast as
+possible for a very simple operation.
+
+- Tool: `dev-adder` and `adder`
+- Supported: QNX 7.1, QNX 8.0
+- [Documentation](./benchmarks/devctl.md)
+- [Results](./benchmarks/devctl.md)
 
 ### 2.2. Tools
 

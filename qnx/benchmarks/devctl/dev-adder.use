@@ -1,0 +1,14 @@
+dev-adder - software driver to add one to a uint32_t
+
+dev-adder -n <threads> -i <start>
+
+Options:
+ -n  Number of devices to create in /dev/adder/X
+ -i  The first number for X.
+
+This is a simple resource manager intended for performance measurements. It
+allows a client to open, and send a DCMD_DRIVER_ADD that increments the value
+given by 1.
+
+It creates one thread per device, which has its own channel, for multithreaded
+processing, where each device operates as a single thread.

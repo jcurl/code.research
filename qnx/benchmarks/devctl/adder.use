@@ -1,0 +1,17 @@
+adder - Do a performance test to /dev/adder/X
+
+adder -n <threads> -i <start> -I <iterations>
+
+Options:
+ -n  Number of threads to create, connecting to /dev/adder/X
+ -i  The first number for X.
+ -S  Number of samples for the test
+ -I  Perform an idle test
+
+The client opens the file /dev/adder/X, which is provided by the resource
+manager dev-adder. The value of X is the value provided by "-i", which is
+usually zero. The number of threads created is defined by "-n" and increments to
+the next one for each thread.
+
+Then it iterates a number, starting from 0, as fast as possible and times the
+duration it takes.
