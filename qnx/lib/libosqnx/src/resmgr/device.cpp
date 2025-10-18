@@ -1,5 +1,9 @@
 #include "osqnx/resmgr/device.h"
 
+#if QNXVER >= 800
+#include <secpol/secpol.h>
+#endif
+
 namespace os::qnx::resmgr {
 
 namespace details {
@@ -60,6 +64,7 @@ auto device::run_internal(void *driver, const config &config,
         break;
     }
 
+#if QNXVER < 800
     ids[i] = resmgr_attach(dpp_,   // dispatch handle
         &resmgr_attr,              // resource mgr attributes
         (*paths)[i].path.c_str(),  // device name
@@ -69,6 +74,18 @@ auto device::run_internal(void *driver, const config &config,
         io,                        // I/O functions
         reinterpret_cast<iofunc_attr_t *>(
             &attr[i]));  // resource manager handle
+#else
+    ids[i] = secpol_resmgr_attach(nullptr,
+        dpp_,                      // dispatch handle
+        &resmgr_attr,              // resource mgr attributes
+        (*paths)[i].path.c_str(),  // device name
+        _FTYPE_ANY,                // open type
+        resflags,                  // flags
+        connect,                   // connection functions
+        io,                        // I/O functions
+        reinterpret_cast<iofunc_attr_t *>(&attr[i]),
+        nullptr);  // resource manager handle
+#endif
 
     if (ids[i] == -1) {
       auto errno_cpy = errno;
