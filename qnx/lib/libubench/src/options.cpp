@@ -28,7 +28,8 @@ auto build_option_map(std::string_view options) -> std::array<option_arg, 128> {
 
   char optchar = 0;
   std::size_t options_pos = 0;
-  while ((optchar = options[options_pos]) != 0) {
+  while (
+      options_pos < options.size() && (optchar = options[options_pos]) != 0) {
     if (is_valid_opt(optchar)) {
       char optchar_next = options_pos + 1 < options.length()
                               ? options[options_pos + 1]
