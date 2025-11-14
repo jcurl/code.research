@@ -7,6 +7,7 @@
 #include <net/bpf.h>
 #include <net/if.h>
 #include <fcntl.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #include <cerrno>
@@ -15,6 +16,7 @@
 #include <cstring>
 #include <iostream>
 
+#include "l2_eth_udp_pkt.h"
 #include "ubench/net.h"
 #include "ubench/string.h"
 #include "udp_talker.h"
@@ -23,12 +25,12 @@ using namespace std::chrono_literals;
 
 // For the "pimpl" pattern (using a unique_ptr on a forward declarated class),
 // need to ensure that there is no definition (inline) of the constructor in the
-// header file, else a move of "udp_talker_bpf" will not compile.
-udp_talker_bpf::~udp_talker_bpf() = default;
-udp_talker_bpf::udp_talker_bpf() = default;
+// header file, else a move of "udp_talker_bpfmm" will not compile.
+udp_talker_bpfmm::~udp_talker_bpfmm() = default;
+udp_talker_bpfmm::udp_talker_bpfmm() = default;
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
+auto udp_talker_bpfmm::init_packets(const struct sockaddr_in& source,
     const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept -> bool {
   if (socket_fd_) return false;
 
@@ -40,8 +42,9 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     return false;
   }
 
-  pkt_ = std::make_unique<l2_eth_udp_pkt>();
-  if (!ubench::net::get_ether_multicast(dest.sin_addr, &pkt_->dst_mac())) {
+  // Generate the sample packet
+  std::unique_ptr<l2_eth_udp_pkt> pkt = std::make_unique<l2_eth_udp_pkt>();
+  if (!ubench::net::get_ether_multicast(dest.sin_addr, &pkt->dst_mac())) {
     std::cerr << "BPF mode requires multicast destination MAC" << std::endl;
     return false;
   }
@@ -64,16 +67,7 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
           }
           bpf_intf = name;
 
-          // Under BPF, if we use a VLAN interface, it will automatically add
-          // the VLAN tag for us. If we try and use the parent interface, the
-          // MTU will be reduced by 4 bytes.
-
-          // if (intf.vlan()) {
-          //   pkt_->vlan_id() = intf.vlan()->id;
-          //   bpf_intf = intf.vlan()->parent;
-          // }
-
-          pkt_->src_mac() = *intf.hw_addr();
+          pkt->src_mac() = *intf.hw_addr();
           break;
         }
       }
@@ -85,23 +79,42 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     return false;
   }
 
-  pkt_->src_ip() = source.sin_addr;
-  pkt_->dst_ip() = dest.sin_addr;
-  pkt_->src_port() = source.sin_port;
-  pkt_->dst_port() = dest.sin_port;
+  pkt->src_ip() = source.sin_addr;
+  pkt->dst_ip() = dest.sin_addr;
+  pkt->src_port() = source.sin_port;
+  pkt->dst_port() = dest.sin_port;
 
   // Generate a packet
-  pkt_->pkt_data().resize(pkt_size);
+  pkt->pkt_data().resize(pkt_size);
   std::uint8_t x = 0;
-  for (auto& b : pkt_->pkt_data()) {
+  for (auto& b : pkt->pkt_data()) {
     b = x;
     x++;
+  }
+
+  // After the sample packet is created, we create multiple copies.
+  //eth_packets_.resize(UIO_MAXIOV >> 1);
+  eth_packets_.reserve(UIO_MAXIOV >> 1);
+  msgvec_.resize(UIO_MAXIOV);
+
+  for (size_t i = 0; i < UIO_MAXIOV; i += 2) {
+    auto p = eth_packets_.emplace_back(*pkt);
+    msgvec_[i].iov_base = nullptr;
+    msgvec_[i].iov_len = 0;
+    msgvec_[i + 1].iov_base = const_cast<std::uint8_t*>(p.pkt_data().data());
+    msgvec_[i + 1].iov_len = pkt_size;
   }
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   ubench::file::fdesc fd = open("/dev/bpf", O_RDWR);
   if (!fd) {
     ubench::string::perror("BPF device interface cannot be opened");
+    return false;
+  }
+
+  unsigned int mmwrite = 1;
+  if (ioctl(fd, BIOCSMMWRITE, &mmwrite) == -1) {
+    ubench::string::perror("BPF Multiwrite can't be set");
     return false;
   }
 
@@ -123,38 +136,41 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
   return true;
 }
 
-auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
+auto udp_talker_bpfmm::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
   if (!socket_fd_) return 0;
+
+  // TODO: Write the iovec
 
   // Note, we don't need to add a trailer of zeroes, as the network stack will
   // extend the size of the Ethernet packet with undefined data to meet the
   // minimum Ethernet specification size.
-  std::array<iovec, 2> iov{};
+  // std::array<iovec, 2> iov{};
 
-  std::uint16_t sent = 0;
-  for (std::uint16_t i = 0; i < count; i++) {
-    // Reset the packet, that the new fragmentation identifier is calculated.
-    pkt_->reset_pkt();
+  // std::uint16_t sent = 0;
+  // for (std::uint16_t i = 0; i < count; i++) {
+  //   // Reset the packet, that the new fragmentation identifier is calculated.
+  //   pkt_->reset_pkt();
 
-    iov[0].iov_base = const_cast<std::uint8_t*>(pkt_->build_pkt_hdr().data());
-    iov[0].iov_len = pkt_->build_pkt_hdr().size();
-    iov[1].iov_base = const_cast<std::uint8_t*>(pkt_->pkt_data().data());
-    iov[1].iov_len = pkt_->pkt_data().size();
+  //   iov[0].iov_base = const_cast<std::uint8_t*>(pkt_->build_pkt_hdr().data());
+  //   iov[0].iov_len = pkt_->build_pkt_hdr().size();
+  //   iov[1].iov_base = const_cast<std::uint8_t*>(pkt_->pkt_data().data());
+  //   iov[1].iov_len = pkt_->pkt_data().size();
 
-    int result{};
-    do {
-      result = writev(socket_fd_, iov.data(), iov.size());
-      if (result == -1) {
-        if (errno == ENOBUFS) {
-          if (delay(750us)) continue;
-        }
-        ubench::string::perror("writev()");
-        return sent;
-      }
-    } while (result < 0);
-    sent++;
-  }
+  //   int result{};
+  //   do {
+  //     result = writev(socket_fd_, iov.data(), iov.size());
+  //     if (result == -1) {
+  //       if (errno == ENOBUFS) {
+  //         if (delay(750us)) continue;
+  //       }
+  //       ubench::string::perror("writev()");
+  //       return sent;
+  //     }
+  //   } while (result < 0);
+  //   sent++;
+  // }
 
-  return sent;
+  // return sent;
+  return 0;
 }

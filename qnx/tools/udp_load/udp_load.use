@@ -5,7 +5,7 @@ udp_load [-n<slots>] [-m<width>] [-p<packets>] [-s<size>]
          [-S<sourceip[:port]>] [-D<destip[:port]>]
 
 Options:
- -B<mode>     - sending mode: sendto, sendmmsg, bpf.
+ -B<mode>     - sending mode: sendto, sendmmsg, bpf, bpfmm.
  -n<slots>    - Number of slots in a time window (default 20).
  -m<width>    - Width of each slot in milliseconds (default 5ms).
  -p<packets>  - Number of packets to send in a window (n*m duration, default 1000).
@@ -29,6 +29,7 @@ total number of slots, so 1000 packets and 20 slots, is 50 packets per slot).
 The test might run on a single thread (default) or multiple threads as given by
 '-T'. The method used to send packets is defined by '-B', e.g.
 
-- bpf: use /dev/bpf and send packets completely constructed in software
 - sendto: use the sendto() library call
 - sendmmsg: use the sendmmsg() library call
+- bpf: use /dev/bpf and send packets completely constructed in software
+- bpfmm: use /dev/bpf QNX8 extension to send packets

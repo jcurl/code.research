@@ -9,6 +9,7 @@
 #include "stdext/expected.h"
 #include "ubench/options.h"
 #include "ubench/string.h"
+#include "udp_talker.h"
 
 namespace {
 
@@ -76,6 +77,11 @@ void print_help(std::string_view prog_name) {
     if (option) std::cout << ", ";
     option = true;
     std::cout << "bpf";
+  }
+  if (make_udp_talker(send_mode::mode_bpfmm)->is_supported()) {
+    if (option) std::cout << ", ";
+    option = true;
+    std::cout << "bpfmm";
   }
   if (option) {
     std::cout << "." << std::endl;
@@ -213,6 +219,8 @@ auto make_options(int argc, char* const argv[]) noexcept
             o.mode_ = send_mode::mode_sendmmsg;
           } else if (arg == "bpf") {
             o.mode_ = send_mode::mode_bpf;
+          } else if (arg == "bpfmm") {
+            o.mode_ = send_mode::mode_bpfmm;
           } else {
             std::cerr << "Error: Invalid test mode " << arg << std::endl;
             return stdext::unexpected{1};

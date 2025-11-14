@@ -32,6 +32,9 @@ auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker> {
     case send_mode::mode_bpf:
       talker = std::make_unique<udp_talker_bpf>();
       break;
+    case send_mode::mode_bpfmm:
+      talker = std::make_unique<udp_talker_bpfmm>();
+      break;
     default:
       talker = std::make_unique<udp_talker>();
       break;
