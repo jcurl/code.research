@@ -8,7 +8,8 @@ find_package(Threads REQUIRED)
 set(BINARY udp_load)
 set(SOURCES
     udp_load.cpp
-    udp_talker.cpp udp_talker_bsdipv4.cpp udp_talker.h
+    udp_talker.h udp_talker.cpp
+    udp_talker_bsdipv4.cpp
     options.cpp options.h
 )
 
@@ -22,11 +23,20 @@ check_symbol_enum_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)
 
 # Test using `sendmmsg`.
 check_symbol_gnusource_exists(sendmmsg "sys/socket.h" HAVE_SENDMMSG)
+if (HAVE_SENDMMSG)
+    check_symbol_enum_exists(UIO_MAXIOV "sys/types.h;sys/socket.h;sys/uio.h" HAVE_UIO_MAXIOV)
+endif()
 
 # Test using `/dev/bpf` on NetBSD, FreeBSD, QNX 7.1. QNX 8.0 also needs "sys/socket.h"
-check_symbol_enum_exists(BIOCSETIF "sys/socket.h;sys/types.h;sys/time.h;sys/ioctl.h;net/bpf.h" HAVE_BIOCSETIF)
+check_symbol_enum_exists(BIOCSETIF "sys/types.h;sys/socket.h;sys/time.h;sys/ioctl.h;net/bpf.h" HAVE_BIOCSETIF)
 if (HAVE_BIOCSETIF)
+    target_sources(${BINARY} PRIVATE l2_eth_udp_pkt.h l2_eth_udp_pkt.cpp)
     target_sources(${BINARY} PRIVATE udp_talker_bpf.cpp)
+
+    check_symbol_enum_exists(BIOCSMMWRITE "sys/socket.h;sys/types.h;sys/time.h;sys/ioctl.h;net/bpf.h" HAVE_BIOCSMMWRITE)
+    if (HAVE_BIOCSMMWRITE)
+        target_sources(${BINARY} PRIVATE udp_talker_bpfmm.cpp)
+    endif()
 endif()
 
 # Timeout testing, used on FreeBSD when ENOBUFS are returned for a delay smaller

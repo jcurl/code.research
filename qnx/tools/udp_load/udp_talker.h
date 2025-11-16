@@ -17,11 +17,20 @@
 #include "ubench/file.h"
 #include "ubench/measure/busy_measurement.h"
 
+#if HAVE_BIOCSETIF
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <net/bpf.h>
+
+#include "l2_eth_udp_pkt.h"
+#endif
+
 /// @brief The class to instantiate when testing.
 enum class send_mode {
   mode_sendto,    //< Use sendto() for sending packets.
   mode_sendmmsg,  //< use sendmmsg() for sending packets.
   mode_bpf,       //< use BPF for sending packets.
+  mode_bpfmm,     //< use BPF QNX8 MMWRITE for sending packets.
 };
 
 /// @brief Executes a period of time in idle for background CPU usage
@@ -216,10 +225,10 @@ using udp_talker_sendmmsg = udp_talker;
 #endif
 
 #if HAVE_BIOCSETIF
-/// @brief Send packets using the sendmmsg() socket call.
+/// @brief Send packets using the device /dev/bpf
 ///
-/// The sendmmsg() call allows to send multiple packets in one system call,
-/// allowing for the reduction of overhead for multiple packets in one slot.
+/// The write() call allows to send a single packet. Messages are created as L2.
+/// No hardware acceleration is used, so this is worst case.
 class udp_talker_bpf final : public udp_talker {
  public:
   explicit udp_talker_bpf();
@@ -239,14 +248,46 @@ class udp_talker_bpf final : public udp_talker {
 
  private:
   ubench::file::fdesc socket_fd_{-1};
-  int writev_errno_{};
 
-  class pkt_details;
-  std::unique_ptr<pkt_details> pkt_;
+  std::unique_ptr<l2_eth_udp_pkt> pkt_;
 };
 #else
 // The /dev/bpf interface constants are not found.
 using udp_talker_bpf = udp_talker;
+#endif
+
+#if HAVE_BIOCSMMWRITE
+/// @brief Send packets using the device /dev/bpf with QNX8 extensions
+///
+/// The write() call allows to send a single packet. Messages are created as L2.
+/// No hardware acceleration is used, so this is worst case.
+class udp_talker_bpfmm final : public udp_talker {
+ public:
+  explicit udp_talker_bpfmm();
+  udp_talker_bpfmm(const udp_talker_bpfmm&) = delete;
+  auto operator=(const udp_talker_bpfmm&) -> udp_talker_bpfmm& = delete;
+  udp_talker_bpfmm(udp_talker_bpfmm&& other) = delete;
+  auto operator=(udp_talker_bpfmm&&) -> udp_talker_bpfmm& = delete;
+  ~udp_talker_bpfmm() override;
+
+  auto is_supported() noexcept -> bool override { return true; }
+
+ protected:
+  auto init_packets(const struct sockaddr_in& source,
+      const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept
+      -> bool override;
+  auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
+
+ private:
+  ubench::file::fdesc socket_fd_{-1};
+
+  std::unique_ptr<l2_eth_udp_pkt> pkt_;
+  std::vector<l2_eth_udp_pkt> eth_packets_{};
+  std::vector<struct iovec> msgvec_{};
+};
+#else
+// The /dev/bpf interface constants are not found.
+using udp_talker_bpfmm = udp_talker;
 #endif
 
 /// @brief Create the benchmark class from the mode.

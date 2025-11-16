@@ -2,9 +2,16 @@
 
 // Enable 'sendmmsg' support.
 #cmakedefine01 HAVE_SENDMMSG
+#cmakedefine01 HAVE_UIO_MAXIOV
+#if !HAVE_UIO_MAXIOV
+# define UIO_MAXIOV 1024
+#else
+# include <sys/uio.h>
+#endif
 
 // Enable 'bpf' support.
 #cmakedefine01 HAVE_BIOCSETIF
+#cmakedefine01 HAVE_BIOCSMMWRITE
 
 // Clock on ENOBUFS.
 #cmakedefine01 HAVE_CLOCK_REALTIME_PRECISE

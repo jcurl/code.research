@@ -120,10 +120,10 @@ auto udp_talker_sendmmsg::init_packets(const struct sockaddr_in &source,
     const struct sockaddr_in &dest, std::uint16_t pkt_size) noexcept -> bool {
   // Prepare up to 1024 Ethernet packets (UIO_MAXIOV) which is supported on QNX
   // and Linux.
-  eth_packets_.resize(1024);
-  msgvec_.resize(1024);
-  msgpool_.resize(1024);
-  for (size_t i = 0; i < 1024; i++) {
+  eth_packets_.resize(UIO_MAXIOV);
+  msgvec_.resize(UIO_MAXIOV);
+  msgpool_.resize(UIO_MAXIOV);
+  for (size_t i = 0; i < UIO_MAXIOV; i++) {
     std::vector<std::uint8_t> packet(pkt_size);
     std::uint8_t x = i;
     for (auto &b : packet) {
@@ -154,7 +154,7 @@ auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
 
   std::uint16_t sent = 0;
   while (sent < count) {
-    auto remain = std::min(count - sent, 1024);
+    auto remain = std::min<std::uint16_t>(count - sent, UIO_MAXIOV);
     int result{};
     do {
       result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);

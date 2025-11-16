@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/uio.h>
 #include <netinet/in.h>
 #include <net/bpf.h>
 #include <net/if.h>
@@ -23,12 +24,11 @@ using namespace std::chrono_literals;
 
 // For the "pimpl" pattern (using a unique_ptr on a forward declarated class),
 // need to ensure that there is no definition (inline) of the constructor in the
-// header file, else a move of "udp_talker_bpf" will not compile.
-udp_talker_bpf::~udp_talker_bpf() = default;
-udp_talker_bpf::udp_talker_bpf() = default;
+// header file, else a move of "udp_talker_bpfmm" will not compile.
+udp_talker_bpfmm::udp_talker_bpfmm() = default;
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
+auto udp_talker_bpfmm::init_packets(const struct sockaddr_in& source,
     const struct sockaddr_in& dest, std::uint16_t pkt_size) noexcept -> bool {
   if (socket_fd_) return false;
 
@@ -40,6 +40,7 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     return false;
   }
 
+  // Generate the sample packet
   pkt_ = std::make_unique<l2_eth_udp_pkt>();
   if (!ubench::net::get_ether_multicast(dest.sin_addr, &pkt_->dst_mac())) {
     std::cerr << "BPF mode requires multicast destination MAC" << std::endl;
@@ -63,15 +64,6 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
             return false;
           }
           bpf_intf = name;
-
-          // Under BPF, if we use a VLAN interface, it will automatically add
-          // the VLAN tag for us. If we try and use the parent interface, the
-          // MTU will be reduced by 4 bytes.
-
-          // if (intf.vlan()) {
-          //   pkt_->vlan_id() = intf.vlan()->id;
-          //   bpf_intf = intf.vlan()->parent;
-          // }
 
           pkt_->src_mac() = *intf.hw_addr();
           break;
@@ -98,10 +90,54 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     x++;
   }
 
+  // Prepare the packet pool
+  bool allocated = eth_packets_.size() != 0;
+
+  std::size_t maxsend = UIO_MAXIOV / 3;
+  if (!allocated) {
+    // Because of the malloc(), if we resize we'll lose all the pointers and
+    // can't free it later.
+    eth_packets_.resize(maxsend);
+    msgvec_.resize(maxsend * 3);
+  }
+
+  for (std::size_t i = 0, j = 0; i < maxsend; i++, j += 3) {
+    eth_packets_[i] = *pkt_;
+    eth_packets_[i].reset_pkt();
+
+    auto pkt_hdr = eth_packets_[i].build_pkt_hdr();
+    auto pkt_dat = eth_packets_[i].pkt_data();
+
+    // We have to allocate memory using "malloc", because we don't know how many
+    // bytes to allocate upfront. QNX has a weird padding that is needed
+    // depending on the size of the Ethernet packet. This memory should be freed
+    // by the destructor.
+    int s = pkt_hdr.size() + pkt_dat.size();
+    int padding = BPF_WORDALIGN(s) - s;
+    struct bpf_whdr* h =
+        (struct bpf_whdr*)malloc(sizeof(struct bpf_whdr) + padding);
+    h->bh_hdrlen = sizeof(struct bpf_whdr) + padding;
+    h->bh_datalen = s;
+
+    if (allocated) free(msgvec_[j].iov_base);
+    msgvec_[j].iov_base = h;
+    msgvec_[j].iov_len = h->bh_hdrlen;
+    msgvec_[j + 1].iov_base = const_cast<std::uint8_t*>(pkt_hdr.data());
+    msgvec_[j + 1].iov_len = pkt_hdr.size();
+    msgvec_[j + 2].iov_base = const_cast<std::uint8_t*>(pkt_dat.data());
+    msgvec_[j + 2].iov_len = pkt_dat.size();
+  }
+
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   ubench::file::fdesc fd = open("/dev/bpf", O_RDWR);
   if (!fd) {
     ubench::string::perror("BPF device interface cannot be opened");
+    return false;
+  }
+
+  unsigned int mmwrite = 1;
+  if (ioctl(fd, BIOCSMMWRITE, &mmwrite) == -1) {
+    ubench::string::perror("BPF Multiwrite can't be set");
     return false;
   }
 
@@ -123,28 +159,17 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
   return true;
 }
 
-auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
+auto udp_talker_bpfmm::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
   if (!socket_fd_) return 0;
 
-  // Note, we don't need to add a trailer of zeroes, as the network stack will
-  // extend the size of the Ethernet packet with undefined data to meet the
-  // minimum Ethernet specification size.
-  std::array<iovec, 2> iov{};
-
   std::uint16_t sent = 0;
-  for (std::uint16_t i = 0; i < count; i++) {
-    // Reset the packet, that the new fragmentation identifier is calculated.
-    pkt_->reset_pkt();
-
-    iov[0].iov_base = const_cast<std::uint8_t*>(pkt_->build_pkt_hdr().data());
-    iov[0].iov_len = pkt_->build_pkt_hdr().size();
-    iov[1].iov_base = const_cast<std::uint8_t*>(pkt_->pkt_data().data());
-    iov[1].iov_len = pkt_->pkt_data().size();
-
+  while (sent < count) {
+    auto remain = std::min<std::uint16_t>(count - sent, eth_packets_.size());
     int result{};
+
     do {
-      result = writev(socket_fd_, iov.data(), iov.size());
+      result = writev(socket_fd_, msgvec_.data(), remain * 3);
       if (result == -1) {
         if (errno == ENOBUFS) {
           if (delay(750us)) continue;
@@ -153,8 +178,18 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
         return sent;
       }
     } while (result < 0);
-    sent++;
+    sent += remain;
   }
-
   return sent;
+}
+
+udp_talker_bpfmm::~udp_talker_bpfmm() {
+  bool allocated = msgvec_.size() != 0;
+  if (allocated) {
+    // We don't have a class managing the variable sizesd bpf header object,
+    // which is every third packet in the pool.
+    for (std::size_t i = 0; i < msgvec_.size(); i += 3) {
+      free(msgvec_[i].iov_base);
+    }
+  }
 }
