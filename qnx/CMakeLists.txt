@@ -106,18 +106,21 @@ target_compile_features(benchmark_main PRIVATE cxx_std_17)
 # Must enable CLANG-TIDY *after* google packages, so we don't interfere.
 check_clang_tidy()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libubench/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libstdext/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libosqnx/include)
-add_subdirectory(lib)
-
-add_subdirectory(benchmarks)
-add_subdirectory(tools)
-add_subdirectory(poc)
-
+# Testing must be enabled now, if we don't want to enable it explicitly in subdirectories.
 if(ENABLE_TEST)
     message(STATUS "Test suite enabled with -DENABLE_TEST=on (execute with make && ctest)")
     enable_testing()
 else()
     message(STATUS "Test suite disabled with -DENABLE_TEST=off")
 endif()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libubench/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libstdext/include)
+if(QNXNTO)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libosqnx/include)
+endif()
+add_subdirectory(lib)
+
+add_subdirectory(benchmarks)
+add_subdirectory(tools)
+add_subdirectory(poc)
