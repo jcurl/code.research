@@ -1,6 +1,7 @@
 set(LIBRARY libcpuid)
 set(SOURCES
     ../include/cpuid/cpuid.h
+    cpuid_dev.h cpuid_dev.cpp
     cpuid_native.h cpuid_native.cpp
 )
 
