@@ -3,6 +3,7 @@ set(SOURCES
     ../include/cpuid/cpuid.h
     cpuid_dev.h cpuid_dev.cpp
     cpuid_native.h cpuid_native.cpp
+    cpuidreader_native.h
 )
 
 add_library(${LIBRARY} STATIC ${SOURCES})
