@@ -224,10 +224,10 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   ubench::thread::sync_event flag{};
 
   std::thread ping_thread([&]() {
-    auto success = ubench::thread::pin_core(ping_core);
-    if (!success) {
+    auto pinned = ubench::thread::pin_core(ping_core);
+    if (!pinned) {
       std::cerr << "Could not pin 'ping' core; "
-                << ubench::string::perror(success.error()) << std::endl;
+                << ubench::string::perror(pinned.error()) << std::endl;
       std::abort();
     }
     flag.wait();
@@ -237,10 +237,10 @@ auto core_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
   });
 
   std::thread pong_thread([&]() {
-    auto success = ubench::thread::pin_core(pong_core);
-    if (!success) {
+    auto pinned = ubench::thread::pin_core(pong_core);
+    if (!pinned) {
       std::cerr << "Could not pin 'pong' core; "
-                << ubench::string::perror(success.error()) << std::endl;
+                << ubench::string::perror(pinned.error()) << std::endl;
       std::abort();
     }
     flag.wait();

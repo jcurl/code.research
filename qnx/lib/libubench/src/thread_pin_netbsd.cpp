@@ -3,11 +3,6 @@
 #include <pthread.h>
 #include <sched.h>
 
-#if HAVE_INCLUDE_PTHREAD_NP_H
-// FreeBSD
-#include <pthread_np.h>
-#endif
-
 #include <cerrno>
 #include <thread>
 
@@ -22,23 +17,39 @@ class pin_core::pin_core_impl {
 
     thread_ = pthread_self();
 
+    orig_mask_ = cpuset_create();
+    if (orig_mask_ == nullptr) {
+      error_ = errno;
+      return;
+    }
+    cpuset_zero(orig_mask_);
+
+    new_mask_ = cpuset_create();
+    if (new_mask_ == nullptr) {
+      error_ = errno;
+      cpuset_destroy(orig_mask_);
+      return;
+    }
+    cpuset_zero(new_mask_);
+
     int rc = 0;
-    CPU_ZERO(&orig_mask_);
-    rc = pthread_getaffinity_np(thread_, sizeof(cpu_set_t), &orig_mask_);
+    rc = pthread_getaffinity_np(thread_, cpuset_size(orig_mask_), orig_mask_);
     if (rc) {
       error_ = errno;
+      cpuset_destroy(orig_mask_);
+      cpuset_destroy(new_mask_);
       return;
     }
 
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    CPU_SET(core, &cpuset);
-    rc = pthread_setaffinity_np(thread_, sizeof(cpu_set_t), &cpuset);
+    cpuid_t ci = core;
+    cpuset_set(ci, new_mask_);
+    rc = pthread_setaffinity_np(thread_, cpuset_size(new_mask_), new_mask_);
     if (rc) {
       error_ = errno;
+      cpuset_destroy(orig_mask_);
+      cpuset_destroy(new_mask_);
       return;
     }
-
     pinned_ = true;
   }
 
@@ -49,7 +60,9 @@ class pin_core::pin_core_impl {
 
   ~pin_core_impl() {
     if (!pinned_) return;
-    pthread_setaffinity_np(thread_, sizeof(cpu_set_t), &orig_mask_);
+    pthread_setaffinity_np(thread_, cpuset_size(orig_mask_), orig_mask_);
+    cpuset_destroy(orig_mask_);
+    cpuset_destroy(new_mask_);
   }
 
   [[nodiscard]] auto is_pinned() const -> bool { return pinned_; }
@@ -63,7 +76,8 @@ class pin_core::pin_core_impl {
   bool pinned_{};
   int error_{};
   pthread_t thread_;
-  cpu_set_t orig_mask_{};
+  cpuset_t* orig_mask_{};
+  cpuset_t* new_mask_{};
 };
 
 pin_core::pin_core([[maybe_unused]] unsigned int core)
