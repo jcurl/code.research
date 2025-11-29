@@ -1,3 +1,4 @@
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" OR
+   ${CMAKE_SYSTEM_PROCESSOR} MATCHES "i[3456]86")
   add_subdirectory(libcpuid)
 endif()
