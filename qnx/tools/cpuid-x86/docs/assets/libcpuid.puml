@@ -8,6 +8,7 @@ class cpuid_native {
 class cpuidreader_native {
     +has_cpuid(): bool
     +is_online(): bool
+    +cores(): unsigned int
     +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
     +enable_core(core: unsigned int): std::optional<ubench::thread::pin_core>
 }
@@ -49,6 +50,7 @@ class cpuid_dev {
 class cpuidreader_dev {
     +has_cpuid(): bool
     +is_online(): bool
+    +cores(): unsigned int
     +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
     +enable_core(core: unsigned int): std::optional<detail::cpuid_dev_ctx>
     -default_: bool

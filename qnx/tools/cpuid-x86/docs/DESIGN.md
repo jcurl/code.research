@@ -45,8 +45,9 @@ The classes `cpuidreader_*` are intended to be the classes that are instantiated
 to read the CPUID information. They all offer the same methods, that makes them
 suitable for template programming:
 
-- `has_cpuid()` indicates if the class is capable of returning results
-- `is_online()` indicates if the results are for the current CPU
+- `has_cpuid()` indicates if the class is capable of returning results.
+- `is_online()` indicates if the results are for the current.
+- `cores()` the number of cores available to query.
 - `cpuid()` query the CPUID results for the leaf and subleaf.
 - `enable_core()` provide a context, that when destroyed, releases the context,
   for querying the CPUID.

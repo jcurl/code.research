@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <optional>
+#include <thread>
 #include <utility>
 
 #include "cpuid/cpuid.h"
@@ -180,6 +181,13 @@ class cpuidreader_dev {
   /// @return true if queries are on current hardware, false if queries are
   /// cached and may not reflect this machine.
   auto is_online() -> bool { return true; }
+
+  /// @brief Get the number of cores available.
+  ///
+  /// @return the number of cores available.
+  [[nodiscard]] auto cores() const -> unsigned int {
+    return std::thread::hardware_concurrency();
+  }
 
   /// @brief Query the CPUID for the register eax and ecx.
   ///

@@ -55,7 +55,7 @@ TEST(cpuidreader_dev, cpuid_context_move) {
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
-  if (std::thread::hardware_concurrency() > 0) core = 1;
+  if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
   ASSERT_HAS_VALUE(pin);
@@ -89,8 +89,7 @@ TEST(cpuidreader_dev, cpuid_threads) {
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   std::set<rjcp::cpuid::cpuidreg> acpi{};
-  for (unsigned int core = 0; core < std::thread::hardware_concurrency();
-       core++) {
+  for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
     ASSERT_HAS_VALUE(pin);
     ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
@@ -107,8 +106,7 @@ TEST(cpuidreader_dev, cpuid_threads_context_move) {
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   std::set<rjcp::cpuid::cpuidreg> acpi{};
-  for (unsigned int core = 0; core < std::thread::hardware_concurrency();
-       core++) {
+  for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
     ASSERT_HAS_VALUE(pin);
     ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
@@ -144,7 +142,7 @@ TEST(cpuidreader_dev, cpuid_query_then_enable) {
 
   // Now enable a specific core, which should succeed.
   unsigned int core = 0;
-  if (std::thread::hardware_concurrency() > 0) core = 1;
+  if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
   ASSERT_HAS_VALUE(pin);
@@ -164,7 +162,7 @@ TEST(cpuidreader_dev, cpuid_enable_core_twice_fail) {
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
-  if (std::thread::hardware_concurrency() > 0) core = 1;
+  if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
   ASSERT_HAS_VALUE(pin);
@@ -183,7 +181,7 @@ TEST(cpuidreader_dev, cpuid_enable_core_twice_success) {
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
-  if (std::thread::hardware_concurrency() > 0) core = 1;
+  if (cpu.cores() > 1) core = 1;
 
   rjcp::cpuid::cpuidreg regc = 0;
   {
@@ -217,7 +215,7 @@ TEST(cpuidreader_dev, move_ctor) {
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
-  if (std::thread::hardware_concurrency() > 0) core = 1;
+  if (cpu.cores() > 1) core = 1;
 
   rjcp::cpuid::cpuidreg regebx{}, regmebx{};
   {
@@ -247,7 +245,7 @@ TEST(cpuidreader_dev, move_assignment) {
   rjcp::cpuid::cpuidreader_dev cpu2{};
 
   unsigned int core = 0;
-  if (std::thread::hardware_concurrency() > 0) core = 1;
+  if (cpu.cores() > 1) core = 1;
 
   rjcp::cpuid::cpuidreg regebx{}, regmebx{};
   {

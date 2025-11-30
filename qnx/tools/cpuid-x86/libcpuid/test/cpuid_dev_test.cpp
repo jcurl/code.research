@@ -11,6 +11,15 @@
 
 #include "ubench/file.h"
 
+// Needed so that clang-tidy doesn't complain about values being used without
+// checking the condition first.
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define ASSERT_HAS_VALUE(variable)       \
+  {                                      \
+    ASSERT_TRUE((variable).has_value()); \
+    if (!(variable).has_value()) return; \
+  }
+
 auto get_fdpath(unsigned int cpunum) -> ubench::file::fdesc {
   std::string path =
       std::string{"/dev/cpu/"} + std::to_string(cpunum) + std::string{"/cpuid"};
@@ -50,10 +59,8 @@ TEST(cpuid_dev, cpuid_zero) {
 
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_TRUE(reg.has_value());
-  if (reg) {
-    ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
-  }
+  ASSERT_HAS_VALUE(reg);
+  ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
 TEST(cpuid_dev, cpuid_ext) {
@@ -67,10 +74,8 @@ TEST(cpuid_dev, cpuid_ext) {
 
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_TRUE(reg.has_value());
-  if (reg) {
-    ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
-  }
+  ASSERT_HAS_VALUE(reg);
+  ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
 
 TEST(cpuid_dev, move_ctor) {

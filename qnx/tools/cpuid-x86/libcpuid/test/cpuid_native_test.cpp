@@ -2,6 +2,15 @@
 
 #include <gtest/gtest.h>
 
+// Needed so that clang-tidy doesn't complain about values being used without
+// checking the condition first.
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define ASSERT_HAS_VALUE(variable)       \
+  {                                      \
+    ASSERT_TRUE((variable).has_value()); \
+    if (!(variable).has_value()) return; \
+  }
+
 TEST(cpuid_native, has_cpuid) {
   rjcp::cpuid::cpuid_native cpu{};
 
@@ -14,10 +23,8 @@ TEST(cpuid_native, cpuid_zero) {
 
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_TRUE(reg.has_value());
-  if (reg) {
-    ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
-  }
+  ASSERT_HAS_VALUE(reg);
+  ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
 TEST(cpuid_native, cpuid_ext) {
@@ -26,8 +33,6 @@ TEST(cpuid_native, cpuid_ext) {
 
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_TRUE(reg.has_value());
-  if (reg) {
-    ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
-  }
+  ASSERT_HAS_VALUE(reg);
+  ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
