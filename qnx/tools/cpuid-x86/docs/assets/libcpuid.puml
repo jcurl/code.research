@@ -1,0 +1,69 @@
+@startuml libcpuid_cpuid_native
+
+class cpuid_native {
+    +has_cpuid(): bool
+    +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
+}
+
+class cpuidreader_native {
+    +has_cpuid(): bool
+    +is_online(): bool
+    +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
+    +enable_core(core: unsigned int): std::optional<ubench::thread::pin_core>
+}
+
+cpuidreader_native *-r- cpuid_native
+
+@enduml
+
+@startuml libcpuid_cpuid_dev
+
+namespace detail {
+
+    class cpuid_dev_file {
+        +bool()
+        +core(): unsigned int
+        +error(): int
+        +cpuid(): cpuid_dev&
+        +close(): bool
+        -fd_: int
+        -core_: unsigned int
+        -error_: int
+        -cpuid_: cpuid_dev
+    }
+
+    class cpuid_dev_ctx {
+        +bool()
+        +core(): unsigned int
+        +error(): int
+        -cpuid_file_: shared_ptr<detail::cpuid_dev_file>
+    }
+
+}
+
+class cpuid_dev {
+    +has_cpuid(): bool
+    +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
+}
+
+class cpuidreader_dev {
+    +has_cpuid(): bool
+    +is_online(): bool
+    +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
+    +enable_core(core: unsigned int): std::optional<detail::cpuid_dev_ctx>
+    -default_: bool
+    -cpuid_file_: shared_ptr<detail::cpuid_dev_file>
+}
+
+cpuid_dev_file *-d- cpuid_dev
+cpuidreader_dev .d.> cpuid_dev_ctx : <<create>>
+cpuidreader_dev *-d- cpuid_dev_file
+
+cpuid_dev_file -r-o cpuid_dev_ctx
+
+class User
+
+User *-d- cpuidreader_dev
+User o--d- cpuid_dev_ctx : <<enable_core>>
+
+@enduml
