@@ -1,10 +1,13 @@
 set(LIBRARY libcpuid)
 set(SOURCES
     ../include/cpuid/cpuid.h
-    cpuid_dev.h cpuid_dev.cpp
-    cpuid_native.h cpuid_native.cpp
-    cpuidreader_dev.h cpuidreader_dev.cpp
-    cpuidreader_native.h
+    ../include/cpuid/cpuidreader_dev.h
+    ../include/cpuid/cpuidreader_native.h
+    ../include/cpuid/cpuid_dev.h
+    ../include/cpuid/cpuid_native.h
+    cpuid_dev.cpp
+    cpuid_native.cpp
+    cpuidreader_dev.cpp
 )
 
 add_library(${LIBRARY} STATIC ${SOURCES})

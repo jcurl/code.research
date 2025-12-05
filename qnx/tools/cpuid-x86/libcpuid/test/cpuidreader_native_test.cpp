@@ -1,11 +1,12 @@
-#include "cpuidreader_native.h"
+#include "cpuid/cpuidreader_native.h"
 
 #include <set>
-#include <thread>
 
 #include <gtest/gtest.h>
 
-#include "cpuid/cpuid.h"
+#include "ubench/string.h"
+
+using namespace rjcp::cpuid;
 
 // Needed so that clang-tidy doesn't complain about values being used without
 // checking the condition first.
@@ -17,13 +18,19 @@
   }
 
 TEST(cpuidreader_native, has_cpuid) {
-  rjcp::cpuid::cpuidreader_native cpu{};
+  cpuidreader_native cpu{};
 
   ASSERT_TRUE(cpu.has_cpuid());
 }
 
+TEST(cpuidreader_native, make_cpuidreader) {
+  auto cpu = make_cpuidreader<cpuidreader_native>();
+
+  ASSERT_TRUE(cpu->has_cpuid());
+}
+
 TEST(cpuidreader_native, cpuid_zero) {
-  rjcp::cpuid::cpuidreader_native cpu{};
+  cpuidreader_native cpu{};
 
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
@@ -33,7 +40,7 @@ TEST(cpuidreader_native, cpuid_zero) {
 }
 
 TEST(cpuidreader_native, cpuid_ext) {
-  rjcp::cpuid::cpuidreader_native cpu{};
+  cpuidreader_native cpu{};
 
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
@@ -43,12 +50,14 @@ TEST(cpuidreader_native, cpuid_ext) {
 }
 
 TEST(cpuidreader_native, cpuid_threads) {
-  rjcp::cpuid::cpuidreader_native cpu{};
+  cpuidreader_native cpu{};
 
-  std::set<rjcp::cpuid::cpuidreg> acpi{};
+  std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_HAS_VALUE(pin);
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
+    EXPECT_EQ((*pin)->core(), core);
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
     ASSERT_HAS_VALUE(result);

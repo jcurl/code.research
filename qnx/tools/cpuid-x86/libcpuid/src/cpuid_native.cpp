@@ -1,4 +1,4 @@
-#include "cpuid_native.h"
+#include "cpuid/cpuid_native.h"
 
 #include <cpuid.h>
 

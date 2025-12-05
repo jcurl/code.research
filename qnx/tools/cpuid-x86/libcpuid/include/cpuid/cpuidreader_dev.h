@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "cpuid/cpuid.h"
-#include "cpuid_dev.h"
+#include "cpuid/cpuid_dev.h"
 
 namespace rjcp::cpuid {
 
@@ -17,6 +17,12 @@ namespace detail {
 
 /// @brief Manages the cpuid_dev object by opening the file.
 class cpuid_dev_file {
+ private:
+  friend class rjcp::cpuid::cpuidreader_dev;
+
+  // Only friends can instantiate with this token.
+  class token {};
+
  public:
   /// @brief Open '/dev/cpu/<core>/cpuid'.
   ///
@@ -24,7 +30,7 @@ class cpuid_dev_file {
   /// return false. Get the error with the error(0 function.
   ///
   /// @param core The core to open.
-  cpuid_dev_file(unsigned int core);
+  cpuid_dev_file(unsigned int core, token);
 
   cpuid_dev_file() = default;
 
@@ -91,8 +97,17 @@ class cpuid_dev_file {
 /// The context is created and given to the user via the enable_core() function.
 /// While the context is enabled, the reader will get the CPUID information.
 /// When the context is destroyed, it closes the file for reading the CPUID.
-class cpuid_dev_ctx {
+class cpuid_dev_ctx : public cpuid_ctx {
+ private:
+  friend class rjcp::cpuid::cpuidreader_dev;
+
+  // Only friends can instantiate with this token.
+  class token {};
+
  public:
+  cpuid_dev_ctx(std::shared_ptr<cpuid_dev_file> dev, token)
+      : cpuid_file_{std::move(dev)} {};
+
   cpuid_dev_ctx(const cpuid_dev_ctx&) = delete;
 
   cpuid_dev_ctx(cpuid_dev_ctx&& other) noexcept
@@ -115,34 +130,15 @@ class cpuid_dev_ctx {
     }
   }
 
-  /// @brief Indicate if this thread is pinned, or if there was an error.
-  operator bool() const { return cpuid_file_ != nullptr && *cpuid_file_; };
-
-  /// @brief If the thread wasn't pinned, this will return the errno value.
-  ///
-  /// @return The errno value from the pin operation.
-  [[nodiscard]] auto error() const -> int {
-    return cpuid_file_ == nullptr ? 0 : cpuid_file_->error();
-  }
-
   /// @brief Get the core that is being queried.
   ///
   /// @return The core that is currently queried by this class.
-  [[nodiscard]] auto core() const -> unsigned int {
+  [[nodiscard]] auto core() const -> unsigned int override {
     return cpuid_file_ == nullptr ? 0 : cpuid_file_->core();
   }
 
  private:
   std::shared_ptr<cpuid_dev_file> cpuid_file_{};
-
-  // Only friends can construct this object. A reference to the device is given,
-  // and this class will close it when destroyed.
-  cpuid_dev_ctx() = default;
-  cpuid_dev_ctx(std::shared_ptr<cpuid_dev_file> dev)
-      : cpuid_file_{std::move(dev)} {};
-
-  // Don't allow everyone access to internals.
-  friend class rjcp::cpuid::cpuidreader_dev;
 
   auto swap(cpuid_dev_ctx& other) noexcept -> void {
     std::swap(other.cpuid_file_, cpuid_file_);
@@ -151,8 +147,8 @@ class cpuid_dev_ctx {
 
 }  // namespace detail
 
-/// @brief Query the CPUID using the native CPUID instruction.
-class cpuidreader_dev {
+/// @brief Query the CPUID using the device /dev/cpu/N/cpuid
+class cpuidreader_dev : public cpuidreader {
  public:
   cpuidreader_dev() = default;
 
@@ -174,18 +170,18 @@ class cpuidreader_dev {
   /// @brief Checks if this class can query the CPUID.
   ///
   /// @return true if querying the CPUID should work, false otherwise.
-  auto has_cpuid() -> bool;
+  auto has_cpuid() -> bool override;
 
   /// @brief Indicates if this instance queries current hardware.
   ///
   /// @return true if queries are on current hardware, false if queries are
   /// cached and may not reflect this machine.
-  auto is_online() -> bool { return true; }
+  auto is_online() -> bool override { return true; }
 
   /// @brief Get the number of cores available.
   ///
   /// @return the number of cores available.
-  [[nodiscard]] auto cores() const -> unsigned int {
+  [[nodiscard]] auto cores() const -> unsigned int override {
     return std::thread::hardware_concurrency();
   }
 
@@ -197,7 +193,7 @@ class cpuidreader_dev {
   ///
   /// @return the result of the query, or std::nullopt if the query failed.
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  auto cpuid(cpuidreg eax, cpuidreg ecx) -> std::optional<cpuid_res>;
+  auto cpuid(cpuidreg eax, cpuidreg ecx) -> std::optional<cpuid_res> override;
 
   /// @brief Enable CPUID instructions on the specified core, until object is
   /// destroyed.
@@ -209,7 +205,8 @@ class cpuidreader_dev {
   ///
   /// @return An optional object, if it has the value, represents the state of
   /// the CPU when querying the CPUID.
-  auto enable_core(unsigned int core) -> std::optional<detail::cpuid_dev_ctx>;
+  auto enable_core(unsigned int core)
+      -> stdext::expected<std::unique_ptr<cpuid_ctx>, int> override;
 
  private:
   bool default_{false};
@@ -232,6 +229,11 @@ class cpuidreader_dev {
     std::swap(cpuid_file_, other.cpuid_file_);
   }
 };
+
+template <>
+inline auto make_cpuidreader() -> std::unique_ptr<cpuidreader_dev> {
+  return std::make_unique<cpuidreader_dev>();
+}
 
 }  // namespace rjcp::cpuid
 

@@ -1,13 +1,13 @@
-#include "cpuidreader_dev.h"
+#include "cpuid/cpuidreader_dev.h"
 
 #include <filesystem>
 #include <set>
-#include <thread>
 
 #include <gtest/gtest.h>
 
-#include "cpuid/cpuid.h"
 #include "ubench/string.h"
+
+using namespace rjcp::cpuid;
 
 // Needed so that clang-tidy doesn't complain about values being used without
 // checking the condition first.
@@ -18,18 +18,27 @@
     if (!(variable).has_value()) return; \
   }
 
-TEST(cpuidreader_dev, has_cpuid) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
-
+auto has_cpuid_driver() -> bool {
   std::string path = std::string{"/dev/cpu/0/cpuid"};
   std::filesystem::path dev{path};
 
-  bool present = std::filesystem::exists(dev);
-  ASSERT_EQ(cpu.has_cpuid(), present);
+  return std::filesystem::exists(dev);
+}
+
+TEST(cpuidreader_dev, has_cpuid) {
+  cpuidreader_dev cpu{};
+
+  ASSERT_EQ(cpu.has_cpuid(), has_cpuid_driver());
+}
+
+TEST(cpuidreader_dev, make_cpuidreader) {
+  auto cpu = make_cpuidreader<cpuidreader_dev>();
+
+  ASSERT_EQ(cpu->has_cpuid(), has_cpuid_driver());
 }
 
 TEST(cpuidreader_dev, cpuid_zero) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   // Check the first register, whose result is expected to be not more than
@@ -40,7 +49,7 @@ TEST(cpuidreader_dev, cpuid_zero) {
 }
 
 TEST(cpuidreader_dev, cpuid_ext) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   // Check the extended register, whose result is expected to be not more than
@@ -51,32 +60,27 @@ TEST(cpuidreader_dev, cpuid_ext) {
 }
 
 TEST(cpuidreader_dev, cpuid_context_move) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
   if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
-  ASSERT_HAS_VALUE(pin);
-  ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
+  ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+  ASSERT_TRUE(*pin);
 
   auto reg0 = cpu.cpuid(1, 0);
   ASSERT_HAS_VALUE(reg0);
-  auto reg0ebx = reg0.value().ebx;
+  auto reg0ebx = reg0->ebx;
 
   decltype(pin) pin2 = std::move(pin);
-  ASSERT_HAS_VALUE(pin2);
-  ASSERT_TRUE(pin2.value()) << ubench::string::perror(pin2->error());
-
-  // NOLINTNEXTLINE(bugprone-use-after-move,clang-analyzer-cplusplus.Move)
-  ASSERT_HAS_VALUE(pin);
-  // NOLINTNEXTLINE(bugprone-use-after-move,clang-analyzer-cplusplus.Move)
-  ASSERT_FALSE(pin.value());
+  ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
+  ASSERT_TRUE(*pin2);
 
   auto reg1 = cpu.cpuid(1, 0);
   ASSERT_HAS_VALUE(reg1);
-  auto reg1ebx = reg1.value().ebx;
+  auto reg1ebx = reg1->ebx;
 
   // Moving the context should not affect which core is being read. We check
   // that the cores are the same by comparing the actual CPUID.01 EBX which is
@@ -85,14 +89,14 @@ TEST(cpuidreader_dev, cpuid_context_move) {
 }
 
 TEST(cpuidreader_dev, cpuid_threads) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
-  std::set<rjcp::cpuid::cpuidreg> acpi{};
+  std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_HAS_VALUE(pin);
-    ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
     ASSERT_HAS_VALUE(result);
@@ -102,27 +106,18 @@ TEST(cpuidreader_dev, cpuid_threads) {
 }
 
 TEST(cpuidreader_dev, cpuid_threads_context_move) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
-  std::set<rjcp::cpuid::cpuidreg> acpi{};
+  std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_HAS_VALUE(pin);
-    ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
 
     auto pin2 = std::move(pin);
-
-    // We've moved, but after the move. Users should not use this after the
-    // move, but the check here is to make sure that the move worked so we don't
-    // have latent problems with pin is destroyed
-
-    // NOLINTNEXTLINE(bugprone-use-after-move,clang-analyzer-cplusplus.Move)
-    ASSERT_HAS_VALUE(pin);      // the optional has a value.
-    EXPECT_FALSE(pin.value());  // the value is not valid.
-
-    ASSERT_HAS_VALUE(pin2);
-    ASSERT_TRUE(pin2.value()) << ubench::string::perror(pin->error());
+    ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
+    ASSERT_TRUE(*pin2);
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
     ASSERT_HAS_VALUE(result);
@@ -132,7 +127,7 @@ TEST(cpuidreader_dev, cpuid_threads_context_move) {
 }
 
 TEST(cpuidreader_dev, cpuid_query_then_enable) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   // Query using the default core (0).
@@ -145,9 +140,9 @@ TEST(cpuidreader_dev, cpuid_query_then_enable) {
   if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
-  ASSERT_HAS_VALUE(pin);
-  ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
-  EXPECT_EQ(pin->core(), core);
+  ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+  ASSERT_TRUE(*pin);
+  EXPECT_EQ((*pin)->core(), core);
 
   auto regc = cpu.cpuid(1, 0);
   ASSERT_HAS_VALUE(regc);
@@ -158,37 +153,38 @@ TEST(cpuidreader_dev, cpuid_query_then_enable) {
 }
 
 TEST(cpuidreader_dev, cpuid_enable_core_twice_fail) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
   if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
-  ASSERT_HAS_VALUE(pin);
-  ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
-  EXPECT_EQ(pin->core(), core);
+  ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+  ASSERT_TRUE(*pin);
+  EXPECT_EQ((*pin)->core(), core);
 
   // The second activation should fail, because the first activation is still
   // valid.
 
   auto pin2 = cpu.enable_core(core);
-  ASSERT_FALSE(pin2.has_value());
+  ASSERT_FALSE(pin2);
+  ASSERT_EQ(pin2.error(), EINVAL);
 }
 
 TEST(cpuidreader_dev, cpuid_enable_core_twice_success) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
   if (cpu.cores() > 1) core = 1;
 
-  rjcp::cpuid::cpuidreg regc = 0;
+  cpuidreg regc = 0;
   {
     auto pin = cpu.enable_core(core);
-    ASSERT_HAS_VALUE(pin);
-    ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
-    EXPECT_EQ(pin->core(), core);
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
+    EXPECT_EQ((*pin)->core(), core);
     auto reg = cpu.cpuid(1, 0);
     ASSERT_HAS_VALUE(reg);
     regc = reg->ebx;
@@ -196,12 +192,12 @@ TEST(cpuidreader_dev, cpuid_enable_core_twice_success) {
 
   // The second activation should succeed because the first activation went out
   // of scope.
-  rjcp::cpuid::cpuidreg reg0 = 0;
+  cpuidreg reg0 = 0;
   {
     auto pin = cpu.enable_core(0);
-    ASSERT_HAS_VALUE(pin);
-    ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
-    EXPECT_EQ(pin->core(), 0);
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
+    EXPECT_EQ((*pin)->core(), 0);
     auto reg = cpu.cpuid(1, 0);
     ASSERT_HAS_VALUE(reg);
     reg0 = reg->ebx;
@@ -211,18 +207,18 @@ TEST(cpuidreader_dev, cpuid_enable_core_twice_success) {
 }
 
 TEST(cpuidreader_dev, move_ctor) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
   if (cpu.cores() > 1) core = 1;
 
-  rjcp::cpuid::cpuidreg regebx{}, regmebx{};
+  cpuidreg regebx{}, regmebx{};
   {
     auto pin = cpu.enable_core(core);
-    ASSERT_HAS_VALUE(pin);
-    ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
-    EXPECT_EQ(pin->core(), core);
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
+    EXPECT_EQ((*pin)->core(), core);
     auto reg = cpu.cpuid(1, 0);
     ASSERT_HAS_VALUE(reg);
     regebx = reg->ebx;
@@ -239,20 +235,20 @@ TEST(cpuidreader_dev, move_ctor) {
 }
 
 TEST(cpuidreader_dev, move_assignment) {
-  rjcp::cpuid::cpuidreader_dev cpu{};
+  cpuidreader_dev cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
-  rjcp::cpuid::cpuidreader_dev cpu2{};
+  cpuidreader_dev cpu2{};
 
   unsigned int core = 0;
   if (cpu.cores() > 1) core = 1;
 
-  rjcp::cpuid::cpuidreg regebx{}, regmebx{};
+  cpuidreg regebx{}, regmebx{};
   {
     auto pin = cpu.enable_core(core);
-    ASSERT_HAS_VALUE(pin);
-    ASSERT_TRUE(pin.value()) << ubench::string::perror(pin->error());
-    EXPECT_EQ(pin->core(), core);
+    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
+    ASSERT_TRUE(*pin);
+    EXPECT_EQ((*pin)->core(), core);
     auto reg = cpu.cpuid(1, 0);
     ASSERT_HAS_VALUE(reg);
     regebx = reg->ebx;
@@ -268,6 +264,6 @@ TEST(cpuidreader_dev, move_assignment) {
   ASSERT_EQ(regebx, regmebx);
 
   auto pin2 = cpu2.enable_core(0);
-  ASSERT_HAS_VALUE(pin2);
-  ASSERT_TRUE(pin2.value()) << ubench::string::perror(pin2->error());
+  ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
+  ASSERT_TRUE(*pin2);
 }

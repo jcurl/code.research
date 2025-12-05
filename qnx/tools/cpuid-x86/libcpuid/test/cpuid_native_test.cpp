@@ -1,6 +1,8 @@
-#include "cpuid_native.h"
+#include "cpuid/cpuid_native.h"
 
 #include <gtest/gtest.h>
+
+using namespace rjcp::cpuid;
 
 // Needed so that clang-tidy doesn't complain about values being used without
 // checking the condition first.
@@ -12,13 +14,13 @@
   }
 
 TEST(cpuid_native, has_cpuid) {
-  rjcp::cpuid::cpuid_native cpu{};
+  cpuid_native cpu{};
 
   ASSERT_TRUE(cpu.has_cpuid());
 }
 
 TEST(cpuid_native, cpuid_zero) {
-  rjcp::cpuid::cpuid_native cpu{};
+  cpuid_native cpu{};
   auto reg = cpu.cpuid(0, 0);
 
   // Check the first register, whose result is expected to be not more than
@@ -28,7 +30,7 @@ TEST(cpuid_native, cpuid_zero) {
 }
 
 TEST(cpuid_native, cpuid_ext) {
-  rjcp::cpuid::cpuid_native cpu{};
+  cpuid_native cpu{};
   auto reg = cpu.cpuid(0x80000000, 0);
 
   // Check the extended register, whose result is expected to be not more than

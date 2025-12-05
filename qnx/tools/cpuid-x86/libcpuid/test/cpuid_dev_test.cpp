@@ -1,4 +1,4 @@
-#include "cpuid_dev.h"
+#include "cpuid/cpuid_dev.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -10,6 +10,8 @@
 #include <gtest/gtest.h>
 
 #include "ubench/file.h"
+
+using namespace rjcp::cpuid;
 
 // Needed so that clang-tidy doesn't complain about values being used without
 // checking the condition first.
@@ -33,7 +35,7 @@ auto get_fdpath(unsigned int cpunum) -> ubench::file::fdesc {
 }
 
 TEST(cpuid_dev, has_cpuid_invalid) {
-  rjcp::cpuid::cpuid_dev cpu{-1};
+  cpuid_dev cpu{-1};
   ASSERT_FALSE(cpu.has_cpuid());
 }
 
@@ -43,7 +45,7 @@ TEST(cpuid_dev, has_cpuid) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
 
-  rjcp::cpuid::cpuid_dev cpu{fd};
+  cpuid_dev cpu{fd};
   ASSERT_TRUE(cpu.has_cpuid());
   close(fd);
 }
@@ -54,7 +56,7 @@ TEST(cpuid_dev, cpuid_zero) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
 
-  rjcp::cpuid::cpuid_dev cpu{fd};
+  cpuid_dev cpu{fd};
   auto reg = cpu.cpuid(0, 0);
 
   // Check the first register, whose result is expected to be not more than
@@ -69,7 +71,7 @@ TEST(cpuid_dev, cpuid_ext) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
 
-  rjcp::cpuid::cpuid_dev cpu{fd};
+  cpuid_dev cpu{fd};
   auto reg = cpu.cpuid(0x80000000, 0);
 
   // Check the extended register, whose result is expected to be not more than
@@ -84,10 +86,10 @@ TEST(cpuid_dev, move_ctor) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
 
-  rjcp::cpuid::cpuid_dev cpu{fd};
+  cpuid_dev cpu{fd};
   ASSERT_TRUE(cpu.has_cpuid());
 
-  rjcp::cpuid::cpuid_dev cpu2{std::move(cpu)};
+  cpuid_dev cpu2{std::move(cpu)};
 
   // We've moved, but after the move, we expect the object to at least indicate
   // it is no longer valid. This is OK, because the classes are internal only to
@@ -105,10 +107,10 @@ TEST(cpuid_dev, move_assignment) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
 
-  rjcp::cpuid::cpuid_dev cpu{fd};
+  cpuid_dev cpu{fd};
   ASSERT_TRUE(cpu.has_cpuid());
 
-  rjcp::cpuid::cpuid_dev cpu2;
+  cpuid_dev cpu2;
   cpu2 = std::move(cpu);
 
   // We've moved, but after the move, we expect the object to at least indicate
