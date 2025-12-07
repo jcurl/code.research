@@ -5,9 +5,13 @@ set(SOURCES
     ../include/cpuid/cpuidreader_native.h
     ../include/cpuid/cpuid_dev.h
     ../include/cpuid/cpuid_native.h
+    cpuid.cpp
     cpuid_dev.cpp
     cpuid_native.cpp
     cpuidreader_dev.cpp
+    dump_generic.h dump_generic.cpp
+    dump_intel.h dump_intel.cpp
+    dump_amd.h dump_amd.cpp
 )
 
 add_library(${LIBRARY} STATIC ${SOURCES})

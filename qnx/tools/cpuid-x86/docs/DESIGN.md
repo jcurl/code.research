@@ -14,6 +14,7 @@ provides the correct results.
 - [2. Library Detailed Design](#2-library-detailed-design)
   - [2.1. Implementation Specific CPUID](#21-implementation-specific-cpuid)
   - [2.2. CPUID Context](#22-cpuid-context)
+  - [2.3. Dumping](#23-dumping)
 
 ## 1. Component Design
 
@@ -85,3 +86,27 @@ Each context returns the following fields:
 
 Creating a new context while an existing context is open results in undefined
 behaviour.
+
+### 2.3. Dumping
+
+The method `cpuid_dump` takes a `cpuidreader` and uses this to dump CPUID
+information on the core specified. THe results are provided as a vector.
+
+The implementation is reasonably simple, there is no generic interface. The
+`cpuid_dump` queries the `cpuidreader` for the first leaf to get the brand
+string. From this, it calls a specialised method internally to get all
+information for that specific CPU.
+
+Each CPU has methods for obtaining information, one per leaf. As CPU
+implementations offer share the same specifications, dumping for an AMD might
+call methods originally documented for dumping for an Intel.
+
+With this, there are three files (no classes are created):
+
+- `dump_generic.h` dump the regions 0x00000000 (normal), 0x80000000 (extended,
+  defined by AMD), 0x40000000 (hypervisor extensions). Each block has the first
+  register which defines the number of leaves, followed by the data. None of the
+  dumping routines dump subleaves.
+- `dump_intel.h` dump Intel specific registers. There are lots of overlap with
+  AMD, so many methods here can be used by AMD and other CPUs also.
+- `dump_amd.h` dump AMD specific registers.

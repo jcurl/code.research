@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <vector>
 
 #include "stdext/expected.h"
 
@@ -117,6 +118,21 @@ class cpuidreader {
 
 template <class T, class... Args>
 auto make_cpuidreader(Args&&... args) -> std::unique_ptr<T>;
+
+/// @brief Dump all the CPUID registers for the CPU.
+///
+/// Interprets the CPUID registers to determine all registers that should be
+/// dumped. The output of what registers are available are CPU specific.
+///
+/// @param reader a pointer to a cpuidreader that is used for the dump. It is
+/// only used for the duration of the call. This can be obtained with
+/// make_cpuidreader.
+///
+/// @param core the core to dump for, in the range of 0 to reader->cores().
+///
+/// @result A vector of all registers read.
+auto cpuid_dump(cpuidreader& reader, unsigned int core)
+    -> std::optional<std::vector<cpuid_info>>;
 
 }  // namespace rjcp::cpuid
 

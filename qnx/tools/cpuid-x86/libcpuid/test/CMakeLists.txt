@@ -2,6 +2,7 @@ include(GoogleTest)
 
 set(BINARY cpuid_test)
 set(SOURCES
+    cpuid_test.cpp
     cpuid_dev_test.cpp
     cpuid_native_test.cpp
     cpuidreader_dev_test.cpp
