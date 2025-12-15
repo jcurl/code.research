@@ -110,11 +110,6 @@ class cpuidreader_native : public cpuidreader {
   cpuid_native cpuid_{};
 };
 
-template <>
-inline auto make_cpuidreader() -> std::unique_ptr<cpuidreader_native> {
-  return std::make_unique<cpuidreader_native>();
-}
-
 }  // namespace rjcp::cpuid
 
 #endif

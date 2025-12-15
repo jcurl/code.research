@@ -14,6 +14,8 @@ provides the correct results.
 - [2. Library Detailed Design](#2-library-detailed-design)
   - [2.1. Implementation Specific CPUID](#21-implementation-specific-cpuid)
   - [2.2. CPUID Context](#22-cpuid-context)
+    - [2.2.1. Managing a Context](#221-managing-a-context)
+    - [2.2.2. Common Implementation of a Context](#222-common-implementation-of-a-context)
   - [2.3. Dumping](#23-dumping)
 
 ## 1. Component Design
@@ -86,6 +88,51 @@ Each context returns the following fields:
 
 Creating a new context while an existing context is open results in undefined
 behaviour.
+
+#### 2.2.1. Managing a Context
+
+The `cpuidreader_native_ctx` is the simplest, because the context is maintained
+by the Operating System. It just asks the OS to pin the current thread. On
+destruction, it pins to the original threads before the context was created.
+
+Otherwise, maintaining a context relies on an interaction between the
+`cpuidreader_xx`, a common state shared between the `cpuidreader_xx` that must
+know what core to read, and a context that when destroyed, lets the
+`cpuidreader_xx` know that the default context (normally core 0) is to be used
+when `cpuid()` is called.
+
+The generic implementation is:
+
+- `cpuidreader_X` creates a `shared_ptr<data> ctx_` and stores it locally.
+- `cpuidreader_X` passes the `shared_ptr<data> ctx_` by value to a new
+  `cpuid_X_ctx` which also stores the object.
+- When `cpuidreader_x.cpuid()` is called
+  - If `ctx_` is `nullptr`, then it uses the default core for context
+  - If `ctx_` has a reference count of 1, then it releases `ctx_` so the
+    reference count goes to zero, and uses the default core for context. It can
+    also set `ctx_` to `nullptr`.
+  - If `ctx_` has a reference count of more than 1, then the context is still
+    active, and it retrieves the core from the shared pointer `ctx_`.
+
+For `cpuidreader_dev`, it maintains a file, so the context object is of type
+`cpuid_dev_file` which contains the file descriptor of the open file and
+`cpuid_dev` which is the actual class that reads the file descriptor to obtain
+the data.
+
+For `cpuidreader_cache`, the `ctx_` is a `shared_ptr<core_ctx>`, which just
+maintains the current core.
+
+#### 2.2.2. Common Implementation of a Context
+
+Because the context behaviour of all `cpuidreader_*` classes should be similar,
+a common templated class `cpuid_basic_ctx` is provided. It receives a copy of
+shared data, the data shared between the context and the `cpuidreader_*` class.
+It is handled as a shared pointer, which simplifies the reference counting. When
+the context is removed, there is only a unique context in the `cpuidreader_*`
+class which can then be safely removed. If the `cpuidreader_*` is destroyed
+earlier than the context, the context is still preserved.
+
+![](./assets/libcpuid/cpuid_basic_ctx.svg)
 
 ### 2.3. Dumping
 

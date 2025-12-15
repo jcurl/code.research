@@ -1,6 +1,7 @@
 set(LIBRARY libcpuid)
 set(SOURCES
     ../include/cpuid/cpuid.h
+    ../include/cpuid/cpuidreader_cache.h
     ../include/cpuid/cpuidreader_dev.h
     ../include/cpuid/cpuidreader_native.h
     ../include/cpuid/cpuid_dev.h
@@ -8,6 +9,7 @@ set(SOURCES
     cpuid.cpp
     cpuid_dev.cpp
     cpuid_native.cpp
+    cpuidreader_cache.cpp
     cpuidreader_dev.cpp
     dump_generic.h dump_generic.cpp
     dump_intel.h dump_intel.cpp

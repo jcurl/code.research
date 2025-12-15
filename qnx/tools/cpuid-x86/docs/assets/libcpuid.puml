@@ -5,19 +5,37 @@ class cpuid_native {
     +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
 }
 
+class cpuid_ctx {
+    +core(): unsigned int = 0
+}
+
+class cpuid_native_ctx {
+    +core(): unsigned int
+    -core_: pin_core
+}
+note bottom
+    Doesn't need a reference to cpuid_native
+    because it runs on the current thread.
+end note
+
+cpuid_ctx <|-d- cpuid_native_ctx
+
 class cpuidreader_native {
     +has_cpuid(): bool
     +is_online(): bool
     +cores(): unsigned int
     +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
-    +enable_core(core: unsigned int): std::optional<ubench::thread::pin_core>
+    +enable_core(core: unsigned int): std::expected<std::unique_ptr<cpuid_ctx>, int>
 }
 
-cpuidreader_native *-r- cpuid_native
+cpuidreader_native *-d- cpuid_native
+cpuidreader_native -d-> cpuid_native_ctx : <<returns>>
 
 @enduml
 
 @startuml libcpuid_cpuid_dev
+
+allowmixing
 
 namespace detail {
 
@@ -52,7 +70,7 @@ class cpuidreader_dev {
     +is_online(): bool
     +cores(): unsigned int
     +cpuid(eax: cpuidreg, ecx: cpuidreg): std::optional<cpuid_res>
-    +enable_core(core: unsigned int): std::optional<detail::cpuid_dev_ctx>
+    +enable_core(core: unsigned int): std::expected<std::unique_ptr<cpuid_ctx>, int>
     -default_: bool
     -cpuid_file_: shared_ptr<detail::cpuid_dev_file>
 }
@@ -63,9 +81,51 @@ cpuidreader_dev *-d- cpuid_dev_file
 
 cpuid_dev_file -r-o cpuid_dev_ctx
 
-class User
+actor User
 
 User *-d- cpuidreader_dev
 User o--d- cpuid_dev_ctx : <<enable_core>>
+
+@enduml
+
+@startuml cpuid_basic_ctx
+
+class cpuid_ctx {
+    +core(): unsigned int = 0
+}
+
+class cpuid_basic_ctx<T> {
+    +core(): unsigned int
+    +value(): T&
+    -value_: shared_ptr<T>
+}
+
+cpuid_ctx <|-d- cpuid_basic_ctx
+
+class T {
+    +core(): unsigned int
+    -core_: unsigned int
+}
+note bottom
+    The class T can be arbitrary
+    complex. It exposes the current
+    core via the method core(), that
+    cpuid_basic_ctx can return it.
+end note
+
+cpuid_basic_ctx *-r- T
+
+class cpuidreader_X {
+    +enable_core(core: unsigned int): std::optional<detail::cpuid_dev_ctx>
+    -ctx_: std::shared_ptr<T>
+}
+note bottom
+    Creates its own context T and assigns
+    it to `ctx_`. Passes the shraed pointer
+    to a new class derived from
+    cpuid_basic_ctx and returns that.
+end note
+
+cpuidreader_X -r-> cpuid_basic_ctx : enable_core()\n<<returns>>
 
 @enduml

@@ -230,11 +230,6 @@ class cpuidreader_dev : public cpuidreader {
   }
 };
 
-template <>
-inline auto make_cpuidreader() -> std::unique_ptr<cpuidreader_dev> {
-  return std::make_unique<cpuidreader_dev>();
-}
-
 }  // namespace rjcp::cpuid
 
 #endif
