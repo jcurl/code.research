@@ -13,7 +13,7 @@ namespace ubench::thread {
 class pin_core::pin_core_impl {
  public:
   pin_core_impl(unsigned int core) : core_{core} {
-    if (core >= std::thread::hardware_concurrency()) return;
+    if (core >= ubench::thread::thread_count()) return;
 
     thread_ = pthread_self();
 

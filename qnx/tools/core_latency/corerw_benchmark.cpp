@@ -25,9 +25,8 @@ auto corerw_benchmark::init() -> bool {
 
 auto corerw_benchmark::run(std::uint32_t ping_core, std::uint32_t pong_core)
     -> std::uint32_t {
-  if (ping_core >= std::thread::hardware_concurrency() ||
-      pong_core >= std::thread::hardware_concurrency() ||
-      ping_core == pong_core) {
+  if (ping_core >= ubench::thread::thread_count() ||
+      pong_core >= ubench::thread::thread_count() || ping_core == pong_core) {
     std::abort();
   }
   ubench::thread::sync_event flag{};

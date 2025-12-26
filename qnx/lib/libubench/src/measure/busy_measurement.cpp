@@ -1,6 +1,6 @@
 #include "ubench/measure/busy_measurement.h"
 
-#include <thread>
+#include "ubench/thread.h"
 
 namespace ubench::measure {
 
@@ -26,7 +26,7 @@ auto busy_stop_watch::measure() const noexcept -> busy_measurement {
       end_idle - start_idle_);
   auto proc_span = std::chrono::duration_cast<std::chrono::nanoseconds>(
       end_proc - start_proc_);
-  auto cores = std::thread::hardware_concurrency();
+  auto cores = ubench::thread::thread_count();
 
   // For systems with almost no CPU busy, there could be a minor error in the
   // idle time and the running time of probably less than 200us.

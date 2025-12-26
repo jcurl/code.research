@@ -8,6 +8,7 @@
 
 #include "ubench/atomics.h"
 #include "ubench/options.h"
+#include "ubench/thread.h"
 
 using namespace std::chrono_literals;
 
@@ -79,12 +80,11 @@ auto main(int argc, char* argv[]) -> int {
               // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
               thread_string.data() + thread_string.size(), threads);
           if (ec == std::errc()) {
-            if (threads < 1 || threads > std::thread::hardware_concurrency()) {
+            if (threads < 1 || threads > ubench::thread::thread_count()) {
               exit_code = 1;
               std::cerr
                   << "Error: Specify a minimum of 1 thread and not more than "
-                  << std::thread::hardware_concurrency() << " threads"
-                  << std::endl;
+                  << ubench::thread::thread_count() << " threads" << std::endl;
             }
           } else {
             exit_code = 1;
@@ -114,7 +114,7 @@ auto main(int argc, char* argv[]) -> int {
   }
 
   if (threads == 0) {
-    threads = std::thread::hardware_concurrency();
+    threads = ubench::thread::thread_count();
   }
 
   run_stress(threads);

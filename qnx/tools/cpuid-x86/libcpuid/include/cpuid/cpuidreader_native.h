@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <optional>
-#include <thread>
 
 #include "cpuid/cpuid.h"
 #include "cpuid/cpuid_native.h"
@@ -72,7 +71,7 @@ class cpuidreader_native : public cpuidreader {
   ///
   /// @return the number of cores available.
   [[nodiscard]] auto cores() const -> unsigned int override {
-    return std::thread::hardware_concurrency();
+    return ubench::thread::thread_count();
   }
 
   /// @brief Query the CPUID for the register eax and ecx.

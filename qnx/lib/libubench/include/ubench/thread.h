@@ -49,6 +49,11 @@ class pin_core {
   std::unique_ptr<pin_core_impl> impl_;
 };
 
+/// @brief Get the number of available threads/cores on this system.
+///
+/// @return The number of available threads/cores.
+[[nodiscard]] auto thread_count() -> unsigned int;
+
 /// @brief Be able to synchronise waiting for an event.
 class sync_event {
  public:

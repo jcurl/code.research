@@ -99,6 +99,20 @@ else()
     endif()
 endif()
 
+# Thread Count (number of cores)
+if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
+    target_sources(${LIBRARY} PRIVATE thread_count_linux.cpp)
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+    target_sources(${LIBRARY} PRIVATE thread_count_windows.cpp)
+else()
+    check_symbol_enum_exists(_SC_NPROCESSORS_CONF "unistd.h" HAVE_SC_NPROCESSORS_CONF)
+    if(HAVE_SC_NPROCESSORS_CONF)
+        target_sources(${LIBRARY} PRIVATE thread_count_sysconf.cpp)
+    else()
+        target_sources(${LIBRARY} PRIVATE thread_count.cpp)
+    endif()
+endif()
+
 # ----------------------------------------------------------------------
 # Determine features for NETWORKING
 
