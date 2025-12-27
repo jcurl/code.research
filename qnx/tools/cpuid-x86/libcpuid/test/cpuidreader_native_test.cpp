@@ -68,3 +68,11 @@ TEST(cpuidreader_native, cpuid_threads) {
     acpi.insert(result->ebx);
   }
 }
+
+TEST(cpuidreader_native, oob_cores) {
+  cpuidreader_native cpu{};
+
+  auto pin = cpu.enable_core(ubench::thread::thread_count());
+  ASSERT_FALSE(pin.has_value());
+  ASSERT_EQ(pin.error(), EINVAL);
+}

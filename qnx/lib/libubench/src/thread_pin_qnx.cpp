@@ -10,7 +10,10 @@ namespace ubench::thread {
 class pin_core::pin_core_impl {
  public:
   pin_core_impl(unsigned int core) : core_{core} {
-    if (core >= ubench::thread::thread_count()) return;
+    if (core >= ubench::thread::thread_count()) {
+      errno_ = EINVAL;
+      return;
+    }
 
     self_ = pthread_self();
 

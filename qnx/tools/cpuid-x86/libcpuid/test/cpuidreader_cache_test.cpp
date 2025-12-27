@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "cpuid/cpuidreader_dev.h"
 #include "cpuid/cpuidreader_native.h"
 #include "ubench/string.h"
 
@@ -95,6 +96,24 @@ TEST(cpuidreader_cache, cpuid_native_compare) {
   }
 }
 
+TEST(cpuidreader_cache, native_oob_cores) {
+  cpuidreader_native ncpu{};
+  cpuidreader_cache cpu{ncpu};
+
+  auto pin = cpu.enable_core(ubench::thread::thread_count());
+  ASSERT_FALSE(pin.has_value());
+  ASSERT_EQ(pin.error(), EINVAL);
+}
+
+TEST(cpuidreader_cache, dev_oob_cores) {
+  cpuidreader_dev ncpu{};
+  cpuidreader_cache cpu{ncpu};
+
+  auto pin = cpu.enable_core(ubench::thread::thread_count());
+  ASSERT_FALSE(pin.has_value());
+  ASSERT_EQ(pin.error(), EINVAL);
+}
+
 class cpuidreader_fake : public cpuidreader_cache {
  public:
   cpuidreader_fake() {
@@ -130,4 +149,12 @@ TEST(cpuidreader_cache, fake_cpuid_zero) {
 TEST(cpuidreader_cache, fake_cpuid_ext_nonexistent) {
   cpuidreader_fake cpu{};
   ASSERT_FALSE(cpu.cpuid(0x80000000, 0));
+}
+
+TEST(cpuidreader_cache, fake_oob_cores) {
+  cpuidreader_fake cpu{};
+
+  auto pin = cpu.enable_core(ubench::thread::thread_count());
+  ASSERT_FALSE(pin.has_value());
+  ASSERT_EQ(pin.error(), EINVAL);
 }

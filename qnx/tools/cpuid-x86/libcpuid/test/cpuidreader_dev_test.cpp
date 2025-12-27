@@ -267,3 +267,11 @@ TEST(cpuidreader_dev, move_assignment) {
   ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
   ASSERT_TRUE(*pin2);
 }
+
+TEST(cpuidreader_dev, oob_cores) {
+  cpuidreader_dev cpu{};
+
+  auto pin = cpu.enable_core(ubench::thread::thread_count());
+  ASSERT_FALSE(pin.has_value());
+  ASSERT_NE(pin.error(), 0);
+}
