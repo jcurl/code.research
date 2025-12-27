@@ -17,6 +17,7 @@
 #endif
 
 #include "stdext/expected.h"
+#include "config.h"
 
 template <class TClock>
 auto print_clock_details(std::string_view name) -> void {
@@ -73,15 +74,21 @@ auto print_qnx_details() -> void {
 #endif
 
   std::cout << "- Flags" << std::endl;
-#if !defined(__QNX__) || __QNX__ < 800
+#if HAVE_QTIME_FLAG_TIMER_ON_CPU0
   std::cout << QTIME_FLAG_STRING(QTIME_FLAG_TIMER_ON_CPU0) << std::endl;
 #endif
+#if HAVE_QTIME_FLAG_CHECK_STABLE
   std::cout << QTIME_FLAG_STRING(QTIME_FLAG_CHECK_STABLE) << std::endl;
+#endif
+#if HAVE_QTIME_FLAG_TICKLESS
   std::cout << QTIME_FLAG_STRING(QTIME_FLAG_TICKLESS) << std::endl;
-#if !defined(__QNX__) || __QNX__ < 800
+#endif
+#if HAVE_QTIME_FLAG_TIMECC
   std::cout << QTIME_FLAG_STRING(QTIME_FLAG_TIMECC) << std::endl;
 #endif
+#if HAVE_QTIME_FLAG_GLOBAL_CLOCKCYCLES
   std::cout << QTIME_FLAG_STRING(QTIME_FLAG_GLOBAL_CLOCKCYCLES) << std::endl;
+#endif
 }
 
 auto qnx_clockcycles()
