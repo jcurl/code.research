@@ -80,10 +80,6 @@ object is alive, calls to `cpuid()` are valid for that context.
 
 Each context returns the following fields:
 
-- `bool()` if the context is active (if the creation of the context succeeded
-  and can be used).
-- `error()` the system `errno` if the context creation failed, to be looked up
-  by the Operating System manual.
 - `core()` the core that the context is valid for.
 
 Creating a new context while an existing context is open results in undefined
@@ -105,7 +101,8 @@ The generic implementation is:
 
 - `cpuidreader_X` creates a `shared_ptr<data> ctx_` and stores it locally.
 - `cpuidreader_X` passes the `shared_ptr<data> ctx_` by value to a new
-  `cpuid_X_ctx` which also stores the object.
+  `cpuid_X_ctx` which also stores the object (e.g. to `cpuid_basic_ctx` that is
+  provided for this purpose).
 - When `cpuidreader_x.cpuid()` is called
   - If `ctx_` is `nullptr`, then it uses the default core for context
   - If `ctx_` has a reference count of 1, then it releases `ctx_` so the
@@ -114,10 +111,12 @@ The generic implementation is:
   - If `ctx_` has a reference count of more than 1, then the context is still
     active, and it retrieves the core from the shared pointer `ctx_`.
 
-For `cpuidreader_dev`, it maintains a file, so the context object is of type
-`cpuid_dev_file` which contains the file descriptor of the open file and
-`cpuid_dev` which is the actual class that reads the file descriptor to obtain
-the data.
+For `cpuidreader_dev`, it maintains a handle to an open file. When the context
+is closed, the file handle isn't immediately closed (because the
+`cpuidreader_dev` contains a reference to the context also, to actually get the
+CPUID information via `cpuid()`). To ensure the file handle is closed, one must
+destroy the `cpuidreader_dev`, not just the context. By keeping the file handle
+open for the context, we can reuse the file handle if the core hasn't changed.
 
 For `cpuidreader_cache`, the `ctx_` is a `shared_ptr<core_ctx>`, which just
 maintains the current core.

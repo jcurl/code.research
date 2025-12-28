@@ -51,11 +51,9 @@ namespace detail {
         -cpuid_: cpuid_dev
     }
 
-    class cpuid_dev_ctx {
-        +bool()
+    class cpuid_basic_ctx<cpuid_dev_file> {
         +core(): unsigned int
         +error(): int
-        -cpuid_file_: shared_ptr<detail::cpuid_dev_file>
     }
 
 }
@@ -76,15 +74,15 @@ class cpuidreader_dev {
 }
 
 cpuid_dev_file *-d- cpuid_dev
-cpuidreader_dev .d.> cpuid_dev_ctx : <<create>>
+cpuidreader_dev .d.> cpuid_basic_ctx : <<create>>
 cpuidreader_dev *-d- cpuid_dev_file
 
-cpuid_dev_file -r-o cpuid_dev_ctx
+cpuid_dev_file -r-o cpuid_basic_ctx
 
 actor User
 
 User *-d- cpuidreader_dev
-User o--d- cpuid_dev_ctx : <<enable_core>>
+User o--d- cpuid_basic_ctx : <<enable_core>>
 
 @enduml
 
