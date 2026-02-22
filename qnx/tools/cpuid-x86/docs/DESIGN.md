@@ -17,6 +17,10 @@ provides the correct results.
     - [2.2.1. Managing a Context](#221-managing-a-context)
     - [2.2.2. Common Implementation of a Context](#222-common-implementation-of-a-context)
   - [2.3. Dumping](#23-dumping)
+- [3. Usage Examples](#3-usage-examples)
+  - [3.1. Instantiating a Reader](#31-instantiating-a-reader)
+  - [3.2. Querying the Reader](#32-querying-the-reader)
+  - [3.3. Querying a CPUID](#33-querying-a-cpuid)
 
 ## 1. Component Design
 
@@ -63,7 +67,7 @@ on a specific core. There should only be one context active at any one time
 (nested contexts should not be allowed, but may not result in an error either).
 
 Essentially, running the method `cpuid()` without a context, returns a default
-result, depending on the implementaiton (e.g. always core 0, or the current
+result, depending on the implementation (e.g. always core 0, or the current
 thread, whatever makes sense for that specific implementation).
 
 When CPUID information is needed for a specific core, one generates a context
@@ -156,3 +160,117 @@ With this, there are three files (no classes are created):
 - `dump_intel.h` dump Intel specific registers. There are lots of overlap with
   AMD, so many methods here can be used by AMD and other CPUs also.
 - `dump_amd.h` dump AMD specific registers.
+
+## 3. Usage Examples
+
+### 3.1. Instantiating a Reader
+
+The test code contains excellent examples of how to use the library.
+
+The main library to include is `cpuid/cpuid.h`. This contains the definition of
+querying a CPUID register `cpuid_req`, and getting the result of the query
+`cpuid_res`.
+
+The base class for all CPUID read operations is the `cpuidreader` class. This is
+the base class for all concrete implementations, and as an abstract class, it
+can't be instantiated on its own.
+
+To instantiate a CPUID reader, there is a concrete implementation:
+
+- `cpuidreader_native` which uses the CPUID instruction in your program;
+- `cpuidreader_dev` which uses the device `/dev/cpu/X/cpuid` to query the
+  results.
+
+There is a special implementation `cpuidreader_cache` that needs one of the
+above classes, but caches the result, that a CPUID register doesn't need to be
+queried more than once.
+
+To create a CPUID reader:
+
+```cpp
+#include "cpuid/cpuidreader_native.h"
+
+auto reader = make_cpuidreader<cpuidreader_native>();
+```
+
+The include for the specific implementation must include by nature
+`cpuid/cpuid.h`. The `make_cpuidreader<T>` method returns a
+`std::unique_ptr<T>`.
+
+### 3.2. Querying the Reader
+
+Once we have the reader, it's simple to see if it implements the CPUID
+instruction with the method `has_cpuid()`. Reasons why it might not work, is the
+device driver for querying the CPUID is not loaded (e.g. no path
+`/dev/cpu/X/cpuid` for the `cpuidreader_dev` class).
+
+```cpp
+if (!reader->has_cpuid())
+  std::cerr << "No CPUID\n";
+```
+
+The method `is_online()` can determine if the results are relevant for the
+current running thread, or of the results are from somewhere else, such as a
+file.
+
+The number of cores supported is obtained by the `cores()` method.
+
+### 3.3. Querying a CPUID
+
+The query of the CPUID usually depends on the core that the thread is running
+when done natively, or the device that is opened when using a device driver.
+
+The method `cpuid)eax, ecx)` provides an implementation specific result
+depending on the implementation. It might provide for the current thread, or it
+might provide for the default core.
+
+To specify the core that should be used when getting the CPUID information, one
+creates a CPUID context with `enable_core(core)`.
+
+```cpp
+auto cpuid_context = reader->enable_core(1);
+if (!cpuid_context) {
+  std::cout << "Context error: " << cpuid_context.error() << "\n";
+}
+```
+
+If there was an error, the result is the `errno` as shown above.
+
+Once we have the context, it's a unique pointer, so it can be moved around. When
+the context is destroyed, the system returns to the original state.
+
+It is undefined behaviour to move the context beyond the current thread, and
+depends on the implementation. For example, the `cpuidreader_native` will pin
+the current thread. The `cpuidreader_dev` maintains a file handle to the device.
+If your program must handle all implementations by taking a `cpuidreader`, it
+should do all work on the current thread and destroy the context when it is
+finished.
+
+The context can tell you the current core that is pinned.
+
+```cpp
+std::cout << "Core :" << (*cpuid_context)->core() << "\n";
+```
+
+The first dereference is to get the expected value. This was used instead of
+setting the `std::unique_ptr` to `nullptr`, so that error information can be
+returned also.
+
+Then the unique pointer to `cpuid_ctx` can be dereferenced, which should be only
+done if the expected result has a value. Normally, you don't need to access the
+context at all, but just let it be destroyed when the context is no longer
+needed.
+
+Once the context is available, querying the CPUID for the core defined by the
+context is as simple as accessing the reader
+
+```cpp
+// The 'cpuid_context' defines the current core.
+auto res = cpuid(0, 0);
+if (!res) {
+  std::cout << "Reading CPUID 0h failed\n";
+}
+```
+
+While the `cpuidreader_native` is unlikely to fail, other implementations are
+expected to, such as reading from a device driver, or reading from a file.
