@@ -2,8 +2,6 @@
 
 #include <unistd.h>
 
-#include <optional>
-
 namespace rjcp::cpuid {
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)

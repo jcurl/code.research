@@ -1,4 +1,4 @@
-#include "cpuid/cpuid_dev.h"
+#include "cpuid/cpuid_cpuctl.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -25,8 +25,7 @@ using namespace rjcp::cpuid;
 namespace {
 
 auto get_fdpath(unsigned int cpunum) -> ubench::file::fdesc {
-  std::string path =
-      std::string{"/dev/cpu/"} + std::to_string(cpunum) + std::string{"/cpuid"};
+  std::string path = std::string{"/dev/cpuctl"} + std::to_string(cpunum);
   std::filesystem::path dev{path};
 
   if (!std::filesystem::exists(dev)) return ubench::file::fdesc{};
@@ -38,29 +37,29 @@ auto get_fdpath(unsigned int cpunum) -> ubench::file::fdesc {
 
 }  // namespace
 
-TEST(cpuid_dev, has_cpuid_invalid) {
-  cpuid_dev cpu{-1};
+TEST(cpuid_cpuctl, has_cpuid_invalid) {
+  cpuid_cpuctl cpu{-1};
   ASSERT_FALSE(cpu.has_cpuid());
 }
 
-TEST(cpuid_dev, has_cpuid) {
+TEST(cpuid_cpuctl, has_cpuid) {
   auto fd = get_fdpath(0);
   if (!fd) {
-    GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
+    GTEST_SKIP() << "Couldn't open '/dev/cpuctl0'";
   }
 
-  cpuid_dev cpu{fd};
+  cpuid_cpuctl cpu{fd};
   ASSERT_TRUE(cpu.has_cpuid());
   close(fd);
 }
 
-TEST(cpuid_dev, cpuid_zero) {
+TEST(cpuid_cpuctl, cpuid_zero) {
   auto fd = get_fdpath(0);
   if (!fd) {
-    GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
+    GTEST_SKIP() << "Couldn't open '/dev/cpuctl0'";
   }
 
-  cpuid_dev cpu{fd};
+  cpuid_cpuctl cpu{fd};
   auto reg = cpu.cpuid(0, 0);
 
   // Check the first register, whose result is expected to be not more than
@@ -69,13 +68,13 @@ TEST(cpuid_dev, cpuid_zero) {
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
-TEST(cpuid_dev, cpuid_ext) {
+TEST(cpuid_ctl, cpuid_ext) {
   auto fd = get_fdpath(0);
   if (!fd) {
-    GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
+    GTEST_SKIP() << "Couldn't open '/dev/cpuctl0'";
   }
 
-  cpuid_dev cpu{fd};
+  cpuid_cpuctl cpu{fd};
   auto reg = cpu.cpuid(0x80000000, 0);
 
   // Check the extended register, whose result is expected to be not more than
@@ -84,16 +83,16 @@ TEST(cpuid_dev, cpuid_ext) {
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
 
-TEST(cpuid_dev, move_ctor) {
+TEST(cpuid_cpuctl, move_ctor) {
   auto fd = get_fdpath(0);
   if (!fd) {
-    GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
+    GTEST_SKIP() << "Couldn't open '/dev/cpuctl0'";
   }
 
-  cpuid_dev cpu{fd};
+  cpuid_cpuctl cpu{fd};
   ASSERT_TRUE(cpu.has_cpuid());
 
-  cpuid_dev cpu2{std::move(cpu)};
+  cpuid_cpuctl cpu2{std::move(cpu)};
 
   // We've moved, but after the move, we expect the object to at least indicate
   // it is no longer valid. This is OK, because the classes are internal only to
@@ -105,16 +104,16 @@ TEST(cpuid_dev, move_ctor) {
   EXPECT_TRUE(cpu2.has_cpuid());
 }
 
-TEST(cpuid_dev, move_assignment) {
+TEST(cpuid_cpuctl, move_assignment) {
   auto fd = get_fdpath(0);
   if (!fd) {
-    GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
+    GTEST_SKIP() << "Couldn't open '/dev/cpuctl0'";
   }
 
-  cpuid_dev cpu{fd};
+  cpuid_cpuctl cpu{fd};
   ASSERT_TRUE(cpu.has_cpuid());
 
-  cpuid_dev cpu2;
+  cpuid_cpuctl cpu2;
   cpu2 = std::move(cpu);
 
   // We've moved, but after the move, we expect the object to at least indicate

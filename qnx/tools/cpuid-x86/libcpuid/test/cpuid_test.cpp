@@ -1,6 +1,5 @@
 #include "cpuid/cpuid.h"
 
-#include <algorithm>
 #include <iomanip>
 #include <ios>
 #include <iostream>

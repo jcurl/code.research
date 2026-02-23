@@ -274,3 +274,18 @@ if (!res) {
 
 While the `cpuidreader_native` is unlikely to fail, other implementations are
 expected to, such as reading from a device driver, or reading from a file.
+
+### Setting up Cpu Control on FreeBSD
+
+Ensure to load the driver by modifying the file `/boot/loader.conf` with the
+string:
+
+```text
+cpuctl_load="YES"
+```
+
+Then on restart, you should see the device
+
+```text
+/dev/cpuctl0
+```
