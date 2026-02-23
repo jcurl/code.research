@@ -1,4 +1,4 @@
-#include "cpuid/cpuidreader_dev.h"
+#include "cpuid/cpuidreader_cpuctl.h"
 
 #include <filesystem>
 #include <set>
@@ -21,7 +21,7 @@ using namespace rjcp::cpuid;
 namespace {
 
 auto has_cpuid_driver() -> bool {
-  std::string path = std::string{"/dev/cpu/0/cpuid"};
+  std::string path = std::string{"/dev/cpuctl0"};
   std::filesystem::path dev{path};
 
   return std::filesystem::exists(dev);
@@ -29,20 +29,20 @@ auto has_cpuid_driver() -> bool {
 
 }  // namespace
 
-TEST(cpuidreader_dev, has_cpuid) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, has_cpuid) {
+  cpuidreader_cpuctl cpu{};
 
   ASSERT_EQ(cpu.has_cpuid(), has_cpuid_driver());
 }
 
-TEST(cpuidreader_dev, make_cpuidreader) {
-  auto cpu = make_cpuidreader<cpuidreader_dev>();
+TEST(cpuidreader_cpuctl, make_cpuidreader) {
+  auto cpu = make_cpuidreader<cpuidreader_cpuctl>();
 
   ASSERT_EQ(cpu->has_cpuid(), has_cpuid_driver());
 }
 
-TEST(cpuidreader_dev, cpuid_zero) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_zero) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   // Check the first register, whose result is expected to be not more than
@@ -52,8 +52,8 @@ TEST(cpuidreader_dev, cpuid_zero) {
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
-TEST(cpuidreader_dev, cpuid_ext) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_ext) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   // Check the extended register, whose result is expected to be not more than
@@ -63,8 +63,8 @@ TEST(cpuidreader_dev, cpuid_ext) {
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
 
-TEST(cpuidreader_dev, cpuid_context_move) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_context_move) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
@@ -92,8 +92,8 @@ TEST(cpuidreader_dev, cpuid_context_move) {
   ASSERT_EQ(reg0ebx, reg1ebx);
 }
 
-TEST(cpuidreader_dev, cpuid_threads) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_threads) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   std::set<cpuidreg> acpi{};
@@ -109,8 +109,8 @@ TEST(cpuidreader_dev, cpuid_threads) {
   }
 }
 
-TEST(cpuidreader_dev, cpuid_threads_context_move) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_threads_context_move) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   std::set<cpuidreg> acpi{};
@@ -130,8 +130,8 @@ TEST(cpuidreader_dev, cpuid_threads_context_move) {
   }
 }
 
-TEST(cpuidreader_dev, cpuid_query_then_enable) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_query_then_enable) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   // Query using the default core (0).
@@ -156,8 +156,8 @@ TEST(cpuidreader_dev, cpuid_query_then_enable) {
   ASSERT_EQ(regcebx == regdebx, core == 0);
 }
 
-TEST(cpuidreader_dev, cpuid_enable_core_twice_fail) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_enable_core_twice_fail) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
@@ -176,8 +176,8 @@ TEST(cpuidreader_dev, cpuid_enable_core_twice_fail) {
   ASSERT_EQ(pin2.error(), EINVAL);
 }
 
-TEST(cpuidreader_dev, cpuid_enable_core_twice_success) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, cpuid_enable_core_twice_success) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
@@ -210,8 +210,8 @@ TEST(cpuidreader_dev, cpuid_enable_core_twice_success) {
   ASSERT_EQ(regc == reg0, core == 0);
 }
 
-TEST(cpuidreader_dev, move_ctor) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, move_ctor) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
   unsigned int core = 0;
@@ -238,11 +238,11 @@ TEST(cpuidreader_dev, move_ctor) {
   ASSERT_EQ(regebx, regmebx);
 }
 
-TEST(cpuidreader_dev, move_assignment) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, move_assignment) {
+  cpuidreader_cpuctl cpu{};
   if (!cpu.has_cpuid()) GTEST_SKIP() << "No CPUID supported";
 
-  cpuidreader_dev cpu2{};
+  cpuidreader_cpuctl cpu2{};
 
   unsigned int core = 0;
   if (cpu.cores() > 1) core = 1;
@@ -272,8 +272,8 @@ TEST(cpuidreader_dev, move_assignment) {
   ASSERT_TRUE(*pin2);
 }
 
-TEST(cpuidreader_dev, oob_cores) {
-  cpuidreader_dev cpu{};
+TEST(cpuidreader_cpuctl, oob_cores) {
+  cpuidreader_cpuctl cpu{};
 
   auto pin = cpu.enable_core(ubench::thread::thread_count());
   ASSERT_FALSE(pin.has_value());

@@ -1,40 +1,40 @@
-#ifndef CPUID_CPUIDREADER_DEV_H
-#define CPUID_CPUIDREADER_DEV_H
+#ifndef CPUID_CPUIDREADER_CPUCTL_H
+#define CPUID_CPUIDREADER_CPUCTL_H
 
 #include <memory>
 #include <optional>
 #include <utility>
 
 #include "cpuid/cpuid.h"
-#include "cpuid/cpuid_dev.h"
+#include "cpuid/cpuid_cpuctl.h"
 #include "ubench/thread.h"
 
 namespace rjcp::cpuid {
 
 namespace detail {
 
-class cpuid_dev_file;
+class cpuid_cpuctl_file;
 
 }  // namespace detail
 
-/// @brief Query the CPUID using the device /dev/cpu/N/cpuid
-class cpuidreader_dev : public cpuidreader {
+/// @brief Query the CPUID using the device /dev/cpuctlN
+class cpuidreader_cpuctl : public cpuidreader {
  public:
-  cpuidreader_dev() = default;
+  cpuidreader_cpuctl() = default;
 
-  cpuidreader_dev(const cpuidreader_dev&) = delete;
+  cpuidreader_cpuctl(const cpuidreader_cpuctl&) = delete;
 
-  cpuidreader_dev(cpuidreader_dev&& other) noexcept
+  cpuidreader_cpuctl(cpuidreader_cpuctl&& other) noexcept
       : ctx_{std::exchange(other.ctx_, nullptr)} {}
 
-  auto operator=(const cpuidreader_dev&) -> cpuidreader_dev& = delete;
+  auto operator=(const cpuidreader_cpuctl&) -> cpuidreader_cpuctl& = delete;
 
-  auto operator=(cpuidreader_dev&& other) noexcept -> cpuidreader_dev& {
-    cpuidreader_dev{std::move(other)}.swap(*this);
+  auto operator=(cpuidreader_cpuctl&& other) noexcept -> cpuidreader_cpuctl& {
+    cpuidreader_cpuctl{std::move(other)}.swap(*this);
     return *this;
   }
 
-  ~cpuidreader_dev() = default;
+  ~cpuidreader_cpuctl() = default;
 
   /// @brief Checks if this class can query the CPUID.
   ///
@@ -78,9 +78,9 @@ class cpuidreader_dev : public cpuidreader {
       -> stdext::expected<std::unique_ptr<cpuid_ctx>, int> override;
 
  private:
-  std::shared_ptr<detail::cpuid_dev_file> ctx_{};
+  std::shared_ptr<detail::cpuid_cpuctl_file> ctx_{};
 
-  auto swap(cpuidreader_dev& other) noexcept -> void {
+  auto swap(cpuidreader_cpuctl& other) noexcept -> void {
     std::swap(ctx_, other.ctx_);
   }
 };

@@ -7,6 +7,7 @@ set(SOURCES
     cpuid_dev_test.cpp
     cpuid_native_test.cpp
     cpuidreader_cache_test.cpp
+    cpuidreader_cpuctl_test.cpp
     cpuidreader_dev_test.cpp
     cpuidreader_native_test.cpp
 )
