@@ -1,3 +1,5 @@
+#include <sys/resource.h>
+
 #include <csignal>
 #include <memory>
 #include <thread>
@@ -6,7 +8,37 @@
 
 #include "ubench/atomics.h"
 
+namespace {
+
+class nocore {
+ public:
+  nocore() {
+    int rgres = getrlimit(RLIMIT_CORE, &limit_cur_);
+    EXPECT_EQ(rgres, 0) << "couldn't get RLIMIT_CORE";
+
+    struct rlimit limit_new = limit_cur_;
+    limit_new.rlim_cur = 0;
+    int rsres = setrlimit(RLIMIT_CORE, &limit_new);
+    EXPECT_EQ(rsres, 0) << "couldn't set RLIMIT_CORE";
+  }
+  nocore(const nocore &) = delete;
+  nocore(nocore &&) noexcept = default;
+  auto operator=(const nocore &) -> nocore & = delete;
+  auto operator=(nocore &&) noexcept -> nocore & = default;
+  ~nocore() {
+    int rrres = setrlimit(RLIMIT_CORE, &limit_cur_);
+    EXPECT_EQ(rrres, 0) << "couldn't restore RLIMIT_CORE";
+  }
+
+ private:
+  struct rlimit limit_cur_ {};
+};
+
+}  // namespace
+
 TEST(rcu, init_null_pointer) {
+  nocore ncore{};
+
   EXPECT_EXIT(
       {
         // Initialise direct with `nullptr`.
@@ -16,6 +48,8 @@ TEST(rcu, init_null_pointer) {
 }
 
 TEST(rcu, init_null_pointer_from_reset) {
+  nocore ncore{};
+
   std::unique_ptr v = std::make_unique<int>(5);
   v.reset(nullptr);
 
@@ -28,6 +62,8 @@ TEST(rcu, init_null_pointer_from_reset) {
 }
 
 TEST(rcu, init_destructor_when_not_free) {
+  nocore ncore{};
+
   rcu_ptr<int> p;
 
   EXPECT_EXIT(
