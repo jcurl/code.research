@@ -7,10 +7,12 @@ set(SOURCES
     ../include/cpuid/cpuidreader_cpuctl.h
     ../include/cpuid/cpuidreader_dev.h
     ../include/cpuid/cpuidreader_native.h
+    ../include/cpuid/cpuid_cache.h
     ../include/cpuid/cpuid_cpuctl.h
     ../include/cpuid/cpuid_dev.h
     ../include/cpuid/cpuid_native.h
     cpuid.cpp
+    cpuid_cache.cpp
     cpuid_dev.cpp
     cpuid_native.cpp
     cpuid_none.cpp
