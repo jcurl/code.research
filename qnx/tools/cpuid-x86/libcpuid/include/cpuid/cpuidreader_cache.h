@@ -5,9 +5,11 @@
 #include <unordered_map>
 
 #include "cpuid/cpuid.h"
+#include "cpuid/cpuid_cache.h"
 
 namespace rjcp::cpuid {
 
+/// @brief A CPUID reader that caches the results of CPUID queries.
 class cpuidreader_cache : public cpuidreader {
  public:
   cpuidreader_cache(cpuidreader& reader) : reader_{&reader} {};
@@ -100,8 +102,8 @@ class cpuidreader_cache : public cpuidreader {
   ///
   /// @param res The output result.
   ///
-  /// @return the result if the value was added (or overwritten), std::nullopt
-  /// if out of range or an other error.
+  /// @return the result if the value was added (or overwritten), true if the
+  /// value is updated, false if the value was not inserted.
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   auto add_cpuid(unsigned int core, cpuidreg eax, cpuidreg ecx, cpuid_res& res)
       -> bool;
@@ -109,8 +111,7 @@ class cpuidreader_cache : public cpuidreader {
  private:
   cpuidreader* reader_{};
   unsigned int cores_{0};
-  std::unordered_map<unsigned int, std::unordered_map<cpuid_req, cpuid_info>>
-      cache_{};
+  std::unordered_map<unsigned int, cpuid_cache> cache_{};
 
   // The context is the current core.
   class core_ctx {

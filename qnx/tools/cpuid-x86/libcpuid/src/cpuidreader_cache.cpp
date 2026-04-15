@@ -11,8 +11,14 @@ namespace rjcp::cpuid {
 auto cpuidreader_cache::has_cpuid() -> bool {
   if (reader_) return reader_->has_cpuid();
 
-  // There must be at least one core and one value present.
-  return (!cache_.empty());
+  // There must be at least one core present.
+  if (cache_.empty()) return false;
+
+  // And there must be at least one value present.
+  for (const auto& [core, cpuid_cache] : cache_) {
+    if (cpuid_cache.has_cpuid()) return true;
+  }
+  return false;
 }
 
 auto cpuidreader_cache::add_cpuid(
@@ -22,34 +28,33 @@ auto cpuidreader_cache::add_cpuid(
 
   // The core isn't cached.
   cpuid_req req{eax, ecx};
+  cpuid_info info{req, res};
+
   auto cpuid_map_it = cache_.find(core);
   if (cpuid_map_it == cache_.end()) {
-    decltype(cache_)::mapped_type cpuid{};
-    auto [it, success] = cpuid.emplace(req, cpuid_info{req, res});
-    if (!success) return false;
+    // The core has no entry. Updating the cache is always true.
+    cpuid_cache cpuid{};
+    cpuid.update_cache(info);
 
-    auto [it2, success2] = cache_.emplace(core, cpuid);
-    if (!success2) return false;
+    // success is always true, unless there was a race condition. This results
+    // in undefined behaviour, but at least let the user know.
+    auto [it, success] = cache_.emplace(core, std::move(cpuid));
+    return success;
   } else {
     // The core is cached, but there is no register.
-    auto cpuid = cpuid_map_it->second;
-    auto [it, success] = cpuid.emplace(req, cpuid_info{req, res});
-    if (!success) return false;
+    auto& cpuid = cpuid_map_it->second;
+    cpuid.update_cache(info);
+    return true;
   }
-  return true;
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto cpuidreader_cache::get_cpuid(unsigned int core, cpuidreg eax, cpuidreg ecx)
     -> std::optional<cpuid_res> {
-  cpuid_req req{eax, ecx};
   auto cpuid_map_it = cache_.find(core);
   if (cpuid_map_it != cache_.end()) {
-    auto cpuid = cpuid_map_it->second;
-    auto cpuid_info_it = cpuid.find(req);
-    if (cpuid_info_it != cpuid.end()) {
-      return cpuid_info_it->second.res;
-    }
+    auto& cpuid = cpuid_map_it->second;
+    return cpuid.cpuid(eax, ecx);
   }
   return std::nullopt;
 }
