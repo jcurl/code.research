@@ -68,6 +68,23 @@ else()
     endif()
 endif()
 
+# Executable Path
+if(QNXNTO)
+    target_sources(${LIBRARY} PRIVATE get_executable_path_qnx.cpp get_executable_path_common.cpp get_executable_path_common.h)
+    if(CMAKE_SYSTEM_VERSION VERSION_LESS 8.0)
+        # QNX 8.0 and later automatically include the std::filesystem extensions
+        target_link_libraries(${LIBRARY} c++fs)
+    endif()
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN" OR
+       upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
+    target_sources(${LIBRARY} PRIVATE get_executable_path_linux.cpp get_executable_path_common.cpp get_executable_path_common.h)
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "NETBSD" OR
+       upper_CMAKE_SYSTEM_NAME STREQUAL "FREEBSD")
+    target_sources(${LIBRARY} PRIVATE get_executable_path_bsd.cpp get_executable_path_common.cpp get_executable_path_common.h)
+else()
+    target_sources(${LIBRARY} PRIVATE get_executable_path_null.cpp)
+endif()
+
 # Thread Affinity
 if(QNXNTO)
     target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
