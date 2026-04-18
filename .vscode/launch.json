@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug libubench.a",
+            "name": "Debug cpuid_test",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Build QNX (Debug)",
-            "program": "${workspaceRoot}/qnx/build/linux-debug/lib/libubench/test/ubench_test",
+            "preLaunchTask": "Build (Debug)",
+            "program": "${workspaceRoot}/qnx/build/linux-debug/tools/cpuid-x86/libcpuid/test/cpuid_test",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}/qnx/build/linux-debug/lib/libubench/test",
+            "cwd": "${workspaceRoot}/qnx/build/linux-debug/tools/cpuid-x86/libcpuid/test",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

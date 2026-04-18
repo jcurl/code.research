@@ -1,1 +1,2 @@
 #cmakedefine01 HAVE_CPUCTL_CPUID_COUNT
+#cmakedefine01 HAVE_LIBXML2
