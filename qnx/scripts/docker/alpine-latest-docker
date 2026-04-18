@@ -4,7 +4,8 @@ LABEL MAINTAINER="Davide Cunial <dcunial@proton.me>"
 
 RUN apk update                                                          \
     && apk add clang clang-extra-tools compiler-rt lld libc++-dev       \
-    llvm-libunwind-dev musl-dev cmake samurai linux-headers
+    llvm-libunwind-dev musl-dev cmake samurai linux-headers             \
+    libxml2-dev
 
 RUN mkdir /source
 RUN mkdir /build
