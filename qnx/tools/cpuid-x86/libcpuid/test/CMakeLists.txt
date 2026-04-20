@@ -36,9 +36,6 @@ if (LibXml2_FOUND)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_assets/valid_line_space1.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test_assets)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_assets/valid_line_space2.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test_assets)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_assets/valid_line_space3.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test_assets)
-    set(HAVE_LIBXML2 true)
-else()
-    set(HAVE_LIBXML2 false)
 endif()
 
 if(IS_DEBUG)
@@ -52,4 +49,3 @@ target_code_coverage(${BINARY}
 )
 
 target_clangformat(TARGET ${BINARY} DIR_RECURSE .)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
