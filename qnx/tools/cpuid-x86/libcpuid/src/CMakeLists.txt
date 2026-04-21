@@ -33,8 +33,7 @@ target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../incl
 
 find_package(LibXml2)
 if (LibXml2_FOUND)
-    target_include_directories(${LIBRARY} PRIVATE ${LIBXML2_INCLUDE_DIRS})
-    target_link_libraries(${LIBRARY} PRIVATE ${LIBXML2_LIBRARIES})
+    target_link_libraries(${LIBRARY} PRIVATE LibXml2::LibXml2)
     set(HAVE_LIBXML2 true)
 else()
     set(HAVE_LIBXML2 false)

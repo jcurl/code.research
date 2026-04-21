@@ -19,15 +19,19 @@ using namespace rjcp::cpuid;
   }
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_NOT_VALUE(variable)       \
-  {                                      \
+#define ASSERT_HAS_NOT_VALUE(variable)    \
+  {                                       \
     ASSERT_FALSE((variable).has_value()); \
-    if (!(variable).has_value()) return; \
+    if (!(variable).has_value()) return;  \
   }
+
+namespace {
 
 auto has_cpuid_driver(const std::filesystem::path& xml_file) -> bool {
   return exists(xml_file);
 }
+
+}  // namespace
 
 TEST(cpuidreader_xml, has_cpuid) {
   std::filesystem::path xml_file =
@@ -245,19 +249,19 @@ auto one_core_valid_line(std::filesystem::path xml_file) {
 }
 
 TEST(cpuidreader_xml, one_core_valid_line_space1) {
-  std::filesystem::path xml_file =
-      ubench::os::get_executable_path() / "test_assets" / "valid_line_space1.xml";
+  std::filesystem::path xml_file = ubench::os::get_executable_path() /
+                                   "test_assets" / "valid_line_space1.xml";
   one_core_valid_line(std::move(xml_file));
 }
 
 TEST(cpuidreader_xml, one_core_valid_line_space2) {
-  std::filesystem::path xml_file =
-      ubench::os::get_executable_path() / "test_assets" / "valid_line_space2.xml";
+  std::filesystem::path xml_file = ubench::os::get_executable_path() /
+                                   "test_assets" / "valid_line_space2.xml";
   one_core_valid_line(std::move(xml_file));
 }
 
 TEST(cpuidreader_xml, one_core_valid_line_space3) {
-  std::filesystem::path xml_file =
-      ubench::os::get_executable_path() / "test_assets" / "valid_line_space3.xml";
+  std::filesystem::path xml_file = ubench::os::get_executable_path() /
+                                   "test_assets" / "valid_line_space3.xml";
   one_core_valid_line(std::move(xml_file));
 }

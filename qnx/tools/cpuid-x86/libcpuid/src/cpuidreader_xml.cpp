@@ -9,7 +9,7 @@
 
 namespace rjcp::cpuid {
 
-cpuidreader_xml::cpuidreader_xml([[maybe_unused]] std::string_view file_name) { }
+cpuidreader_xml::cpuidreader_xml([[maybe_unused]] std::string_view file_name) {}
 
 }  // namespace rjcp::cpuid
 
