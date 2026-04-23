@@ -17,7 +17,21 @@ using namespace rjcp::cpuid;
     if (!(variable).has_value()) return; \
   }
 
+namespace {
+
+auto has_cpuid_driver() -> bool {
+#if __x86_64__ || __amd64__ || __i386__
+  return true;
+#else
+  return false;
+#endif
+}
+
+}  // namespace
+
 TEST(cpuidreader_cache, native_has_cpuid) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   cpuidreader_cache cpu{ncpu};
 
@@ -25,6 +39,8 @@ TEST(cpuidreader_cache, native_has_cpuid) {
 }
 
 TEST(cpuidreader_cache, make_cpuidreader) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   auto cpu =
       make_cpuidreader<cpuidreader_cache>(static_cast<cpuidreader&>(ncpu));
@@ -33,6 +49,8 @@ TEST(cpuidreader_cache, make_cpuidreader) {
 }
 
 TEST(cpuidreader_cache, native_cpuid_zero) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   cpuidreader_cache cpu{ncpu};
 
@@ -44,6 +62,8 @@ TEST(cpuidreader_cache, native_cpuid_zero) {
 }
 
 TEST(cpuidreader_cache, native_cpuid_ext) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   cpuidreader_cache cpu{ncpu};
 
@@ -55,6 +75,8 @@ TEST(cpuidreader_cache, native_cpuid_ext) {
 }
 
 TEST(cpuidreader_cache, native_cpuid_threads) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   cpuidreader_cache cpu{ncpu};
 
@@ -76,6 +98,8 @@ TEST(cpuidreader_cache, native_cpuid_threads) {
 }
 
 TEST(cpuidreader_cache, cpuid_native_compare) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   cpuidreader_cache cpu{ncpu};
 
@@ -97,6 +121,8 @@ TEST(cpuidreader_cache, cpuid_native_compare) {
 }
 
 TEST(cpuidreader_cache, native_oob_cores) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_native ncpu{};
   cpuidreader_cache cpu{ncpu};
 
@@ -106,6 +132,8 @@ TEST(cpuidreader_cache, native_oob_cores) {
 }
 
 TEST(cpuidreader_cache, dev_oob_cores) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   cpuidreader_dev ncpu{};
   cpuidreader_cache cpu{ncpu};
 

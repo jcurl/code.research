@@ -19,7 +19,21 @@ using namespace rjcp::cpuid;
     if (!(variable).has_value()) return; \
   }
 
+namespace {
+
+auto has_cpuid_driver() -> bool {
+#if __x86_64__ || __amd64__ || __i386__
+  return true;
+#else
+  return false;
+#endif
+}
+
+}  // namespace
+
 TEST(cpuid, dump) {
+  if (!has_cpuid_driver()) GTEST_SKIP() << "Not on X86 hardware";
+
   auto reader = make_cpuidreader<cpuidreader_native>();
   ASSERT_TRUE(reader);
 

@@ -20,6 +20,7 @@ set(SOURCES
     cpuidreader_cache.cpp
     cpuidreader_cpuctl.cpp
     cpuidreader_dev.cpp
+    cpuidreader_native.cpp
     cpuidreader_xml.cpp
     dump_generic.h dump_generic.cpp
     dump_intel.h dump_intel.cpp
@@ -30,6 +31,14 @@ add_library(${LIBRARY} STATIC ${SOURCES})
 set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "cpuid")
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" OR
+   ${CMAKE_SYSTEM_PROCESSOR} MATCHES "amd64" OR
+   ${CMAKE_SYSTEM_PROCESSOR} MATCHES "i[3456]86")
+    check_include_file("cpuid.h" HAVE_CPUIDX86)
+else()
+    set(HAVE_CPUIDX86 FALSE)
+endif()
 
 find_package(LibXml2)
 if (LibXml2_FOUND)

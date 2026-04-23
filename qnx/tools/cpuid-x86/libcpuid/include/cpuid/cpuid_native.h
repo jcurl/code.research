@@ -22,7 +22,7 @@ class cpuid_native {
   /// @brief Checks if this class can query the CPUID.
   ///
   /// @return true if querying the CPUID should work, false otherwise.
-  [[nodiscard]] auto has_cpuid() const -> bool { return true; }
+  [[nodiscard]] auto has_cpuid() const -> bool;
 
   /// @brief Query the CPUID for the register eax and ecx.
   ///

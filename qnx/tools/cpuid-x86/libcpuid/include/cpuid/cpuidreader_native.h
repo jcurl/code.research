@@ -59,7 +59,7 @@ class cpuidreader_native : public cpuidreader {
   /// @brief Checks if this class can query the CPUID.
   ///
   /// @return true if querying the CPUID should work, false otherwise.
-  auto has_cpuid() -> bool override { return true; }
+  auto has_cpuid() -> bool override;
 
   /// @brief Indicates if this instance queries current hardware.
   ///
