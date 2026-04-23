@@ -21,6 +21,7 @@ provides the correct results.
   - [3.1. Instantiating a Reader](#31-instantiating-a-reader)
   - [3.2. Querying the Reader](#32-querying-the-reader)
   - [3.3. Querying a CPUID](#33-querying-a-cpuid)
+  - [3.4. Setting up CPU Control on FreeBSD](#34-setting-up-cpu-control-on-freebsd)
 
 ## 1. Component Design
 
@@ -41,10 +42,17 @@ Reading the CPUID via the Intel instruction `cpuid` is done with the class
 
 ![](./assets/libcpuid/libcpuid_cpuid_native.svg)
 
+Other mechanisms exist to read CPUID information:
+
 Reading the CPUID via the Linux kernel module `cpuid.ko` is done with the class
-`cpuidreader_dev`.
+`cpuidreader_dev` (which accesses `/dev/cpu/0/cpuid`).
 
 ![](./assets/libcpuid/libcpuid_cpuid_dev.svg)
+
+Other mechanisms also exist:
+
+- FreeBSD: Use the `cpuidreader_cpuctl` class to read the device `/dev/cpuctl0`.
+- XML File: Read previously captured data in an XML file.
 
 ### 2.1. Implementation Specific CPUID
 
@@ -179,11 +187,17 @@ To instantiate a CPUID reader, there is a concrete implementation:
 
 - `cpuidreader_native` which uses the CPUID instruction in your program;
 - `cpuidreader_dev` which uses the device `/dev/cpu/X/cpuid` to query the
-  results.
+  results on Linux.
+- `cpuidreader_cpuctl` which uses the device `/dev/cpuctlX` to query the results
+  on FreeBSD.
+- `cpuidreader_xml` which loads an XML file and caches it in `cpuidreader_cache`
+  for offline processing, or simulation of CPUID information.
 
 There is a special implementation `cpuidreader_cache` that needs one of the
 above classes, but caches the result, that a CPUID register doesn't need to be
-queried more than once.
+queried more than once. Note, because the `cpuidreader_xml` is derived from
+`cpuidreader_cache` for implementing offline behaviour, it doesn't need to be
+cached again.
 
 To create a CPUID reader:
 
@@ -275,7 +289,7 @@ if (!res) {
 While the `cpuidreader_native` is unlikely to fail, other implementations are
 expected to, such as reading from a device driver, or reading from a file.
 
-### Setting up Cpu Control on FreeBSD
+### 3.4. Setting up CPU Control on FreeBSD
 
 Ensure to load the driver by modifying the file `/boot/loader.conf` with the
 string:
