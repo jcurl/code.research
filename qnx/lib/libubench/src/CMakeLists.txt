@@ -68,6 +68,23 @@ else()
     endif()
 endif()
 
+# Executable Path
+if(QNXNTO)
+    target_sources(${LIBRARY} PRIVATE get_executable_path_qnx.cpp get_executable_path_common.cpp get_executable_path_common.h)
+    if(CMAKE_SYSTEM_VERSION VERSION_LESS 8.0)
+        # QNX 8.0 and later automatically include the std::filesystem extensions
+        target_link_libraries(${LIBRARY} c++fs)
+    endif()
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN" OR
+       upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
+    target_sources(${LIBRARY} PRIVATE get_executable_path_linux.cpp get_executable_path_common.cpp get_executable_path_common.h)
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "NETBSD" OR
+       upper_CMAKE_SYSTEM_NAME STREQUAL "FREEBSD")
+    target_sources(${LIBRARY} PRIVATE get_executable_path_bsd.cpp get_executable_path_common.cpp get_executable_path_common.h)
+else()
+    target_sources(${LIBRARY} PRIVATE get_executable_path_null.cpp)
+endif()
+
 # Thread Affinity
 if(QNXNTO)
     target_sources(${LIBRARY} PRIVATE thread_pin_qnx.cpp)
@@ -88,10 +105,28 @@ else()
     cmake_pop_check_state()
 
     if(HAVE_PTHREAD_SETAFFINITY_NP)
-        target_sources(${LIBRARY} PRIVATE thread_pin.cpp)
+        if(upper_CMAKE_SYSTEM_NAME STREQUAL "NETBSD")
+            target_sources(${LIBRARY} PRIVATE thread_pin_netbsd.cpp)
+        else()
+            target_sources(${LIBRARY} PRIVATE thread_pin.cpp)
+        endif()
     else()
         target_sources(${LIBRARY} PRIVATE thread_pin_null.cpp)
         message(WARNING "Can't find a way to pin threads to a core")
+    endif()
+endif()
+
+# Thread Count (number of cores)
+if(upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
+    target_sources(${LIBRARY} PRIVATE thread_count_linux.cpp)
+elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+    target_sources(${LIBRARY} PRIVATE thread_count_windows.cpp)
+else()
+    check_symbol_enum_exists(_SC_NPROCESSORS_CONF "unistd.h" HAVE_SC_NPROCESSORS_CONF)
+    if(HAVE_SC_NPROCESSORS_CONF)
+        target_sources(${LIBRARY} PRIVATE thread_count_sysconf.cpp)
+    else()
+        target_sources(${LIBRARY} PRIVATE thread_count.cpp)
     endif()
 endif()
 

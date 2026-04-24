@@ -1,5 +1,6 @@
 #include "ubench/os.h"
 
+#include <filesystem>
 #include <iostream>
 
 #include <gmock/gmock.h>
@@ -26,4 +27,13 @@ TEST(get_page_size, check_not_zero_or_error) {
   ASSERT_TRUE(page_size);
   EXPECT_NE(*page_size, 0);
   std::cout << *page_size << std::endl;
+}
+
+TEST(get_executable_path, check_not_empty) {
+  auto path = ubench::os::get_executable_path();
+  ASSERT_NE(path.string().length(), 0);
+
+  std::cout << "path " << path << std::endl;
+  ASSERT_TRUE(std::filesystem::exists(path));
+  ASSERT_TRUE(std::filesystem::is_directory(path));
 }

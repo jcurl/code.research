@@ -1,51 +1,87 @@
 #include "config.h"
 
 #include <pthread.h>
+#include <sched.h>
 
-#include "stdext/expected.h"
 #if HAVE_INCLUDE_PTHREAD_NP_H
 // FreeBSD
 #include <pthread_np.h>
 #endif
 
-#include <sched.h>
-
 #include <cerrno>
-#include <cstdio>
-#include <cstdlib>
 #include <thread>
 
 #include "ubench/thread.h"
 
 namespace ubench::thread {
 
-auto pin_core(unsigned int core) -> stdext::expected<void, int> {
-  if (core >= std::thread::hardware_concurrency())
-    return stdext::unexpected{EINVAL};
+class pin_core::pin_core_impl {
+ public:
+  pin_core_impl(unsigned int core) : core_{core} {
+    if (core >= ubench::thread::thread_count()) {
+      error_ = EINVAL;
+      return;
+    }
 
-  pthread_t current = pthread_self();
+    thread_ = pthread_self();
 
-#if defined(__NetBSD__)
-  errno = 0;
-  cpuset_t *cpuset = cpuset_create();
-  if (cpuset == nullptr) return stdext::unexpected{errno};
+    int rc = 0;
+    CPU_ZERO(&orig_mask_);
+    rc = pthread_getaffinity_np(thread_, sizeof(cpu_set_t), &orig_mask_);
+    if (rc) {
+      error_ = errno;
+      return;
+    }
 
-  cpuid_t ci = core;
-  cpuset_set(ci, cpuset);
-  int rc = pthread_setaffinity_np(current, cpuset_size(cpuset), cpuset);
-  cpuset_destroy(cpuset);
-#elif defined(__linux__) || defined(__CYGWIN__) || defined(__FreeBSD__)
-  // Linux, Cygwin
-  cpu_set_t cpuset;
-  CPU_ZERO(&cpuset);
-  CPU_SET(core, &cpuset);
-  int rc = pthread_setaffinity_np(current, sizeof(cpu_set_t), &cpuset);
-#else
-  // Unknown. A port is needed.
-  return stdext::unexpected{ENOSYS};
-#endif
-  if (rc != 0) return stdext::unexpected{rc};
-  return {};
-}
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(core, &cpuset);
+    rc = pthread_setaffinity_np(thread_, sizeof(cpu_set_t), &cpuset);
+    if (rc) {
+      error_ = errno;
+      return;
+    }
+
+    pinned_ = true;
+  }
+
+  pin_core_impl(const pin_core_impl&) = delete;
+  pin_core_impl(pin_core_impl&&) = default;
+  auto operator=(const pin_core_impl&) -> pin_core_impl& = delete;
+  auto operator=(pin_core_impl&&) -> pin_core_impl& = default;
+
+  ~pin_core_impl() {
+    if (!pinned_) return;
+    pthread_setaffinity_np(thread_, sizeof(cpu_set_t), &orig_mask_);
+  }
+
+  [[nodiscard]] auto is_pinned() const -> bool { return pinned_; }
+
+  [[nodiscard]] auto error() const -> int { return error_; }
+
+  [[nodiscard]] auto core() const -> unsigned int { return core_; }
+
+ private:
+  unsigned int core_{};
+  bool pinned_{};
+  int error_{};
+  pthread_t thread_;
+  cpu_set_t orig_mask_{};
+};
+
+pin_core::pin_core([[maybe_unused]] unsigned int core)
+    : impl_{std::make_unique<pin_core::pin_core_impl>(core)} {}
+
+pin_core::~pin_core() = default;
+
+pin_core::operator bool() const { return impl_->is_pinned(); }
+
+auto pin_core::error() const -> int { return impl_->error(); }
+
+auto pin_core::core() const -> unsigned int { return impl_->core(); }
+
+pin_core::pin_core(pin_core&&) noexcept = default;
+
+auto pin_core::operator=(pin_core&&) noexcept -> pin_core& = default;
 
 }  // namespace ubench::thread

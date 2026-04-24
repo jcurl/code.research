@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include <array>
+#include <filesystem>
 #include <new>
 #include <string>
 
@@ -110,6 +111,16 @@ auto get_proc_name(pid_t pid) -> stdext::expected<std::string, int>;
 ///
 /// @return the page size, in bytes, or an error.
 auto get_syspage_size() -> stdext::expected<unsigned int, int>;
+
+/// @brief Get the path to the current executable running.
+///
+/// @return the path to the executable.
+auto get_executable_path_name() -> std::string;
+
+/// @brief Get the path to the current executable running.
+///
+/// @return the path to the executable.
+auto get_executable_path() -> std::filesystem::path;
 
 }  // namespace ubench::os
 

@@ -2,19 +2,57 @@
 #define UBENCH_THREAD_PIN_H
 
 #include <condition_variable>
+#include <memory>
 #include <mutex>
-
-#include "stdext/expected.h"
 
 namespace ubench::thread {
 
-/// @brief Pin the current thread to core.
+/// @brief pin the current thread to the core, until destroyed.
 ///
-/// @param core The core to pin the thread to
+/// This class can be moved, but should not be copied. Ensure that when this
+/// class is destroyed, it is done so on the same thread it was pinned, else
+/// undefind behaviour will occur.
+class pin_core {
+ public:
+  /// @brief Pin the current thread to core.
+  ///
+  /// After assigning the current thread to the core, ensure that it was
+  /// successful by checking the object boolean operator is true. If the boolean
+  /// operator returns false, check the internal error with the error()
+  /// function.
+  ///
+  /// For example, on NetBSD, it may fail with the error EPERM.
+  ///
+  /// @param core The core to pin the current thread to.
+  pin_core(unsigned int core);
+  pin_core(const pin_core&) = delete;
+  auto operator=(const pin_core&) -> pin_core& = delete;
+  pin_core(pin_core&&) noexcept;
+  auto operator=(pin_core&&) noexcept -> pin_core&;
+  ~pin_core();
+
+  /// @brief Indicate if this thread is pinned, or if there was an error.
+  operator bool() const;
+
+  /// @brief If the thread wasn't pinned, this will return the errno value.
+  ///
+  /// @return The errno value from the pin operation.
+  [[nodiscard]] auto error() const -> int;
+
+  /// @brief Get the core that this thread is pinned to.
+  ///
+  /// @return The core that is currently pinned by this class.
+  [[nodiscard]] auto core() const -> unsigned int;
+
+ private:
+  class pin_core_impl;
+  std::unique_ptr<pin_core_impl> impl_;
+};
+
+/// @brief Get the number of available threads/cores on this system.
 ///
-/// @return true if the core was pinned, false otherwise. Use errno to get the
-/// error.
-auto pin_core(unsigned int core) -> stdext::expected<void, int>;
+/// @return The number of available threads/cores.
+[[nodiscard]] auto thread_count() -> unsigned int;
 
 /// @brief Be able to synchronise waiting for an event.
 class sync_event {

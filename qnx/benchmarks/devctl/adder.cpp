@@ -45,7 +45,7 @@ class options {
   friend auto make_options(int argc, const char* const argv[]) noexcept
       -> stdext::expected<options, int>;
 
-  unsigned int count_{std::thread::hardware_concurrency()};
+  unsigned int count_{ubench::thread::thread_count()};
   unsigned int start_{0};
   unsigned int iterations_{2000000};
   bool idle_{false};

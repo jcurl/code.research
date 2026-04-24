@@ -4,12 +4,12 @@
 #include <limits>
 #include <string>
 #include <thread>
-#include <vector>
 
 #include "osqnx/resmgr/device.h"
 #include "stdext/expected.h"
 #include "ubench/options.h"
 #include "ubench/string.h"
+#include "ubench/thread.h"
 
 static constexpr int rdev_major = 500;
 const std::string basedev{"/dev/adder/"};
@@ -89,7 +89,7 @@ class options {
   friend auto make_options(int argc, const char* const argv[]) noexcept
       -> stdext::expected<options, int>;
 
-  unsigned int count_{std::thread::hardware_concurrency()};
+  unsigned int count_{ubench::thread::thread_count()};
   unsigned int start_{0};
 };
 

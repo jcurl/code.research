@@ -1,0 +1,20 @@
+@startuml cpuid_component
+
+component libcpuid.a as libcpuid <<Static Lib>>
+component "/dev/cpu/**//n//**/cpuid" as linux <<Linux cpuid.ko>> <<QNX dev-cpuid>>
+component "CPUID" as cpuid
+component "/dev/cpuctl**//n//**" as freebsd <<FreeBSD cpuctl.kmod>>
+component "cpuid.xml" as XML
+
+libcpuid -d-> linux
+libcpuid -d-> cpuid
+libcpuid -d-> freebsd
+libcpuid -d-> XML
+
+component "dev-cpuid" as dev_cpuid <<QNX>>
+component cpuid_test
+
+cpuid_test -d-> libcpuid
+dev_cpuid -d-> libcpuid
+
+@enduml

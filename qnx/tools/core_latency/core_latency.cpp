@@ -8,8 +8,8 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
-#include <thread>
 
+#include "ubench/thread.h"
 #include "core_benchmark.h"
 #include "corerw_benchmark.h"
 #include "options.h"
@@ -55,17 +55,17 @@ auto main(int argc, char* argv[]) -> int {
   std::cout << std::endl;
 
   std::cout << "      ";
-  for (unsigned int pong_core = 0;
-       pong_core < std::thread::hardware_concurrency(); pong_core++) {
+  for (unsigned int pong_core = 0; pong_core < ubench::thread::thread_count();
+       pong_core++) {
     std::cout << std::left << std::setw(5) << pong_core << " ";
   }
   std::cout << std::endl;
 
-  for (unsigned int ping_core = 0;
-       ping_core < std::thread::hardware_concurrency(); ping_core++) {
+  for (unsigned int ping_core = 0; ping_core < ubench::thread::thread_count();
+       ping_core++) {
     std::cout << std::left << std::setw(5) << ping_core << " ";
-    for (unsigned int pong_core = 0;
-         pong_core < std::thread::hardware_concurrency(); pong_core++) {
+    for (unsigned int pong_core = 0; pong_core < ubench::thread::thread_count();
+         pong_core++) {
       if (pong_core == ping_core) {
         std::cout << "      " << std::flush;
       } else {

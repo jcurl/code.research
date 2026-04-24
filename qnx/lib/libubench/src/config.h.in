@@ -15,6 +15,7 @@
 // SysConf
 // --------------------------------------------------------------------
 #cmakedefine01 HAVE_SC_PAGESIZE
+#cmakedefine01 HAVE_SC_NPROCESSORS_CONF
 
 // --------------------------------------------------------------------
 // Networking

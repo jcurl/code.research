@@ -1,10 +1,10 @@
 #include <sys/neutrino.h>
 
 #include <cerrno>
-#include <thread>
 #include <vector>
 
 #include "ubench/clock.h"
+#include "ubench/thread.h"
 
 namespace ubench::chrono {
 
@@ -16,7 +16,7 @@ namespace {
 std::vector<int> idle_clocks{};
 
 auto init_idle_clocks() -> bool {
-  auto threads = std::thread::hardware_concurrency();
+  auto threads = ubench::thread::thread_count();
   idle_clocks.reserve(threads);
   for (std::size_t i = 0; i < threads; i++) {
     int result = ClockId(1, i + 1);
