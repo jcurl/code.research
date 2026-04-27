@@ -14,13 +14,22 @@ ROOT=0
 CODENAME=jammy
 REBUILD=0
 DEBUG=0
+DOCKERFILE=
+BUILDARGS=
 
 CODENAMESET=0
-OPTSTRING="c:d:firv:D?"
+OPTSTRING="b:c:d:firs:v:D?"
 while getopts $OPTSTRING OPTION; do
   case $OPTION in
   i)
     INTERACTIVE=1
+    ;;
+  b)
+    if [ -z "$BUILDARGS"]; then
+      BUILDARGS="--build-arg $OPTARG"
+    else
+      BUILDARGS="$BUILDARGS --build-arg $OPTARG"
+    fi
     ;;
   c)
     CODENAME=$OPTARG
@@ -34,6 +43,9 @@ while getopts $OPTSTRING OPTION; do
     ;;
   r)
     ROOT=1
+    ;;
+  s)
+    DOCKERFILE=$OPTARG
     ;;
   v)
     VARIANT=$OPTARG
@@ -63,6 +75,8 @@ while getopts $OPTSTRING OPTION; do
     echo "      start the shell)"
     echo " -r - Start in the container as root. Note, that the container is"
     echo "      dropped when finished, so changes are not permanent."
+    echo " -s - Override docker script file."
+    echo " -b - Provide docker buildargs."
     echo ""
     echo " -f - Force rebuild. If the container exists, try to rebuild again anyway"
     echo " -D - Debug. Don't squash the container. Implies '-f' to force rebuild on"
@@ -110,12 +124,17 @@ if [ $REBUILD -eq 0 ]; then
   REBUILD=$?
 fi
 if [ $REBUILD -ne 0 ]; then
-  DOCKERFILE=$BASEDIR/qnx/scripts/docker/$PODVERSION-docker
-  if [ ! -f "$DOCKERFILE" ]; then
-    DOCKERFILE=$BASEDIR/qnx/scripts/docker/$DISTRO-docker
+  if [ x$DOCKERFILE == "x" ]; then
+    DOCKERFILE=$BASEDIR/qnx/scripts/docker/$PODVERSION-docker
+    if [ ! -f "$DOCKERFILE" ]; then
+      DOCKERFILE=$BASEDIR/qnx/scripts/docker/$DISTRO-docker
+    fi
+  else
+    DOCKERFILE=$BASEDIR/qnx/scripts/docker/$DOCKERFILE
   fi
+
   if [ ! -f "$DOCKERFILE" ]; then
-    echo "Can't find file 'docker/$PODVERSION-docker' to build"
+    echo "Can't find file '$DOCKERFILE' to build"
     exit 1
   fi
 
@@ -129,7 +148,7 @@ if [ $REBUILD -ne 0 ]; then
     SQUASH=
   fi
 
-  podman build $SQUASH --build-arg CODE_VERSION=$CODENAME -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
+  podman build $SQUASH --build-arg CODE_VERSION=$CODENAME $BUILDARGS -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
   if [ $? -ne 0 ]; then
     echo "Error building. Exiting"
     exit 1

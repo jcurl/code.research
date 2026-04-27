@@ -1,5 +1,5 @@
-ARG CODE_VERSION=13.5
-ARG UBUNTU_VERSION=jammy
+ARG CODE_VERSION=0.0
+ARG UBUNTU_VERSION=noble
 FROM ubuntu:${UBUNTU_VERSION}
 LABEL MAINTAINER="Jason Curl <jcurl@arcor.de>"
 
@@ -26,7 +26,7 @@ RUN (apt update -y || \
 RUN mkdir -p /opt/freebsd/${FREEBSD_VERSION}/aarch64/src \
   && mkdir -p /opt/freebsd/${FREEBSD_VERSION}/aarch64/sysroot \
   && cd /opt/freebsd/${FREEBSD_VERSION}/aarch64/src \
-  && wget --no-check-certificate -nc -nv http://ftp.freebsd.org/pub/FreeBSD/releases/arm64/${FREEBSD_VERSION}-RELEASE/base.txz
+  && wget --no-check-certificate -nc -nv http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/arm64/${FREEBSD_VERSION}-RELEASE/base.txz
 
 # Put this on a new line, so we don't need to keep downloading the sources.
 # Extract the sources, build it, and then remove the sources and intermediate
@@ -44,7 +44,10 @@ RUN mkdir -p /opt/freebsd/${FREEBSD_VERSION}/aarch64/src \
 # Toolchains must provide '-stdlib=libc++' (clang)
 RUN BASE=/opt/freebsd/${FREEBSD_VERSION} \
   && cd $BASE/aarch64/sysroot \
-  && tar -xf ../src/base.txz ./lib/ ./usr/lib/ ./usr/include/ \
+  && tar -xf ../src/base.txz --no-same-owner --no-same-permissions ./lib/ ./usr/lib/ ./usr/include/ || true
+
+RUN BASE=/opt/freebsd/${FREEBSD_VERSION} \
+  && cd $BASE/aarch64/sysroot \
   && cd ./usr/lib \
   && find . -xtype l | xargs ls -l | awk -v base="${BASE}" '{print "ln -sf "base"/aarch64/sysroot"$11 " " $9}' | /bin/sh
 

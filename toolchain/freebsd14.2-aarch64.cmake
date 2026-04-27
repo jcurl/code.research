@@ -15,4 +15,3 @@ set(CMAKE_C_FLAGS "-target aarch64-unknown-freebsd14")
 set(CMAKE_CXX_FLAGS "-target aarch64-unknown-freebsd14")
 set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld -stdlib=libc++")
 include_directories(BEFORE SYSTEM "/opt/freebsd/14.2/aarch64/sysroot/usr/include/c++/v1")
-
