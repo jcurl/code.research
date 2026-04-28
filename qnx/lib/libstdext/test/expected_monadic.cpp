@@ -23,7 +23,8 @@ TEST(expected, nonvoid_and_then_value) {
   using Expected2 = stdext::expected<double, T>;
 
   Expected e = 42;
-  const auto newVal = e.and_then([](int x) { return Expected2{x * 2}; });
+  const auto newVal =
+      e.and_then([](int x) -> Expected2 { return Expected2{x * 2}; });
   auto result = std::is_same_v<std::remove_cv_t<decltype(newVal)>, Expected2>;
   EXPECT_TRUE(result);
   EXPECT_TRUE(newVal);
@@ -47,7 +48,7 @@ TEST(expected, nonvoid_and_then) {
   using Expected2 = stdext::expected<double, T>;
 
   Expected e{};
-  const auto newVal = e.and_then([]() { return Expected2{}; });
+  const auto newVal = e.and_then([]() -> Expected2 { return Expected2{}; });
   auto result = std::is_same_v<std::remove_cv_t<decltype(newVal)>, Expected2>;
   EXPECT_TRUE(result);
   EXPECT_TRUE(newVal);
@@ -59,7 +60,7 @@ TEST(expected, or_else) {
   using Expected2 = stdext::expected<T, double>;
 
   Expected e{};
-  const auto newVal = e.or_else([](auto&&) { return Expected2{}; });
+  const auto newVal = e.or_else([](auto&&) -> auto{ return Expected2{}; });
   auto result = std::is_same_v<std::remove_cv_t<decltype(newVal)>, Expected2>;
   EXPECT_TRUE(result);
   EXPECT_TRUE(newVal);
@@ -70,7 +71,7 @@ TEST(expected, void_or_else) {
   using Expected2 = stdext::expected<void, double>;
 
   Expected e{};
-  const auto newVal = e.or_else([](auto&&) { return Expected2{}; });
+  const auto newVal = e.or_else([](auto&&) -> auto{ return Expected2{}; });
   auto result = std::is_same_v<std::remove_cv_t<decltype(newVal)>, Expected2>;
   EXPECT_TRUE(result);
   EXPECT_TRUE(newVal);

@@ -117,7 +117,7 @@ auto query_net_interfaces_getifaddrs(
 
         // Add only if this IP address doesn't already exist.
         if (std::find_if(interface.inet().begin(), interface.inet().end(),
-                [&ipv4addr](if_ipv4& ip) {
+                [&ipv4addr](if_ipv4& ip) -> bool {
                   return ip.addr().s_addr == ipv4addr.s_addr;
                 }) == interface.inet().end()) {
           auto& entry = interface.inet().emplace_back(ipv4addr);

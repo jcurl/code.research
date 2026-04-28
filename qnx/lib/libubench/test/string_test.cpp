@@ -15,7 +15,7 @@ auto split_check(const std::string& arg, std::initializer_list<std::string> l)
   // The output is of `string_view`. For checking, we convert to a `string`.
   std::vector<std::string> args{};
   std::transform(arg_parse.cbegin(), arg_parse.cend(), std::back_inserter(args),
-      [](std::string_view x) { return std::string{x}; });
+      [](std::string_view x) -> std::string { return std::string{x}; });
 
   std::size_t p = 0;
   for (const auto& a : l) {
@@ -90,7 +90,7 @@ auto split_check_max_fields(
   // The output is of `string_view`. For checking, we convert to a `string`.
   std::vector<std::string> args{};
   std::transform(arg_parse.cbegin(), arg_parse.cend(), std::back_inserter(args),
-      [](std::string_view x) { return std::string{x}; });
+      [](std::string_view x) -> std::string { return std::string{x}; });
 
   std::size_t p = 0;
   for (const auto& a : l) {

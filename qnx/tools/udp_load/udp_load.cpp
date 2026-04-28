@@ -78,7 +78,7 @@ auto main(int argc, char* argv[]) -> int {
     auto runner = [&sync, &packets_sent, &packets_expected, &wait_time,
                       &sent_time,
                       &thread_failures](std::unique_ptr<udp_talker> talker,
-                      std::chrono::milliseconds duration) {
+                      std::chrono::milliseconds duration) -> void {
       sync.wait();
       auto result = talker->run(duration);
       if (result) {

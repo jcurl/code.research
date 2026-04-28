@@ -11,6 +11,7 @@ enum class netflags {
 };
 DEFINE_GLOBAL_FLAG_OPERATORS(netflags)
 
+// NOLINTNEXTLINE(cppcoreguidelines-use-enum-class)
 enum cnetflags {
   IFF_UP = 1,
   IFF_DOWN = 2,

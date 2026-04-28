@@ -16,8 +16,9 @@
 #include <inttypes.h>
 #endif
 
-#include "stdext/expected.h"
 #include "config.h"
+
+#include "stdext/expected.h"
 
 template <class TClock>
 auto print_clock_details(std::string_view name) -> void {

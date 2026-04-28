@@ -53,7 +53,7 @@ TEST(sync_event, normal) {
   sem t{};
   ubench::thread::sync_event sync{};
 
-  std::thread trigger([&sync, &t]() {
+  std::thread trigger([&sync, &t]() -> void {
     t.wait();
 
     // The minor sleep helps that the wait is entered.
@@ -90,7 +90,7 @@ TEST(sync_event, preset_wait_clear) {
   sync.wait();
   sync.clear();
 
-  std::thread trigger([&sync, &t]() {
+  std::thread trigger([&sync, &t]() -> void {
     t.wait();
 
     // The minor sleep helps that the wait is entered.
@@ -111,7 +111,7 @@ TEST(sync_event, set_clear_wait) {
   sync.set();
   sync.clear();
 
-  std::thread trigger([&sync, &t]() {
+  std::thread trigger([&sync, &t]() -> void {
     t.wait();
 
     // The minor sleep helps that the wait is entered.
@@ -135,7 +135,7 @@ TEST(sync_event, normal_no_timeout) {
   sem t{};
   ubench::thread::sync_event sync{};
 
-  std::thread trigger([&sync, &t]() {
+  std::thread trigger([&sync, &t]() -> void {
     t.wait();
 
     // The minor sleep helps that the wait is entered.

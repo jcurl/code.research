@@ -447,14 +447,14 @@ TEST(rcu, DISABLED_stress_threaded_update) {
   std::atomic<bool> terminate{false};
 
   // Thread X: Read the data
-  std::thread thread_x([&]() {
+  std::thread thread_x([&]() -> void {
     while (!terminate.load()) {
       auto ptr = rcu.read();
     }
   });
 
   // Thread Y: Update the data
-  std::thread thread_y([&]() {
+  std::thread thread_y([&]() -> void {
     while (!terminate.load()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       std::unique_ptr<MyData> new_data(new MyData(24));

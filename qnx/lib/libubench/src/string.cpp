@@ -15,14 +15,14 @@ auto split_args(std::string_view arg, unsigned int fields)
     if (fields == 0 || split_args.size() < fields - 1) {
       std::string_view::size_type next = arg.find_first_of(',', sz);
       if (next == std::string_view::npos) {
-        split_args.emplace_back(arg.data() + sz, arg.size() - sz);
+        split_args.emplace_back(arg.substr(sz));
         return split_args;
       }
 
-      split_args.emplace_back(arg.data() + sz, next - sz);
+      split_args.emplace_back(arg.substr(sz, next - sz));
       sz = next + 1;
     } else {
-      split_args.emplace_back(arg.data() + sz, arg.size() - sz);
+      split_args.emplace_back(arg.substr(sz));
       return split_args;
     }
   }

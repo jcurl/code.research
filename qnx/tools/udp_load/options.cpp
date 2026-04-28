@@ -27,8 +27,7 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
   if (port_sep != std::string_view::npos) {
     if (arg.size() < port_sep - 1) return false;
 
-    std::string_view portstr(
-        arg.data() + port_sep + 1, arg.size() - port_sep - 1);
+    std::string_view portstr = arg.substr(port_sep + 1);
     auto port = ubench::string::parse_int<std::uint16_t>(portstr);
     if (!port) return false;
     addr.sin_port = htons(*port);

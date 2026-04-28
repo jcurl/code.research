@@ -29,7 +29,7 @@ auto run_stress(unsigned int threads) {
   std::atomic<std::uint32_t> counter{0};
   std::atomic<std::uint32_t> updates{0};
 
-  std::thread thread_update([&]() {
+  std::thread thread_update([&]() -> void {
     while (!terminate.load()) {
       std::this_thread::sleep_for(10ms);
       std::unique_ptr new_data(std::make_unique<int>(24));
@@ -44,7 +44,7 @@ auto run_stress(unsigned int threads) {
 
   std::vector<std::thread> reads;
   for (unsigned int t = 0; t < threads; t++) {
-    reads.emplace_back([&]() {
+    reads.emplace_back([&]() -> void {
       while (!terminate.load()) {
         rcu_ptr ptr = rcu.read();
         counter++;
