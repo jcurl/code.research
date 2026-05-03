@@ -1,4 +1,4 @@
-ARG CODE_VERSION=plucky
+ARG CODE_VERSION=resolute
 FROM ubuntu:${CODE_VERSION}
 LABEL MAINTAINER="Jason Curl <jcurl@arcor.de>"
 
@@ -17,7 +17,7 @@ RUN (apt update -y || \
       lsb-release cmake git-core \
       clang clang-tidy clang-format llvm-runtime \
       libc++-dev libc++abi-dev lld llvm-dev libclang-rt-dev \
-      libxml2-dev \
+      libxml2-dev libunwind-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

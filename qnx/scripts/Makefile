@@ -1,5 +1,5 @@
 .PHONY: linux
-linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-jammy-clang ubuntu-noble ubuntu-noble-clang
+linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-jammy-clang ubuntu-noble ubuntu-noble-clang ubuntu-resolute ubuntu-resolute-clang
 
 .PHONY: netbsd
 netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb
@@ -36,11 +36,11 @@ ubuntu-noble:
 ubuntu-noble-clang:
 	@./build.sh -cnoble -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} && ctest"
 
-ubuntu-plucky:
-	@./build.sh -cplucky "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} && ctest"
+ubuntu-resolute:
+	@./build.sh -cresolute "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} && ctest"
 
-ubuntu-plucky-clang:
-	@./build.sh -cplucky -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} && ctest"
+ubuntu-resolute-clang:
+	@./build.sh -cresolute -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} && ctest"
 
 netbsd10.1-aarch64:
 	@./build.sh -dnetbsd -c10.1 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64.cmake && cmake --build . -j${NUM_CPUS}"

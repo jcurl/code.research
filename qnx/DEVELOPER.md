@@ -115,9 +115,10 @@ the different variants.
 An example of occasional support for Tier 2 targets are:
 
 - NetBSD 10.1 (RPi4 cross-compile)¹
-- FreeBSD 14.2 (RPi4 cross-compile)²
+- FreeBSD 13.5 (RPi4 cross-compile)²
+- FreeBSD 14.4 (RPi4 cross-compile)²
+- FreeBSD 15.0 (RPi4 cross-compile)²
 - Cygwin 3.x (Windows 10 64-bit or later)
-- MacOS-X (non-free, support very limited)
 
 Notes:
 
@@ -159,6 +160,7 @@ Ubuntu targets):
 | Ubuntu 20.04      | -   | X      | -     | -     |
 | Ubuntu 22.04      | -   | X      | -     | -     |
 | Ubuntu 24.04      | -   | X      | -     | -     |
+| Ubuntu 26.04      | -   | X      | -     | -     |
 | RPi OS            | -   | -      | X     | X     |
 | QNX 7.1           | -   | -      | X     | -     |
 | QNX 8.0           | -   | -      | X     | -     |
