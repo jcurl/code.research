@@ -5,7 +5,7 @@ set(DEVMGR_SOURCES
 
 add_executable(${DEVMGR_BINARY} ${DEVMGR_SOURCES})
 target_compile_features(${DEVMGR_BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${DEVMGR_BINARY} PRIVATE osqnx)
+target_link_libraries(${DEVMGR_BINARY} PRIVATE libosqnx)
 
 SET(RESTEST_BINARY resmgr_device_test)
 SET(RESTEST_SOURCES
@@ -14,7 +14,7 @@ SET(RESTEST_SOURCES
 
 add_executable(${RESTEST_BINARY} ${RESTEST_SOURCES})
 target_compile_features(${RESTEST_BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${RESTEST_BINARY} PRIVATE GTest::gtest_main gmock_main osqnx)
+target_link_libraries(${RESTEST_BINARY} PRIVATE GTest::gtest_main gmock_main libosqnx)
 add_test(NAME ${RESTEST_BINARY} COMMAND ${RESTEST_BINARY})
 
 if(IS_DEBUG)

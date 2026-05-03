@@ -18,7 +18,7 @@ set(SOURCES
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main ubench)
+target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libubench)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
 set(BINARY_GETOPT ubench_getopt_test)
@@ -29,7 +29,7 @@ set(SOURCES_GETOPT
 
 add_executable(${BINARY_GETOPT} ${SOURCES_GETOPT})
 target_compile_features(${BINARY_GETOPT} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY_GETOPT} PRIVATE GTest::gtest_main ubench)
+target_link_libraries(${BINARY_GETOPT} PRIVATE GTest::gtest_main libubench)
 # The test case should not run automatically - it will fail with the various implementations,
 # or some implementations of libc result in undefined behaviour.
 #add_test(NAME ${BINARY_GETOPT} COMMAND ${BINARY_GETOPT})

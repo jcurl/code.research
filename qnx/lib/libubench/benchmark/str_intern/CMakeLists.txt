@@ -17,7 +17,7 @@ set(STRINTERN_SOURCES
 
 add_executable(${STRINTERN_BINARY} ${STRINTERN_SOURCES})
 target_compile_features(${STRINTERN_BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${STRINTERN_BINARY} PRIVATE ubench)
+target_link_libraries(${STRINTERN_BINARY} PRIVATE libubench)
 
 check_type_exists("std::pmr::memory_resource" "memory_resource" HAVE_CXX_MEMORY_RESOURCE)
 if(NOT HAVE_CXX_MEMORY_RESOURCE)

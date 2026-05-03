@@ -1,7 +1,9 @@
-set(LIBRARY stdext)
+set(LIBRARY libstdext)
 set(SOURCES
     ../include/stdext/expected.h
 )
+
+# set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "stdext")
 
 # There is nothing to build. When there is, add all necessary instructions (see
 # libubench/src/CMakeLists.txt).

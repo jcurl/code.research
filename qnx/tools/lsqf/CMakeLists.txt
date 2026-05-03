@@ -7,7 +7,7 @@ set(SOURCES
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} PRIVATE ubench osqnx)
+target_link_libraries(${BINARY} PRIVATE libubench libosqnx)
 
 if(IS_DEBUG)
     add_sanitizers(${BINARY})

@@ -7,7 +7,7 @@ include(research/check_symbol_lib_exists)
 include(research/check_symbol_gnusource_exists)
 include(research/check_struct_field_exists)
 
-set(LIBRARY ubench)
+set(LIBRARY libubench)
 set(SOURCES
     ../include/ubench/clock.h
     ../include/ubench/flags.h
@@ -22,6 +22,7 @@ set(SOURCES
     ../include/ubench/measure/print.h measure/print.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
+set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "ubench")
 
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 
