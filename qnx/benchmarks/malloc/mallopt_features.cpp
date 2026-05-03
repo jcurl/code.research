@@ -102,6 +102,7 @@ auto parse_mallopt(std::string_view mallopt_item)
 
   int value = 0;
   auto [ptr, ec] = std::from_chars(
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       value_str.data(), value_str.data() + value_str.size(), value);
   if (ec != std::errc{}) return stdext::unexpected{"Value not a number"};
 
