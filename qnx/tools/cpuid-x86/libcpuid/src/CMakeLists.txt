@@ -32,6 +32,8 @@ set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "cpuid")
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
+target_link_libraries(${LIBRARY} PRIVATE libubench)
+
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" OR
    ${CMAKE_SYSTEM_PROCESSOR} MATCHES "amd64" OR
    ${CMAKE_SYSTEM_PROCESSOR} MATCHES "i[3456]86")

@@ -114,7 +114,6 @@ else()
     message(STATUS "Test suite disabled with -DENABLE_TEST=off")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libubench/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libstdext/include)
 if(QNXNTO)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libosqnx/include)

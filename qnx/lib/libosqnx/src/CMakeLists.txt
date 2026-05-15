@@ -8,7 +8,8 @@ set(SOURCES
 add_library(${LIBRARY} STATIC ${SOURCES})
 set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "osqnx")
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
-target_link_libraries(${LIBRARY} PRIVATE libubench)
+# Header files also use libubench includes, so this must be public.
+target_link_libraries(${LIBRARY} PUBLIC libubench)
 
 if(CMAKE_SYSTEM_VERSION VERSION_LESS 8.0)
     # QNX 8.0 and later automatically include the std::filesystem extensions

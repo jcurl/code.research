@@ -23,6 +23,7 @@ set(SOURCES
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "ubench")
+target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 
