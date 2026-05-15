@@ -11,6 +11,8 @@ target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
 # Header files also use libubench includes, so this must be public.
 target_link_libraries(${LIBRARY} PUBLIC libubench)
 
+target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
 if(CMAKE_SYSTEM_VERSION VERSION_LESS 8.0)
     # QNX 8.0 and later automatically include the std::filesystem extensions
     target_link_libraries(${LIBRARY} PRIVATE c++fs)
