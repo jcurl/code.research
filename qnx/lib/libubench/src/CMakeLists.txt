@@ -75,7 +75,7 @@ if(QNXNTO)
     target_sources(${LIBRARY} PRIVATE get_executable_path_qnx.cpp get_executable_path_common.cpp get_executable_path_common.h)
     if(CMAKE_SYSTEM_VERSION VERSION_LESS 8.0)
         # QNX 8.0 and later automatically include the std::filesystem extensions
-        target_link_libraries(${LIBRARY} c++fs)
+        target_link_libraries(${LIBRARY} PRIVATE c++fs)
     endif()
 elseif(upper_CMAKE_SYSTEM_NAME STREQUAL "CYGWIN" OR
        upper_CMAKE_SYSTEM_NAME STREQUAL "LINUX")
