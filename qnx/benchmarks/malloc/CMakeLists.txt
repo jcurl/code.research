@@ -57,6 +57,6 @@ check_symbol_exists(mlockall "sys/mman.h" HAVE_MLOCKALL)
 target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} malloc_bench.use DESCRIPTION "Google Benchmark for malloc() performance")
 
+target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 install(TARGETS ${BINARY} DESTINATION bin)

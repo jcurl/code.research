@@ -39,5 +39,5 @@ endif()
 target_clangformat(TARGET ${STRINTERN_BINARY} DIR .)
 target_use_msg(${STRINTERN_BINARY} str_intern.use DESCRIPTION "String intern benchmark")
 
+target_include_directories(${STRINTERN_BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -28,7 +28,7 @@ endif()
 target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} core_latency.use DESCRIPTION "measure core-to-core latency for memory read/writes")
 
+target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 install(TARGETS ${BINARY} DESTINATION bin)

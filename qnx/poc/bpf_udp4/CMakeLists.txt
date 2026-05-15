@@ -32,6 +32,6 @@ endif()
 target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} bpf_udp4.use DESCRIPTION "POC Sending UDPv4 packetsl")
 
+target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 install(TARGETS ${BINARY} DESTINATION bin)

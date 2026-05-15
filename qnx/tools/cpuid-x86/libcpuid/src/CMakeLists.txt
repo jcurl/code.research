@@ -66,4 +66,4 @@ endif()
 target_clangformat(TARGET ${LIBRARY} DIR_RECURSE . DIR_RECURSE ../include/cpuid)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${LIBRARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
