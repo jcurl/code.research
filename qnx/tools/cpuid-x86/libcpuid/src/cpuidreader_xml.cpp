@@ -2,6 +2,9 @@
 
 #include "cpuid/cpuidreader_xml.h"
 
+#include <cctype>
+#include <cerrno>
+
 #if !HAVE_LIBXML2
 
 // ----------------------------------------------------------------------------
@@ -45,16 +48,28 @@ auto xmlCharToInt(const xmlChar** value, int base)
   if (**value == 0) return std::nullopt;
   char* endptr = nullptr;
 
-  auto result =
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      std::strtoul(reinterpret_cast<const char*>(*value), &endptr, base);
+  // Eat all characters that are whitespace, and then ensure that we have a
+  // valid non-negative value.
+
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  const char* v = reinterpret_cast<const char*>(*value);
+  while (*v && std::isspace(*v)) {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    v++;
+  }
+  if (!std::isxdigit(*v)) return std::nullopt;
+
+  errno = 0;
+  auto result = std::strtoul(v, &endptr, base);
+  if (result == ULONG_MAX && errno) {
+    return std::nullopt;
+  }
 
   // Value out of bounds.
   if (result > 0xFFFFFFFF) return std::nullopt;
 
   // No value interpreted.
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (reinterpret_cast<const char*>(*value) == endptr) return std::nullopt;
+  if (v == endptr) return std::nullopt;
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   *value = reinterpret_cast<const xmlChar*>(endptr);

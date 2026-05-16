@@ -8,6 +8,8 @@
   - [1.3. Further Notes](#13-further-notes)
   - [1.4. Other Architectures (Not Supported)](#14-other-architectures-not-supported)
     - [1.4.1. Cygwin 3.x (Windows)](#141-cygwin-3x-windows)
+    - [1.4.2. Compile 32-bit binaries from Ubuntu 64-bit](#142-compile-32-bit-binaries-from-ubuntu-64-bit)
+    - [1.4.3. MacOS](#143-macos)
 - [2. Installed Binaries](#2-installed-binaries)
   - [2.1. Benchmarks](#21-benchmarks)
     - [2.1.1. Memory Allocation](#211-memory-allocation)
@@ -80,6 +82,29 @@ cd build/cygwin
 cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release
 make -j8
 ```
+
+#### 1.4.2. Compile 32-bit binaries from Ubuntu 64-bit
+
+To compile from a 64-bit Ubuntu and target 32-bit, ensure you have the
+prerequisites installed:
+
+```sh
+sudo apt install build-essential gcc-multilib g++-multilib
+sudo apt install libxml2-dev:i386
+```
+
+Then compile with the toolchain file, that sets multilib 32-bit
+
+```sh
+mkdir -p build/linux32
+cd build/linux32
+cmake -S ../.. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../../../ubuntu-gcc-m32.cmake
+make -j8
+```
+
+#### 1.4.3. MacOS
+
+No tests have been done with this platform. It is unlikely to compile.
 
 ## 2. Installed Binaries
 
@@ -182,7 +207,6 @@ cmake -B . -S .. -DCMAKE_CXX_FLAGS="-march=armv8.1-a+lse"
 
 Other Platforms:
 
-- (X) MacOS-X: Pinning threads in the Operating System not supported.
 - (/) Cygwin (Windows): Shows core latencies as expected.
 - (/) NetBSD 10.1: Shows core latencies as expected (tested on RPi4).
 - (/) FreeBSD 14.2: Shows core latencies as expected (tested on RPi4).

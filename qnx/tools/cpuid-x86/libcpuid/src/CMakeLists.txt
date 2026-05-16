@@ -1,4 +1,6 @@
+include(CheckTypeSize)
 include(research/check_symbol_enum_exists)
+include(research/check_sizeof_off_t)
 
 set(LIBRARY libcpuid)
 set(SOURCES
@@ -40,6 +42,13 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" OR
     check_include_file("cpuid.h" HAVE_CPUIDX86)
 else()
     set(HAVE_CPUIDX86 FALSE)
+endif()
+
+check_sizeof_off_t()
+if(${HAVE_SIZEOF_OFF_T} AND ${SIZEOF_OFF_T} EQUAL 8)
+    # If we don't have this, we can't use 64-bit pread/lseek for talking to
+    # /dev/cpu/N/cpuid. This is put in 'config.h'.
+    set(HAVE_OFF_T_64BIT TRUE)
 endif()
 
 find_package(LibXml2)

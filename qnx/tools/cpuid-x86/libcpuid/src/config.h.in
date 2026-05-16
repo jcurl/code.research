@@ -1,3 +1,6 @@
 #cmakedefine01 HAVE_CPUCTL_CPUID_COUNT
 #cmakedefine01 HAVE_LIBXML2
 #cmakedefine01 HAVE_CPUIDX86
+
+#cmakedefine01 HAVE_OFF_T_64BIT
+#cmakedefine01 HAVE_FILE_OFFSET_BITS_64

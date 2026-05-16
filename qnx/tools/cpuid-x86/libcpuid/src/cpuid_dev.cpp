@@ -1,8 +1,20 @@
-#include "cpuid/cpuid_dev.h"
+#include "config.h"
+
+#if HAVE_FILE_OFFSET_BITS_64
+// Needed to enable 64-bit off_t for 32-bit compilations
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage,bugprone-reserved-identifier)
+#define _FILE_OFFSET_BITS 64
+#endif
 
 #include <unistd.h>
 
+#include "cpuid/cpuid_dev.h"
+
 namespace rjcp::cpuid {
+
+[[nodiscard]] auto cpuid_dev::has_cpuid() const -> bool {
+  return HAVE_OFF_T_64BIT && fd_ >= 0;
+}
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 auto cpuid_dev::cpuid(cpuidreg eax, cpuidreg ecx) -> std::optional<cpuid_res> {

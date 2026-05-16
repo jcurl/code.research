@@ -230,6 +230,12 @@ TEST(cpuidreader_xml, one_core_invalid_field_oob) {
   one_core_invalid_line(std::move(xml_file));
 }
 
+TEST(cpuidreader_xml, one_core_invalid_field_minus) {
+  std::filesystem::path xml_file =
+      ubench::os::get_executable_path() / "test_assets" / "invalid_line8.xml";
+  one_core_invalid_line(std::move(xml_file));
+}
+
 auto one_core_valid_line(std::filesystem::path xml_file) {
   if (!has_cpuid_driver(xml_file)) GTEST_SKIP() << "No XML supported";
 
@@ -264,4 +270,18 @@ TEST(cpuidreader_xml, one_core_valid_line_space3) {
   std::filesystem::path xml_file = ubench::os::get_executable_path() /
                                    "test_assets" / "valid_line_space3.xml";
   one_core_valid_line(std::move(xml_file));
+}
+
+TEST(cpuidreader_xml, one_core_valid_line_ff) {
+  std::filesystem::path xml_file =
+      ubench::os::get_executable_path() / "test_assets" / "valid_line_ff.xml";
+  one_core_valid_line(xml_file);
+
+  cpuidreader_xml cpu{xml_file.string()};
+  auto ctx = cpu.enable_core(0);
+  ASSERT_HAS_VALUE(ctx);
+
+  auto reg = cpu.cpuid(0x80000001, 0);
+  ASSERT_HAS_VALUE(reg);
+  ASSERT_EQ(reg->eax, 0xFFFFFFFF);
 }
