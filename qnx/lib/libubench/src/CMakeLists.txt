@@ -26,6 +26,7 @@ set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "ubench")
 target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 target_compile_features(${LIBRARY} PRIVATE cxx_std_17)
+target_link_libraries(${LIBRARY} PUBLIC libstdext)
 
 # BSD Variable only available in CMake 3.25 or later.
 # LINUX Variable not available in CMake 3.16 (Ubuntu 20.04)

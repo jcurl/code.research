@@ -3,6 +3,7 @@ set(SOURCES time_compare.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
+target_link_libraries(${BINARY} PRIVATE libstdext)
 
 # Check for QTIME flags.
 if(QNXNTO)
