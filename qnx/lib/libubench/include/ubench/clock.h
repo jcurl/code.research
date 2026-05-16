@@ -2,6 +2,7 @@
 #define UBENCH_CHRONO_CLOCK_H
 
 #include <chrono>
+#include <ctime>
 
 namespace ubench::chrono {
 
@@ -61,6 +62,24 @@ struct process_clock {
   /// return zero idle time.
   static auto is_available() noexcept -> bool;
 };
+
+/// @brief Convert a nano-seconds value to a timespec.
+///
+/// The function converts a duration of nanoseconds into a timespec. This
+/// function works for 32-bit and 64-bit conversions.
+///
+/// @param dur The duration to convert.
+///
+/// @return the timespec equivalent.
+constexpr auto duration_to_timespec(std::chrono::nanoseconds dur) -> timespec {
+  auto secs = std::chrono::duration_cast<std::chrono::seconds>(dur);
+  auto nsecs = dur - secs;
+  timespec ts{};
+
+  ts.tv_sec = static_cast<decltype(ts.tv_sec)>(secs.count());
+  ts.tv_nsec = static_cast<decltype(ts.tv_nsec)>(nsecs.count());
+  return ts;
+}
 
 }  // namespace ubench::chrono
 

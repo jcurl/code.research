@@ -1,5 +1,7 @@
 #include "ubench/clock.h"
 
+#include <chrono>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -31,4 +33,39 @@ TEST(process_clock, is_available) {
   }
   auto time = ubench::chrono::process_clock::now();
   EXPECT_THAT(time.time_since_epoch().count(), Ne(0));
+}
+
+TEST(timespec, nanoseconds_t0) {
+  std::chrono::nanoseconds ns{0};
+  timespec ts = ubench::chrono::duration_to_timespec(ns);
+  ASSERT_EQ(ts.tv_sec, 0);
+  ASSERT_EQ(ts.tv_nsec, 0);
+}
+
+TEST(timespec, nanoseconds_m1) {
+  std::chrono::nanoseconds ns{999999999};
+  timespec ts = ubench::chrono::duration_to_timespec(ns);
+  ASSERT_EQ(ts.tv_sec, 0);
+  ASSERT_EQ(ts.tv_nsec, 999999999);
+}
+
+TEST(timespec, nanoseconds_p1) {
+  std::chrono::nanoseconds ns{1000000001};
+  timespec ts = ubench::chrono::duration_to_timespec(ns);
+  ASSERT_EQ(ts.tv_sec, 1);
+  ASSERT_EQ(ts.tv_nsec, 1);
+}
+
+TEST(timespec, milliseconds_m1) {
+  std::chrono::milliseconds ms{999};
+  timespec ts = ubench::chrono::duration_to_timespec(ms);
+  ASSERT_EQ(ts.tv_sec, 0);
+  ASSERT_EQ(ts.tv_nsec, 999000000);
+}
+
+TEST(timespec, milliseconds_p1) {
+  std::chrono::milliseconds ms{1001};
+  timespec ts = ubench::chrono::duration_to_timespec(ms);
+  ASSERT_EQ(ts.tv_sec, 1);
+  ASSERT_EQ(ts.tv_nsec, 1000000);
 }

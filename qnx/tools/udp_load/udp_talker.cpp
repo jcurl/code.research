@@ -7,10 +7,13 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <thread>
+
+#include "ubench/clock.h"
 
 #ifndef NDEBUG
 #include <sstream>
@@ -112,7 +115,7 @@ auto udp_talker::send_packets([[maybe_unused]] std::uint16_t count) noexcept
 auto udp_talker::delay(std::chrono::nanoseconds ns) noexcept -> bool {
   if (delay_count_ > 5) return false;
 
-  timespec ts = {ns.count() / 1000000000, ns.count() % 1000000000};
+  timespec ts = ubench::chrono::duration_to_timespec(ns);
   timespec rm{};
 
   if (delay_count_ == 0) {
