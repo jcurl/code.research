@@ -67,7 +67,7 @@ auto dump_amd_normal(cpuidreader& reader, std::vector<cpuid_info>& registers)
 auto dump_amd_extended(cpuidreader& reader, std::vector<cpuid_info>& registers)
     -> bool {
   cpuidreg leaf{0x80000000};
-  cpuidreg maxleaf{};
+  cpuidreg maxleaf{leaf};
 
   bool success{};
 
