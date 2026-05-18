@@ -33,6 +33,8 @@ auto dump_amd_normal(cpuidreader& reader, std::vector<cpuid_info>& registers)
           for (cpuidreg subleaf = 1; subleaf <= subleaves; subleaf++) {
             reg = get_cpuid(reader, leaf, subleaf);
             if (!reg) break;
+            // Clang 18.1.3 false warning.
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             registers.push_back(*reg);
           }
           break;
@@ -82,9 +84,13 @@ auto dump_amd_extended(cpuidreader& reader, std::vector<cpuid_info>& registers)
         }
         case 0x8000001D: {
           cpuidreg subleaf = 1;
+          // Clang 18.1.3 false warning.
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           while (subleaf <= 0xFF && (reg->res.eax & 0x1F)) {
             reg = get_cpuid(reader, leaf, subleaf);
             if (!reg) break;
+            // Clang 18.1.3 false warning.
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             registers.push_back(*reg);
             subleaf++;
           }
@@ -94,15 +100,21 @@ auto dump_amd_extended(cpuidreader& reader, std::vector<cpuid_info>& registers)
           for (cpuidreg subleaf : {1, 2, 3, 5}) {
             reg = get_cpuid(reader, leaf, subleaf);
             if (!reg) break;
+            // Clang 18.1.3 false warning.
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             registers.push_back(*reg);
           }
           break;
         }
         case 0x80000026: {
           cpuidreg subleaf = 1;
+          // Clang 18.1.3 false warning.
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           while (subleaf <= 0xFF && (reg->res.ecx & 0xFF00)) {
             reg = get_cpuid(reader, leaf, subleaf);
             if (!reg) break;
+            // Clang 18.1.3 false warning.
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             registers.push_back(*reg);
             subleaf++;
           }

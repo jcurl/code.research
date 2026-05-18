@@ -149,20 +149,25 @@ auto query_net_interfaces_getifaddrs(
       case AF_LINK: {
         if (!interface.hw_addr()) {
           // On BSD, QNX7 we could use `satocsdl()` but that is removed in QNX8.
-          sockaddr_dl* dl_addr = (struct sockaddr_dl*)(ifaddr.ifa_addr);
+          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+          auto dl_addr = reinterpret_cast<struct sockaddr_dl*>(ifaddr.ifa_addr);
 
           // NOLINTNEXTLINE(bugprone-switch-missing-default-case)
           switch (dl_addr->sdl_type) {
 #if HAVE_NET_IFT_ETHER
             case IFT_ETHER: {
-              unsigned char* ptr = (unsigned char*)LLADDR(dl_addr);
+              // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+              auto ptr = reinterpret_cast<unsigned char*>(LLADDR(dl_addr));
               ether_addr hwaddr{};
+
+              // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
               hwaddr.ether_addr_octet[0] = ptr[0];
               hwaddr.ether_addr_octet[1] = ptr[1];
               hwaddr.ether_addr_octet[2] = ptr[2];
               hwaddr.ether_addr_octet[3] = ptr[3];
               hwaddr.ether_addr_octet[4] = ptr[4];
               hwaddr.ether_addr_octet[5] = ptr[5];
+              // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
               interface.hw_addr(hwaddr);
               break;
             }

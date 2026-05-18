@@ -47,6 +47,7 @@ auto bpf_setintf(int fd, const std::string& name)
 
   ifreq ifr{};
   strlcpy(&ifr.ifr_name[0], name.c_str(), IFNAMSIZ);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if (ioctl(fd, BIOCSETIF, &ifr) == -1) return stdext::unexpected{errno};
   return {};
 }
@@ -55,6 +56,7 @@ auto bpf_sethdr(int fd, bool complete) -> stdext::expected<void, int> {
   if (fd < 0) return stdext::unexpected{EINVAL};
 
   unsigned int hdr_complete = complete ? 1 : 0;
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if (ioctl(fd, BIOCSHDRCMPLT, &hdr_complete) == -1)
     return stdext::unexpected{errno};
   return {};
@@ -83,9 +85,15 @@ bpf_socket::bpf_socket(const sockaddr_in& src, const sockaddr_in& dest)
   // Query all interfaces and find the source MAC and the MTU.
   auto srcintf = find_ipv4(src);
   if (!srcintf) return;
+  if (!srcintf->mtu()) return;
+  if (!srcintf->hw_addr()) return;
+
+  // Already checked that it's valid here. Clang 18.1.3 false warning.
+  // NOLINTBEGIN(bugprone-unchecked-optional-access)
   mtu_ = *srcintf->mtu();
   pkt_->write_src_mac(*srcintf->hw_addr());
   pkt_->write_src_ip(src);
+  // NOLINTEND(bugprone-unchecked-optional-access)
 
   // Initialise the BPF interface.
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)

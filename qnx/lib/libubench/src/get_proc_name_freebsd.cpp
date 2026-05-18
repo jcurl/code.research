@@ -14,7 +14,6 @@ auto get_proc_name(pid_t pid) -> stdext::expected<std::string, int> {
   size_t size = sizeof(kinfo_proc);
   int st = sysctl(mib.data(), mib.size(), &proc, &size, nullptr, 0);
   if (st == -1) {
-    printf("sysctl errno=%d", errno);
     return stdext::unexpected{errno};
   }
 

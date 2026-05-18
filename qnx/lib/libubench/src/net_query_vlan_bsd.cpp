@@ -35,15 +35,21 @@ auto query_net_interface_vlan_id(const ubench::file::fdesc& sock,
   ifr.ifr_data = &req;
 #else
   // FreeBSD, QNX 8.0
-  ifr.ifr_data = (caddr_t)&req;
+  //
+  // Reinterpet cast for platform compatibility.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  ifr.ifr_data = reinterpret_cast<caddr_t>(&req);
 #endif
 
   strlcpy(&ifr.ifr_name[0], interface.c_str(), IFNAMSIZ);
 
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,cppcoreguidelines-pro-bounds-array-to-pointer-decay)
   if (ioctl(sock, SIOCGETVLAN, &ifr) < 0) return stdext::unexpected{errno};
 
   if_vlan result{};
+
+  // FreeBSD headers, vlr_parent is the interface name as a C-string.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
   result.parent = std::string{req.vlr_parent};
   result.id = req.vlr_tag;
   return result;

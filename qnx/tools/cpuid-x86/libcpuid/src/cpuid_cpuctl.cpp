@@ -19,6 +19,8 @@ auto cpuid_cpuctl::cpuid(cpuidreg eax, cpuidreg ecx)
   cpuctl_cpuid_count_args_t args;
   args.level = static_cast<int>(eax);
   args.level_type = static_cast<int>(ecx);
+
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   int idresult = ioctl(fd_, CPUCTL_CPUID_COUNT, &args);
   if (idresult == -1) {
     // We have an error, but we can't say what the error is.

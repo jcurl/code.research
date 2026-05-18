@@ -56,8 +56,13 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     if (intf.hw_addr() && (intf.status() & flags)) {
       for (const auto& ip : intf.inet()) {
         if (source.sin_addr.s_addr == ip.addr().s_addr) {
+          // Accessing const is fine. Clang 18.1.3 false warning.
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           if (intf.mtu() && *intf.mtu() < pkt_size + 28u) {
-            std::cerr << "BPF mode size " << pkt_size << " <= UDP Max "
+            std::cerr << "BPF mode size " << pkt_size
+                      << " <= UDP Max "
+                      // Clang 18.1.3 false warning.
+                      // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                       << (*intf.mtu() - 28)
                       << " would require IPv4 fragmentation" << std::endl;
             return false;
@@ -73,6 +78,9 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
           //   bpf_intf = intf.vlan()->parent;
           // }
 
+          // We know that `hw_addr` is defined in a prevous check. The value is
+          // `const` so cannot change.
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           pkt_->src_mac() = *intf.hw_addr();
           break;
         }
@@ -107,12 +115,14 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
 
   ifreq ifr{};
   strlcpy(&ifr.ifr_name[0], bpf_intf.c_str(), IFNAMSIZ);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if (ioctl(fd, BIOCSETIF, &ifr) == -1) {
     ubench::string::perror("BPF mode can't set the interface " + bpf_intf);
     return false;
   }
 
   unsigned int hdr_complete = 1;
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   if (ioctl(fd, BIOCSHDRCMPLT, &hdr_complete) == -1) {
     ubench::string::perror(
         "BPF mode can't set the interface flag BIOCSHDRCMPLT " + bpf_intf);
@@ -137,14 +147,19 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
     // Reset the packet, that the new fragmentation identifier is calculated.
     pkt_->reset_pkt();
 
+    // Need to remove the const for the OS, even though the OS doesn't change
+    // the values.
+    //
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-const-cast)
     iov[0].iov_base = const_cast<std::uint8_t*>(pkt_->build_pkt_hdr().data());
     iov[0].iov_len = pkt_->build_pkt_hdr().size();
     iov[1].iov_base = const_cast<std::uint8_t*>(pkt_->pkt_data().data());
     iov[1].iov_len = pkt_->pkt_data().size();
+    // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 
-    int result{};
+    bool retry{};
     do {
-      result = writev(socket_fd_, iov.data(), iov.size());
+      auto result = writev(socket_fd_, iov.data(), iov.size());
       if (result == -1) {
         if (errno == ENOBUFS) {
           if (delay(750us)) continue;
@@ -152,7 +167,8 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
         ubench::string::perror("writev()");
         return sent;
       }
-    } while (result < 0);
+      retry = result < 0;
+    } while (retry);
     sent++;
   }
 

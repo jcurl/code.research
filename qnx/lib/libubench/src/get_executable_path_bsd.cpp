@@ -13,13 +13,13 @@ auto get_executable_path() -> std::filesystem::path {
   std::array<char, 4096> buffer{};
 
 #if defined(__NetBSD__)
-  int mib[4] = {CTL_KERN, KERN_PROC_ARGS, -1, KERN_PROC_PATHNAME};
+  std::array<int, 4> mib{CTL_KERN, KERN_PROC_ARGS, -1, KERN_PROC_PATHNAME};
 #else
-  int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
+  std::array<int, 4> mib{CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
 #endif
 
   size_t size = buffer.size();
-  auto result = sysctl(mib, 4, buffer.data(), &size, nullptr, 0);
+  auto result = sysctl(mib.data(), 4, buffer.data(), &size, nullptr, 0);
 
   // Error occurred.
   if (result == -1) return {};

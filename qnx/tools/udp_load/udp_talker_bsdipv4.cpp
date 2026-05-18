@@ -155,9 +155,9 @@ auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
   std::uint16_t sent = 0;
   while (sent < count) {
     auto remain = std::min<std::uint16_t>(count - sent, UIO_MAXIOV);
-    int result{};
+    bool retry{};
     do {
-      result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);
+      auto result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);
       if (result == -1) {
         if (errno == ENOBUFS) {
           if (delay(750us)) continue;
@@ -165,8 +165,10 @@ auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
         ubench::string::perror("sendmmsg()");
         return sent;
       }
-    } while (result < 0);
-    sent += result;
+
+      retry = result < 0;
+      if (!retry) sent += result;
+    } while (retry);
   }
   return sent;
 }

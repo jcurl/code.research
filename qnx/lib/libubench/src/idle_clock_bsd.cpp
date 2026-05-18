@@ -4,6 +4,7 @@
 #include <sys/sysctl.h>
 #include <unistd.h>
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -48,11 +49,11 @@ class cp_time_idle_clock : public base_clock {
     // Ask the Operating System tne number of CPUs. Don't use the CPP standard,
     // as that may be technically different to the way the kernel handles its
     // details.
-    int mib[2];
+    std::array<int, 2> mib{};
     mib[0] = CTL_HW;
     mib[1] = HW_NCPU;
     std::size_t size = sizeof(ncpu_);
-    if (sysctl(mib, 2, &ncpu_, &size, NULL, 0) < 0) return;
+    if (sysctl(mib.data(), 2, &ncpu_, &size, nullptr, 0) < 0) return;
     if (ncpu_ > 0xFFFF) return;
 
     // Determine frequency of clock ticks, the resolution of the idle clock.
@@ -63,6 +64,11 @@ class cp_time_idle_clock : public base_clock {
     }
 
     // Allocate dynamic memory only once for getting CPU time information.
+    //
+    // Multiplication not a problem, as ncpu_ is limited to 0xFFFF, and
+    // CPUSTATES is a small constant.
+    //
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     times_.resize(ncpu_ * CPUSTATES);
 
     // Get the MIB for the KERN_CP_TIMES, as there is no constant available.
@@ -86,7 +92,7 @@ class cp_time_idle_clock : public base_clock {
     // Get the clock details CP_* defined in <sys/sched.h>.
     std::size_t size = sizeof(decltype(times_)::value_type) * CPUSTATES * ncpu_;
     if (sysctl(mib_cp_times_.data(), mib_cp_times_.size(), times_.data(), &size,
-            NULL, 0) < 0)
+            nullptr, 0) < 0)
       return 0;
 
     // Sum up the idle ticks per CPU. Note that the accuracy of this system call
