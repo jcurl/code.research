@@ -1,6 +1,6 @@
 # To use this toolchain file
 #
-# cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain/freebsd-14.3-aarch64.cmake
+# cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain/freebsd-15.0-aarch64.cmake
 #
 
 set(CMAKE_SYSTEM_NAME FreeBSD)
