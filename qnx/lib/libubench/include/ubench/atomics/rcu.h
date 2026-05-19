@@ -1,3 +1,6 @@
+#ifndef UBENCH_ATOMICS_RCU_H
+#define UBENCH_ATOMICS_RCU_H
+
 #include <array>
 #include <atomic>
 #include <cstdint>
@@ -5,9 +8,6 @@
 #include <memory>
 #include <mutex>
 #include <utility>
-
-#ifndef UBENCH_ATOMICS_RCU_H
-#define UBENCH_ATOMICS_RCU_H
 
 template <class T, class Deleter, std::size_t N>
 class rcu;
@@ -57,6 +57,8 @@ class rcu_ptr {
   auto operator*() const -> const T & { return *ptr_; }
 
   explicit operator bool() const { return ptr_ != nullptr; }
+
+  auto reset() -> void { free(); }
 
   ~rcu_ptr() { free(); }
 

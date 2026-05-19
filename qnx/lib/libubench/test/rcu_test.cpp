@@ -436,6 +436,50 @@ TEST(rcu, ptr_custom_deleter) {
   EXPECT_EQ(del_counter, 2);
 }
 
+TEST(rcu, reset) {
+  std::unique_ptr v = std::make_unique<int>(10);
+  int *rv = v.get();
+  rcu x{std::move(v)};
+
+  rcu_ptr p = x.read();
+
+  // 2 references. The first in `rcu` because it's active, and `p`.
+  ASSERT_TRUE(p);
+  ASSERT_EQ(p.use_count(), 2);
+  ASSERT_EQ(p.get(), rv);
+  ASSERT_EQ(*p, 10);
+
+  p.reset();
+  ASSERT_FALSE(p);
+}
+
+TEST(rcu, reset_free) {
+  std::unique_ptr v = std::make_unique<int>(10);
+  int *rv = v.get();
+  rcu x{std::move(v)};
+
+  rcu_ptr p = x.read();
+  EXPECT_EQ(p.use_count(), 2);
+  EXPECT_EQ(p.get(), rv);
+
+  {
+    rcu_ptr q = x.read();
+    EXPECT_EQ(p.use_count(), 3);
+    EXPECT_EQ(p.get(), rv);
+    EXPECT_EQ(q.use_count(), 3);
+    EXPECT_EQ(q.get(), rv);
+
+    q.reset();
+    EXPECT_EQ(p.use_count(), 2);
+
+    EXPECT_FALSE(q);
+    // q is dropped. Dereference by 1.
+  }
+
+  EXPECT_EQ(p.use_count(), 2);
+  EXPECT_EQ(p.get(), rv);
+}
+
 // Run with disabled tests. Disabled as it's a long running test.
 //
 //  rcutest-test --gtest_also_run_disabled_tests
