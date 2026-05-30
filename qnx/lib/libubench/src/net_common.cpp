@@ -21,7 +21,7 @@ auto get_ether_multicast(const in_addr& addr, ether_addr* eth) -> bool {
   if (eth == nullptr) return false;
   if (!is_multicast(addr)) return false;
 
-  std::uint32_t ipv4addr = ntohl(addr.s_addr);
+  auto ipv4addr = ntohl(addr.s_addr);
   eth->ether_addr_octet[0] = 0x01;
   eth->ether_addr_octet[1] = 0x00;
   eth->ether_addr_octet[2] = 0x5E;

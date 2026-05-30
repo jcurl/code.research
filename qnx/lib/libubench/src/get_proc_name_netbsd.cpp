@@ -19,7 +19,7 @@ auto get_proc_name(pid_t pid) -> stdext::expected<std::string, int> {
   if (st == -1) return stdext::unexpected{errno};
 
   kinfo_proc2 proc{};
-  mib[5] = (size / sizeof(kinfo_proc2));
+  mib[5] = static_cast<int>(size / sizeof(kinfo_proc2));
   st = sysctl(mib.data(), mib.size(), &proc, &size, nullptr, 0);
   if (st == -1) return stdext::unexpected{errno};
 
