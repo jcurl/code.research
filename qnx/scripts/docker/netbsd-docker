@@ -1,5 +1,5 @@
 ARG CODE_VERSION=10.1
-ARG UBUNTU_VERSION=jammy
+ARG UBUNTU_VERSION=noble
 FROM ubuntu:${UBUNTU_VERSION}
 LABEL MAINTAINER="Jason Curl <jcurl@arcor.de>"
 
@@ -31,15 +31,19 @@ RUN mkdir -p /opt/netbsd/${NETBSD_VERSION}/src \
 # Extract the sources, build it, and then remove the sources and intermediate
 # build files.
 RUN cd /opt/netbsd/${NETBSD_VERSION}/src \
-  && for file in *.tgz; do echo Extracting $file...; tar -xzf $file; done \
-  && NPROC=`nproc` \
+  && for file in *.tgz; do echo Extracting $file...; tar --no-same-owner --no-same-permissions -xzf $file; done
+
+RUN NPROC=`nproc` \
   && cd /opt/netbsd/${NETBSD_VERSION}/src/usr/src \
   && BASE=/opt/netbsd/${NETBSD_VERSION}/aarch64 && DESTDIR=$BASE/sysroot ./build.sh -O $BASE/build -T $BASE/tools -j$NPROC -m evbarm -a aarch64 tools libs \
-  && cd /opt/netbsd/${NETBSD_VERSION}/aarch64 && tar -cf - build | pigz -9 > build.tar.gz \
+  && cd /opt/netbsd/${NETBSD_VERSION}/aarch64 && tar -cf - build | pigz -9 > build.tar.gz
+
+RUN NPROC=`nproc` \
   && cd /opt/netbsd/${NETBSD_VERSION}/src/usr/src \
   && BASE=/opt/netbsd/${NETBSD_VERSION}/aarch64eb && DESTDIR=$BASE/sysroot ./build.sh -O $BASE/build -T $BASE/tools -j$NPROC -m evbarm -a aarch64eb tools libs \
-  && cd /opt/netbsd/${NETBSD_VERSION}/aarch64eb && tar -cf - build | pigz -9 > build.tar.gz \
-  && rm -rf /opt/netbsd/${NETBSD_VERSION}/aarch64/build \
+  && cd /opt/netbsd/${NETBSD_VERSION}/aarch64eb && tar -cf - build | pigz -9 > build.tar.gz
+
+RUN rm -rf /opt/netbsd/${NETBSD_VERSION}/aarch64/build \
   && rm -rf /opt/netbsd/${NETBSD_VERSION}/aarch64eb/build \
   && rm -rf /opt/netbsd/${NETBSD_VERSION}/src
 

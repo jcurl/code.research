@@ -1,14 +1,17 @@
 # Scripts <!-- omit in toc -->
 
 - [1. Podman Container - build.sh](#1-podman-container---buildsh)
-  - [1.1. Using the build.sh script](#11-using-the-buildsh-script)
-    - [1.1.1. Removing ALL podman containers](#111-removing-all-podman-containers)
-  - [1.2. Using build.sh](#12-using-buildsh)
-    - [1.2.1. Building Ubuntu](#121-building-ubuntu)
-    - [1.2.2. Building Alpine](#122-building-alpine)
-    - [1.2.3. Building NetBSD](#123-building-netbsd)
-    - [1.2.4. Building FreeBSD](#124-building-freebsd)
-    - [1.2.5. Building QNX](#125-building-qnx)
+  - [1.1. Configuring Podman the First Time](#11-configuring-podman-the-first-time)
+  - [1.2. Using the build.sh script](#12-using-the-buildsh-script)
+  - [1.3. Removing ALL podman containers](#13-removing-all-podman-containers)
+  - [1.4. Using build.sh](#14-using-buildsh)
+    - [1.4.1. Building using an Ubuntu Container](#141-building-using-an-ubuntu-container)
+    - [1.4.2. Building Alpine](#142-building-alpine)
+    - [1.4.3. Building NetBSD](#143-building-netbsd)
+      - [1.4.3.1. Build Failures from Ubuntu Jammy](#1431-build-failures-from-ubuntu-jammy)
+      - [1.4.3.2. Using the Clang Toolchain](#1432-using-the-clang-toolchain)
+    - [1.4.4. Building FreeBSD](#144-building-freebsd)
+    - [1.4.5. Building QNX](#145-building-qnx)
 - [2. Building using Makefile](#2-building-using-makefile)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
 
@@ -21,7 +24,60 @@ that installs the necessary build tools.
 It is used to simplify the testing of the repository against current and older
 (supported) distributions.
 
-### 1.1. Using the build.sh script
+### 1.1. Configuring Podman the First Time
+
+If you've never used podman, these instructions provide a quick set up guide.
+This is tested on Ubuntu 22.04, 26.04.
+
+1. Install podman for your Ubuntu machine
+
+   ```sh
+   # apt install podman
+   ```
+
+2. Check the `subuid` and `subgid` files.
+
+   Check the contents of the file. You might see a default for your machine,
+   here the default user is `user`:
+
+   ```sh
+   # cat /etc/subuid
+   user:100000:65536
+   # cat /etc/subgid
+   user:100000:65536
+   ```
+
+   If it's empty, then you have no defaults. Choose the first range. For
+   example, if empty, then `100000-165535`, or in the example above,
+   `200000-265535`.
+
+   The `sub*` means "subordinate".
+
+3. Add a new range. The user being added here is `jcurl`. Replace this with your
+   own user.
+
+   ```sh
+   # usermod --add-subuids 200000-265535 --add-subgids  200000-265535 jcurl
+   ```
+
+4. Check the updates were done.
+
+   ```sh
+   # cat /etc/subuid
+   user:100000:65536
+   jcurl:200000:65536
+   # cat /etc/subgid
+   user:100000:65536
+   jcurl:200000:65536
+   ```
+
+5. Finish the update
+
+   ```sh
+   $ podman system migrate
+   ```
+
+### 1.2. Using the build.sh script
 
 To see how to use the `build.sh` script, run the current version with the help
 option.
@@ -32,7 +88,7 @@ $ ./build.sh -?
 
 It will provide you instructions on its use.
 
-#### 1.1.1. Removing ALL podman containers
+### 1.3. Removing ALL podman containers
 
 If your machine is only uses podman for this repository, you can easily remove
 all containers on podman with this instruction:
@@ -55,9 +111,9 @@ Dockerfiles may not work! This is due to changes on how external resources
 manage their URLs and package dependencies (e.g. with `alpine-latest` image,
 packages may be refactored at any time, less likely with the `ubuntu-*` images).
 
-### 1.2. Using build.sh
+### 1.4. Using build.sh
 
-#### 1.2.1. Building Ubuntu
+#### 1.4.1. Building using an Ubuntu Container
 
 The `build.sh` script can be run that:
 
@@ -71,9 +127,9 @@ For example:
 
 ```sh
 jcurl@localhost$ build.sh -cjammy -i
-jcurl@180ae061e343$ cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release
-jcurl@180ae061e343$ make -j8
-jcurl@180ae061e343$ make clangformat
+jcurl@ubuntu-jammy-06747d$ cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release
+jcurl@ubuntu-jammy-06747d$ make -j8
+jcurl@ubuntu-jammy-06747d$ make clangformat
 ```
 
 Or to build on a single command line
@@ -95,7 +151,7 @@ populate the repository. Note, that running in root mode will let you modify the
 container, but the `build.sh` script uses the `--rm` option to delete the
 container when finished, so your results are not persisted.
 
-#### 1.2.2. Building Alpine
+#### 1.4.2. Building Alpine
 
 Alpine is an alternative distribution with a smaller footprint. It always builds
 against latest (so you'll need to remove the image and rebuild at periodic
@@ -118,7 +174,7 @@ $ podman image rm coderesearch:alpine-latest
 
 Then on the next invocation of the `Makefile`, the image will be regenerated.
 
-#### 1.2.3. Building NetBSD
+#### 1.4.3. Building NetBSD
 
 NetBSD supports a large number of target architectures. It is interesting as the
 network stack `io-pkt` from QNX is similar to NetBSD.
@@ -146,7 +202,40 @@ system](https://www.netbsd.org/docs/guide/en/chap-fetch.html). It should be
 trivial to extend the Dockerfile to support other architectures (e.g. MIPS,
 SH4), but ARM64 bit is chosen to compare on the Raspbery Pi 4.
 
-#### 1.2.4. Building FreeBSD
+##### 1.4.3.1. Build Failures from Ubuntu Jammy
+
+The current podman/docker container pulls Ubuntu 24.04 (Noble). When building
+from Ubuntu 24.04 or 26.04, the build of NetBSD toolchain works as expected.
+
+When building from Ubuntu 22.04, permission errors occur.
+
+The workaround is to build the podman container on Ubuntu 26.04, and then copy
+it to an Ubuntu 22.04 machine.
+
+After building on Ubuntu 26.04, back up the podman container as such:
+
+```sh
+$ podman save coderesearch:netbsd-10.1 | gzip -9 >netbsd10.1.tar.gz
+```
+
+Copy this to the Ubuntu 22.04 image, and restore it:
+
+```sh
+gunzip -c netbsd-10.1.tar.gz | podman load
+```
+
+Else you can modify the Docker container file `docker/netbsd-docker` to use
+Ubuntu Jammy as the base image, which works. This results in an older version of
+Clang-Tidy for tests and may not be as reliable as the one in Noble.
+
+##### 1.4.3.2. Using the Clang Toolchain
+
+There is a toolchain file for this project that uses the Clang toolchain from
+Ubuntu Noble (clang 18.1.3). The advantage of using a clang toolchain is that is
+allows seemless integration with the CMake implementation of clang-tidy. Thus,
+the NetBSD sources can also be checked against clang-tidy.
+
+#### 1.4.4. Building FreeBSD
 
 FreeBSD is not as minimalistic as NetBSD and has a few forks and more software
 support, but supports fewer targets. It is interesting as the network stack
@@ -162,7 +251,7 @@ $ ./build.sh -dfreebsd -c14.2
 The `Makefile` and toolchain file `freebsd14.2-aarch64.cmake` depend on version
 14.2.
 
-#### 1.2.5. Building QNX
+#### 1.4.5. Building QNX
 
 These instructions have been tested on QNX 7.1 and QNX 8.0. The QNX installation
 is *mounted* into the container, and not copied. This speeds up significantly
