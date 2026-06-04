@@ -176,15 +176,17 @@ auto perror(const std::string &msg) -> void;
 // This works, because the signature is the same. Compilers shouldn't complain
 // if there is a redefinition.
 
-/// @brief Copy src to string dst of size siz.
+/// @brief Copy src to string dst of length size.
 ///
-/// At most siz-1 characters will be copied.  Always NUL terminates (unless siz
+/// At most size-1 characters will be copied. Always NUL terminates (unless size
 /// == 0).
 ///
 /// Note: this function is safe if only src is the same size or larger than dst.
 /// If src is not NUL-terminated, out of bounds access can occur in src while
 /// copying to dst. Use with std::string.c_str(), but not with
-/// std::string_view.c_str().
+/// std::string_view.c_str(). If used with std::string_view.c_str(), then set
+/// the size to be the length of the string_view and add the NUL-terminator
+/// explicitly if less than the length of dst.
 ///
 /// @param dst The destination string to copy to.
 ///
