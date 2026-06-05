@@ -23,6 +23,7 @@
     - [2.2.4. List QNX Files](#224-list-qnx-files)
     - [2.2.5. List Shared Memory](#225-list-shared-memory)
     - [2.2.6. List Interfaces and IPv4 Addresses](#226-list-interfaces-and-ipv4-addresses)
+    - [2.2.7. Simple Discovery Daemon](#227-simple-discovery-daemon)
 - [3. Further Benchmarks for Testing](#3-further-benchmarks-for-testing)
   - [3.1. String Interning](#31-string-interning)
   - [3.2. Conversion of Hexadecimal String to Integer](#32-conversion-of-hexadecimal-string-to-integer)
@@ -256,6 +257,14 @@ Other Platforms:
 - (/) Cygwin (Windows): Gets the alias names from the GUIDs. No VLANs.
 - (/) NetBSD 10.1: Works.
 - (/) FreeBSD 14.2: Works.
+
+#### 2.2.7. Simple Discovery Daemon
+
+A tiny tool to emit over UDP multicast host IP address and name.
+
+- Tool `sdd`
+- Supported: Linux, FreeBSD, NetBSD, Cygwin, QNX 7.1, QNX 8.0
+- [Documentation](./tools/sdd.md)
 
 ## 3. Further Benchmarks for Testing
 
