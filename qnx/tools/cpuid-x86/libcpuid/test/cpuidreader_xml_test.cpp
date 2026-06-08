@@ -275,6 +275,8 @@ TEST(cpuidreader_xml, one_core_valid_line_space3) {
 TEST(cpuidreader_xml, one_core_valid_line_ff) {
   std::filesystem::path xml_file =
       ubench::os::get_executable_path() / "test_assets" / "valid_line_ff.xml";
+  if (!has_cpuid_driver(xml_file)) GTEST_SKIP() << "No XML supported";
+
   one_core_valid_line(xml_file);
 
   cpuidreader_xml cpu{xml_file.string()};
