@@ -1,0 +1,46 @@
+@startuml json_writer
+
+class json_writer {
+    +json_writer(file_name: string_view)
+    +json_writer(stream: ostream&)
+    +~json_writer()
+    ---
+    +write_object(): json_writer_object
+    +write_array(): json_writer_array
+    +close()
+}
+
+class json_writer_object {
+    +~json_writer_object()
+    ---
+    +write_object(key: string_view): json_writer_object
+    +write_array(key: string_view): json_writer_array
+    +write_value(key: string_view, value: string_view)
+    +<<T: is_integer>>\nwrite_value(key: string_view, value: T)
+    +write_bool(key: string_view, value: bool)
+    +write_null(key: string_view)
+    +close()
+}
+
+class json_writer_array {
+    +~json_writer_array()
+    ---
+    +write_object(): json_writer_object
+    +write_array(): json_writer_array
+    +write_value(value: string_view)
+    +<<T: is_integer>>\nwrite_value(value: T)
+    +write_bool(value: bool)
+    +write_null()
+    +close()
+}
+
+class json_writer_context
+
+json_writer *-r- json_writer_context
+json_writer ..d.> json_writer_object : <<create>>
+json_writer ..d.> json_writer_array : <<create>>
+
+json_writer_object o-u- json_writer_context
+json_writer_array o-u- json_writer_context
+
+@enduml

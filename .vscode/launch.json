@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug cpuid_test",
+            "name": "Debug libsjson_test",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "Build (Debug)",
-            "program": "${workspaceRoot}/qnx/build/linux-debug/tools/cpuid-x86/libcpuid/test/cpuid_test",
+            "program": "${workspaceRoot}/qnx/build/linux-debug/tools/sdd/libsjson/test/libsjson_test",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}/qnx/build/linux-debug/tools/cpuid-x86/libcpuid/test",
+            "cwd": "${workspaceRoot}/qnx/build/linux-debug/tools/sdd/libsjson/test",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -26,8 +26,13 @@
                     "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "Enable skipping built-in libraries when single stepping code",
+                    "text": "-interpreter-exec console \"skip -rfu ^(std::|testing::)\"",
+                    "ignoreFailures": true
                 }
-            ]
+            ],
         },
     ]
 }

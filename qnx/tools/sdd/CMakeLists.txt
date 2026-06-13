@@ -1,3 +1,5 @@
+add_subdirectory(libsjson)
+
 set(BINARY sdd)
 set(SOURCES
     sdd.cpp
