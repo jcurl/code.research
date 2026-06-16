@@ -29,7 +29,6 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} bpf_udp4.use DESCRIPTION "POC Sending UDPv4 packetsl")
 
 target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

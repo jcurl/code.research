@@ -49,5 +49,3 @@ target_code_coverage(${BINARY}
     ${CMAKE_SOURCE_DIR}/test/*
     ${CMAKE_BINARY_DIR}/build/*
 )
-
-target_clangformat(TARGET ${BINARY} DIR_RECURSE .)

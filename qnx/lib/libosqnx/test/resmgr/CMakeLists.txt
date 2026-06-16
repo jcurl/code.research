@@ -20,5 +20,3 @@ add_test(NAME ${RESTEST_BINARY} COMMAND ${RESTEST_BINARY})
 if(IS_DEBUG)
     add_sanitizers(${DEVMGR_BINARY})
 endif()
-
-target_clangformat(TARGET rsrc_mgr DIR .)

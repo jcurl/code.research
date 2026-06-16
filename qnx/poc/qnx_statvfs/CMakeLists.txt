@@ -16,7 +16,6 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} qnx_statvfs.use DESCRIPTION "POC for getting block statistics")
 
 install(TARGETS ${BINARY} DESTINATION bin)

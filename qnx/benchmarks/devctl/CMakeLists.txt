@@ -17,5 +17,3 @@ target_use_msg(${ADDER_BINARY} adder.use DESCRIPTION "Uses dev-adder to test spe
 if(IS_DEBUG)
     add_sanitizers(${DEVADDER_BINARY})
 endif()
-
-target_clangformat(TARGET ${ADDER_BINARY} DIR .)

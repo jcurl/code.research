@@ -16,6 +16,10 @@ clang: alpine-latest-clang ubuntu-resolute-clang ubuntu-noble-clang ubuntu-jammy
 .PHONY: all
 all: linux netbsd freebsd
 
+# Defining clangformat in a podman container ensures consistent formatting across all platforms.
+clangformat:
+	@./build.sh -dubuntu -cjammy -S -Bclangformat "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . --target clangformat"
+
 NUM_CPUS := $(shell nproc)
 
 alpine-latest-clang:

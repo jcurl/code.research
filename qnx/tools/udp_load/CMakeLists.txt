@@ -48,7 +48,6 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} udp_load.use DESCRIPTION "UDP Stress Test tool")
 
 target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
