@@ -36,7 +36,6 @@ if(IS_DEBUG)
     add_sanitizers(${STRINTERN_BINARY})
 endif()
 
-target_clangformat(TARGET ${STRINTERN_BINARY} DIR .)
 target_use_msg(${STRINTERN_BINARY} str_intern.use DESCRIPTION "String intern benchmark")
 
 target_include_directories(${STRINTERN_BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

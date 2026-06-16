@@ -13,8 +13,3 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.22")
 endif()
 
 target_include_directories(${LIBRARY} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-
-# We don't want to format these files, to keep them similar to the original to
-# make it easier to compare.
-#
-# target_clangformat(TARGET ${LIBRARY})

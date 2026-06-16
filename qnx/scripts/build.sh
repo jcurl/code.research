@@ -16,9 +16,11 @@ REBUILD=0
 DEBUG=0
 DOCKERFILE=
 BUILDARGS=
+SOURCE="ro"
+BUILDDIR=
 
 CODENAMESET=0
-OPTSTRING="b:c:d:firs:v:D?"
+OPTSTRING="b:c:d:firs:v:D?SB:"
 while getopts $OPTSTRING OPTION; do
   case $OPTION in
   i)
@@ -57,6 +59,12 @@ while getopts $OPTSTRING OPTION; do
     DEBUG=1
     REBUILD=1
     ;;
+  S)
+    SOURCE="rw"
+    ;;
+  B)
+    BUILDDIR=$OPTARG
+    ;;
   ?)
     echo "build.sh -i [-r] [-d DISTRO] [-c CODENAME] [-v VAR]"
     echo "  Run in interactive mode for Ubuntu container \$CODENAME"
@@ -77,6 +85,8 @@ while getopts $OPTSTRING OPTION; do
     echo "      dropped when finished, so changes are not permanent."
     echo " -s - Override docker script file."
     echo " -b - Provide docker buildargs."
+    echo " -S - Source should be r/w. Useful for clangformat."
+    echo " -B - Override build directory name."
     echo ""
     echo " -f - Force rebuild. If the container exists, try to rebuild again anyway"
     echo " -D - Debug. Don't squash the container. Implies '-f' to force rebuild on"
@@ -173,8 +183,6 @@ else
   ROOTOPT="--userns=keep-id"
   if [ ${INTERACTIVE} -ne 0 ]; then
     SOURCE="rw"
-  else
-    SOURCE="ro"
   fi
   PODMAN_HOME="/home/user"
   PODMAN_USERNAME="$USER"
@@ -183,11 +191,12 @@ fi
 # Create the build directory where to put the build results. We don't leave the
 # results in the podman container, but outside, so that it can be inspected, or
 # copied to the target.
-BUILDDIR=""
-if [ -z "$VARIANT" ]; then
-  BUILDDIR="$PODVERSION"
-else
-  BUILDDIR="$PODVERSION-$VARIANT"
+if [ -z "$BUILDDIR" ]; then
+  if [ -z "$VARIANT" ]; then
+    BUILDDIR="$PODVERSION"
+  else
+    BUILDDIR="$PODVERSION-$VARIANT"
+  fi
 fi
 
 if [ ! -e "$BASEDIR/qnx/build/$BUILDDIR" ]; then

@@ -20,6 +20,4 @@ target_code_coverage(${BINARY}
     ${CMAKE_BINARY_DIR}/build/*
 )
 
-target_clangformat(TARGET ${BINARY} DIR .)
-
 add_subdirectory(resmgr)

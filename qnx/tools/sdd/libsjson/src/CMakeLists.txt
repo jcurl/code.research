@@ -18,5 +18,3 @@ target_include_directories(${LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../incl
 if(IS_DEBUG)
     add_sanitizers(${LIBRARY})
 endif()
-
-target_clangformat(TARGET ${LIBRARY} DIR_RECURSE . DIR_RECURSE ../include/sjson)

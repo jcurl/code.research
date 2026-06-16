@@ -54,7 +54,6 @@ endif()
 
 check_symbol_exists(mlockall "sys/mman.h" HAVE_MLOCKALL)
 
-target_clangformat(TARGET ${BINARY} DIR .)
 target_use_msg(${BINARY} malloc_bench.use DESCRIPTION "Google Benchmark for malloc() performance")
 
 target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

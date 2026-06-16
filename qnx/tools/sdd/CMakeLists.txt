@@ -16,7 +16,6 @@ if(IS_DEBUG)
     add_sanitizers(${BINARY})
 endif()
 
-target_clangformat(TARGET ${BINARY} DIR_RECURSE .)
 target_use_msg(${BINARY} sdd.use DESCRIPTION "Simple Discovery Daemon")
 
 install(TARGETS ${BINARY} DESTINATION bin)

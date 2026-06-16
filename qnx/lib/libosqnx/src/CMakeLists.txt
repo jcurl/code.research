@@ -23,5 +23,3 @@ endif()
 if(IS_DEBUG)
     add_sanitizers(${LIBRARY})
 endif()
-
-target_clangformat(TARGET ${LIBRARY} DIR . DIR_RECURSE ../include/osqnx resmgr)
