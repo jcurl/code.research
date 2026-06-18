@@ -61,6 +61,12 @@ class token_t {
 
 }  // namespace detail
 
+/// @brief Configuration on how to write JSON snippets.
+struct json_writer_config {
+  /// @brief If the solidus '/' should be escaped, default as per the RFC.
+  bool escape_solidus{true};
+};
+
 // Forward declarations
 class json_writer_object;
 class json_writer_array;
@@ -77,6 +83,13 @@ class json_writer {
   json_writer(json_writer&&) noexcept = default;
   auto operator=(json_writer&&) noexcept -> json_writer& = default;
   ~json_writer() { close(); }
+
+  /// @brief Configuration on how to write snippets
+  ///
+  /// This configuration must be set before the the first write.
+  ///
+  /// @return The configuration that it can be modified.
+  auto config() -> json_writer_config& { return config_; }
 
   /// @brief Create a new instance writing to file_name.
   ///
@@ -124,6 +137,7 @@ class json_writer {
   std::shared_ptr<detail::json_writer_context> context_{};
   detail::token_t token_{};
   bool root_populated_{false};
+  json_writer_config config_{};
 };
 
 /// @brief The root JSON writer that can write objects.

@@ -234,3 +234,40 @@ TEST(sjson, complex_object) {
   EXPECT_EQ(ss.str(),
       R"({ "host": "netbsd-arm64-rpi4", "domain": "home.lan", "interfaces": { "eth0": { "ipv4": [ "192.168.1.15\/24", "169.254.234.23\/16" ] }, "lo0": { "ipv4": [ "127.0.0.1\/8" ] } } })");
 }
+
+TEST(sjson, complex_object_no_solidus_escape) {
+  std::stringstream ss;
+
+  // The braces which define scope cause the block to terminate by appending the
+  // appropriate array/object end character. Saves having to explicitly write
+  // ex.close() because it is closed automatically when going out of scope.
+  {
+    ubench::sjson::json_writer json_writer{ss};
+    json_writer.config().escape_solidus = false;
+    {
+      auto e1 = json_writer.write_object();
+      e1.write_value("host", "netbsd-arm64-rpi4");
+      e1.write_value("domain", "home.lan");
+      {
+        auto e2 = e1.write_object("interfaces");
+        {
+          auto e3 = e2.write_object("eth0");
+          {
+            auto e4 = e3.write_array("ipv4");
+            e4.write_value("192.168.1.15/24");
+            e4.write_value("169.254.234.23/16");
+          }
+        }
+        {
+          auto e5 = e2.write_object("lo0");
+          {
+            auto e6 = e5.write_array("ipv4");
+            e6.write_value("127.0.0.1/8");
+          }
+        }
+      }
+    }
+  }
+  EXPECT_EQ(ss.str(),
+      R"({ "host": "netbsd-arm64-rpi4", "domain": "home.lan", "interfaces": { "eth0": { "ipv4": [ "192.168.1.15/24", "169.254.234.23/16" ] }, "lo0": { "ipv4": [ "127.0.0.1/8" ] } } })");
+}

@@ -171,6 +171,17 @@ TEST(sjson, escape_value_array_forwardslash) {
   EXPECT_EQ(ss.str(), R"([ "\/usr\/bin\/ls" ])");
 }
 
+TEST(sjson, escape_value_array_forwardslash_disabled) {
+  std::stringstream ss;
+  ubench::sjson::json_writer json_writer{ss};
+  json_writer.config().escape_solidus = false;
+  auto e1 = json_writer.write_array();
+  e1.write_value("/usr/bin/ls");
+  e1.close();
+  json_writer.close();
+  EXPECT_EQ(ss.str(), R"([ "/usr/bin/ls" ])");
+}
+
 TEST(sjson, escape_value_array_backspace) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};

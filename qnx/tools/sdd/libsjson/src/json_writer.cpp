@@ -55,6 +55,7 @@ json_writer::json_writer(std::ostream& ostream) {
 auto json_writer::write_object() -> json_writer_object {
   if (root_populated_)
     throw json_writer_error("Only a single root element supported");
+  context_->config() = config_;
   root_populated_ = true;
   detail::token_t new_token = context_->register_context(token_);
   return {new_token, context_};
@@ -63,6 +64,7 @@ auto json_writer::write_object() -> json_writer_object {
 auto json_writer::write_array() -> json_writer_array {
   if (root_populated_)
     throw json_writer_error("Only a single root element supported");
+  context_->config() = config_;
   root_populated_ = true;
   detail::token_t new_token = context_->register_context(token_);
   return {new_token, context_};

@@ -83,6 +83,7 @@ auto payload::generate() -> std::string {
   auto ss = std::stringstream{};
   {
     auto writer = ubench::sjson::json_writer(ss);
+    writer.config().escape_solidus = false;
     {
       auto block = writer.write_object();
       create_net_block(block);

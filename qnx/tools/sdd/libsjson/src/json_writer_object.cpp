@@ -1,5 +1,4 @@
 #include "sjson/json_writer.h"
-#include "json_utils.h"
 #include "json_writer_context.h"
 
 namespace ubench::sjson {
@@ -61,7 +60,7 @@ auto json_writer_object::write_new_field(std::string_view key) -> void {
     has_element_ = true;
   }
 
-  context_->write(token_, detail::json_escape_string(key));
+  context_->write(token_, context_->json_escape_string(key));
   context_->write(token_, "\": ");
 }
 
@@ -76,7 +75,7 @@ auto json_writer_object::write_value_quoted(
     std::string_view key, std::string_view value) -> void {
   write_new_field(key);
   context_->write(token_, "\"");
-  context_->write(token_, detail::json_escape_string(value));
+  context_->write(token_, context_->json_escape_string(value));
   context_->write(token_, "\"");
 }
 

@@ -6,8 +6,6 @@ set(SOURCES
     json_writer_context.cpp
     json_writer_array.cpp
     json_writer_object.cpp
-    json_utils.h
-    json_utils.cpp
 )
 
 add_library(${LIBRARY} STATIC ${SOURCES})

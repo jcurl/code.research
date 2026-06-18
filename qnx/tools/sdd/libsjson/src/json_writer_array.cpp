@@ -1,5 +1,4 @@
 #include "sjson/json_writer.h"
-#include "json_utils.h"
 #include "json_writer_context.h"
 
 namespace ubench::sjson {
@@ -66,7 +65,7 @@ auto json_writer_array::write_value_quoted(std::string_view value) -> void {
   write_new_field();
   context_->write(token_, "\"");
   // TODO: Should escape the string as we write.
-  context_->write(token_, detail::json_escape_string(value));
+  context_->write(token_, context_->json_escape_string(value));
   context_->write(token_, "\"");
 }
 
