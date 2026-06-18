@@ -454,6 +454,16 @@ class interface {
 [[nodiscard]] auto query_net_interface(std::string name)
     -> const std::optional<interface>;
 
+/// @brief Get the machine host name.
+///
+/// @return The host name, if it could be retrieved.
+[[nodiscard]] auto gethostname() -> std::optional<std::string>;
+
+/// @brief Get teh machine domain name
+///
+/// @return The domain name, if it could be retrieved
+[[nodiscard]] auto getdomainname() -> std::optional<std::string>;
+
 }  // namespace ubench::net
 
 /// @brief Write to the string representation of the IPv4 address and port.

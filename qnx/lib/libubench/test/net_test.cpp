@@ -257,3 +257,18 @@ TEST(ubench_net, parse_sockaddr_invalid4) {
 
   ASSERT_FALSE(ubench::net::parse_sockaddr("127.0.0.1:0:1", ipv4addr));
 }
+
+TEST(ubench_net, gethostname) {
+  auto hostname = ubench::net::gethostname();
+  ASSERT_TRUE(hostname.has_value());
+  if (hostname) {
+    ASSERT_GT(hostname->length(), 0);
+  }
+}
+
+TEST(ubench_net, getdomainname) {
+  auto domainname = ubench::net::getdomainname();
+  if (domainname) {
+    ASSERT_GT(domainname->length(), 0);
+  }
+}
