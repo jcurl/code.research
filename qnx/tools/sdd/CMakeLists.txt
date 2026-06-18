@@ -5,12 +5,15 @@ set(SOURCES
     sdd.cpp
     options.h
     options.cpp
+    payload.h
+    payload.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
 target_link_libraries(${BINARY} PRIVATE libubench)
 target_link_libraries(${BINARY} PRIVATE libstdext)
+target_link_libraries(${BINARY} PRIVATE libsjson)
 
 if(IS_DEBUG)
     add_sanitizers(${BINARY})

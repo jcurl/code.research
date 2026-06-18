@@ -2,6 +2,7 @@
 
 #include "ubench/net.h"
 #include "options.h"
+#include "payload.h"
 
 auto main(int argc, char* argv[]) -> int {
   auto options = make_options(argc, argv);
@@ -12,5 +13,9 @@ auto main(int argc, char* argv[]) -> int {
   std::cout << "Destination: " << ubench::net::inet_ntos(options->dest_addr())
             << std::endl;
   std::cout << "Interval: " << options->interval().count() << "ms" << std::endl;
+
+  auto p = payload{};
+  std::cout << p.generate();
+
   return 0;
 }

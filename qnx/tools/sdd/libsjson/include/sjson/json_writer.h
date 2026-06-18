@@ -188,7 +188,11 @@ class json_writer_object {
   template <typename T,
       typename = std::void_t<decltype(std::to_string(std::declval<T>()))>>
   auto write_value(std::string_view key, T value) -> void {
-    write_value_unquoted(key, std::to_string(value));
+    if constexpr (std::is_integral_v<T>) {
+      write_value_unquoted(key, std::to_string(value));
+    } else {
+      write_value_quoted(key, std::to_string(value));
+    }
   }
 
   /// @brief Write a boolean value.
@@ -275,7 +279,11 @@ class json_writer_array {
   template <typename T,
       typename = std::void_t<decltype(std::to_string(std::declval<T>()))>>
   auto write_value(T value) -> void {
-    write_value_unquoted(std::to_string(value));
+    if constexpr (std::is_integral_v<T>) {
+      write_value_unquoted(std::to_string(value));
+    } else {
+      write_value_quoted(std::to_string(value));
+    }
   }
 
   /// @brief Write a boolean value.
