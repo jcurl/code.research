@@ -17,6 +17,8 @@ namespace std {
 auto to_string(const if_ipv4& addr) -> std::string {
   int netmask = -1;
   if (addr.netmask()) {
+    // False positive.
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     in_addr_t n = ntohl(addr.netmask()->s_addr);
 
     // Count consecutive set bits from MSB, stopping at first zero bit
@@ -49,12 +51,18 @@ namespace {
 auto create_net_iface(json_writer_object& block_iface, const interface& iface)
     -> void {
   if (iface.vlan().has_value()) {
+    // False positive.
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     block_iface.write_value("vlan", iface.vlan()->id);
   }
   if (iface.hw_addr().has_value()) {
+    // False positive.
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     block_iface.write_value("mac", *iface.hw_addr());
   }
   if (iface.mtu()) {
+    // False positive.
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     block_iface.write_value("mtu", *iface.mtu());
   }
   auto block_ipv4 = block_iface.write_array("ipv4");
@@ -65,8 +73,17 @@ auto create_net_iface(json_writer_object& block_iface, const interface& iface)
 
 // Writes the "interfaces" block in an object.
 auto create_net_block(json_writer_object& block) -> void {
-  auto block_ifaces = block.write_object("interfaces");
+  const auto hostname = gethostname();
+  if (hostname) {
+    block.write_value("host", *hostname);
+  }
 
+  const auto domainname = getdomainname();
+  if (domainname) {
+    block.write_value("domain", *domainname);
+  }
+
+  auto block_ifaces = block.write_object("interfaces");
   auto interfaces = ubench::net::query_net_interfaces();
   for (const auto& [name, iface] : interfaces) {
     const auto active = if_flags::UP | if_flags::RUNNING;
