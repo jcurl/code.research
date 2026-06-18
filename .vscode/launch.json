@@ -34,5 +34,35 @@
                 }
             ],
         },
+        {
+            "name": "Debug sdd",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "Build (Debug)",
+            "program": "${workspaceRoot}/qnx/build/linux-debug/tools/sdd/sdd",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/qnx/build/linux-debug/tools/sdd",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable skipping built-in libraries when single stepping code",
+                    "text": "-interpreter-exec console \"skip -rfu ^(std::|testing::)\"",
+                    "ignoreFailures": true
+                }
+            ],
+        },
     ]
 }
