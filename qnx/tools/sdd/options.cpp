@@ -33,6 +33,45 @@ void print_help(std::string_view prog_name) {
   std::cout << " -? - Display this help." << std::endl;
 }
 
+auto parse_iface(std::string_view arg, sockaddr_in& addr) -> bool {
+  auto port_sep = arg.find_last_of(':');
+
+  std::string addrstr{};
+  if (port_sep != std::string_view::npos) {
+    if (arg.size() < port_sep - 1) return false;
+
+    std::string_view portstr = arg.substr(port_sep + 1);
+    auto port = ubench::string::parse_int<std::uint16_t>(portstr);
+    if (!port) return false;
+    addr.sin_port = htons(*port);
+
+    // Get a NUL-terminated string. The value `port_sep` is guaranteed to be
+    // to be within the bounds of the string.
+    //
+    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
+    addrstr = std::string{arg.data(), port_sep};
+  } else {
+    addr.sin_port = 0;
+    // arg may not be NUL terminated. Ensure it is.
+    addrstr = std::string{arg.data(), arg.size()};
+  }
+
+  addr.sin_family = AF_INET;
+  if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) == 1) return true;
+
+  // Not an IPv4 address. Check if it is an interface, and get the first IPv4
+  // address from that.
+  auto piface = ubench::net::query_net_interface(addrstr);
+  if (piface) {
+    if (!piface->inet().empty()) {
+      addr.sin_addr = piface->inet()[0].addr();
+      return true;
+    }
+  }
+
+  return false;
+}
+
 }  // namespace
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
@@ -65,11 +104,11 @@ auto make_options(int argc, char* const argv[]) noexcept
         case 'S': {
           // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           auto arg = *opt->argument();
-          if (!ubench::net::parse_sockaddr(std::string_view{arg}, o.source_)) {
-            std::cerr << "Error: Invalid source address - " << arg << std::endl;
-            return stdext::unexpected{1};
+          if (parse_iface(std::string_view{arg}, o.source_)) {
+            break;
           }
-          break;
+          std::cerr << "Error: Invalid source address - " << arg << std::endl;
+          return stdext::unexpected{1};
         }
         case 'D': {
           // NOLINTNEXTLINE(bugprone-unchecked-optional-access)

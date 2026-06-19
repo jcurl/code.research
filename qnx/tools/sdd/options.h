@@ -22,6 +22,12 @@ class options {
   /// This is the '-S ipv4addr:port' option. The port is optional and zero will
   /// be returned if not provided, which code should choose a suitable default.
   ///
+  /// If the user provided an interface name, such as "eth0", then the first IP
+  /// address on that interface is returned. Note, that this check is done only
+  /// at the time the program runs. If the DHCP address changes, then the
+  /// program will need to be stopped and restarted, because it won't
+  /// dynamically update for a change to DHCP addresses.
+  ///
   /// @return The user provided source port and address. If any parameter is not
   /// provided, the field contains 0. Code should determine a suitable default
   /// for itself.
