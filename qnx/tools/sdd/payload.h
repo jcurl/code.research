@@ -16,6 +16,7 @@ auto to_string(const ubench::net::ether_addr& addr) -> std::string;
 /// @brief Class to maintain state for generating a UDP payload for discovery.
 class payload {
  public:
+  payload(const sockaddr_in& bind);
   payload(const payload&) = delete;
   auto operator=(const payload&) -> payload& = delete;
   payload(payload&&) noexcept = default;
@@ -28,6 +29,8 @@ class payload {
   auto generate() -> std::string;
 
  private:
+  sockaddr_in bind_{};
+  unsigned int mtu_{};
 };
 
 #endif

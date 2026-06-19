@@ -14,7 +14,7 @@ auto main(int argc, char* argv[]) -> int {
             << std::endl;
   std::cout << "Interval: " << options->interval().count() << "ms" << std::endl;
 
-  auto p = payload{};
+  auto p = payload{options->source_addr()};
   std::cout << p.generate();
 
   return 0;

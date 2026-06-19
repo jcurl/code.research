@@ -96,6 +96,22 @@ auto create_net_block(json_writer_object& block) -> void {
 
 }  // namespace
 
+payload::payload(const sockaddr_in& bind) : bind_{bind} {
+  auto interfaces = ubench::net::query_net_interfaces();
+
+  for (const auto& [_, iface] : interfaces) {
+    for (const auto& ipv4 : iface.inet()) {
+      if (ipv4.addr().s_addr == bind.sin_addr.s_addr) {
+        if (iface.mtu()) {
+          // False positive.
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          mtu_ = *iface.mtu();
+        }
+      }
+    }
+  }
+}
+
 auto payload::generate() -> std::string {
   auto ss = std::stringstream{};
   {
@@ -106,5 +122,12 @@ auto payload::generate() -> std::string {
       create_net_block(block);
     }
   }
-  return ss.str();
+
+  const std::string& payload = ss.str();
+  if (mtu_ && payload.length() <= mtu_ - 28) {
+    return ss.str();
+  }
+
+  // Payload too large.
+  return std::string{};
 }
