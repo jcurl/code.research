@@ -3,10 +3,9 @@ add_subdirectory(libsjson)
 set(BINARY sdd)
 set(SOURCES
     sdd.cpp
-    options.h
-    options.cpp
-    payload.h
-    payload.cpp
+    options.h options.cpp
+    payload.h payload.cpp
+    udp.h udp.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

@@ -46,7 +46,7 @@ class fdesc {
   /// @param fd the file descriptor to manage.
   ///
   /// @return this object that was assigned.
-  auto operator=(int fd) -> fdesc& {
+  auto operator=(int fd) noexcept -> fdesc& {
     close();
     fd_ = fd;
     return *this;
@@ -107,7 +107,7 @@ class fdesc {
   /// @return true if the handle was closed, false if it was already closed. If
   /// there was an error, it is ignored and it is assumed that the handle is now
   /// closed.
-  auto close() -> bool {
+  auto close() noexcept -> bool {
     bool is_opened{fd_ != -1};
     if (is_opened) ::close(fd_);
     fd_ = -1;
@@ -117,7 +117,7 @@ class fdesc {
   /// @brief Set this object to invalid, without closing the file descriptor.
   ///
   /// @return the file descriptor before it is reset.
-  auto reset() -> int {
+  auto reset() noexcept -> int {
     fd_ = -1;
     return fd_;
   }
