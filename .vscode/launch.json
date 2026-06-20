@@ -59,7 +59,7 @@
                 },
                 {
                     "description": "Enable skipping built-in libraries when single stepping code",
-                    "text": "-interpreter-exec console \"skip -rfu ^(std::|testing::)\"",
+                    "text": "-interpreter-exec console \"skip -rfu ^(std::|stdext::|testing::)\"",
                     "ignoreFailures": true
                 }
             ],
