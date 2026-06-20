@@ -1,8 +1,12 @@
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include "ubench/net.h"
+#include "ubench/string.h"
 #include "options.h"
 #include "payload.h"
+#include "udp.h"
 
 auto main(int argc, char* argv[]) -> int {
   auto options = make_options(argc, argv);
@@ -14,8 +18,18 @@ auto main(int argc, char* argv[]) -> int {
             << std::endl;
   std::cout << "Interval: " << options->interval().count() << "ms" << std::endl;
 
-  auto p = payload{options->source_addr()};
-  std::cout << p.generate();
+  payload p{};
+  auto ores = p.open(options->source_addr(), options->dest_addr());
+  if (!ores) return ores.error();
+
+  while (true) {
+    auto sres = p.send();
+    if (!sres) {
+      std::cout << "Error sending: " << ubench::string::perror(sres.error());
+      return sres.error();
+    }
+    std::this_thread::sleep_for(options->interval());
+  }
 
   return 0;
 }

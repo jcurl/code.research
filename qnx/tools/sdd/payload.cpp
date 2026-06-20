@@ -39,15 +39,15 @@ auto to_string(const if_ipv4& addr) -> std::string {
   }
 }
 
-auto to_string(const ubench::net::ether_addr& addr) -> std::string {
-  return ubench::net::ether_ntos(addr);
+auto to_string(const ether_addr& addr) -> std::string {
+  return ether_ntos(addr);
 }
 
 }  // namespace std
 
 namespace {
 
-// Writes the "ipv4" block in an object
+// Writes the "ipv4" block in a JSON object
 auto create_net_iface(json_writer_object& block_iface, const interface& iface)
     -> void {
   if (iface.vlan().has_value()) {
@@ -71,7 +71,7 @@ auto create_net_iface(json_writer_object& block_iface, const interface& iface)
   }
 }
 
-// Writes the "interfaces" block in an object.
+// Writes the "interfaces" block in a JSON object.
 auto create_net_block(json_writer_object& block) -> void {
   const auto hostname = gethostname();
   if (hostname) {
@@ -84,7 +84,7 @@ auto create_net_block(json_writer_object& block) -> void {
   }
 
   auto block_ifaces = block.write_object("interfaces");
-  auto interfaces = ubench::net::query_net_interfaces();
+  auto interfaces = query_net_interfaces();
   for (const auto& [name, iface] : interfaces) {
     const auto active = if_flags::UP | if_flags::RUNNING;
     if ((iface.status() & active) == active) {
@@ -96,22 +96,7 @@ auto create_net_block(json_writer_object& block) -> void {
 
 }  // namespace
 
-payload::payload(const sockaddr_in& bind) : bind_{bind} {
-  auto interfaces = ubench::net::query_net_interfaces();
-
-  for (const auto& [_, iface] : interfaces) {
-    for (const auto& ipv4 : iface.inet()) {
-      if (ipv4.addr().s_addr == bind.sin_addr.s_addr) {
-        if (iface.mtu()) {
-          // False positive.
-          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-          mtu_ = *iface.mtu();
-        }
-      }
-    }
-  }
-}
-
+// Generate a JSON object with network details.
 auto payload::generate() -> std::string {
   auto ss = std::stringstream{};
   {
@@ -123,11 +108,90 @@ auto payload::generate() -> std::string {
     }
   }
 
-  const std::string& payload = ss.str();
-  if (mtu_ && payload.length() <= mtu_ - 28) {
-    return ss.str();
+  return ss.str();
+}
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+auto payload::open(const sockaddr_in& bind, sockaddr_in dest)
+    -> stdext::expected<int, int> {
+  dest_ = dest;
+  if (!is_multicast(dest.sin_addr)) {
+    return stdext::unexpected{EINVAL};
   }
 
-  // Payload too large.
-  return std::string{};
+  int e = 0;
+  auto interfaces = query_net_interfaces();
+  for (const auto& [name, iface] : interfaces) {
+    const auto ready = if_flags::MULTICAST | if_flags::UP | if_flags::RUNNING;
+    const auto mask = ready | if_flags::LOOPBACK;
+
+    if ((iface.status() & mask) == ready) {
+      // Only use interfaces that are multicast and not loopback.
+      for (const auto& ipv4 : iface.inet()) {
+        if (bind.sin_addr.s_addr == INADDR_ANY ||
+            ipv4.addr().s_addr == bind.sin_addr.s_addr) {
+          iface_ctx in{};
+
+          if (iface.mtu()) {
+            // False positive.
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+            in.mtu_ = *iface.mtu();
+          }
+
+          in.udp_ = udp{};
+          sockaddr_in addr{};
+          addr.sin_family = bind.sin_family;
+          addr.sin_addr = ipv4.addr();
+          addr.sin_port = bind.sin_port;
+
+          if (in.udp_.open(addr)) {
+            bool success = true;
+
+            auto jresult = in.udp_.multicast_join(addr);
+            if (!jresult) {
+              success = false;
+              e = jresult.error();
+            }
+
+            if (success) {
+              auto tresult = in.udp_.set_multicast_ttl(1);
+              if (!tresult) {
+                success = false;
+                e = tresult.error();
+              }
+            }
+
+            if (success) {
+              auto hresult = in.udp_.ipv4hdr_length();
+              if (hresult) in.ipv4hdr_ = *hresult;
+            }
+
+            if (success) {
+              sockets_.push_back(std::move(in));
+            } else {
+              in.udp_.close();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (sockets_.empty()) return stdext::unexpected{e};
+  return sockets_.size();
+}
+
+auto payload::send() -> stdext::expected<void, int> {
+  auto p = generate();
+
+  int e = 0;
+  for (auto& ctx : sockets_) {
+    if (p.length() < ctx.mtu_ - ctx.ipv4hdr_) {
+      if (!ctx.udp_.send(dest_, p)) {
+        if (!e) e = errno;
+      }
+    }
+  }
+  if (e) return stdext::unexpected{e};
+  return {};
 }
