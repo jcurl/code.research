@@ -1,6 +1,8 @@
 #include "payload.h"
 
+#include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 #include "sjson/json_writer.h"
 
@@ -39,6 +41,11 @@ auto to_string(const if_ipv4& addr) -> std::string {
   }
 }
 
+/// @brief Converts an Ethernet interface to colon notation.
+///
+/// @param addr to convert.
+///
+/// @return a string representation of the address.
 auto to_string(const ether_addr& addr) -> std::string {
   return ether_ntos(addr);
 }
@@ -111,74 +118,76 @@ auto payload::generate() -> std::string {
   return ss.str();
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-auto payload::open(const sockaddr_in& bind, sockaddr_in dest)
-    -> stdext::expected<int, int> {
-  dest_ = dest;
+payload::payload(const sockaddr_in& dest) {
   if (!is_multicast(dest.sin_addr)) {
+    throw std::invalid_argument("Expected multicast destination");
+  }
+
+  // We throw away the cast, as it's not good having const private members in a
+  // class. It's a copy we make.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+  dest_ = const_cast<sockaddr_in&>(dest);
+}
+
+auto payload::open(const sockaddr_in& bind, unsigned int mtu)
+    -> stdext::expected<void, int> {
+  // Ensure it is valid.
+  if (bind.sin_addr.s_addr == INADDR_ANY ||
+      bind.sin_addr.s_addr == INADDR_NONE) {
     return stdext::unexpected{EINVAL};
   }
 
-  int e = 0;
-  auto interfaces = query_net_interfaces();
-  for (const auto& [name, iface] : interfaces) {
-    const auto ready = if_flags::MULTICAST | if_flags::UP | if_flags::RUNNING;
-    const auto mask = ready | if_flags::LOOPBACK;
-
-    if ((iface.status() & mask) == ready) {
-      // Only use interfaces that are multicast and not loopback.
-      for (const auto& ipv4 : iface.inet()) {
-        if (bind.sin_addr.s_addr == INADDR_ANY ||
-            ipv4.addr().s_addr == bind.sin_addr.s_addr) {
-          iface_ctx in{};
-
-          if (iface.mtu()) {
-            // False positive.
-            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-            in.mtu_ = *iface.mtu();
-          }
-
-          in.udp_ = udp{};
-          sockaddr_in addr{};
-          addr.sin_family = bind.sin_family;
-          addr.sin_addr = ipv4.addr();
-          addr.sin_port = bind.sin_port;
-
-          if (in.udp_.open(addr)) {
-            bool success = true;
-
-            auto jresult = in.udp_.multicast_join(addr);
-            if (!jresult) {
-              success = false;
-              e = jresult.error();
-            }
-
-            if (success) {
-              auto tresult = in.udp_.set_multicast_ttl(1);
-              if (!tresult) {
-                success = false;
-                e = tresult.error();
-              }
-            }
-
-            if (success) {
-              auto hresult = in.udp_.ipv4hdr_length();
-              if (hresult) in.ipv4hdr_ = *hresult;
-            }
-
-            if (success) {
-              sockets_.push_back(std::move(in));
-            } else {
-              in.udp_.close();
-            }
-          }
-        }
-      }
+  // Ensure it doesn't already exist.
+  for (auto& s : sockets_) {
+    if (s.src.sin_addr.s_addr == bind.sin_addr.s_addr &&
+        s.src.sin_port == bind.sin_port) {
+      s.active = true;
+      return stdext::unexpected{EEXIST};
     }
   }
 
-  if (sockets_.empty()) return stdext::unexpected{e};
-  return sockets_.size();
+  iface_ctx in{};
+  in.udp = udp{};
+  sockaddr_in addr{};
+  addr.sin_family = bind.sin_family;
+  addr.sin_addr = bind.sin_addr;
+  addr.sin_port = bind.sin_port;
+
+  auto oresult = in.udp.open(addr);
+  if (!oresult) return stdext::unexpected{oresult.error()};
+
+  auto jresult = in.udp.multicast_join(addr);
+  if (!jresult) return stdext::unexpected{jresult.error()};
+
+  auto tresult = in.udp.set_multicast_ttl(1);
+  if (!tresult) return stdext::unexpected{tresult.error()};
+
+  if (mtu) {
+    in.mtu = mtu;
+    auto hresult = in.udp.ipv4hdr_length();
+    if (hresult) in.ipv4hdr = *hresult;
+  }
+
+  in.src = bind;
+  in.active = true;
+  sockets_.push_back(std::move(in));
+  return {};
+}
+
+auto payload::close(const sockaddr_in& bind) -> stdext::expected<void, int> {
+  for (auto it = sockets_.begin(); it != sockets_.end();) {
+    auto& in = *it;
+    if (in.src.sin_addr.s_addr == bind.sin_addr.s_addr &&
+        in.src.sin_port == bind.sin_port) {
+      // This is the socket. Close it.
+      in.udp.close();
+      sockets_.erase(it);
+      return {};
+    } else {
+      it++;
+    }
+  }
+  return stdext::unexpected{ESRCH};
 }
 
 auto payload::send() -> stdext::expected<void, int> {
@@ -186,13 +195,135 @@ auto payload::send() -> stdext::expected<void, int> {
 
   int e = 0;
   for (auto& ctx : sockets_) {
-    if (p.length() < ctx.mtu_ - ctx.ipv4hdr_ - 8) {
-      auto r = ctx.udp_.send(dest_, p);
-      if (!r && !e) {
-        e = r.error();
+    if (ctx.mtu == 0 || (p.length() < ctx.mtu - ctx.ipv4hdr - 8)) {
+      if (!ctx.udp.send(dest_, p)) {
+        if (!e) e = errno;
       }
     }
   }
   if (e) return stdext::unexpected{e};
   return {};
+}
+
+namespace {
+
+constexpr auto IFACE_READY =
+    if_flags::MULTICAST | if_flags::UP | if_flags::RUNNING;
+constexpr auto IFACE_MASK = IFACE_READY | if_flags::LOOPBACK;
+
+auto is_up(ubench::flags<if_flags> flags) -> bool {
+  return (flags & IFACE_MASK) == IFACE_READY;
+}
+
+}  // namespace
+
+auto payload::set_inactive() -> void {
+  for (auto& ctx : sockets_) {
+    ctx.active = false;
+  }
+}
+
+auto payload::close_inactive() -> void {
+  for (auto it = sockets_.begin(); it != sockets_.end();) {
+    auto& in = *it;
+    if (!in.active) {
+      std::cout << "Closed: " << ubench::net::inet_ntos(in.src) << std::endl;
+      in.udp.close();
+      sockets_.erase(it);
+    } else {
+      it++;
+    }
+  }
+}
+
+auto payload::query(in_port_t srcport) -> bool {
+  set_inactive();
+
+  auto interfaces = query_net_interfaces();
+  for (const auto& [name, intf] : interfaces) {
+    if (is_up(intf.status())) {
+      for (const auto& ipv4 : intf.inet()) {
+        sockaddr_in addr{};
+        addr.sin_family = AF_INET;
+        addr.sin_addr = ipv4.addr();
+        addr.sin_port = srcport;
+        unsigned int mtu{};
+        if (intf.mtu()) {
+          // False positive clang-tidy 18.1.3
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          mtu = *intf.mtu();
+        }
+        auto result = open(addr, mtu);
+        if (result) {
+          std::cout << "Opened: " << ubench::net::inet_ntos(addr) << std::endl;
+        }
+      }
+    }
+  }
+
+  // Look for all sockets that don't have an active interface and remove them.
+  close_inactive();
+  return !sockets_.empty();
+}
+
+auto payload::query(std::string iface, in_port_t srcport) -> bool {
+  set_inactive();
+
+  auto pintf = query_net_interface(std::move(iface));
+  if (pintf) {
+    auto& intf = *pintf;
+    if (is_up(intf.status())) {
+      for (const auto& ipv4 : intf.inet()) {
+        sockaddr_in addr{};
+        addr.sin_family = AF_INET;
+        addr.sin_addr = ipv4.addr();
+        addr.sin_port = srcport;
+        unsigned int mtu{};
+        if (intf.mtu()) {
+          // False positive clang-tidy 18.1.3
+          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+          mtu = *intf.mtu();
+        }
+        auto result = open(addr, mtu);
+        if (result) {
+          std::cout << "Opened: " << ubench::net::inet_ntos(addr) << std::endl;
+        }
+      }
+    }
+  }
+
+  // Look for all sockets that don't have an active interface and remove them.
+  close_inactive();
+  return !sockets_.empty();
+}
+
+auto payload::query(const sockaddr_in& iface) -> bool {
+  set_inactive();
+
+  auto interfaces = query_net_interfaces();
+  for (const auto& [name, intf] : interfaces) {
+    if (is_up(intf.status())) {
+      for (const auto& ipv4 : intf.inet()) {
+        if (iface.sin_addr.s_addr == ipv4.addr().s_addr) {
+          unsigned int mtu{};
+          if (intf.mtu()) {
+            // False positive clang-tidy 18.1.3
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+            mtu = *intf.mtu();
+          }
+          auto result = open(iface, mtu);
+          if (result) {
+            std::cout << "Opened: " << ubench::net::inet_ntos(iface)
+                      << std::endl;
+          }
+          goto found;
+        }
+      }
+    }
+  }
+
+found:
+  // Look for all sockets that don't have an active interface and remove them.
+  close_inactive();
+  return !sockets_.empty();
 }

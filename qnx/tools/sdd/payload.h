@@ -20,27 +20,58 @@ auto to_string(const ubench::net::ether_addr& addr) -> std::string;
 /// @brief Class to maintain state for generating a UDP payload for discovery.
 class payload {
  public:
-  payload() = default;
+  /// @brief Initialises the payload sender with the destination multicast
+  /// address.
+  ///
+  /// @param dest The multicast address to send packets to.
+  ///
+  /// @exception std::invalid_argument The destination address is not a
+  /// multicast IPv4 address.
+  payload(const sockaddr_in& dest);
+
   payload(const payload&) = delete;
   auto operator=(const payload&) -> payload& = delete;
   payload(payload&&) noexcept = default;
   auto operator=(payload&&) noexcept -> payload& = default;
   ~payload() = default;
 
-  /// @brief Open a UDP socket channel.
+  /// @brief Query all interfaces and add them to our list.
   ///
-  /// @param bind The source address to bind to. If this is INADDR_ANY, we
-  /// create one socket per IP address found for all interfaces. Otherwise we
-  /// bind to the specific IP address given. Attempt to join the multicast group
-  /// on each.
+  /// @param srcport The source port to bind to.
   ///
-  /// @param dest The destination address to send to. The address must be a
-  /// multicast destination address.
+  /// @return true if there is at least one interface transmitting.
+  auto query(in_port_t srcport) -> bool;
+
+  /// @brief Query all IP addresses and add them to our list.
   ///
-  /// @return The number of interfaces generated, or the error if unexpected.
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  auto open(const sockaddr_in& bind, sockaddr_in dest)
-      -> stdext::expected<int, int>;
+  /// @param iface The interface to query for.
+  ///
+  /// @return true if there is at least one interface transmitting.
+  auto query(std::string iface, in_port_t srcport) -> bool;
+
+  /// @brief Query the specific IP addresses and add them to our list.
+  ///
+  /// @param iface The interface to query for.
+  ///
+  /// @return true if there is at least one interface transmitting.
+  auto query(const sockaddr_in& iface) -> bool;
+
+  /// @brief Adds a socket to the list to send a payload to.
+  ///
+  /// @param bind The address to add.
+  ///
+  /// @param mtu The MTU of the interface.
+  ///
+  /// @return The errno, if unexpected.
+  auto open(const sockaddr_in& bind, unsigned int mtu)
+      -> stdext::expected<void, int>;
+
+  /// @brief Removes a socket from the list to send a payload to.
+  ///
+  /// @param bind The address to remove.
+  ///
+  /// @return The errno, if unexpected.
+  auto close(const sockaddr_in& bind) -> stdext::expected<void, int>;
 
   /// @brief Generates and sends the payload.
   ///
@@ -50,13 +81,20 @@ class payload {
   /// @return The errno, if unexpected.
   auto send() -> stdext::expected<void, int>;
 
+  /// @brief Get if there is at least one socket defined.
+  operator bool() const { return !sockets_.empty(); }
+
  private:
   auto generate() -> std::string;
+  auto set_inactive() -> void;
+  auto close_inactive() -> void;
 
   struct iface_ctx {
-    unsigned int mtu_;
-    unsigned int ipv4hdr_;
-    ubench::net::udp udp_;
+    sockaddr_in src{};
+    unsigned int mtu{};
+    unsigned int ipv4hdr{};
+    ubench::net::udp udp{};
+    bool active{};
   };
 
   std::vector<iface_ctx> sockets_{};

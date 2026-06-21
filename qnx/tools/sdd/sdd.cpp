@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <vector>
 
 #include "ubench/net.h"
 #include "ubench/string.h"
@@ -14,21 +15,37 @@ auto main(int argc, char* argv[]) -> int {
 
   std::cout << "Source: " << ubench::net::inet_ntos(options->source_addr())
             << std::endl;
+  std::cout << "Source Intf: " << options->source_iface() << std::endl;
   std::cout << "Destination: " << ubench::net::inet_ntos(options->dest_addr())
             << std::endl;
   std::cout << "Interval: " << options->interval().count() << "ms" << std::endl;
 
-  payload p{};
-  auto ores = p.open(options->source_addr(), options->dest_addr());
-  if (!ores) return ores.error();
+  payload p{options->dest_addr()};
+  // auto ores = p.open(options->source_addr(), options->dest_addr());
+  // if (!ores) return ores.error();
 
   while (true) {
-    auto sres = p.send();
-    if (!sres) {
-      std::cout << "Error sending: " << ubench::string::perror(sres.error());
-      return sres.error();
+    if (options->source_addr().sin_addr.s_addr) {
+      p.query(options->source_addr());
+    } else {
+      if (options->source_iface().empty()) {
+        p.query(options->source_addr().sin_port);
+      } else {
+        p.query(options->source_iface(), options->source_addr().sin_port);
+      }
     }
-    std::this_thread::sleep_for(options->interval());
+
+    if (!p) {
+      // No interfaces registered, so wait 5 seconds and do the query again.
+      std::this_thread::sleep_for(std::chrono::seconds(5));
+    } else {
+      auto current = std::chrono::steady_clock::now();
+      while (std::chrono::steady_clock::now() - current <
+             std::chrono::seconds(30)) {
+        p.send();
+        std::this_thread::sleep_for(options->interval());
+      }
+    }
   }
 
   return 0;

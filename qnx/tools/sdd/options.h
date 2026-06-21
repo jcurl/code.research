@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 
 #include <chrono>
+#include <string>
 
 #include "stdext/expected.h"
 
@@ -28,11 +29,24 @@ class options {
   /// program will need to be stopped and restarted, because it won't
   /// dynamically update for a change to DHCP addresses.
   ///
+  /// If the interface is 0.0.0.0, check that source_iface is not empty. If it
+  /// is empty, then the user intends to connect to all interfaces. If it is not
+  /// empty, then the user intends to connect to all addresses on the specific
+  /// interface.
+  ///
   /// @return The user provided source port and address. If any parameter is not
   /// provided, the field contains 0. Code should determine a suitable default
   /// for itself.
-  [[nodiscard]] auto source_addr() const noexcept -> const struct sockaddr_in& {
+  [[nodiscard]] auto source_addr() const noexcept -> const sockaddr_in& {
     return source_;
+  }
+
+  /// @brief Get the user provided interface to bind to.
+  ///
+  /// @return The interface. If the string is empty, then the user chose no
+  /// interfaces to bind to.
+  [[nodiscard]] auto source_iface() const noexcept -> const std::string& {
+    return source_iface_;
   }
 
   /// @brief Get the user provided destination port and address.
@@ -43,7 +57,7 @@ class options {
   /// @return The user provided destination port and address. If any parameter
   /// is not provided, the field contains 0. Code shold determine a suitable
   /// default for itself.
-  [[nodiscard]] auto dest_addr() const noexcept -> const struct sockaddr_in& {
+  [[nodiscard]] auto dest_addr() const noexcept -> const sockaddr_in& {
     return dest_;
   }
 
@@ -60,8 +74,9 @@ class options {
   friend auto make_options(int argc, char* const argv[]) noexcept
       -> stdext::expected<options, int>;
 
-  struct sockaddr_in source_ {};
-  struct sockaddr_in dest_ {};
+  sockaddr_in source_{};
+  sockaddr_in dest_{};
+  std::string source_iface_{};
   std::chrono::milliseconds interval_{1000};
 };
 

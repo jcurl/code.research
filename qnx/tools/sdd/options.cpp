@@ -1,6 +1,7 @@
 #include "options.h"
 
 #include <iostream>
+#include <optional>
 
 #include "ubench/net.h"
 #include "ubench/options.h"
@@ -33,17 +34,24 @@ void print_help(std::string_view prog_name) {
   std::cout << " -? - Display this help." << std::endl;
 }
 
-auto parse_iface(std::string_view arg, sockaddr_in& addr) -> bool {
+struct iface_option {
+  sockaddr_in addr{};
+  std::string iface{};
+};
+
+auto parse_iface(std::string_view arg) -> std::optional<iface_option> {
+  iface_option result{};
+  std::string addrstr{};
+
   auto port_sep = arg.find_last_of(':');
 
-  std::string addrstr{};
   if (port_sep != std::string_view::npos) {
-    if (arg.size() < port_sep - 1) return false;
+    if (arg.size() < port_sep - 1) return std::nullopt;
 
     std::string_view portstr = arg.substr(port_sep + 1);
     auto port = ubench::string::parse_int<std::uint16_t>(portstr);
-    if (!port) return false;
-    addr.sin_port = htons(*port);
+    if (!port) return std::nullopt;
+    result.addr.sin_port = htons(*port);
 
     // Get a NUL-terminated string. The value `port_sep` is guaranteed to be
     // to be within the bounds of the string.
@@ -51,25 +59,18 @@ auto parse_iface(std::string_view arg, sockaddr_in& addr) -> bool {
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     addrstr = std::string{arg.data(), port_sep};
   } else {
-    addr.sin_port = 0;
+    result.addr.sin_port = 0;
     // arg may not be NUL terminated. Ensure it is.
     addrstr = std::string{arg.data(), arg.size()};
   }
 
-  addr.sin_family = AF_INET;
-  if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) == 1) return true;
-
-  // Not an IPv4 address. Check if it is an interface, and get the first IPv4
-  // address from that.
-  auto piface = ubench::net::query_net_interface(addrstr);
-  if (piface) {
-    if (!piface->inet().empty()) {
-      addr.sin_addr = piface->inet()[0].addr();
-      return true;
-    }
+  result.addr.sin_family = AF_INET;
+  if (inet_pton(AF_INET, addrstr.data(), &(result.addr.sin_addr)) == 1) {
+    return result;
   }
 
-  return false;
+  result.iface = std::move(addrstr);
+  return result;
 }
 
 }  // namespace
@@ -104,7 +105,10 @@ auto make_options(int argc, char* const argv[]) noexcept
         case 'S': {
           // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           auto arg = *opt->argument();
-          if (parse_iface(std::string_view{arg}, o.source_)) {
+          auto source = parse_iface(std::string_view{arg});
+          if (source) {
+            o.source_ = source->addr;
+            o.source_iface_ = std::move(source->iface);
             break;
           }
           std::cerr << "Error: Invalid source address - " << arg << std::endl;
