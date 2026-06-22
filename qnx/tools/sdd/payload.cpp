@@ -186,9 +186,10 @@ auto payload::send() -> stdext::expected<void, int> {
 
   int e = 0;
   for (auto& ctx : sockets_) {
-    if (p.length() < ctx.mtu_ - ctx.ipv4hdr_) {
-      if (!ctx.udp_.send(dest_, p)) {
-        if (!e) e = errno;
+    if (p.length() < ctx.mtu_ - ctx.ipv4hdr_ - 8) {
+      auto r = ctx.udp_.send(dest_, p);
+      if (!r && !e) {
+        e = r.error();
       }
     }
   }
