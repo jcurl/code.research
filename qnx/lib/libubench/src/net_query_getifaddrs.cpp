@@ -122,21 +122,28 @@ auto query_net_interfaces_getifaddrs(
                 }) == interface.inet().end()) {
           auto& entry = interface.inet().emplace_back(ipv4addr);
 
-          if (ifaddr.ifa_netmask && ifaddr.ifa_netmask->sa_family == AF_INET) {
+          if (ifaddr.ifa_netmask &&
+              (ifaddr.ifa_netmask->sa_family == AF_UNSPEC ||
+                  ifaddr.ifa_netmask->sa_family == AF_INET)) {
+            // QNX7.1 has the sa_family == AF_UNSPEC in tests. Other OSes
+            // (NetBSD, QNX8, etc.) have sa_family == AF_INET as one would
+            // expect.
             entry.netmask(
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
                 ((sockaddr_in*)(ifaddr.ifa_netmask))->sin_addr);
           }
 
           if ((ifaddr.ifa_flags & IFF_BROADCAST) && ifaddr.ifa_broadaddr &&
-              ifaddr.ifa_broadaddr->sa_family == AF_INET) {
+              (ifaddr.ifa_broadaddr->sa_family == AF_UNSPEC ||
+                  ifaddr.ifa_broadaddr->sa_family == AF_INET)) {
             entry.broadcast_addr(
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
                 ((sockaddr_in*)(ifaddr.ifa_broadaddr))->sin_addr);
           }
 
           if ((ifaddr.ifa_flags & IFF_POINTOPOINT) && ifaddr.ifa_dstaddr &&
-              ifaddr.ifa_dstaddr->sa_family == AF_INET) {
+              (ifaddr.ifa_dstaddr->sa_family == AF_UNSPEC ||
+                  ifaddr.ifa_dstaddr->sa_family == AF_INET)) {
             entry.dest_addr(
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
                 ((sockaddr_in*)(ifaddr.ifa_dstaddr))->sin_addr);
