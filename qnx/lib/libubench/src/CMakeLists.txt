@@ -12,7 +12,7 @@ set(SOURCES
     ../include/ubench/clock.h
     ../include/ubench/flags.h
     ../include/ubench/file.h
-    ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp
+    ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp net_hostname.cpp
     ../include/ubench/options.h options.cpp
     ../include/ubench/os.h
     ../include/ubench/string.h string.cpp

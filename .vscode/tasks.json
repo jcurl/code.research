@@ -14,7 +14,7 @@
                 "options": {
                     "cwd": "${workspaceFolder}/qnx"
                 },
-                "command": "cmake -E make_directory ${workspaceFolder}/qnx/build/linux-debug && cmake -S ${workspaceFolder}/qnx -B ${workspaceFolder}/qnx/build/linux-debug -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_RUN_CLANG_TIDY=off -DSANITIZE_THREAD=Off -DCODE_COVERAGE=off && cmake --build ${workspaceFolder}/qnx/build/linux-debug --target cpuid_test"
+                "command": "cmake -E make_directory ${workspaceFolder}/qnx/build/linux-debug && cmake -S ${workspaceFolder}/qnx -B ${workspaceFolder}/qnx/build/linux-debug -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_RUN_CLANG_TIDY=off -DSANITIZE_THREAD=Off -DCODE_COVERAGE=off && cmake --build ${workspaceFolder}/qnx/build/linux-debug"
             },
             "problemMatcher": [
                 {

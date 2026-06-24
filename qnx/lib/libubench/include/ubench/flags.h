@@ -56,8 +56,7 @@ class flags {
   ///
   /// @return the sets of bits in the current flags that are set where also the
   /// bits in rhs are set.
-  [[nodiscard]] constexpr auto operator&(const flags& rhs) const noexcept
-      -> flags {
+  [[nodiscard]] constexpr auto operator&(flags rhs) const noexcept -> flags {
     return flags(mask_ & rhs.mask_);
   }
 
@@ -66,8 +65,7 @@ class flags {
   /// @param rhs the bits to set.
   ///
   /// @return the new set of bits of the current mask with bits of rhs also set.
-  [[nodiscard]] constexpr auto operator|(const flags& rhs) const noexcept
-      -> flags {
+  [[nodiscard]] constexpr auto operator|(flags rhs) const noexcept -> flags {
     return flags(mask_ | rhs.mask_);
   }
 
@@ -77,8 +75,7 @@ class flags {
   ///
   /// @return the new set of bits in the current mask that are inverted defined
   /// by rhs.
-  [[nodiscard]] constexpr auto operator^(const flags& rhs) const noexcept
-      -> flags {
+  [[nodiscard]] constexpr auto operator^(flags rhs) const noexcept -> flags {
     return flags(mask_ ^ rhs.mask_);
   }
 
@@ -95,8 +92,7 @@ class flags {
   ///
   /// @return true if equal, false otherwise. All flags are tested, not just the
   /// ones defined in the bit_type.
-  [[nodiscard]] constexpr auto operator==(const flags& rhs) const noexcept
-      -> bool {
+  [[nodiscard]] constexpr auto operator==(flags rhs) const noexcept -> bool {
     return mask_ == rhs.mask_;
   }
 
@@ -106,8 +102,7 @@ class flags {
   ///
   /// @return true if unequal, false otherwise. All flags are tested, not just
   /// the ones defined in the bit_type.
-  [[nodiscard]] constexpr auto operator!=(const flags& rhs) const noexcept
-      -> bool {
+  [[nodiscard]] constexpr auto operator!=(flags rhs) const noexcept -> bool {
     return !operator==(rhs);
   }
 
@@ -116,7 +111,7 @@ class flags {
   /// @param rhs the bits to set.
   //
   /// @return the object with the bits set.
-  constexpr auto operator|=(const flags& rhs) noexcept -> flags& {
+  constexpr auto operator|=(flags rhs) noexcept -> flags& {
     mask_ |= rhs.mask_;
     return *this;
   }
@@ -126,7 +121,7 @@ class flags {
   /// @param rhs the sets of flags that should be set.
   ///
   /// @return the object with the bits masked.
-  constexpr auto operator&=(const flags& rhs) noexcept -> flags& {
+  constexpr auto operator&=(flags rhs) noexcept -> flags& {
     mask_ &= rhs.mask_;
     return *this;
   }
@@ -136,7 +131,7 @@ class flags {
   /// @param rhs the sets of flags that should invert the current flags.
   ///
   /// @return the new flags with the required bits inverted.
-  constexpr auto operator^=(const flags& rhs) noexcept -> flags& {
+  constexpr auto operator^=(flags rhs) noexcept -> flags& {
     mask_ ^= rhs.mask_;
     return *this;
   }
@@ -146,7 +141,7 @@ class flags {
   /// @param rhs the bits to set.
   //
   /// @return the object with the bits set.
-  constexpr auto operator|=(const bit_type& rhs) noexcept -> flags& {
+  constexpr auto operator|=(bit_type rhs) noexcept -> flags& {
     mask_ |= static_cast<mask_type>(rhs);
     return *this;
   }
@@ -156,7 +151,7 @@ class flags {
   /// @param rhs the sets of flags that should be set.
   ///
   /// @return the object with the bits masked.
-  constexpr auto operator&=(const bit_type& rhs) noexcept -> flags& {
+  constexpr auto operator&=(bit_type rhs) noexcept -> flags& {
     mask_ &= static_cast<mask_type>(rhs);
     return *this;
   }
@@ -166,7 +161,7 @@ class flags {
   /// @param rhs the sets of flags that should invert the current flags.
   ///
   /// @return the new flags with the required bits inverted.
-  constexpr auto operator^=(const bit_type& rhs) noexcept -> flags& {
+  constexpr auto operator^=(bit_type rhs) noexcept -> flags& {
     mask_ ^= static_cast<mask_type>(rhs);
     return *this;
   }

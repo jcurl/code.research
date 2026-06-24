@@ -10,6 +10,7 @@
 #include <cstdint>
 
 #include "ubench/net.h"
+#include "ubench/string.h"
 
 namespace ubench::net {
 
@@ -85,6 +86,33 @@ auto if_ipv4::operator==(const if_ipv4& rhs) const noexcept -> bool {
   if (baddr_ && baddr_->s_addr != rhs.baddr_->s_addr) return false;
   if (daddr_ && daddr_->s_addr != rhs.daddr_->s_addr) return false;
   if (nmask_ && nmask_->s_addr != rhs.nmask_->s_addr) return false;
+  return true;
+}
+
+auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
+  auto port_sep = arg.find_last_of(':');
+  if (port_sep != std::string_view::npos) {
+    if (arg.size() < port_sep - 1) return false;
+
+    std::string_view portstr = arg.substr(port_sep + 1);
+    auto port = ubench::string::parse_int<std::uint16_t>(portstr);
+    if (!port) return false;
+    addr.sin_port = htons(*port);
+
+    // Get a NUL-terminated string. The value `port_sep` is guaranteed to be
+    // to be within the bounds of the string.
+    //
+    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
+    std::string addrstr{arg.data(), port_sep};
+    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
+  } else {
+    addr.sin_port = 0;
+    // arg may not be NUL terminated. Ensure it is.
+    std::string addrstr{arg.data(), arg.size()};
+    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
+  }
+
+  addr.sin_family = AF_INET;
   return true;
 }
 

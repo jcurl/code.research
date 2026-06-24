@@ -1,6 +1,7 @@
 #ifndef UBENCH_NET_H
 #define UBENCH_NET_H
 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
@@ -113,6 +114,18 @@ struct ether_addr {
 ///
 /// @return The string converted, or on error, an empty string.
 [[nodiscard]] auto ether_ntos(const ether_addr& addr) -> std::string;
+
+/// @brief Parses the string in the format of an IPv4 number, a colon and a port
+///
+/// @param arg The argument given to the program which is to be parsed to an
+/// IPv4 number and port.
+///
+/// @param addr [out] The result of parsing. If no port is present in the
+/// string, it is set to zero.
+///
+/// @return true if the conversion was successful, false otherwise.
+[[nodiscard]] auto parse_sockaddr(std::string_view arg, sockaddr_in& addr)
+    -> bool;
 
 /// @brief Interface flags.
 ///
@@ -440,6 +453,16 @@ class interface {
 /// available.
 [[nodiscard]] auto query_net_interface(std::string name)
     -> const std::optional<interface>;
+
+/// @brief Get the machine host name.
+///
+/// @return The host name, if it could be retrieved.
+[[nodiscard]] auto gethostname() -> std::optional<std::string>;
+
+/// @brief Get teh machine domain name
+///
+/// @return The domain name, if it could be retrieved
+[[nodiscard]] auto getdomainname() -> std::optional<std::string>;
 
 }  // namespace ubench::net
 

@@ -10,5 +10,8 @@
     "files.associations": {
         "*.tcc": "cpp"
     },
-    "cmake.sourceDirectory": "${workspaceRoot}/qnx"
+    "cmake.sourceDirectory": "${workspaceRoot}/qnx",
+    "C_Cpp.default.compileCommands": [
+        "${workspaceRoot}/build/compile_commands.json"
+    ],
 }

@@ -1,5 +1,6 @@
 #include "ubench/net.h"
 
+#include <netinet/in.h>
 #include <arpa/inet.h>
 
 #include <sstream>
@@ -194,5 +195,80 @@ TEST(ubench_net, query_interface) {
         EXPECT_THAT(pair.second.inet(), Contains(ipv4));
       }
     }
+  }
+}
+
+TEST(ubench_net, parse_sockaddr) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_TRUE(ubench::net::parse_sockaddr("127.0.0.1", ipv4addr));
+  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0x7f000001);
+  ASSERT_EQ(ntohs(ipv4addr.sin_port), 0);
+}
+
+TEST(ubench_net, parse_sockaddr_port) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_TRUE(ubench::net::parse_sockaddr("127.0.0.1:3499", ipv4addr));
+  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0x7f000001);
+  ASSERT_EQ(ntohs(ipv4addr.sin_port), 3499);
+}
+
+TEST(ubench_net, parse_sockaddr_any) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_TRUE(ubench::net::parse_sockaddr("0.0.0.0:3499", ipv4addr));
+  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0);
+  ASSERT_EQ(ntohs(ipv4addr.sin_port), 3499);
+}
+
+TEST(ubench_net, parse_sockaddr_broadcast) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_TRUE(ubench::net::parse_sockaddr("255.255.255.255:3499", ipv4addr));
+  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0xffffffff);
+  ASSERT_EQ(ntohs(ipv4addr.sin_port), 3499);
+}
+
+TEST(ubench_net, parse_sockaddr_invalid) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_FALSE(ubench::net::parse_sockaddr("192.168.1.256:3499", ipv4addr));
+}
+
+TEST(ubench_net, parse_sockaddr_invalid2) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_FALSE(ubench::net::parse_sockaddr("host.local", ipv4addr));
+}
+
+TEST(ubench_net, parse_sockaddr_invalid3) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_FALSE(ubench::net::parse_sockaddr("127.0.0.1:ssh", ipv4addr));
+}
+
+TEST(ubench_net, parse_sockaddr_invalid4) {
+  struct sockaddr_in ipv4addr {};
+
+  ASSERT_FALSE(ubench::net::parse_sockaddr("127.0.0.1:0:1", ipv4addr));
+}
+
+TEST(ubench_net, gethostname) {
+  auto hostname = ubench::net::gethostname();
+  ASSERT_TRUE(hostname.has_value());
+  if (hostname) {
+    ASSERT_GT(hostname->length(), 0);
+  }
+}
+
+TEST(ubench_net, getdomainname) {
+  auto domainname = ubench::net::getdomainname();
+  if (domainname) {
+    ASSERT_GT(domainname->length(), 0);
   }
 }

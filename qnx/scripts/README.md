@@ -13,6 +13,7 @@
     - [1.4.4. Building FreeBSD](#144-building-freebsd)
     - [1.4.5. Building QNX](#145-building-qnx)
 - [2. Building using Makefile](#2-building-using-makefile)
+  - [2.1. Overriding Targets](#21-overriding-targets)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
 
 ## 1. Podman Container - build.sh
@@ -31,7 +32,7 @@ This is tested on Ubuntu 22.04, 26.04.
 
 1. Install podman for your Ubuntu machine
 
-   ```sh
+   ```cmd
    # apt install podman
    ```
 
@@ -40,7 +41,7 @@ This is tested on Ubuntu 22.04, 26.04.
    Check the contents of the file. You might see a default for your machine,
    here the default user is `user`:
 
-   ```sh
+   ```cmd
    # cat /etc/subuid
    user:100000:65536
    # cat /etc/subgid
@@ -56,13 +57,13 @@ This is tested on Ubuntu 22.04, 26.04.
 3. Add a new range. The user being added here is `jcurl`. Replace this with your
    own user.
 
-   ```sh
+   ```cmd
    # usermod --add-subuids 200000-265535 --add-subgids  200000-265535 jcurl
    ```
 
 4. Check the updates were done.
 
-   ```sh
+   ```cmd
    # cat /etc/subuid
    user:100000:65536
    jcurl:200000:65536
@@ -73,7 +74,7 @@ This is tested on Ubuntu 22.04, 26.04.
 
 5. Finish the update
 
-   ```sh
+   ```cmd
    $ podman system migrate
    ```
 
@@ -83,7 +84,7 @@ To see how to use the `build.sh` script, run the current version with the help
 option.
 
 ```sh
-$ ./build.sh -?
+./build.sh -?
 ```
 
 It will provide you instructions on its use.
@@ -125,7 +126,7 @@ The `build.sh` script can be run that:
 
 For example:
 
-```sh
+```cmd
 jcurl@localhost$ build.sh -cjammy -i
 jcurl@ubuntu-jammy-06747d$ cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release
 jcurl@ubuntu-jammy-06747d$ make -j8
@@ -135,7 +136,7 @@ jcurl@ubuntu-jammy-06747d$ make clangformat
 Or to build on a single command line
 
 ```sh
-$ ./build.sh -cjammy "cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && make -j8"
+./build.sh -cjammy "cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && make -j8"
 ```
 
 Output is put in the folder `$REPO/qnx/build/ubuntu-CODENAME`.
@@ -163,13 +164,13 @@ from the time it was build.
 To build on a single command line, using LLVM:
 
 ```sh
-$ make alpine-latest-clang
+make alpine-latest-clang
 ```
 
 If you want to update the image, you must first destroy the image:
 
 ```sh
-$ podman image rm coderesearch:alpine-latest
+podman image rm coderesearch:alpine-latest
 ```
 
 Then on the next invocation of the `Makefile`, the image will be regenerated.
@@ -183,7 +184,7 @@ To build the docker container, which builds the toolchain (may take 1h or
 longer):
 
 ```sh
-$ ./build.sh -dnetbsd -c10.1
+./build.sh -dnetbsd -c10.1
 ```
 
 The `Makefile` and toolchain file `netbsd10.1-aarch64.cmake` and
@@ -215,7 +216,7 @@ it to an Ubuntu 22.04 machine.
 After building on Ubuntu 26.04, back up the podman container as such:
 
 ```sh
-$ podman save coderesearch:netbsd-10.1 | gzip -9 >netbsd10.1.tar.gz
+podman save coderesearch:netbsd-10.1 | gzip -9 >netbsd10.1.tar.gz
 ```
 
 Copy this to the Ubuntu 22.04 image, and restore it:
@@ -245,7 +246,7 @@ To build the docker container, which downloads the base files and extracts them
 (the compiler toolchain comes from Ubuntu 22.04, which is Clang 14.0.0):
 
 ```sh
-$ ./build.sh -dfreebsd -c14.2
+./build.sh -dfreebsd -c14.2
 ```
 
 The `Makefile` and toolchain file `freebsd14.2-aarch64.cmake` depend on version
@@ -268,9 +269,9 @@ For example, when building for QNX 7.1.0 and QNX 8.0.0, the parameter given to
 `-cCODENAME` is used to identify the environment variable.
 
 ```sh
-$ export QNXSDP_710=/home/<user>/qnx/qnx710
-$ export QNXSDP_800=/home/<user>/qnx/qnx800
-$ build.sh -dqnx -c710 -i
+export QNXSDP_710=/home/${USER}/qnx/qnx710
+export QNXSDP_800=/home/${USER}/qnx/qnx800
+build.sh -dqnx -c710 -i
 ```
 
 ## 2. Building using Makefile
@@ -288,6 +289,50 @@ and rebuild to obtain a new image.
 Compilation stops on a build failure.
 
 You can then run `build.sh` manually in interactive mode to debug and fix.
+
+### 2.1. Overriding Targets
+
+Buliding the entire repository multiple times per target may take too long. For
+example, on a Skylake 6700T, it takes about 1.5 hours.
+
+To reduce the time to test changes during development, two environment variables
+are checked for on build.
+
+```sh
+TARGET=sdd make all qnx
+```
+
+This will build all containers, and build only the `sdd` binary. When providing
+the `TARGET` environment variable, all tests are disabled by default - CTest
+tries to run test cases that are defind but not built otherwise. When not
+providing the `TARGET` variable, all tests are run by default.
+
+If there are unit tests associated that should also run, we can extend this with
+the TESTTARGET, which controls how `ctest` is run.
+
+```sh
+TARGET="sdd" TESTTARGET="libsjson_test ubench_test" make all qnx
+```
+
+This will build the targets (building `libsjson` doesn't build the test cases).
+Targets defined for testing will run the tests.
+
+Or if we're only building test cases to run them, the TARGET will automatically
+take over the tests.
+
+```sh
+TESTTARGET="libsjson_test ubench_test" make all qnx
+```
+
+For those targets that can't run tests natively, the tests aren't run, but
+they're built.
+
+If you want to build all targets, but only test a subset, we need to use the
+`ctest` terminology direct:
+
+```sh
+TESTTARGET="-R ubench_test|libsjson_test" make all qnx
+```
 
 ## 3. Adding Your Own Distribution
 

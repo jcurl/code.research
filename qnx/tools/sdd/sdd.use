@@ -1,0 +1,21 @@
+sdd - Simple Discovery Daemon
+
+sdd -S<source> -D<destination> -n<time>
+
+Options:
+ -S Specify the source interfaces. 0.0.0.0 indicates all interfaces. An IPv4
+    dotted notation indicates a static IPv4 source address. A name indicates
+    an interface name (like 'eth0'). Specify the source port with like ":52399".
+ -D Specify the destination multicast address. Specify the destingation port
+    like ":52399".
+ -n The time in seconds before sending out a new beacon.
+
+The tool is a very simple utility to broadcast it's IPv4 address to a multicast
+address over the network. This is especially useful for embedded devices that
+are headless and obtains a random IPv4 address via DHCP.
+
+The full blown solution would be to use mDNS (Avahi), but this already requires
+a lot of integration and overhead for something that should very simple.
+
+The generated output in the UDP packet is a JSON snippet that can be parsed to
+identify details about the host.

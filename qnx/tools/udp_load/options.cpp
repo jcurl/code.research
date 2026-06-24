@@ -7,47 +7,12 @@
 #include <string_view>
 
 #include "stdext/expected.h"
+#include "ubench/net.h"
 #include "ubench/options.h"
 #include "ubench/string.h"
 #include "udp_talker.h"
 
 namespace {
-
-/// @brief Parses the string in the format of an IPv4 number, a colon and a port
-///
-/// @param arg The argument given to the program which is to be parsed to an
-/// IPv4 number and port.
-///
-/// @param addr [out] The result of parsing. If no port is present in the
-/// string, it is set to zero.
-///
-/// @return true if the conversion was successful, false otherwise.
-auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
-  auto port_sep = arg.find_last_of(':');
-  if (port_sep != std::string_view::npos) {
-    if (arg.size() < port_sep - 1) return false;
-
-    std::string_view portstr = arg.substr(port_sep + 1);
-    auto port = ubench::string::parse_int<std::uint16_t>(portstr);
-    if (!port) return false;
-    addr.sin_port = htons(*port);
-
-    // Get a NUL-terminated string. The value `port_sep` is guaranteed to be
-    // to be within the bounds of the string.
-    //
-    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
-    std::string addrstr{arg.data(), port_sep};
-    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
-  } else {
-    addr.sin_port = 0;
-    // arg may not be NUL terminated. Ensure it is.
-    std::string addrstr{arg.data(), arg.size()};
-    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
-  }
-
-  addr.sin_family = AF_INET;
-  return true;
-}
 
 void print_help(std::string_view prog_name) {
   std::cout << prog_name << " [-n<slots>] [-m<width>] [-p<packets>] [-s<size>]"
@@ -253,7 +218,7 @@ auto make_options(int argc, char* const argv[]) noexcept
         case 'S': {
           // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           auto arg = *opt->argument();
-          if (!parse_sockaddr(std::string_view{arg}, o.source_)) {
+          if (!ubench::net::parse_sockaddr(std::string_view{arg}, o.source_)) {
             std::cerr << "Error: Invalid source address - " << arg << std::endl;
             return stdext::unexpected{1};
           }
@@ -262,7 +227,7 @@ auto make_options(int argc, char* const argv[]) noexcept
         case 'D': {
           // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           auto arg = *opt->argument();
-          if (!parse_sockaddr(std::string_view{arg}, o.dest_)) {
+          if (!ubench::net::parse_sockaddr(std::string_view{arg}, o.dest_)) {
             std::cerr << "Error: Invalid destination address - " << arg
                       << std::endl;
             return stdext::unexpected{1};
