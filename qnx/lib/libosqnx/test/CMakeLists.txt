@@ -1,6 +1,6 @@
 include(GoogleTest)
 
-set(BINARY osqnx_test)
+set(BINARY libosqnx_test)
 set(SOURCES
     asinfo_test.cpp
 )

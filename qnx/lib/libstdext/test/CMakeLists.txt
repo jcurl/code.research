@@ -1,6 +1,6 @@
 include(GoogleTest)
 
-set(BINARY stdext_test)
+set(BINARY libstdext_test)
 set(SOURCES
     expected_base.cpp
     expected_equality.cpp

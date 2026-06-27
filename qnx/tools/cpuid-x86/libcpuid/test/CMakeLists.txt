@@ -1,6 +1,6 @@
 include(GoogleTest)
 
-set(BINARY cpuid_test)
+set(BINARY libcpuid_test)
 set(SOURCES
     cpuid_test.cpp
     cpuid_cache_test.cpp

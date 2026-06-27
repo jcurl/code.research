@@ -1,6 +1,6 @@
 include(GoogleTest)
 
-set(BINARY ubench_test)
+set(BINARY libubench_test)
 set(SOURCES
     clock_test.cpp
     flags_test.cpp
@@ -21,7 +21,7 @@ target_compile_features(${BINARY} PRIVATE cxx_std_17)
 target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libubench)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
-set(BINARY_GETOPT ubench_getopt_test)
+set(BINARY_GETOPT libubench_getopt_test)
 set(SOURCES_GETOPT
     getopt_compat/options.h getopt_compat/options.cpp
     getopt_compat/getopt_test.cpp
