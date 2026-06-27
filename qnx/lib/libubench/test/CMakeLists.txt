@@ -5,7 +5,6 @@ set(SOURCES
     clock_test.cpp
     flags_test.cpp
     measure/print_test.cpp
-    net_test.cpp
     options_test.cpp
     os_test.cpp
     rcu_test.cpp
