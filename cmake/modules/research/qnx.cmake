@@ -123,6 +123,13 @@ int main() { return 0; }
     endif()
 endfunction(_get_qnx_version_try_compile_c_cxx)
 
+# target_use_msg(<TARGET> <FILE>)
+#
+# Compile into <TARGET> the use file for `use <target>`. Add a use information
+# file (tag=value) for `use -i <target>`.
+#
+# If the variable `CMAKE_GIT` is defined, then the use information will also
+# contain the tag VERSION=${CMAKE_GIT}.
 function(target_use_msg TARGET USEFILE)
     if(QNXNTO)
         get_property(qnx_usemsg_found GLOBAL PROPERTY QNX_USEMSG_FOUND)
@@ -155,9 +162,9 @@ function(target_use_msg TARGET USEFILE)
 
             site_name(HOSTNAME)
             set(_USE_INFO_SOURCE "")
-            string(APPEND _USE_INFO_SOURCE "USER=$ENV{USER}\nHOST=${HOSTNAME}\nMYVERSION=x\n")
+            string(APPEND _USE_INFO_SOURCE "USER=$ENV{USER}\nHOST=${HOSTNAME}\nVERSION=${CMAKE_GIT}\n")
             if(arg_DESCRIPTION)
-                string(APPEND _USE_INFO_SOURCE "DESCRIPTION=${arg_DESCRIPTION}")
+                string(APPEND _USE_INFO_SOURCE "DESCRIPTION=${arg_DESCRIPTION}\n")
             endif()
             file(WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}_info.use" "${_USE_INFO_SOURCE}")
             UNSET(_USE_INFO_SOURCE)
@@ -196,14 +203,24 @@ function(target_use_msg TARGET USEFILE)
                 COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_BINARY_DIR}/${_qnx_usemsg_file}"
                 COMMENT ""
             )
+
+            set(_use_version "")
+            if(DEFINED CMAKE_GIT)
+                # Don't put quots here, else it will be passed as a single
+                # argument. It needs to be two arguments.
+                set(_use_version -i VERSION)
+            endif()
+
             add_custom_command(
                 TARGET ${TARGET} POST_BUILD
                 COMMAND ${QNX_USEMSG_EXECUTABLE}
                 ARGS "$<TARGET_FILE:${TARGET}>" "${CMAKE_CURRENT_SOURCE_DIR}/${USEFILE}"
                 COMMAND ${QNX_USEMSG_EXECUTABLE}
-                ARGS -f "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}_info.use" "$<TARGET_FILE:${TARGET}>"
+                ARGS -f "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}_info.use" ${_use_version} "$<TARGET_FILE:${TARGET}>"
                 VERBATIM
             )
+
+            unset(_use_version)
             target_sources(${TARGET} PRIVATE ${_qnx_usemsg_file})
         endif()
     endif()

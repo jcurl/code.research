@@ -26,6 +26,7 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules/" ${CMAKE_MODULE_PATH})
 include(research/qnx)
+include(research/cmake_git)
 include(research/clang-tidy)
 
 # Default to DEBUG mode if not provided.
