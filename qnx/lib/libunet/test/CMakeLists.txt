@@ -3,6 +3,7 @@ include(GoogleTest)
 set(BINARY libunet_test)
 set(SOURCES
     net_test.cpp
+    udp_test.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

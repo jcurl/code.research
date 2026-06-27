@@ -156,7 +156,7 @@ auto payload::open(const sockaddr_in& bind, unsigned int mtu)
   auto oresult = in.udp.open(addr);
   if (!oresult) return stdext::unexpected{oresult.error()};
 
-  auto jresult = in.udp.multicast_join(addr);
+  auto jresult = in.udp.multicast_register_interface(addr);
   if (!jresult) return stdext::unexpected{jresult.error()};
 
   auto tresult = in.udp.set_multicast_ttl(1);

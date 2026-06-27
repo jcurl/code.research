@@ -29,7 +29,7 @@
                 },
                 {
                     "description": "Enable skipping built-in libraries when single stepping code",
-                    "text": "-interpreter-exec console \"skip -rfu ^(std::|testing::)\"",
+                    "text": "-interpreter-exec console \"skip -rfu ^(std::|stdext::|testing::)\"",
                     "ignoreFailures": true
                 }
             ],
@@ -43,6 +43,36 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}/qnx/build/linux-debug/tools/sdd",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable skipping built-in libraries when single stepping code",
+                    "text": "-interpreter-exec console \"skip -rfu ^(std::|stdext::|testing::)\"",
+                    "ignoreFailures": true
+                }
+            ],
+        },
+        {
+            "name": "Debug libunet_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "Build (Debug)",
+            "program": "${workspaceRoot}/qnx/build/linux-debug/lib/libunet/test/libunet_test",
+            "args": [ "--gtest_filter=ubench_net_udp.send_dest_unicast" ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/qnx/build/linux-debug/lib/libunet/test",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

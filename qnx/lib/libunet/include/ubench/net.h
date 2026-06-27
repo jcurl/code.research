@@ -487,32 +487,45 @@ class udp {
   auto set_sendbuf(int buf) noexcept -> stdext::expected<void, int>;
 
   /// @brief Get if sent multicast packets should be looped back to the local
-  /// sockets.
+  /// sockets for receiving on the interface.
   ///
   /// @return If enabled or disabled, or the errno if unexpected.
-  auto get_multicast_loop() noexcept -> stdext::expected<bool, int>;
+  auto get_multicast_loopback() noexcept -> stdext::expected<bool, int>;
 
   /// @brief Set if multicast packets should be looped back to the local
-  /// sockets.
+  /// sockets for receiving on the interface.
   ///
   /// @param enable if it should be enabled or not.
   ///
   /// @return The errno, if unexpected.
-  auto set_multicast_loop(bool enable) noexcept -> stdext::expected<void, int>;
-
-  /// @brief Joins the address bind in the constructor as a multicast socket.
-  ///
-  /// @param local the local address to bind to for joining a multicast group.
-  ///
-  /// @return The errno, if unexpected.
-  auto multicast_join(const sockaddr_in& local) noexcept
+  auto set_multicast_loopback(bool enable) noexcept
       -> stdext::expected<void, int>;
 
-  /// @brief Read the time-to-live value of outgoing multicast packets for this
-  /// socket.
+  /// @brief Joins the address bind in the constructor for sending multicast
+  /// traffic.
+  ///
+  /// @param local the local address interface for sending multicast traffic.
+  ///
+  /// @return The errno, if unexpected.
+  auto multicast_register_interface(const in_addr local) noexcept
+      -> stdext::expected<void, int>;
+
+  /// @brief Joins the address bind in the constructor for sending multicast
+  /// traffic.
+  ///
+  /// This method also checks that the address is correctly an AF_INET type.
+  ///
+  /// @param local the local address interface for sending multicast traffic.
+  ///
+  /// @return The errno, if unexpected.
+  auto multicast_register_interface(const sockaddr_in& local) noexcept
+      -> stdext::expected<void, int>;
+
+  /// @brief Read the time-to-live value of outgoing multicast packets for
+  /// this socket.
   ///
   /// @return The TTL, or the errno if unexpected.
-  auto get_multicast_ttl() noexcept -> stdext::expected<int, int>;
+  auto get_multicast_ttl() noexcept -> stdext::expected<std::uint8_t, int>;
 
   /// @brief Set the time-to-live value of the outgoing multicast packets for
   /// this socket.
@@ -520,7 +533,8 @@ class udp {
   /// @param ttl the new TTL value.
   ///
   /// @return The errno, if unexpected.
-  auto set_multicast_ttl(int ttl) noexcept -> stdext::expected<void, int>;
+  auto set_multicast_ttl(std::uint8_t ttl) noexcept
+      -> stdext::expected<void, int>;
 
   /// @brief Read if socket address reuse is enabled for binding.
   ///
@@ -555,18 +569,45 @@ class udp {
 
   /// @brief Open the socket and bind it to the port.
   ///
-  /// Equivalent to not binding to any socket.
+  /// With this method, the socket is not connected to any destination address,
+  /// so only send(dest, payload) can be used.
   ///
-  /// @return The errno, if unexpected.
-  auto open() noexcept -> stdext::expected<void, int>;
-
-  /// @brief Open the socket and bind it to the port.
+  /// If you're sending multicast traffic, you must register the interface. Some
+  /// operating systems will behave correctly without registering, others will
+  /// not, so behaviour is undefined if you don't register and send to multicast
+  /// traffic later.
   ///
-  /// @param bind The local address to bind the socket to. If the socket is
-  /// INADDR_ANY, then the socket is not bound.
+  /// @param bind The local address to bind the socket to.
   ///
   /// @return The errno, if unexpected.
   auto open(const sockaddr_in& bind) noexcept -> stdext::expected<void, int>;
+
+  /// @brief Open the socket and bind it to the port, connect to the destination
+  /// address.
+  ///
+  /// With this method, either send(payload) or send(dest, payload) can be used.
+  ///
+  /// @param bind The local address to bind the socket to.
+  ///
+  /// @param dest The remote address to connect the socket to. If the
+  /// destination address is a multicast address, this function automatically
+  /// registers the interface specified by bind for multicast packet sending.
+  ///
+  /// @return The errno, if unexpected.
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+  auto open(const sockaddr_in& bind, const sockaddr_in& dest) noexcept
+      -> stdext::expected<void, int>;
+
+  /// @brief Get if the socket is open.
+  operator bool() const { return socket_; }
+
+  /// @brief Get the file descriptor.
+  ///
+  /// This method is discouraged as the lifetime of the file descriptor must
+  /// be managed separately.
+  ///
+  /// @return a temporary copy of the file descriptor.
+  operator int() const { return socket_; }
 
   /// @brief Closes the socket.
   ///
@@ -575,7 +616,17 @@ class udp {
 
   /// @brief Send a UTF-8 sequence of characters as the UDP payload.
   ///
-  /// @param dest the destination socket
+  /// The socket must have been opened with the open(bind, dest) method, so
+  /// that the destination address is known.
+  ///
+  /// @param payload the payload to send as raw bytes.
+  ///
+  /// @return The number of bytes sent, or the errno if unexpected.
+  auto send(std::string_view payload) -> stdext::expected<int, int>;
+
+  /// @brief Send a UTF-8 sequence of characters as the UDP payload.
+  ///
+  /// @param dest the destination address and port.
   ///
   /// @param payload the payload to send as raw bytes.
   ///
