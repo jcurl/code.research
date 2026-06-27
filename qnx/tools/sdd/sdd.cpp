@@ -7,7 +7,6 @@
 #include "ubench/string.h"
 #include "options.h"
 #include "payload.h"
-#include "udp.h"
 
 auto main(int argc, char* argv[]) -> int {
   auto options = make_options(argc, argv);

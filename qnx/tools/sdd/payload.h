@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "ubench/net.h"
-#include "udp.h"
 
 // Forward declarations for writing values into JSON. This must be in the public
 // header file, so that `payload.cpp` sees the definition before including

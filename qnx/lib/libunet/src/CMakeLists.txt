@@ -9,7 +9,11 @@ include(research/check_struct_field_exists)
 
 set(LIBRARY libunet)
 set(SOURCES
-    ../include/ubench/net.h net_common.cpp net_common.h net_query_ioctls.cpp net_hostname.cpp
+    ../include/ubench/net.h
+    net_common.h net_common.cpp
+    net_query_ioctls.cpp
+    net_hostname.cpp
+    udp.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
 set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME "unet")

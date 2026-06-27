@@ -5,7 +5,6 @@ set(SOURCES
     sdd.cpp
     options.h options.cpp
     payload.h payload.cpp
-    udp.h udp.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})
