@@ -6,9 +6,6 @@
 #include <netinet/in.h>
 #include <net/if.h>
 #include <arpa/inet.h>
-#if HAVE_NET_INCLUDE_LINUX_IF_H
-#include <linux/if.h>
-#endif
 
 #include <array>
 #include <cstdint>

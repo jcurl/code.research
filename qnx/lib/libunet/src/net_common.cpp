@@ -6,6 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#if HAVE_NET_INCLUDE_LINUX_IF_H
+#include <linux/if.h>
+#endif
 
 #include <cstdint>
 
