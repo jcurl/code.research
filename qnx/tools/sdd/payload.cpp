@@ -148,16 +148,9 @@ auto payload::open(const sockaddr_in& bind, unsigned int mtu)
 
   iface_ctx in{};
   in.udp = udp{};
-  sockaddr_in addr{};
-  addr.sin_family = bind.sin_family;
-  addr.sin_addr = bind.sin_addr;
-  addr.sin_port = bind.sin_port;
 
-  auto oresult = in.udp.open(addr);
+  auto oresult = in.udp.open(bind, dest_);
   if (!oresult) return stdext::unexpected{oresult.error()};
-
-  auto jresult = in.udp.multicast_register_interface(addr);
-  if (!jresult) return stdext::unexpected{jresult.error()};
 
   auto tresult = in.udp.set_multicast_ttl(1);
   if (!tresult) return stdext::unexpected{tresult.error()};
@@ -196,7 +189,7 @@ auto payload::send() -> stdext::expected<void, int> {
   int e = 0;
   for (auto& ctx : sockets_) {
     if (ctx.mtu == 0 || (p.length() < ctx.mtu - ctx.ipv4hdr - 8)) {
-      if (!ctx.udp.send(dest_, p)) {
+      if (!ctx.udp.send(p)) {
         if (!e) e = errno;
       }
     }

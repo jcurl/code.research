@@ -20,9 +20,6 @@ auto main(int argc, char* argv[]) -> int {
   std::cout << "Interval: " << options->interval().count() << "ms" << std::endl;
 
   payload p{options->dest_addr()};
-  // auto ores = p.open(options->source_addr(), options->dest_addr());
-  // if (!ores) return ores.error();
-
   while (true) {
     if (options->source_addr().sin_addr.s_addr) {
       p.query(options->source_addr());
