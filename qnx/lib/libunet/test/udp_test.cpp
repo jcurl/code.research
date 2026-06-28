@@ -107,28 +107,28 @@ TEST(ubench_net_udp, udp_default) {
     EXPECT_EQ(mcastttl_s.error(), EINVAL);
   }
 
+  // May be used before open.
   auto reuse = udp.get_reuse_addr();
-  ASSERT_FALSE(reuse.has_value());
   if (!reuse) {
-    EXPECT_EQ(reuse.error(), EINVAL);
+    EXPECT_EQ(reuse.error(), ENOTSUP);
   }
 
+  // May be used before open.
   auto reuse_s = udp.set_reuse_addr(true);
-  ASSERT_FALSE(reuse_s.has_value());
   if (!reuse_s) {
-    EXPECT_EQ(reuse_s.error(), EINVAL);
+    EXPECT_EQ(reuse_s.error(), ENOTSUP);
   }
 
+  // May be used before open.
   auto reusep = udp.get_reuse_port();
-  ASSERT_FALSE(reusep.has_value());
   if (!reusep) {
-    EXPECT_EQ(reusep.error(), EINVAL);
+    EXPECT_EQ(reusep.error(), ENOTSUP);
   }
 
+  // May be used before open.
   auto reusep_s = udp.set_reuse_port(true);
-  ASSERT_FALSE(reusep_s.has_value());
   if (!reusep_s) {
-    EXPECT_EQ(reusep_s.error(), EINVAL);
+    EXPECT_EQ(reusep_s.error(), ENOTSUP);
   }
 
   auto ipv4hdr = udp.ipv4hdr_length();
@@ -297,14 +297,16 @@ TEST(ubench_net_udp, reuse_addr) {
   localsock.sin_port = htons(37000);
 
   ubench::net::udp udp{};
-  auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
 
   auto ora = udp.get_reuse_addr();
+  if (!ora && ora.error() == ENOTSUP) return;
   EXPECT_TRUE(ora) << ubench::string::perror(ora.error());
 
   auto ra_s = udp.set_reuse_addr(true);
   EXPECT_TRUE(ra_s) << ubench::string::perror(ra_s.error());
+
+  auto ores = udp.open(localsock);
+  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
 
   if (ora && ra_s) {
     auto nra = udp.get_reuse_addr();
@@ -322,14 +324,16 @@ TEST(ubench_net_udp, reuse_port) {
   localsock.sin_port = htons(37000);
 
   ubench::net::udp udp{};
-  auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
 
   auto orp = udp.get_reuse_port();
+  if (!orp && orp.error() == ENOTSUP) return;
   EXPECT_TRUE(orp) << ubench::string::perror(orp.error());
 
   auto rp_s = udp.set_reuse_port(true);
   EXPECT_TRUE(rp_s) << ubench::string::perror(rp_s.error());
+
+  auto ores = udp.open(localsock);
+  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
 
   if (orp && rp_s) {
     auto nrp = udp.get_reuse_port();

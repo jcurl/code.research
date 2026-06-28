@@ -41,6 +41,9 @@ check_symbol_enum_exists(SIOCGIFDSTADDR "sys/ioctl.h;net/if.h" HAVE_NET_SIOCGIFD
 check_symbol_enum_exists(SIOCGIFFLAGS "sys/ioctl.h;net/if.h" HAVE_NET_SIOCGIFFLAGS)
 check_symbol_enum_exists(SIOCGIFNETMASK "sys/ioctl.h;net/if.h" HAVE_NET_SIOCGIFNETMASK)
 
+check_symbol_enum_exists(SO_REUSEADDR "sys/socket.h" HAVE_SO_REUSEADDR)
+check_symbol_enum_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)
+
 check_symbol_exists(SIOCGIFFRNDLYNAM "sys/ioctl.h;net/if.h" HAVE_NET_SIOCGIFFRNDLYNAM)
 if(HAVE_NET_SIOCGIFFRNDLYNAM)
     target_sources(${LIBRARY} PRIVATE net_query_getalias.cpp)

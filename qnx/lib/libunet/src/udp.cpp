@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -85,6 +87,7 @@ auto set_multicast_ttl(int fd, std::uint8_t ttl)
   return {};
 }
 
+#if HAVE_SO_REUSEADDR
 auto get_reuse_addr([[maybe_unused]] int fd) -> stdext::expected<bool, int> {
   int reuse = 0;
   socklen_t optlen = sizeof(reuse);
@@ -100,7 +103,9 @@ auto set_reuse_addr([[maybe_unused]] int fd, [[maybe_unused]] bool enable)
   if (res) return stdext::unexpected{errno};
   return {};
 }
+#endif
 
+#if HAVE_SO_REUSEPORT
 auto get_reuse_port([[maybe_unused]] int fd) -> stdext::expected<bool, int> {
   int reuse = 0;
   socklen_t optlen = sizeof(reuse);
@@ -116,6 +121,7 @@ auto set_reuse_port([[maybe_unused]] int fd, [[maybe_unused]] bool enable)
   if (res) return stdext::unexpected{errno};
   return {};
 }
+#endif
 
 auto ipv4hdr_length(int fd) -> stdext::expected<int, int> {
   std::array<char, 40> options_buffer{};
@@ -216,32 +222,59 @@ auto udp::set_multicast_ttl(std::uint8_t ttl) noexcept
 }
 
 auto udp::get_reuse_addr() noexcept -> stdext::expected<bool, int> {
-  if (!socket_) {
-    return stdext::unexpected{EINVAL};
+#if HAVE_SO_REUSEADDR
+  // Cygwin must have the flag set after open, and before bind. So we do this in
+  // the open() call.
+  if (socket_) {
+    return internal::get_reuse_addr(socket_);
   }
-  return internal::get_reuse_addr(socket_);
+  return reuse_addr_;
+#else
+  return stdext::unexpected{ENOTSUP};
+#endif
 }
 
 auto udp::set_reuse_addr([[maybe_unused]] bool enable) noexcept
     -> stdext::expected<void, int> {
-  if (!socket_) {
+#if HAVE_SO_REUSEADDR
+  // Cygwin must have the flag set after open, and before bind. So we do this in
+  // the open() call.
+  if (socket_) {
     return stdext::unexpected{EINVAL};
   }
-  return internal::set_reuse_addr(socket_, enable);
+  reuse_addr_ = enable;
+  return {};
+#else
+  return stdext::unexpected{ENOTSUP};
+#endif
 }
 
 auto udp::get_reuse_port() noexcept -> stdext::expected<bool, int> {
-  if (!socket_) {
-    return stdext::unexpected{EINVAL};
+#if HAVE_SO_REUSEPORT
+  // Cygwin must have the flag set after open, and before bind. So we do this in
+  // the open() call.
+  if (socket_) {
+    return internal::get_reuse_port(socket_);
   }
-  return internal::get_reuse_port(socket_);
+  return reuse_port_;
+#else
+  return stdext::unexpected{ENOTSUP};
+#endif
 }
 
-auto udp::set_reuse_port(bool enable) noexcept -> stdext::expected<void, int> {
-  if (!socket_) {
+auto udp::set_reuse_port([[maybe_unused]] bool enable) noexcept
+    -> stdext::expected<void, int> {
+#if HAVE_SO_REUSEPORT
+  // Cygwin must have the flag set after open, and before bind. So we do this in
+  // the open() call.
+  if (socket_) {
     return stdext::unexpected{EINVAL};
   }
-  return internal::set_reuse_port(socket_, enable);
+  reuse_port_ = enable;
+  return {};
+#else
+  return stdext::unexpected{ENOTSUP};
+#endif
 }
 
 auto udp::ipv4hdr_length() noexcept -> stdext::expected<int, int> {
@@ -264,6 +297,20 @@ auto udp::open(const sockaddr_in& bind) noexcept
   auto ores = internal::open();
   if (!ores) return stdext::unexpected{ores.error()};
   ubench::file::fdesc fd = std::move(*ores);
+
+#if HAVE_SO_REUSEADDR
+  if (reuse_addr_) {
+    auto rares = internal::set_reuse_addr(fd, reuse_addr_);
+    if (!rares) return stdext::unexpected{rares.error()};
+  }
+#endif
+
+#if HAVE_SO_REUSEPORT
+  if (reuse_port_) {
+    auto rpres = internal::set_reuse_port(fd, reuse_port_);
+    if (!rpres) return stdext::unexpected{rpres.error()};
+  }
+#endif
 
   auto bres = internal::bind(fd, bind);
   if (!bres) return stdext::unexpected{bres.error()};

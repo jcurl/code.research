@@ -543,6 +543,8 @@ class udp {
 
   /// @brief Set socket address reuse.
   ///
+  /// This method must be used before the open() call.
+  ///
   /// @param enable if reuse should be enabled.
   ///
   /// @return The errno, if unexpected.
@@ -554,6 +556,8 @@ class udp {
   auto get_reuse_port() noexcept -> stdext::expected<bool, int>;
 
   /// @brief Set port address reuse.
+  ///
+  /// This method must be used before the open() call.
   ///
   /// @param enable if reuse should be enabled.
   ///
@@ -636,6 +640,8 @@ class udp {
 
  private:
   ubench::file::fdesc socket_{};
+  bool reuse_port_{false};
+  bool reuse_addr_{false};
 };
 
 }  // namespace ubench::net
