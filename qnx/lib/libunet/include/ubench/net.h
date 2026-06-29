@@ -628,6 +628,17 @@ class udp {
   /// @return The number of bytes sent, or the errno if unexpected.
   auto send(std::string_view payload) -> stdext::expected<int, int>;
 
+  /// @brief Send a byte sequence of data as the UDP payload.
+  ///
+  /// The socket must have been opened with the open(bind, dest) method, so
+  /// that the destination address is known.
+  ///
+  /// @param payload the payload to send as raw bytes.
+  ///
+  /// @return The number of bytes sent, or the errno if unexpected.
+  auto send(const std::vector<std::byte>& payload)
+      -> stdext::expected<int, int>;
+
   /// @brief Send a UTF-8 sequence of characters as the UDP payload.
   ///
   /// @param dest the destination address and port.
@@ -636,6 +647,16 @@ class udp {
   ///
   /// @return The number of bytes sent, or the errno if unexpected.
   auto send(const sockaddr_in& dest, std::string_view payload)
+      -> stdext::expected<int, int>;
+
+  /// @brief Send a UTF-8 sequence of characters as the UDP payload.
+  ///
+  /// @param dest the destination address and port.
+  ///
+  /// @param payload the payload to send as raw bytes.
+  ///
+  /// @return The number of bytes sent, or the errno if unexpected.
+  auto send(const sockaddr_in& dest, const std::vector<std::byte>& payload)
       -> stdext::expected<int, int>;
 
  private:

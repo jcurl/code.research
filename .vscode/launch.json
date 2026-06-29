@@ -70,7 +70,7 @@
             "request": "launch",
             "preLaunchTask": "Build (Debug)",
             "program": "${workspaceRoot}/qnx/build/linux-debug/lib/libunet/test/libunet_test",
-            "args": [ "--gtest_filter=ubench_net_udp.send_dest_unicast" ],
+            "args": [ "--gtest_filter=ubench_net_udp.send_unicast" ],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}/qnx/build/linux-debug/lib/libunet/test",
             "environment": [],

@@ -1,4 +1,2 @@
-#cmakedefine01 HAVE_SO_REUSEPORT
-
 // Enable 'bpf' support.
 #cmakedefine01 HAVE_BIOCSETIF

@@ -63,7 +63,7 @@ void print_help(std::string_view prog_name) {
   std::cout << " -D<destip> - Destination IP address (can be unicast "
                "or multicast)."
             << std::endl;
-  std::cout << " -B<mode> - How to send the packet {bpf, sendto}." << std::endl;
+  std::cout << " -B<mode> - How to send the packet {bpf, send}." << std::endl;
   std::cout << " -s<size> - Size of each UDP packet (default 1472)."
             << std::endl;
   std::cout << std::endl;

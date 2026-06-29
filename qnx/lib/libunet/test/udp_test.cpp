@@ -1,6 +1,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <algorithm>
 #include <cerrno>
 #include <sstream>
 
@@ -344,6 +345,16 @@ TEST(ubench_net_udp, reuse_port) {
   }
 }
 
+auto get_packet(const std::string& payload) -> std::vector<std::byte> {
+  std::vector<std::byte> bpacket{};
+  bpacket.resize(payload.size());
+  std::transform(
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+      payload.c_str(), payload.c_str() + payload.size(), bpacket.begin(),
+      [](const char x) -> auto{ return static_cast<std::byte>(x); });
+  return bpacket;
+}
+
 TEST(ubench_net_udp, send_dest_unicast) {
   sockaddr_in localsock{};
   localsock.sin_family = AF_INET;
@@ -364,6 +375,10 @@ TEST(ubench_net_udp, send_dest_unicast) {
   auto sres = udp.send(destsock, packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(destsock, get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }
 
 TEST(ubench_net_udp, send_unicast) {
@@ -386,6 +401,10 @@ TEST(ubench_net_udp, send_unicast) {
   auto sres = udp.send(packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }
 
 TEST(ubench_net_udp, send_unicast_other) {
@@ -413,6 +432,10 @@ TEST(ubench_net_udp, send_unicast_other) {
   auto sres = udp.send(destsock2, packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(destsock2, get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }
 
 TEST(ubench_net_udp, send_unicast_no_connect) {
@@ -430,6 +453,9 @@ TEST(ubench_net_udp, send_unicast_no_connect) {
   // Should fail, as no destination is specific here or in the open.
   auto sres = udp.send(packet);
   ASSERT_FALSE(sres);
+
+  auto sbres = udp.send(get_packet(packet));
+  ASSERT_FALSE(sbres);
 }
 
 TEST(ubench_net_udp, send_dest_multicast) {
@@ -461,6 +487,10 @@ TEST(ubench_net_udp, send_dest_multicast) {
   auto sres = udp.send(destsock, packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(destsock, get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }
 
 TEST(ubench_net_udp, send_multicast) {
@@ -492,6 +522,10 @@ TEST(ubench_net_udp, send_multicast) {
   auto sres = udp.send(packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }
 
 TEST(ubench_net_udp, send_multicast_other) {
@@ -528,6 +562,10 @@ TEST(ubench_net_udp, send_multicast_other) {
   auto sres = udp.send(destsock2, packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(destsock2, get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }
 
 TEST(ubench_net_udp, send_multicast_no_register) {
@@ -553,4 +591,8 @@ TEST(ubench_net_udp, send_multicast_no_register) {
   auto sres = udp.send(packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+
+  auto sbres = udp.send(get_packet(packet));
+  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
+  ASSERT_EQ(*sbres, 4);
 }

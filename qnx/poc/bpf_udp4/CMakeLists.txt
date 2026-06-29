@@ -16,9 +16,6 @@ add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
 target_link_libraries(${BINARY} PRIVATE libubench libunet)
 
-check_symbol_lib_exists(socket "sys/socket.h" HAVE_SOCKET LIB "socket" TARGET ${BINARY} FATAL)
-check_symbol_enum_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)
-
 # Test using `/dev/bpf` on NetBSD, FreeBSD, QNX 7.1. QNX 8.0 also needs "sys/socket.h"
 check_symbol_enum_exists(BIOCSETIF "sys/socket.h;sys/types.h;sys/time.h;sys/ioctl.h;net/bpf.h" HAVE_BIOCSETIF)
 if (HAVE_BIOCSETIF)

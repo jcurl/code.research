@@ -367,6 +367,17 @@ auto udp::send(std::string_view payload) -> stdext::expected<int, int> {
   return nbytes;
 }
 
+auto udp::send(const std::vector<std::byte>& payload)
+    -> stdext::expected<int, int> {
+  if (!socket_) {
+    return stdext::unexpected{EINVAL};
+  }
+
+  ssize_t nbytes = ::send(socket_, payload.data(), payload.size(), 0);
+  if (nbytes < 0) return stdext::unexpected{errno};
+  return nbytes;
+}
+
 auto udp::send(const sockaddr_in& dest, std::string_view payload)
     -> stdext::expected<int, int> {
   if (!socket_ || !internal::is_valid_sockaddr(dest)) {
@@ -378,6 +389,21 @@ auto udp::send(const sockaddr_in& dest, std::string_view payload)
   auto destaddr = reinterpret_cast<const sockaddr*>(&dest);
   ssize_t nbytes = sendto(
       socket_, payload.data(), payload.length(), 0, destaddr, sizeof(dest));
+  if (nbytes < 0) return stdext::unexpected{errno};
+  return nbytes;
+}
+
+auto udp::send(const sockaddr_in& dest, const std::vector<std::byte>& payload)
+    -> stdext::expected<int, int> {
+  if (!socket_ || !internal::is_valid_sockaddr(dest)) {
+    return stdext::unexpected{EINVAL};
+  }
+
+  // Systems programming.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  auto destaddr = reinterpret_cast<const sockaddr*>(&dest);
+  ssize_t nbytes = sendto(
+      socket_, payload.data(), payload.size(), 0, destaddr, sizeof(dest));
   if (nbytes < 0) return stdext::unexpected{errno};
   return nbytes;
 }

@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 
 #include "ubench/file.h"
+#include "ubench/net.h"
 #include "udp_socket.h"
 
 class bsd_socket : public udp_socket {
@@ -18,13 +19,12 @@ class bsd_socket : public udp_socket {
   auto operator=(bsd_socket&&) -> bsd_socket& = default;
   ~bsd_socket() override = default;
 
-  operator bool() const noexcept override { return sock_; }
+  operator bool() const noexcept override { return udp_; }
   auto send(const std::vector<std::byte>& data) noexcept
       -> stdext::expected<void, int> override;
 
  private:
-  ubench::file::fdesc sock_{};
-  sockaddr_in dest_{};
+  ubench::net::udp udp_{};
 };
 
 #endif
