@@ -10,6 +10,7 @@
 #include <linux/if.h>
 #endif
 
+#include <climits>
 #include <cstdint>
 
 #include "ubench/net.h"
@@ -230,6 +231,25 @@ auto interface::status() const noexcept -> const ubench::flags<if_flags> {
   if (flags_ & IFF_LOWER_UP) f |= if_flags::LOWER_UP;
 #endif
   return f;
+}
+
+[[nodiscard]] auto gethostname() -> std::optional<std::string> {
+  std::array<char, _POSIX_HOST_NAME_MAX> hostname{};
+
+  int result = ::gethostname(hostname.data(), hostname.size());
+  if (result) return std::nullopt;
+
+  // Find the length, which is up to the first dot '.', NUL terminator, or the
+  // maximum length.
+  size_t len = 0;
+  while (len < hostname.size()) {
+    // Clearly within boundaries.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+    if (hostname[len] == '.' || hostname[len] == 0) break;
+    len++;
+  }
+
+  return std::string{hostname.data(), len};
 }
 
 }  // namespace ubench::net

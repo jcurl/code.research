@@ -37,7 +37,7 @@
 // Link Types
 #cmakedefine01 HAVE_NET_IFT_ETHER
 
-// Function getifaddrs() and freeifaddrs() exist.
+// Function getifaddrs() and freeifaddrs() exist
 #cmakedefine01 HAVE_NET_GETIFADDRS
 
 // Field in the struct ifreq (found on FreeBSD)
@@ -49,3 +49,7 @@
 // Socket Options
 #cmakedefine01 HAVE_SO_REUSEADDR
 #cmakedefine01 HAVE_SO_REUSEPORT
+
+// For `getdomainname`
+#cmakedefine01 HAVE_NETDB_GETNAMEINFO
+#cmakedefine01 HAVE_NETDB_GETHOSTENT

@@ -12,7 +12,6 @@ set(SOURCES
     ../include/ubench/net.h
     net_common.h net_common.cpp
     net_query_ioctls.cpp
-    net_hostname.cpp
     udp.cpp
 )
 add_library(${LIBRARY} STATIC ${SOURCES})
@@ -97,6 +96,18 @@ endif()
 
 # Check for FreeBSD that flags is over two fields.
 check_struct_field_exists("ifreq" "ifr_flagshigh" "net/if.h" NET_IFR_FLAGS_HIGH)
+
+# Check for getdomainname functions.
+check_symbol_lib_exists(getnameinfo "sys/socket.h;netdb.h" HAVE_NETDB_GETNAMEINFO)
+check_symbol_lib_exists(gethostent "sys/socket.h;netdb.h" HAVE_NETDB_GETHOSTENT)
+
+if (HAVE_NETDB_GETNAMEINFO)
+    # Cygwin, Linux, QNX, FreeBSD, NetBSD
+    target_sources(${LIBRARY} PRIVATE net_domainname_nameinfo.cpp)
+elseif(HAVE_NETDB_GETHOSTENT)
+    # Linux, QNX, FreeBSD, NetBSD
+    target_sources(${LIBRARY} PRIVATE net_domainname_hostent.cpp)
+endif()
 
 if(IS_DEBUG)
     add_sanitizers(${LIBRARY})

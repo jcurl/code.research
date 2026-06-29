@@ -13,25 +13,6 @@
 
 namespace ubench::net {
 
-[[nodiscard]] auto gethostname() -> std::optional<std::string> {
-  std::array<char, _POSIX_HOST_NAME_MAX> hostname{};
-
-  int result = ::gethostname(hostname.data(), hostname.size());
-  if (result) return std::nullopt;
-
-  // Find the length, which is up to the first dot '.', NUL terminator, or the
-  // maximum length.
-  size_t len = 0;
-  while (len < hostname.size()) {
-    // Clearly within boundaries.
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-    if (hostname[len] == '.' || hostname[len] == 0) break;
-    len++;
-  }
-
-  return std::string{hostname.data(), len};
-}
-
 [[nodiscard]] auto getdomainname() -> std::optional<std::string> {
   auto phostname = gethostname();
   if (!phostname) return std::nullopt;

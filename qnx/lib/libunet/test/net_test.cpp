@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <iostream>
 #include <sstream>
 
 #include <gmock/gmock.h>
@@ -263,6 +264,7 @@ TEST(ubench_net, gethostname) {
   ASSERT_TRUE(hostname.has_value());
   if (hostname) {
     ASSERT_GT(hostname->length(), 0);
+    std::cout << "hostname: " << *hostname << std::endl;
   }
 }
 
@@ -270,5 +272,6 @@ TEST(ubench_net, getdomainname) {
   auto domainname = ubench::net::getdomainname();
   if (domainname) {
     ASSERT_GT(domainname->length(), 0);
+    std::cout << "domain name: " << *domainname << std::endl;
   }
 }
