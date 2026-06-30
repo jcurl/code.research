@@ -3,11 +3,13 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
 #include <sstream>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "ubench/clock.h"
 #include "ubench/net.h"
 #include "ubench/string.h"
 
@@ -40,6 +42,69 @@ auto find_first_interface() -> in_addr {
   }
   return local_interface;
 }
+
+struct recv_packet {
+  sockaddr_in source;
+  std::string packet;
+};
+
+class udp_receive {
+ public:
+  udp_receive() = default;
+  udp_receive(const udp_receive&) = delete;
+  auto operator=(const udp_receive&) -> udp_receive& = delete;
+  udp_receive(udp_receive&&) noexcept = default;
+  auto operator=(udp_receive&&) noexcept -> udp_receive& = default;
+  ~udp_receive() = default;
+
+  auto get_receive_timeout()
+      -> stdext::expected<std::chrono::microseconds, int> {
+    if (!udp_) return stdext::unexpected{EINVAL};
+
+    timeval tv{};
+    socklen_t tvlen = sizeof(tv);
+    auto res = getsockopt(udp_, SOL_SOCKET, SO_RCVTIMEO, &tv, &tvlen);
+    if (res < 0) return stdext::unexpected{errno};
+    unsigned int usec = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return std::chrono::microseconds{usec};
+  }
+
+  auto set_receive_timeout(std::chrono::microseconds timeout)
+      -> stdext::expected<void, int> {
+    if (!udp_) return stdext::unexpected{EINVAL};
+    timeval tv = ubench::chrono::duration_to_timeval(timeout);
+    auto res = setsockopt(udp_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    if (res < 0) return stdext::unexpected{errno};
+    return {};
+  }
+
+  auto open(const sockaddr_in& bind) noexcept -> stdext::expected<void, int> {
+    return udp_.open(bind);
+  }
+
+  operator bool() const { return udp_; }
+
+  auto close() noexcept -> void { udp_.close(); }
+
+  auto receive() -> stdext::expected<recv_packet, int> {
+    if (!udp_) return stdext::unexpected{EINVAL};
+
+    recv_packet p{};
+    std::array<char, 64> buffer{};
+    socklen_t sl{};
+    auto res = recvfrom(udp_, buffer.data(), buffer.size(), 0,
+        // Cast required for systems programming sockets.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        reinterpret_cast<sockaddr*>(&p.packet), &sl);
+    if (res < 0) return stdext::unexpected{errno};
+
+    p.packet = std::string{buffer.data(), static_cast<std::size_t>(res)};
+    return p;
+  }
+
+ private:
+  ubench::net::udp udp_{};
+};
 
 }  // namespace
 
@@ -355,6 +420,14 @@ auto get_packet(const std::string& payload) -> std::vector<std::byte> {
   return bpacket;
 }
 
+auto check_receive(udp_receive& r, std::string exp) -> void {
+  auto p = r.receive();
+  ASSERT_TRUE(p.has_value()) << ubench::string::perror(p.error());
+  if (p) {
+    ASSERT_EQ(exp, p->packet);
+  }
+}
+
 TEST(ubench_net_udp, send_dest_unicast) {
   sockaddr_in localsock{};
   localsock.sin_family = AF_INET;
@@ -366,7 +439,11 @@ TEST(ubench_net_udp, send_dest_unicast) {
   destsock.sin_addr.s_addr = htonl(0x7F000001);
   destsock.sin_port = htons(37001);
 
-  std::string packet{"Test"};
+  std::string packet{"T000"};
+
+  udp_receive udpr{};
+  udpr.open(destsock);
+  udpr.set_receive_timeout(std::chrono::seconds(1));
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
@@ -375,10 +452,12 @@ TEST(ubench_net_udp, send_dest_unicast) {
   auto sres = udp.send(destsock, packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+  check_receive(udpr, "T000");
 
   auto sbres = udp.send(destsock, get_packet(packet));
   ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
   ASSERT_EQ(*sbres, 4);
+  check_receive(udpr, "T000");
 }
 
 TEST(ubench_net_udp, send_unicast) {
@@ -392,7 +471,11 @@ TEST(ubench_net_udp, send_unicast) {
   destsock.sin_addr.s_addr = htonl(0x7F000001);
   destsock.sin_port = htons(37001);
 
-  std::string packet{"Test"};
+  std::string packet{"T001"};
+
+  udp_receive udpr{};
+  udpr.open(destsock);
+  udpr.set_receive_timeout(std::chrono::seconds(1));
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
@@ -401,10 +484,12 @@ TEST(ubench_net_udp, send_unicast) {
   auto sres = udp.send(packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+  check_receive(udpr, "T001");
 
   auto sbres = udp.send(get_packet(packet));
   ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
   ASSERT_EQ(*sbres, 4);
+  check_receive(udpr, "T001");
 }
 
 TEST(ubench_net_udp, send_unicast_other) {
@@ -416,14 +501,18 @@ TEST(ubench_net_udp, send_unicast_other) {
   sockaddr_in destsock{};
   destsock.sin_family = AF_INET;
   destsock.sin_addr.s_addr = htonl(0x7F000001);
-  destsock.sin_port = htons(37001);
+  destsock.sin_port = htons(37002);
 
   sockaddr_in destsock2{};
   destsock2.sin_family = AF_INET;
   destsock2.sin_addr.s_addr = htonl(0x7F000001);
-  destsock2.sin_port = htons(37002);
+  destsock2.sin_port = htons(37001);
 
-  std::string packet{"Test"};
+  std::string packet{"T002"};
+
+  udp_receive udpr{};
+  udpr.open(destsock2);
+  udpr.set_receive_timeout(std::chrono::seconds(1));
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
@@ -432,10 +521,12 @@ TEST(ubench_net_udp, send_unicast_other) {
   auto sres = udp.send(destsock2, packet);
   ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
   ASSERT_EQ(*sres, 4);
+  check_receive(udpr, "T002");
 
   auto sbres = udp.send(destsock2, get_packet(packet));
   ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
   ASSERT_EQ(*sbres, 4);
+  check_receive(udpr, "T002");
 }
 
 TEST(ubench_net_udp, send_unicast_no_connect) {
@@ -444,7 +535,7 @@ TEST(ubench_net_udp, send_unicast_no_connect) {
   localsock.sin_addr.s_addr = htonl(0x7F000001);
   localsock.sin_port = htons(37000);
 
-  std::string packet{"Test"};
+  std::string packet{"T003"};
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
@@ -472,7 +563,7 @@ TEST(ubench_net_udp, send_dest_multicast) {
   destsock.sin_addr.s_addr = htonl(0xEFFF2A63);
   destsock.sin_port = htons(37001);
 
-  std::string packet{"Test"};
+  std::string packet{"T004"};
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
@@ -507,7 +598,7 @@ TEST(ubench_net_udp, send_multicast) {
   destsock.sin_addr.s_addr = htonl(0xEFFF2A63);
   destsock.sin_port = htons(37001);
 
-  std::string packet{"Test"};
+  std::string packet{"T005"};
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
@@ -547,7 +638,7 @@ TEST(ubench_net_udp, send_multicast_other) {
   destsock2.sin_addr.s_addr = htonl(0xEFFF2A63);
   destsock2.sin_port = htons(37002);
 
-  std::string packet{"Test"};
+  std::string packet{"T006"};
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
@@ -582,7 +673,7 @@ TEST(ubench_net_udp, send_multicast_no_register) {
   destsock.sin_addr.s_addr = htonl(0xEFFF2A64);
   destsock.sin_port = htons(37001);
 
-  std::string packet{"Test"};
+  std::string packet{"T007"};
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);

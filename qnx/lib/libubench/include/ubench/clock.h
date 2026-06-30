@@ -1,6 +1,8 @@
 #ifndef UBENCH_CHRONO_CLOCK_H
 #define UBENCH_CHRONO_CLOCK_H
 
+#include <sys/time.h>
+
 #include <chrono>
 #include <ctime>
 
@@ -79,6 +81,21 @@ constexpr auto duration_to_timespec(std::chrono::nanoseconds dur) -> timespec {
   ts.tv_sec = static_cast<decltype(ts.tv_sec)>(secs.count());
   ts.tv_nsec = static_cast<decltype(ts.tv_nsec)>(nsecs.count());
   return ts;
+}
+
+/// @brief Convert a micro-seconds value to a timeval.
+///
+/// @param dur The duration to convert.
+///
+/// @return the timeval equivalent.
+constexpr auto duration_to_timeval(std::chrono::microseconds dur) -> timeval {
+  auto secs = std::chrono::duration_cast<std::chrono::seconds>(dur);
+  auto usecs = dur - secs;
+  timeval tv{};
+
+  tv.tv_sec = static_cast<decltype(tv.tv_sec)>(secs.count());
+  tv.tv_usec = static_cast<decltype(tv.tv_usec)>(usecs.count());
+  return tv;
 }
 
 }  // namespace ubench::chrono
