@@ -622,7 +622,8 @@ struct storage_base<void, E, true>
     storage_base &operator=(storage_base &&)      = default;
 
     constexpr storage_base() noexcept
-        : m_has_val(true)
+        : m_val()
+        , m_has_val(true)
     {
     }
 
@@ -633,7 +634,8 @@ struct storage_base<void, E, true>
     }
 
     constexpr explicit storage_base(std::in_place_t) noexcept
-        : m_has_val(true)
+        : m_val()
+        , m_has_val(true)
     {
     }
 
@@ -685,7 +687,8 @@ struct storage_base<void, E, false>
     storage_base &operator=(storage_base &&)      = default;
 
     constexpr storage_base() noexcept
-        : m_has_val(true)
+        : m_val()
+        , m_has_val(true)
     {
     }
 
@@ -696,7 +699,8 @@ struct storage_base<void, E, false>
     }
 
     constexpr explicit storage_base(std::in_place_t) noexcept
-        : m_has_val(true)
+        : m_val()
+        , m_has_val(true)
     {
     }
 
