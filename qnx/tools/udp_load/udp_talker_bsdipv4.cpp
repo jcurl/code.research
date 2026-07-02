@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <ctime>
+#include <iostream>
 
 #include "ubench/net.h"
 #include "ubench/string.h"
@@ -18,61 +19,45 @@ using namespace std::chrono_literals;
 auto udp_talker_bsd::init_packets(const struct sockaddr_in &source,
     const struct sockaddr_in &dest,
     [[maybe_unused]] std::uint16_t pkt_size) noexcept -> bool {
-  if (socket_fd_) return false;
+  if (udp_) return false;
 
-  ubench::file::fdesc fd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (!fd) return false;
+  ubench::net::udp sock{};
+  sock.set_reuse_addr(true);
+  sock.set_reuse_port(true);
+  auto ores = sock.open(source);
+  if (!ores) {
+    std::cerr << "sock.open() " << ubench::string::perror(ores.error())
+              << std::endl;
+    return false;
+  }
 
   if (ubench::net::is_multicast(dest.sin_addr)) {
-    char loopch = 1;
-    if (setsockopt(
-            fd, IPPROTO_IP, IP_MULTICAST_LOOP, &loopch, sizeof(loopch))) {
-      ubench::string::perror(
-          "setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, 1)");
+    auto mlres = sock.set_multicast_loopback(true);
+    if (!mlres) {
+      std::cerr << "sock.set_multicast_loopback(true) "
+                << ubench::string::perror(mlres.error()) << std::endl;
       return false;
     }
 
-    if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &(source.sin_addr),
-            sizeof(in_addr))) {
-      ubench::string::perror(
-          "setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, source)");
+    auto mires = sock.multicast_register_interface(source);
+    if (!mires) {
+      std::cerr << "sock.multicast_register_interface(source) "
+                << ubench::string::perror(mires.error()) << std::endl;
       return false;
     }
 
-    unsigned char mttl = 1;
-    if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, &mttl, sizeof(mttl))) {
-      ubench::string::perror("setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, 1)");
+    auto mtres = sock.set_multicast_ttl(1);
+    if (!mtres) {
+      std::cerr << "sock.set_multicast_ttl(1) "
+                << ubench::string::perror(mtres.error()) << std::endl;
       return false;
     }
-  }
-
-  int reuseaddr = 1;
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr))) {
-    ubench::string::perror("setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, 1)");
-    return false;
-  }
-
-#if HAVE_SO_REUSEPORT
-  int reuseport = 1;
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &reuseport, sizeof(reuseport))) {
-    ubench::string::perror("setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)");
-    return false;
-  }
-#endif
-
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (bind(fd, reinterpret_cast<const sockaddr *>(&source),
-          sizeof(sockaddr_in))) {
-    ubench::string::perror("bind(fd, source)");
-    return false;
   }
 
   // Remember the settings
   source_ = source;
   dest_ = dest;
-
-  socket_fd_ = std::move(fd);
-
+  udp_ = std::move(sock);
   return true;
 }
 
@@ -82,7 +67,7 @@ auto udp_talker_sendto::init_packets(const struct sockaddr_in &source,
   std::uint8_t x = 0;
   buffer_.resize(pkt_size);
   for (auto &b : buffer_) {
-    b = x;
+    b = static_cast<std::byte>(x);
     x++;
   }
 
@@ -91,24 +76,23 @@ auto udp_talker_sendto::init_packets(const struct sockaddr_in &source,
 
 auto udp_talker_sendto::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
-  if (!socket_fd_) return 0;
+  if (!udp_) return 0;
 
   std::uint16_t sent = 0;
   for (std::uint16_t i = 0; i < count; i++) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    auto dest = reinterpret_cast<const sockaddr *>(&dest_);
-    ssize_t nbytes{};
+    bool retry{};
     do {
-      nbytes = sendto(
-          socket_fd_, buffer_.data(), buffer_.size(), 0, dest, sizeof(dest_));
-      if (nbytes < 0) {
-        if (errno == ENOBUFS) {
+      retry = false;
+      auto sres = udp_.send(dest_, buffer_);
+      if (!sres) {
+        if (sres.error() == ENOBUFS) {
+          retry = true;
           if (delay(750us)) continue;
         }
-        ubench::string::perror("sendto()");
+        std::cerr << "udp_.sendto() " << ubench::string::perror(sres.error());
         return sent;
       }
-    } while (nbytes < 0);
+    } while (retry);
     sent++;
   }
   return sent;
@@ -150,24 +134,24 @@ auto udp_talker_sendmmsg::init_packets(const struct sockaddr_in &source,
 
 auto udp_talker_sendmmsg::send_packets(std::uint16_t count) noexcept
     -> std::uint16_t {
-  if (!socket_fd_) return 0;
+  if (!udp_) return 0;
 
   std::uint16_t sent = 0;
   while (sent < count) {
     auto remain = std::min<std::uint16_t>(count - sent, UIO_MAXIOV);
     bool retry{};
     do {
-      auto result = sendmmsg(socket_fd_, msgpool_.data(), remain, 0);
-      if (result == -1) {
+      retry = false;
+      auto result = sendmmsg(udp_, msgpool_.data(), remain, 0);
+      if (result < 0) {
         if (errno == ENOBUFS) {
+          retry = true;
           if (delay(750us)) continue;
         }
         ubench::string::perror("sendmmsg()");
         return sent;
       }
-
-      retry = result < 0;
-      if (!retry) sent += result;
+      sent += result;
     } while (retry);
   }
   return sent;

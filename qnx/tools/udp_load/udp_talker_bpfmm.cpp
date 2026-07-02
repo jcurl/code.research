@@ -166,18 +166,21 @@ auto udp_talker_bpfmm::send_packets(std::uint16_t count) noexcept
   std::uint16_t sent = 0;
   while (sent < count) {
     auto remain = std::min<std::uint16_t>(count - sent, eth_packets_.size());
-    int result{};
-
+    bool retry{};
     do {
-      result = writev(socket_fd_, msgvec_.data(), remain * 3);
-      if (result == -1) {
+      retry = false;
+      auto result = writev(socket_fd_, msgvec_.data(), remain * 3);
+      if (result < 0) {
         if (errno == ENOBUFS) {
+          retry = true;
           if (delay(750us)) continue;
         }
         ubench::string::perror("writev()");
         return sent;
       }
-    } while (result < 0);
+    } while (retry);
+
+    // writev() returns the number of bytes written. Assume it wrote all data.
     sent += remain;
   }
   return sent;

@@ -16,6 +16,7 @@
 
 #include "ubench/file.h"
 #include "ubench/measure/busy_measurement.h"
+#include "ubench/net.h"
 
 #if HAVE_BIOCSETIF
 #include <sys/types.h>
@@ -175,7 +176,7 @@ class udp_talker_bsd : public udp_talker {
       -> bool override;
 
  protected:
-  ubench::file::fdesc socket_fd_{-1};
+  ubench::net::udp udp_{};
   struct sockaddr_in source_ {};
   struct sockaddr_in dest_ {};
 };
@@ -194,7 +195,7 @@ class udp_talker_sendto final : public udp_talker_bsd {
   auto send_packets(std::uint16_t count) noexcept -> std::uint16_t override;
 
  private:
-  std::vector<std::uint8_t> buffer_{};
+  std::vector<std::byte> buffer_{};
 };
 
 #if HAVE_SENDMMSG

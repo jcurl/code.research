@@ -19,10 +19,9 @@ target_link_libraries(${BINARY} PRIVATE Threads::Threads)
 target_link_libraries(${BINARY} PRIVATE libubench libunet)
 
 check_symbol_lib_exists(socket "sys/socket.h" HAVE_SOCKET LIB "socket" TARGET ${BINARY} FATAL)
-check_symbol_enum_exists(SO_REUSEPORT "sys/socket.h" HAVE_SO_REUSEPORT)
 
 # Test using `sendmmsg`.
-check_symbol_gnusource_exists(sendmmsg "sys/socket.h" HAVE_SENDMMSG)
+check_symbol_gnusource_exists(sendmmsg "sys/types.h;sys/socket.h" HAVE_SENDMMSG)
 if (HAVE_SENDMMSG)
     check_symbol_enum_exists(UIO_MAXIOV "sys/types.h;sys/socket.h;sys/uio.h" HAVE_UIO_MAXIOV)
 endif()

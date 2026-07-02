@@ -159,15 +159,16 @@ auto udp_talker_bpf::send_packets(std::uint16_t count) noexcept
 
     bool retry{};
     do {
+      retry = false;
       auto result = writev(socket_fd_, iov.data(), iov.size());
-      if (result == -1) {
+      if (result < 0) {
         if (errno == ENOBUFS) {
+          retry = true;
           if (delay(750us)) continue;
         }
         ubench::string::perror("writev()");
         return sent;
       }
-      retry = result < 0;
     } while (retry);
     sent++;
   }

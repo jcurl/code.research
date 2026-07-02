@@ -1,5 +1,3 @@
-#cmakedefine01 HAVE_SO_REUSEPORT
-
 // Enable 'sendmmsg' support.
 #cmakedefine01 HAVE_SENDMMSG
 #cmakedefine01 HAVE_UIO_MAXIOV
