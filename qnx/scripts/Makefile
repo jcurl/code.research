@@ -69,10 +69,10 @@ linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-j
 netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb netbsd10.1-aarch64-clang
 
 .PHONY: freebsd
-freebsd: freebsd15.0-aarch64 freebsd14.4-aarch64 freebsd13.5-aarch64
+freebsd: freebsd15.1-aarch64 freebsd14.4-aarch64 freebsd13.5-aarch64
 
 .PHONY: freebsd-all
-freebsd-all: freebsd15.0-aarch64 freebsd14.4-aarch64 freebsd14.3-aarch64 freebsd14.2-aarch64 freebsd13.5-aarch64
+freebsd-all: freebsd15.1-aarch64 freebsd15.0-aarch64 freebsd14.4-aarch64 freebsd14.3-aarch64 freebsd14.2-aarch64 freebsd13.5-aarch64
 
 .PHONY: qnx
 qnx: qnx-710-aarch64 qnx-710-x64 qnx-800-aarch64 qnx-800-x64
@@ -137,6 +137,9 @@ freebsd14.4-aarch64:
 
 freebsd15.0-aarch64:
 	@./build.sh -dfreebsd -c15.0 -bUBUNTU_VERSION=resolute "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+freebsd15.1-aarch64:
+	@./build.sh -dfreebsd -c15.1 -bUBUNTU_VERSION=resolute "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 qnx-710-aarch64:
 	@./build.sh -dqnx -c710 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
