@@ -30,7 +30,7 @@ auto make_options(int argc, const char* const argv[]) noexcept
   int err = 0;
 
   options o{};
-  ubench::options opts{argc, argv, "cdp:sv?"};
+  ubench::options opts{argc, argv, "mp:rstv?"};
   for (const auto& opt : opts) {
     if (opt) {
       switch (opt->get_option()) {
