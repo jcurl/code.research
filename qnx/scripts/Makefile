@@ -75,7 +75,7 @@ freebsd: freebsd15.1-aarch64 freebsd14.4-aarch64 freebsd13.5-aarch64
 freebsd-all: freebsd15.1-aarch64 freebsd15.0-aarch64 freebsd14.4-aarch64 freebsd14.3-aarch64 freebsd14.2-aarch64 freebsd13.5-aarch64
 
 .PHONY: qnx
-qnx: qnx-710-aarch64 qnx-710-x64 qnx-800-aarch64 qnx-800-x64
+qnx: qnx-710-aarch64 qnx-710-x64 qnx-800-aarch64-rpi5 qnx-800-aarch64 qnx-800-x64
 
 .PHONY: clang
 clang: alpine-latest-clang ubuntu-resolute-clang ubuntu-noble-clang ubuntu-jammy-clang freebsd15.0-aarch64 freebsd14.4-aarch64 netbsd10.1-aarch64-clang
@@ -149,6 +149,9 @@ qnx-710-x64:
 
 qnx-800-aarch64:
 	@./build.sh -dqnx -c800 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+qnx-800-aarch64-rpi5:
+	@./build.sh -dqnx -c800 -varm64-rpi5 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le-rpi5.cmake -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 qnx-800-x64:
 	@./build.sh -dqnx -c800 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
