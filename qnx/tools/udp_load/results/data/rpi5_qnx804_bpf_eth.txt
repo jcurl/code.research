@@ -1,0 +1,1345 @@
+QNX rpi5-800-b6a1d3ce 8.0.0 2026/02/27-10:59:13EST RaspberryPi5 aarch64le
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 5000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 6.89%
+Process CPU Busy: 1.03%
+Time in send: 1434ms
+Time in sleep: 28570ms
+Packets Sent: 150025
+Packets Expected: 150025
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 10000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 14.15%
+Process CPU Busy: 2.07%
+Time in send: 3003ms
+Time in sleep: 27002ms
+Packets Sent: 300050
+Packets Expected: 300050
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 15000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 21.32%
+Process CPU Busy: 3.10%
+Time in send: 4548ms
+Time in sleep: 25457ms
+Packets Sent: 450075
+Packets Expected: 450075
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 20000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 28.69%
+Process CPU Busy: 4.12%
+Time in send: 6062ms
+Time in sleep: 23943ms
+Packets Sent: 600100
+Packets Expected: 600100
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 25000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.05%
+Total CPU Busy: 35.16%
+Process CPU Busy: 5.16%
+Time in send: 7494ms
+Time in sleep: 22512ms
+Packets Sent: 750250
+Packets Expected: 750250
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 30000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 42.00%
+Process CPU Busy: 6.25%
+Time in send: 8991ms
+Time in sleep: 21016ms
+Packets Sent: 900300
+Packets Expected: 900300
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 35000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 49.43%
+Process CPU Busy: 7.27%
+Time in send: 10580ms
+Time in sleep: 19426ms
+Packets Sent: 1050350
+Packets Expected: 1050350
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 40000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 56.66%
+Process CPU Busy: 8.34%
+Time in send: 12141ms
+Time in sleep: 17864ms
+Packets Sent: 1200200
+Packets Expected: 1200200
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 45000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 64.02%
+Process CPU Busy: 9.24%
+Time in send: 13744ms
+Time in sleep: 16258ms
+Packets Sent: 1350225
+Packets Expected: 1350225
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 50000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 70.53%
+Process CPU Busy: 10.38%
+Time in send: 15155ms
+Time in sleep: 14847ms
+Packets Sent: 1500250
+Packets Expected: 1500250
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 55000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 76.83%
+Process CPU Busy: 11.45%
+Time in send: 16446ms
+Time in sleep: 13557ms
+Packets Sent: 1650275
+Packets Expected: 1650275
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 60000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 86.03%
+Process CPU Busy: 12.52%
+Time in send: 18131ms
+Time in sleep: 11874ms
+Packets Sent: 1800300
+Packets Expected: 1800300
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 65000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 92.39%
+Process CPU Busy: 13.28%
+Time in send: 19907ms
+Time in sleep: 10098ms
+Packets Sent: 1950325
+Packets Expected: 1950325
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 70000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 98.14%
+Process CPU Busy: 14.40%
+Time in send: 20930ms
+Time in sleep: 9074ms
+Packets Sent: 2100350
+Packets Expected: 2100350
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 75000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.06%
+Total CPU Busy: 105.65%
+Process CPU Busy: 15.22%
+Time in send: 22711ms
+Time in sleep: 7290ms
+Packets Sent: 2250375
+Packets Expected: 2250375
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 8000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 80000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 112.62%
+Process CPU Busy: 16.36%
+Time in send: 24187ms
+Time in sleep: 5815ms
+Packets Sent: 2400400
+Packets Expected: 2400400
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 5000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 8.22%
+Process CPU Busy: 1.42%
+Time in send: 1817ms
+Time in sleep: 58193ms
+Packets Sent: 150024
+Packets Expected: 150024
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 10000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 16.25%
+Process CPU Busy: 2.81%
+Time in send: 3656ms
+Time in sleep: 56354ms
+Packets Sent: 300050
+Packets Expected: 300050
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 15000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 24.26%
+Process CPU Busy: 4.19%
+Time in send: 5485ms
+Time in sleep: 54524ms
+Packets Sent: 450074
+Packets Expected: 450074
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 20000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 32.28%
+Process CPU Busy: 5.59%
+Time in send: 7317ms
+Time in sleep: 52692ms
+Packets Sent: 600100
+Packets Expected: 600100
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 25000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 40.61%
+Process CPU Busy: 7.02%
+Time in send: 9161ms
+Time in sleep: 50849ms
+Packets Sent: 750124
+Packets Expected: 750124
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 30000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 48.28%
+Process CPU Busy: 8.40%
+Time in send: 10978ms
+Time in sleep: 49032ms
+Packets Sent: 900150
+Packets Expected: 900150
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 35000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 56.40%
+Process CPU Busy: 9.66%
+Time in send: 12837ms
+Time in sleep: 47174ms
+Packets Sent: 1050350
+Packets Expected: 1050350
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 40000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 64.60%
+Process CPU Busy: 11.12%
+Time in send: 14729ms
+Time in sleep: 45283ms
+Packets Sent: 1200400
+Packets Expected: 1200400
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 45000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.05%
+Total CPU Busy: 72.71%
+Process CPU Busy: 12.58%
+Time in send: 16584ms
+Time in sleep: 43428ms
+Packets Sent: 1350450
+Packets Expected: 1350450
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 50000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 80.60%
+Process CPU Busy: 13.89%
+Time in send: 18368ms
+Time in sleep: 41644ms
+Packets Sent: 1500500
+Packets Expected: 1500500
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 55000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 89.07%
+Process CPU Busy: 15.42%
+Time in send: 20350ms
+Time in sleep: 39662ms
+Packets Sent: 1650550
+Packets Expected: 1650550
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 60000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 85.71%
+Process CPU Busy: 12.33%
+Time in send: 18419ms
+Time in sleep: 41587ms
+Packets Sent: 1800300
+Packets Expected: 1800300
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 65000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 104.30%
+Process CPU Busy: 17.79%
+Time in send: 23755ms
+Time in sleep: 36248ms
+Packets Sent: 1950324
+Packets Expected: 1950324
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 70000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 113.31%
+Process CPU Busy: 19.56%
+Time in send: 25891ms
+Time in sleep: 34111ms
+Packets Sent: 2100350
+Packets Expected: 2100350
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 75000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 121.19%
+Process CPU Busy: 20.89%
+Time in send: 27685ms
+Time in sleep: 32319ms
+Packets Sent: 2250374
+Packets Expected: 2250374
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 8000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 80000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 114.31%
+Process CPU Busy: 17.12%
+Time in send: 24671ms
+Time in sleep: 35337ms
+Packets Sent: 2400600
+Packets Expected: 2400600
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 5000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 9.71%
+Process CPU Busy: 1.62%
+Time in send: 2363ms
+Time in sleep: 87649ms
+Packets Sent: 150024
+Packets Expected: 150024
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 10000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 18.74%
+Process CPU Busy: 3.13%
+Time in send: 4839ms
+Time in sleep: 85176ms
+Packets Sent: 300048
+Packets Expected: 300048
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 15000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.05%
+Total CPU Busy: 28.07%
+Process CPU Busy: 4.64%
+Time in send: 7327ms
+Time in sleep: 82687ms
+Packets Sent: 450075
+Packets Expected: 450075
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 20000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 37.42%
+Process CPU Busy: 6.17%
+Time in send: 9799ms
+Time in sleep: 80215ms
+Packets Sent: 600099
+Packets Expected: 600099
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 25000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 46.68%
+Process CPU Busy: 7.65%
+Time in send: 12264ms
+Time in sleep: 77749ms
+Packets Sent: 750123
+Packets Expected: 750123
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 30000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 56.07%
+Process CPU Busy: 9.21%
+Time in send: 14757ms
+Time in sleep: 75257ms
+Packets Sent: 900150
+Packets Expected: 900150
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 35000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 63.44%
+Process CPU Busy: 10.37%
+Time in send: 16354ms
+Time in sleep: 73659ms
+Packets Sent: 1050174
+Packets Expected: 1050174
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 40000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 74.80%
+Process CPU Busy: 12.13%
+Time in send: 19783ms
+Time in sleep: 70219ms
+Packets Sent: 1200198
+Packets Expected: 1200198
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 45000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 84.41%
+Process CPU Busy: 13.73%
+Time in send: 22376ms
+Time in sleep: 67642ms
+Packets Sent: 1350450
+Packets Expected: 1350450
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 50000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 93.67%
+Process CPU Busy: 15.18%
+Time in send: 24851ms
+Time in sleep: 65167ms
+Packets Sent: 1500498
+Packets Expected: 1500498
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 55000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 100.51%
+Process CPU Busy: 16.30%
+Time in send: 26169ms
+Time in sleep: 63849ms
+Packets Sent: 1650549
+Packets Expected: 1650549
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 60000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 112.60%
+Process CPU Busy: 18.29%
+Time in send: 29893ms
+Time in sleep: 60126ms
+Packets Sent: 1800600
+Packets Expected: 1800600
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 65000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.05%
+Total CPU Busy: 121.76%
+Process CPU Busy: 19.74%
+Time in send: 32326ms
+Time in sleep: 57694ms
+Packets Sent: 1950648
+Packets Expected: 1950648
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 70000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.06%
+Total CPU Busy: 130.94%
+Process CPU Busy: 21.19%
+Time in send: 34762ms
+Time in sleep: 55258ms
+Packets Sent: 2100699
+Packets Expected: 2100699
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 75000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 140.30%
+Process CPU Busy: 22.74%
+Time in send: 37207ms
+Time in sleep: 52799ms
+Packets Sent: 2250375
+Packets Expected: 2250375
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 8000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 80000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 149.85%
+Process CPU Busy: 24.28%
+Time in send: 39816ms
+Time in sleep: 50190ms
+Packets Sent: 2400399
+Packets Expected: 2400399
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 5000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 10.47%
+Process CPU Busy: 1.89%
+Time in send: 3001ms
+Time in sleep: 117017ms
+Packets Sent: 150024
+Packets Expected: 150024
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 10000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 20.13%
+Process CPU Busy: 3.63%
+Time in send: 6154ms
+Time in sleep: 113866ms
+Packets Sent: 300048
+Packets Expected: 300048
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 15000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.06%
+Total CPU Busy: 30.02%
+Process CPU Busy: 5.35%
+Time in send: 9295ms
+Time in sleep: 110724ms
+Packets Sent: 450072
+Packets Expected: 450072
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 20000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 39.89%
+Process CPU Busy: 7.06%
+Time in send: 12433ms
+Time in sleep: 107587ms
+Packets Sent: 600100
+Packets Expected: 600100
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 25000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 49.77%
+Process CPU Busy: 8.77%
+Time in send: 15574ms
+Time in sleep: 104444ms
+Packets Sent: 750124
+Packets Expected: 750124
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 30000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.08%
+Total CPU Busy: 59.69%
+Process CPU Busy: 10.52%
+Time in send: 18725ms
+Time in sleep: 101293ms
+Packets Sent: 900148
+Packets Expected: 900148
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 35000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.06%
+Total CPU Busy: 69.53%
+Process CPU Busy: 12.20%
+Time in send: 21847ms
+Time in sleep: 98173ms
+Packets Sent: 1050172
+Packets Expected: 1050172
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 40000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.06%
+Total CPU Busy: 75.10%
+Process CPU Busy: 12.69%
+Time in send: 21685ms
+Time in sleep: 98338ms
+Packets Sent: 1200400
+Packets Expected: 1200400
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 45000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 89.61%
+Process CPU Busy: 15.63%
+Time in send: 28366ms
+Time in sleep: 91656ms
+Packets Sent: 1350448
+Packets Expected: 1350448
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 50000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.03%
+Total CPU Busy: 99.43%
+Process CPU Busy: 17.34%
+Time in send: 31496ms
+Time in sleep: 88528ms
+Packets Sent: 1500500
+Packets Expected: 1500500
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 55000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 109.17%
+Process CPU Busy: 19.01%
+Time in send: 34522ms
+Time in sleep: 85502ms
+Packets Sent: 1650548
+Packets Expected: 1650548
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 60000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 119.25%
+Process CPU Busy: 20.73%
+Time in send: 37792ms
+Time in sleep: 82232ms
+Packets Sent: 1800600
+Packets Expected: 1800600
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 65000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.06%
+Total CPU Busy: 129.74%
+Process CPU Busy: 22.53%
+Time in send: 41032ms
+Time in sleep: 78993ms
+Packets Sent: 1950648
+Packets Expected: 1950648
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 70000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 139.23%
+Process CPU Busy: 24.30%
+Time in send: 44168ms
+Time in sleep: 75858ms
+Packets Sent: 2100700
+Packets Expected: 2100700
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7500
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 75000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.04%
+Total CPU Busy: 147.38%
+Process CPU Busy: 25.48%
+Time in send: 46053ms
+Time in sleep: 73951ms
+Packets Sent: 2250372
+Packets Expected: 2250372
+=======================================
+UDP Talker Parameters:
+ Mode: bpf
+ Source: 192.168.178.44:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 8000
+ Size (s): 1472
+ Threads: 4
+ Packets/sec: 80000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 159.18%
+Process CPU Busy: 27.77%
+Time in send: 50504ms
+Time in sleep: 69503ms
+Packets Sent: 2400400
+Packets Expected: 2400400

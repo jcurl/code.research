@@ -252,10 +252,6 @@ class udp_talker_bpf final : public udp_talker {
 
   std::unique_ptr<l2_eth_udp_pkt> pkt_;
 };
-#else
-// The /dev/bpf interface constants are not found.
-using udp_talker_bpf = udp_talker;
-#endif
 
 #if HAVE_BIOCSMMWRITE
 /// @brief Send packets using the device /dev/bpf with QNX8 extensions
@@ -290,6 +286,12 @@ class udp_talker_bpfmm final : public udp_talker {
 // The /dev/bpf interface constants are not found.
 using udp_talker_bpfmm = udp_talker;
 #endif
+#else
+// The /dev/bpf interface constants are not found.
+using udp_talker_bpf = udp_talker;
+using udp_talker_bpfmm = udp_talker;
+#endif
+
 
 /// @brief Create the benchmark class from the mode.
 auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker>;

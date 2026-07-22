@@ -1,8 +1,9 @@
+FreeBSD freebsd135-rpi4.home.lan 13.5-RELEASE-p6 FreeBSD 13.5-RELEASE-p6 releng/13.5-n259182-c4530d6e5f36 GENERIC arm64
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 500
@@ -12,18 +13,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 4.50%
-Total CPU Busy: 18.34%
-Process CPU Busy: 11.33%
-Time in send: 3356ms
-Time in sleep: 26647ms
+Total CPU Busy (Idle Test): 5.56%
+Total CPU Busy: 20.69%
+Process CPU Busy: 13.57%
+Time in send: 4032ms
+Time in sleep: 25971ms
 Packets Sent: 150025
 Packets Expected: 150025
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 1000
@@ -33,18 +34,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 9.13%
-Total CPU Busy: 20.49%
-Process CPU Busy: 11.58%
-Time in send: 3451ms
-Time in sleep: 26552ms
+Total CPU Busy (Idle Test): 1.04%
+Total CPU Busy: 25.09%
+Process CPU Busy: 16.19%
+Time in send: 4835ms
+Time in sleep: 25164ms
 Packets Sent: 300050
 Packets Expected: 300050
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 1500
@@ -54,690 +55,690 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 28.95%
-Process CPU Busy: 17.56%
-Time in send: 5240ms
-Time in sleep: 24764ms
-Packets Sent: 450150
-Packets Expected: 450150
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 2000
- Size (s): 1472
- Threads: 1
- Packets/sec: 20000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 1.98%
-Total CPU Busy: 34.64%
-Process CPU Busy: 22.10%
-Time in send: 6597ms
-Time in sleep: 23407ms
-Packets Sent: 600200
-Packets Expected: 600200
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 2500
- Size (s): 1472
- Threads: 1
- Packets/sec: 25000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 46.43%
-Process CPU Busy: 28.43%
-Time in send: 8499ms
-Time in sleep: 21509ms
-Packets Sent: 750250
-Packets Expected: 750250
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 3000
- Size (s): 1472
- Threads: 1
- Packets/sec: 30000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 5.41%
-Total CPU Busy: 53.89%
-Process CPU Busy: 35.09%
-Time in send: 10494ms
-Time in sleep: 19510ms
-Packets Sent: 900300
-Packets Expected: 900300
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 3500
- Size (s): 1472
- Threads: 1
- Packets/sec: 35000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.73%
-Total CPU Busy: 64.72%
-Process CPU Busy: 41.48%
-Time in send: 12408ms
-Time in sleep: 17591ms
-Packets Sent: 1050175
-Packets Expected: 1050175
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 4000
- Size (s): 1472
- Threads: 1
- Packets/sec: 40000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 2.97%
-Total CPU Busy: 72.17%
-Process CPU Busy: 45.69%
-Time in send: 13670ms
-Time in sleep: 16330ms
-Packets Sent: 1200200
-Packets Expected: 1200200
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 4500
- Size (s): 1472
- Threads: 1
- Packets/sec: 45000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 5.00%
-Total CPU Busy: 79.10%
-Process CPU Busy: 52.24%
-Time in send: 15634ms
-Time in sleep: 14365ms
-Packets Sent: 1350225
-Packets Expected: 1350225
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 5000
- Size (s): 1472
- Threads: 1
- Packets/sec: 50000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 90.19%
-Process CPU Busy: 59.26%
-Time in send: 17745ms
-Time in sleep: 12255ms
-Packets Sent: 1500250
-Packets Expected: 1500250
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 5500
- Size (s): 1472
- Threads: 1
- Packets/sec: 55000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 3.05%
-Total CPU Busy: 97.52%
-Process CPU Busy: 63.35%
-Time in send: 18976ms
-Time in sleep: 11024ms
-Packets Sent: 1650275
-Packets Expected: 1650275
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 6000
- Size (s): 1472
- Threads: 1
- Packets/sec: 60000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 2.07%
-Total CPU Busy: 105.33%
-Process CPU Busy: 68.40%
-Time in send: 20493ms
-Time in sleep: 9505ms
-Packets Sent: 1800300
-Packets Expected: 1800300
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 6500
- Size (s): 1472
- Threads: 1
- Packets/sec: 65000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 113.54%
-Process CPU Busy: 76.96%
-Time in send: 23070ms
-Time in sleep: 6928ms
-Packets Sent: 1950325
-Packets Expected: 1950325
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 7000
- Size (s): 1472
- Threads: 1
- Packets/sec: 70000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 4.32%
-Total CPU Busy: 120.06%
-Process CPU Busy: 77.21%
-Time in send: 23144ms
-Time in sleep: 6854ms
-Packets Sent: 2100350
-Packets Expected: 2100350
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 7500
- Size (s): 1472
- Threads: 1
- Packets/sec: 75000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.65%
-Total CPU Busy: 129.57%
-Process CPU Busy: 84.76%
-Time in send: 25418ms
-Time in sleep: 4583ms
-Packets Sent: 2250375
-Packets Expected: 2250375
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 8000
- Size (s): 1472
- Threads: 1
- Packets/sec: 80000
-
-Performing IDLE test for 5s... done.
-Performing TEST... ........................................................................................................done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 137.38%
-Process CPU Busy: 86.97%
-Time in send: 26192ms
-Time in sleep: 3802ms
-Packets Sent: 2389200
-Packets Expected: 2400000
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 500
- Size (s): 1472
- Threads: 2
- Packets/sec: 5000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.11%
-Total CPU Busy: 20.51%
-Process CPU Busy: 13.43%
-Time in send: 3931ms
-Time in sleep: 56075ms
-Packets Sent: 150024
-Packets Expected: 150024
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 1000
- Size (s): 1472
- Threads: 2
- Packets/sec: 10000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 3.60%
-Total CPU Busy: 23.62%
-Process CPU Busy: 13.93%
-Time in send: 4133ms
-Time in sleep: 55874ms
-Packets Sent: 300050
-Packets Expected: 300050
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 1500
- Size (s): 1472
- Threads: 2
- Packets/sec: 15000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 10.29%
-Total CPU Busy: 29.08%
-Process CPU Busy: 18.27%
-Time in send: 5432ms
-Time in sleep: 54575ms
-Packets Sent: 450074
-Packets Expected: 450074
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 2000
- Size (s): 1472
- Threads: 2
- Packets/sec: 20000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 38.93%
-Process CPU Busy: 24.80%
-Time in send: 7380ms
-Time in sleep: 52628ms
-Packets Sent: 600100
-Packets Expected: 600100
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 2500
- Size (s): 1472
- Threads: 2
- Packets/sec: 25000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 3.16%
-Total CPU Busy: 48.01%
-Process CPU Busy: 30.94%
-Time in send: 9223ms
-Time in sleep: 50784ms
-Packets Sent: 750124
-Packets Expected: 750124
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 3000
- Size (s): 1472
- Threads: 2
- Packets/sec: 30000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 58.30%
-Process CPU Busy: 36.54%
-Time in send: 10903ms
-Time in sleep: 49103ms
-Packets Sent: 900150
-Packets Expected: 900150
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 3500
- Size (s): 1472
- Threads: 2
- Packets/sec: 35000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.23%
-Total CPU Busy: 69.91%
-Process CPU Busy: 42.82%
-Time in send: 12782ms
-Time in sleep: 47224ms
-Packets Sent: 1050174
-Packets Expected: 1050174
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 4000
- Size (s): 1472
- Threads: 2
- Packets/sec: 40000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 6.23%
-Total CPU Busy: 77.27%
-Process CPU Busy: 49.19%
-Time in send: 14699ms
-Time in sleep: 45299ms
-Packets Sent: 1200200
-Packets Expected: 1200200
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 4500
- Size (s): 1472
- Threads: 2
- Packets/sec: 45000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 2.28%
-Total CPU Busy: 84.82%
-Process CPU Busy: 52.64%
-Time in send: 15734ms
-Time in sleep: 44269ms
-Packets Sent: 1350337
-Packets Expected: 1350337
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 5000
- Size (s): 1472
- Threads: 2
- Packets/sec: 50000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 4.42%
-Total CPU Busy: 95.65%
-Process CPU Busy: 58.91%
-Time in send: 17624ms
-Time in sleep: 42379ms
-Packets Sent: 1500375
-Packets Expected: 1500375
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 5500
- Size (s): 1472
- Threads: 2
- Packets/sec: 55000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 3.10%
-Total CPU Busy: 104.66%
-Process CPU Busy: 62.67%
-Time in send: 18751ms
-Time in sleep: 41257ms
-Packets Sent: 1650550
-Packets Expected: 1650550
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 6000
- Size (s): 1472
- Threads: 2
- Packets/sec: 60000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 4.98%
-Total CPU Busy: 111.26%
-Process CPU Busy: 66.71%
-Time in send: 19960ms
-Time in sleep: 40037ms
-Packets Sent: 1800300
-Packets Expected: 1800300
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 6500
- Size (s): 1472
- Threads: 2
- Packets/sec: 65000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 124.49%
-Process CPU Busy: 73.33%
-Time in send: 21947ms
-Time in sleep: 38050ms
-Packets Sent: 1950324
-Packets Expected: 1950324
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 7000
- Size (s): 1472
- Threads: 2
- Packets/sec: 70000
-
-Performing IDLE test for 5s... done.
-Performing TEST... ................................done
-Total CPU Busy (Idle Test): 1.97%
-Total CPU Busy: 132.03%
-Process CPU Busy: 77.33%
-Time in send: 23174ms
-Time in sleep: 36824ms
-Packets Sent: 2100350
-Packets Expected: 2100350
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 7500
- Size (s): 1472
- Threads: 2
- Packets/sec: 75000
-
-Performing IDLE test for 5s... done.
-Performing TEST... .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 0.09%
-Total CPU Busy: 140.27%
-Process CPU Busy: 84.69%
-Time in send: 25804ms
-Time in sleep: 34193ms
-Packets Sent: 2250374
-Packets Expected: 2250374
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 8000
- Size (s): 1472
- Threads: 2
- Packets/sec: 80000
-
-Performing IDLE test for 5s... done.
-Performing TEST... .............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 7.14%
-Total CPU Busy: 147.26%
-Process CPU Busy: 87.99%
-Time in send: 28053ms
-Time in sleep: 31947ms
-Packets Sent: 2400400
-Packets Expected: 2400400
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 500
- Size (s): 1472
- Threads: 3
- Packets/sec: 5000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 2.11%
-Total CPU Busy: 17.85%
-Process CPU Busy: 9.44%
-Time in send: 2893ms
-Time in sleep: 87116ms
-Packets Sent: 150024
-Packets Expected: 150024
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 1000
- Size (s): 1472
- Threads: 3
- Packets/sec: 10000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 23.28%
-Process CPU Busy: 15.19%
-Time in send: 4668ms
-Time in sleep: 85342ms
-Packets Sent: 300048
-Packets Expected: 300048
-=======================================
-UDP Talker Parameters:
- Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
- Slots (n): 20
- Width (m): 5 (ms)
- Packets (p): 1500
- Size (s): 1472
- Threads: 3
- Packets/sec: 15000
-
-Performing IDLE test for 5s... done.
-Performing TEST... done
-Total CPU Busy (Idle Test): 3.75%
-Total CPU Busy: 34.42%
-Process CPU Busy: 22.61%
-Time in send: 6958ms
-Time in sleep: 83051ms
+Total CPU Busy (Idle Test): 2.87%
+Total CPU Busy: 27.79%
+Process CPU Busy: 17.78%
+Time in send: 5306ms
+Time in sleep: 24694ms
 Packets Sent: 450075
 Packets Expected: 450075
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 20000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 42.97%
+Process CPU Busy: 22.96%
+Time in send: 6859ms
+Time in sleep: 23149ms
+Packets Sent: 600200
+Packets Expected: 600200
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 25000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 44.23%
+Process CPU Busy: 28.04%
+Time in send: 8380ms
+Time in sleep: 21624ms
+Packets Sent: 750250
+Packets Expected: 750250
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 30000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 54.10%
+Process CPU Busy: 35.97%
+Time in send: 10759ms
+Time in sleep: 19244ms
+Packets Sent: 900300
+Packets Expected: 900300
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 35000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 3.71%
+Total CPU Busy: 62.95%
+Process CPU Busy: 39.70%
+Time in send: 11873ms
+Time in sleep: 18125ms
+Packets Sent: 1050175
+Packets Expected: 1050175
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 40000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.53%
+Total CPU Busy: 72.90%
+Process CPU Busy: 45.78%
+Time in send: 13696ms
+Time in sleep: 16302ms
+Packets Sent: 1200200
+Packets Expected: 1200200
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 45000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 13.80%
+Total CPU Busy: 78.37%
+Process CPU Busy: 54.63%
+Time in send: 16357ms
+Time in sleep: 13643ms
+Packets Sent: 1350225
+Packets Expected: 1350225
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 50000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 89.70%
+Process CPU Busy: 59.74%
+Time in send: 17891ms
+Time in sleep: 12110ms
+Packets Sent: 1500250
+Packets Expected: 1500250
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 55000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 1.25%
+Total CPU Busy: 96.32%
+Process CPU Busy: 65.46%
+Time in send: 19613ms
+Time in sleep: 10388ms
+Packets Sent: 1650275
+Packets Expected: 1650275
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 60000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 7.50%
+Total CPU Busy: 105.13%
+Process CPU Busy: 67.80%
+Time in send: 20312ms
+Time in sleep: 9685ms
+Packets Sent: 1800300
+Packets Expected: 1800300
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 65000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 1.51%
+Total CPU Busy: 113.52%
+Process CPU Busy: 74.95%
+Time in send: 22466ms
+Time in sleep: 7533ms
+Packets Sent: 1950325
+Packets Expected: 1950325
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 70000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 123.12%
+Process CPU Busy: 81.52%
+Time in send: 24437ms
+Time in sleep: 5560ms
+Packets Sent: 2100350
+Packets Expected: 2100350
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7500
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 75000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.38%
+Total CPU Busy: 129.58%
+Process CPU Busy: 90.64%
+Time in send: 27181ms
+Time in sleep: 2815ms
+Packets Sent: 2250375
+Packets Expected: 2250375
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 8000
+ Size (s): 1472
+ Threads: 1
+ Packets/sec: 80000
+
+Performing IDLE test for 5s... done.
+Performing TEST... .............................................................................................done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 139.90%
+Process CPU Busy: 87.03%
+Time in send: 26207ms
+Time in sleep: 3787ms
+Packets Sent: 2396000
+Packets Expected: 2400000
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 5000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 2.44%
+Total CPU Busy: 20.04%
+Process CPU Busy: 13.47%
+Time in send: 3947ms
+Time in sleep: 56059ms
+Packets Sent: 150024
+Packets Expected: 150024
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 10000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 2.43%
+Total CPU Busy: 23.96%
+Process CPU Busy: 14.78%
+Time in send: 4388ms
+Time in sleep: 55619ms
+Packets Sent: 300050
+Packets Expected: 300050
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 15000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 3.98%
+Total CPU Busy: 28.49%
+Process CPU Busy: 18.64%
+Time in send: 5547ms
+Time in sleep: 54460ms
+Packets Sent: 450074
+Packets Expected: 450074
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 20000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 38.95%
+Process CPU Busy: 24.91%
+Time in send: 7419ms
+Time in sleep: 52587ms
+Packets Sent: 600100
+Packets Expected: 600100
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 2500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 25000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 2.97%
+Total CPU Busy: 47.65%
+Process CPU Busy: 30.39%
+Time in send: 9055ms
+Time in sleep: 50951ms
+Packets Sent: 750124
+Packets Expected: 750124
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 30000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 58.76%
+Process CPU Busy: 36.57%
+Time in send: 10912ms
+Time in sleep: 49099ms
+Packets Sent: 900225
+Packets Expected: 900225
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 3500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 35000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 5.95%
+Total CPU Busy: 68.08%
+Process CPU Busy: 42.47%
+Time in send: 12680ms
+Time in sleep: 47320ms
+Packets Sent: 1050174
+Packets Expected: 1050174
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 40000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 75.33%
+Process CPU Busy: 49.50%
+Time in send: 14797ms
+Time in sleep: 45209ms
+Packets Sent: 1200300
+Packets Expected: 1200300
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 4500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 45000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 6.23%
+Total CPU Busy: 85.78%
+Process CPU Busy: 52.60%
+Time in send: 15727ms
+Time in sleep: 44279ms
+Packets Sent: 1350337
+Packets Expected: 1350337
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 50000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 2.05%
+Total CPU Busy: 95.42%
+Process CPU Busy: 58.96%
+Time in send: 17631ms
+Time in sleep: 42377ms
+Packets Sent: 1500500
+Packets Expected: 1500500
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 5500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 55000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 104.27%
+Process CPU Busy: 62.85%
+Time in send: 18805ms
+Time in sleep: 41201ms
+Packets Sent: 1650550
+Packets Expected: 1650550
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 60000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.55%
+Total CPU Busy: 114.36%
+Process CPU Busy: 68.64%
+Time in send: 20538ms
+Time in sleep: 39460ms
+Packets Sent: 1800300
+Packets Expected: 1800300
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 6500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 65000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 8.37%
+Total CPU Busy: 121.49%
+Process CPU Busy: 73.92%
+Time in send: 22124ms
+Time in sleep: 37874ms
+Packets Sent: 1950324
+Packets Expected: 1950324
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 70000
+
+Performing IDLE test for 5s... done.
+Performing TEST... ................done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 131.75%
+Process CPU Busy: 78.19%
+Time in send: 23412ms
+Time in sleep: 36584ms
+Packets Sent: 2100350
+Packets Expected: 2100350
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 7500
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 75000
+
+Performing IDLE test for 5s... done.
+Performing TEST... .....................................................................................................done
+Total CPU Busy (Idle Test): 2.43%
+Total CPU Busy: 135.49%
+Process CPU Busy: 86.77%
+Time in send: 26045ms
+Time in sleep: 33957ms
+Packets Sent: 2250562
+Packets Expected: 2250562
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 8000
+ Size (s): 1472
+ Threads: 2
+ Packets/sec: 80000
+
+Performing IDLE test for 5s... done.
+Performing TEST... .............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Total CPU Busy (Idle Test): 5.84%
+Total CPU Busy: 148.79%
+Process CPU Busy: 90.54%
+Time in send: 28312ms
+Time in sleep: 31687ms
+Packets Sent: 2400400
+Packets Expected: 2400400
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 5000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 15.81%
+Process CPU Busy: 10.58%
+Time in send: 3239ms
+Time in sleep: 86770ms
+Packets Sent: 150024
+Packets Expected: 150024
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1000
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 10000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 3.53%
+Total CPU Busy: 24.12%
+Process CPU Busy: 15.10%
+Time in send: 4640ms
+Time in sleep: 85369ms
+Packets Sent: 300048
+Packets Expected: 300048
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
+ Slots (n): 20
+ Width (m): 5 (ms)
+ Packets (p): 1500
+ Size (s): 1472
+ Threads: 3
+ Packets/sec: 15000
+
+Performing IDLE test for 5s... done.
+Performing TEST... done
+Total CPU Busy (Idle Test): 1.04%
+Total CPU Busy: 31.05%
+Process CPU Busy: 22.59%
+Time in send: 6958ms
+Time in sleep: 83053ms
+Packets Sent: 450075
+Packets Expected: 450075
+=======================================
+UDP Talker Parameters:
+ Mode: sendmmsg
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 2000
@@ -747,18 +748,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.73%
-Total CPU Busy: 40.07%
-Process CPU Busy: 27.06%
-Time in send: 8161ms
-Time in sleep: 81849ms
+Total CPU Busy (Idle Test): 2.94%
+Total CPU Busy: 39.30%
+Process CPU Busy: 26.98%
+Time in send: 8141ms
+Time in sleep: 81870ms
 Packets Sent: 600099
 Packets Expected: 600099
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 2500
@@ -768,18 +769,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 9.06%
-Total CPU Busy: 57.16%
-Process CPU Busy: 34.38%
-Time in send: 10394ms
-Time in sleep: 79618ms
+Total CPU Busy (Idle Test): 5.75%
+Total CPU Busy: 57.29%
+Process CPU Busy: 34.87%
+Time in send: 10564ms
+Time in sleep: 79446ms
 Packets Sent: 750123
 Packets Expected: 750123
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 3000
@@ -790,17 +791,17 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 66.61%
-Process CPU Busy: 46.58%
-Time in send: 14320ms
-Time in sleep: 75689ms
+Total CPU Busy: 64.08%
+Process CPU Busy: 43.77%
+Time in send: 13380ms
+Time in sleep: 76629ms
 Packets Sent: 900150
 Packets Expected: 900150
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 3500
@@ -810,18 +811,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 1.98%
-Total CPU Busy: 71.73%
-Process CPU Busy: 48.82%
-Time in send: 14829ms
-Time in sleep: 75174ms
-Packets Sent: 1050174
-Packets Expected: 1050174
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 72.49%
+Process CPU Busy: 47.30%
+Time in send: 14302ms
+Time in sleep: 75712ms
+Packets Sent: 1050232
+Packets Expected: 1050232
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 4000
@@ -831,18 +832,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 1.75%
-Total CPU Busy: 81.26%
-Process CPU Busy: 54.64%
-Time in send: 16700ms
-Time in sleep: 73299ms
-Packets Sent: 1200198
-Packets Expected: 1200198
+Total CPU Busy (Idle Test): 4.43%
+Total CPU Busy: 80.79%
+Process CPU Busy: 52.90%
+Time in send: 15958ms
+Time in sleep: 74055ms
+Packets Sent: 1200332
+Packets Expected: 1200332
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 4500
@@ -852,18 +853,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 91.59%
-Process CPU Busy: 60.42%
-Time in send: 18326ms
-Time in sleep: 71689ms
-Packets Sent: 1350450
-Packets Expected: 1350450
+Total CPU Busy (Idle Test): 2.69%
+Total CPU Busy: 88.01%
+Process CPU Busy: 61.99%
+Time in send: 18888ms
+Time in sleep: 71120ms
+Packets Sent: 1350225
+Packets Expected: 1350225
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 5000
@@ -873,18 +874,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 3.89%
-Total CPU Busy: 105.55%
-Process CPU Busy: 65.24%
-Time in send: 19755ms
-Time in sleep: 70257ms
-Packets Sent: 1500498
-Packets Expected: 1500498
+Total CPU Busy (Idle Test): 4.37%
+Total CPU Busy: 100.03%
+Process CPU Busy: 65.62%
+Time in send: 19838ms
+Time in sleep: 70157ms
+Packets Sent: 1500249
+Packets Expected: 1500249
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 5500
@@ -894,18 +895,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 4.89%
-Total CPU Busy: 112.81%
-Process CPU Busy: 70.69%
-Time in send: 21348ms
-Time in sleep: 68661ms
-Packets Sent: 1650365
-Packets Expected: 1650365
+Total CPU Busy (Idle Test): 6.68%
+Total CPU Busy: 106.61%
+Process CPU Busy: 70.28%
+Time in send: 21275ms
+Time in sleep: 68734ms
+Packets Sent: 1650549
+Packets Expected: 1650549
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 6000
@@ -914,19 +915,19 @@ UDP Talker Parameters:
  Packets/sec: 60000
 
 Performing IDLE test for 5s... done.
-Performing TEST... ...............................................done
-Total CPU Busy (Idle Test): 1.29%
-Total CPU Busy: 125.06%
-Process CPU Busy: 76.65%
-Time in send: 23397ms
-Time in sleep: 66598ms
-Packets Sent: 1800300
-Packets Expected: 1800300
+Performing TEST... done
+Total CPU Busy (Idle Test): 0.31%
+Total CPU Busy: 121.07%
+Process CPU Busy: 76.35%
+Time in send: 23115ms
+Time in sleep: 66894ms
+Packets Sent: 1800600
+Packets Expected: 1800600
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 6500
@@ -935,19 +936,19 @@ UDP Talker Parameters:
  Packets/sec: 65000
 
 Performing IDLE test for 5s... done.
-Performing TEST... .......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 0.07%
-Total CPU Busy: 129.21%
-Process CPU Busy: 80.60%
-Time in send: 25244ms
-Time in sleep: 64764ms
-Packets Sent: 1950540
-Packets Expected: 1950540
+Performing TEST... ..................................................................................................................................................................................................................................................................................done
+Total CPU Busy (Idle Test): 1.72%
+Total CPU Busy: 128.84%
+Process CPU Busy: 80.92%
+Time in send: 24598ms
+Time in sleep: 65400ms
+Packets Sent: 1950432
+Packets Expected: 1950432
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 7000
@@ -956,19 +957,19 @@ UDP Talker Parameters:
  Packets/sec: 70000
 
 Performing IDLE test for 5s... done.
-Performing TEST... ...........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 1.31%
-Total CPU Busy: 142.00%
-Process CPU Busy: 87.11%
-Time in send: 28718ms
-Time in sleep: 61274ms
+Performing TEST... .................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Total CPU Busy (Idle Test): 3.16%
+Total CPU Busy: 144.17%
+Process CPU Busy: 88.09%
+Time in send: 28819ms
+Time in sleep: 61172ms
 Packets Sent: 2100348
 Packets Expected: 2100348
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 7500
@@ -977,19 +978,19 @@ UDP Talker Parameters:
  Packets/sec: 75000
 
 Performing IDLE test for 5s... done.
-Performing TEST... .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 1.55%
-Total CPU Busy: 157.62%
-Process CPU Busy: 93.48%
-Time in send: 32763ms
-Time in sleep: 57245ms
-Packets Sent: 2250750
-Packets Expected: 2250750
+Performing TEST... .................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Total CPU Busy (Idle Test): 1.62%
+Total CPU Busy: 157.61%
+Process CPU Busy: 94.28%
+Time in send: 32870ms
+Time in sleep: 57124ms
+Packets Sent: 2250375
+Packets Expected: 2250375
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 8000
@@ -998,19 +999,19 @@ UDP Talker Parameters:
  Packets/sec: 80000
 
 Performing IDLE test for 5s... done.
-Performing TEST... .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 2.61%
-Total CPU Busy: 165.91%
-Process CPU Busy: 98.84%
-Time in send: 37445ms
-Time in sleep: 52546ms
-Packets Sent: 2400399
-Packets Expected: 2400399
+Performing TEST... ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Total CPU Busy (Idle Test): 2.72%
+Total CPU Busy: 165.51%
+Process CPU Busy: 99.19%
+Time in send: 37214ms
+Time in sleep: 52789ms
+Packets Sent: 2400532
+Packets Expected: 2400532
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 500
@@ -1020,18 +1021,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 20.89%
-Process CPU Busy: 14.30%
-Time in send: 4698ms
-Time in sleep: 115311ms
+Total CPU Busy (Idle Test): 5.86%
+Total CPU Busy: 22.59%
+Process CPU Busy: 14.27%
+Time in send: 4737ms
+Time in sleep: 115274ms
 Packets Sent: 150024
 Packets Expected: 150024
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 1000
@@ -1041,18 +1042,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 5.71%
-Total CPU Busy: 24.46%
-Process CPU Busy: 16.38%
-Time in send: 5346ms
-Time in sleep: 114665ms
+Total CPU Busy (Idle Test): 2.62%
+Total CPU Busy: 21.85%
+Process CPU Busy: 15.55%
+Time in send: 5074ms
+Time in sleep: 114937ms
 Packets Sent: 300048
 Packets Expected: 300048
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 1500
@@ -1062,18 +1063,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 7.13%
-Total CPU Busy: 32.68%
-Process CPU Busy: 21.56%
-Time in send: 6662ms
-Time in sleep: 113351ms
+Total CPU Busy (Idle Test): 4.23%
+Total CPU Busy: 34.07%
+Process CPU Busy: 21.91%
+Time in send: 6844ms
+Time in sleep: 113170ms
 Packets Sent: 450072
 Packets Expected: 450072
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 2000
@@ -1083,18 +1084,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.11%
-Total CPU Busy: 38.70%
-Process CPU Busy: 29.47%
-Time in send: 9396ms
-Time in sleep: 110616ms
+Total CPU Busy (Idle Test): 2.27%
+Total CPU Busy: 42.66%
+Process CPU Busy: 28.71%
+Time in send: 8974ms
+Time in sleep: 111040ms
 Packets Sent: 600100
 Packets Expected: 600100
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 2500
@@ -1104,18 +1105,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 3.81%
-Total CPU Busy: 53.28%
+Total CPU Busy (Idle Test): 1.51%
+Total CPU Busy: 53.69%
 Process CPU Busy: 35.83%
-Time in send: 11169ms
-Time in sleep: 108845ms
+Time in send: 11165ms
+Time in sleep: 108846ms
 Packets Sent: 750124
 Packets Expected: 750124
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 3000
@@ -1125,18 +1126,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 1.81%
-Total CPU Busy: 67.15%
-Process CPU Busy: 43.18%
-Time in send: 13587ms
-Time in sleep: 106422ms
+Total CPU Busy (Idle Test): 5.87%
+Total CPU Busy: 65.60%
+Process CPU Busy: 43.20%
+Time in send: 13561ms
+Time in sleep: 106451ms
 Packets Sent: 900148
 Packets Expected: 900148
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 3500
@@ -1146,18 +1147,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 3.90%
-Total CPU Busy: 74.00%
-Process CPU Busy: 51.91%
-Time in send: 16656ms
-Time in sleep: 103355ms
+Total CPU Busy (Idle Test): 2.78%
+Total CPU Busy: 72.83%
+Process CPU Busy: 51.68%
+Time in send: 16536ms
+Time in sleep: 103473ms
 Packets Sent: 1050172
 Packets Expected: 1050172
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 4000
@@ -1167,18 +1168,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 2.91%
-Total CPU Busy: 86.91%
-Process CPU Busy: 58.12%
-Time in send: 19847ms
-Time in sleep: 100159ms
-Packets Sent: 1200200
-Packets Expected: 1200200
+Total CPU Busy (Idle Test): 9.07%
+Total CPU Busy: 84.63%
+Process CPU Busy: 58.11%
+Time in send: 19749ms
+Time in sleep: 100261ms
+Packets Sent: 1200250
+Packets Expected: 1200250
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 4500
@@ -1188,18 +1189,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.91%
-Total CPU Busy: 94.49%
-Process CPU Busy: 64.39%
-Time in send: 20565ms
-Time in sleep: 99440ms
-Packets Sent: 1350224
-Packets Expected: 1350224
+Total CPU Busy (Idle Test): 8.35%
+Total CPU Busy: 95.16%
+Process CPU Busy: 62.97%
+Time in send: 19871ms
+Time in sleep: 100141ms
+Packets Sent: 1350280
+Packets Expected: 1350280
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 5000
@@ -1209,18 +1210,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 1.26%
-Total CPU Busy: 103.47%
-Process CPU Busy: 68.79%
-Time in send: 22217ms
-Time in sleep: 97797ms
+Total CPU Busy (Idle Test): 8.91%
+Total CPU Busy: 102.44%
+Process CPU Busy: 68.57%
+Time in send: 22149ms
+Time in sleep: 97859ms
 Packets Sent: 1500374
 Packets Expected: 1500374
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 5500
@@ -1230,18 +1231,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 114.77%
-Process CPU Busy: 74.92%
-Time in send: 24023ms
-Time in sleep: 96002ms
-Packets Sent: 1650548
-Packets Expected: 1650548
+Total CPU Busy (Idle Test): 4.59%
+Total CPU Busy: 113.86%
+Process CPU Busy: 74.19%
+Time in send: 23528ms
+Time in sleep: 96468ms
+Packets Sent: 1650272
+Packets Expected: 1650272
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 6000
@@ -1251,18 +1252,18 @@ UDP Talker Parameters:
 
 Performing IDLE test for 5s... done.
 Performing TEST... done
-Total CPU Busy (Idle Test): 1.45%
-Total CPU Busy: 122.10%
-Process CPU Busy: 81.22%
-Time in send: 26152ms
-Time in sleep: 93857ms
-Packets Sent: 1800450
-Packets Expected: 1800450
+Total CPU Busy (Idle Test): 0.07%
+Total CPU Busy: 122.95%
+Process CPU Busy: 81.41%
+Time in send: 26240ms
+Time in sleep: 93775ms
+Packets Sent: 1800525
+Packets Expected: 1800525
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 6500
@@ -1273,17 +1274,17 @@ UDP Talker Parameters:
 Performing IDLE test for 5s... done.
 Performing TEST... done
 Total CPU Busy (Idle Test): 0.00%
-Total CPU Busy: 131.71%
-Process CPU Busy: 84.75%
-Time in send: 26995ms
-Time in sleep: 93013ms
-Packets Sent: 1950567
-Packets Expected: 1950567
+Total CPU Busy: 130.16%
+Process CPU Busy: 84.17%
+Time in send: 27434ms
+Time in sleep: 92560ms
+Packets Sent: 1950324
+Packets Expected: 1950324
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 7000
@@ -1292,19 +1293,19 @@ UDP Talker Parameters:
  Packets/sec: 70000
 
 Performing IDLE test for 5s... done.
-Performing TEST... ...done
-Total CPU Busy (Idle Test): 0.57%
-Total CPU Busy: 146.29%
-Process CPU Busy: 89.47%
-Time in send: 30206ms
-Time in sleep: 89788ms
-Packets Sent: 2100436
-Packets Expected: 2100436
+Performing TEST... ..done
+Total CPU Busy (Idle Test): 11.10%
+Total CPU Busy: 148.28%
+Process CPU Busy: 89.76%
+Time in send: 29454ms
+Time in sleep: 90554ms
+Packets Sent: 2100612
+Packets Expected: 2100612
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 7500
@@ -1313,19 +1314,19 @@ UDP Talker Parameters:
  Packets/sec: 75000
 
 Performing IDLE test for 5s... done.
-Performing TEST... .....................................................................................................done
-Total CPU Busy (Idle Test): 0.85%
-Total CPU Busy: 152.04%
-Process CPU Busy: 92.66%
-Time in send: 30931ms
-Time in sleep: 89076ms
-Packets Sent: 2250560
-Packets Expected: 2250560
+Performing TEST... ...........................................................................................................................done
+Total CPU Busy (Idle Test): 0.00%
+Total CPU Busy: 157.02%
+Process CPU Busy: 96.34%
+Time in send: 34967ms
+Time in sleep: 85023ms
+Packets Sent: 2250372
+Packets Expected: 2250372
 =======================================
 UDP Talker Parameters:
  Mode: sendmmsg
- Source: 192.168.1.106:3499
- Destination: 225.0.0.1:3500
+ Source: 192.168.178.28:3499
+ Destination: 239.255.42.99:3500
  Slots (n): 20
  Width (m): 5 (ms)
  Packets (p): 8000
@@ -1334,11 +1335,11 @@ UDP Talker Parameters:
  Packets/sec: 80000
 
 Performing IDLE test for 5s... done.
-Performing TEST... .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-Total CPU Busy (Idle Test): 0.03%
-Total CPU Busy: 166.08%
-Process CPU Busy: 100.35%
-Time in send: 37507ms
-Time in sleep: 82495ms
-Packets Sent: 2400700
-Packets Expected: 2400700
+Performing TEST... .......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Total CPU Busy (Idle Test): 3.38%
+Total CPU Busy: 164.05%
+Process CPU Busy: 98.74%
+Time in send: 36675ms
+Time in sleep: 83316ms
+Packets Sent: 2400400
+Packets Expected: 2400400

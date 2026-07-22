@@ -11,27 +11,47 @@
       - [2.1.2.1. sendto](#2121-sendto)
       - [2.1.2.2. sendmmsg](#2122-sendmmsg)
       - [2.1.2.3. BPF interface (Layer 2)](#2123-bpf-interface-layer-2)
-    - [2.1.3. QNX 8.0.3 (io-sock)](#213-qnx-803-io-sock)
+      - [2.1.2.4. BPF interface with Multiple Write extension (Layer 2)](#2124-bpf-interface-with-multiple-write-extension-layer-2)
+    - [2.1.3. QNX 8.0.4 (io-sock)](#213-qnx-804-io-sock)
       - [2.1.3.1. sendto](#2131-sendto)
       - [2.1.3.2. sendmmsg](#2132-sendmmsg)
       - [2.1.3.3. BPF interface (Layer 2)](#2133-bpf-interface-layer-2)
       - [2.1.3.4. BPF interface with Multiple Write extension (Layer 2)](#2134-bpf-interface-with-multiple-write-extension-layer-2)
-    - [2.1.4. FreeBSD 13.5](#214-freebsd-135)
+    - [2.1.4. QNX 8.0.5 (io-sock)](#214-qnx-805-io-sock)
       - [2.1.4.1. sendto](#2141-sendto)
       - [2.1.4.2. sendmmsg](#2142-sendmmsg)
       - [2.1.4.3. BPF interface (Layer 2)](#2143-bpf-interface-layer-2)
-    - [2.1.5. FreeBSD 14.2](#215-freebsd-142)
+      - [2.1.4.4. BPF interface with Multiple Write extension (Layer 2)](#2144-bpf-interface-with-multiple-write-extension-layer-2)
+    - [2.1.5. FreeBSD 13.5](#215-freebsd-135)
       - [2.1.5.1. sendto](#2151-sendto)
       - [2.1.5.2. sendmmsg](#2152-sendmmsg)
       - [2.1.5.3. BPF interface (Layer 2)](#2153-bpf-interface-layer-2)
-    - [2.1.6. NetBSD 10.1](#216-netbsd-101)
+    - [2.1.6. FreeBSD 14.3](#216-freebsd-143)
       - [2.1.6.1. sendto](#2161-sendto)
       - [2.1.6.2. sendmmsg](#2162-sendmmsg)
       - [2.1.6.3. BPF interface (Layer 2)](#2163-bpf-interface-layer-2)
+    - [2.1.7. FreeBSD 15.1](#217-freebsd-151)
+      - [2.1.7.1. sendto](#2171-sendto)
+      - [2.1.7.2. sendmmsg](#2172-sendmmsg)
+      - [2.1.7.3. BPF interface (Layer 2)](#2173-bpf-interface-layer-2)
+    - [2.1.8. NetBSD 10.1](#218-netbsd-101)
+      - [2.1.8.1. sendto](#2181-sendto)
+      - [2.1.8.2. sendmmsg](#2182-sendmmsg)
+      - [2.1.8.3. BPF interface (Layer 2)](#2183-bpf-interface-layer-2)
   - [2.2. Raspberry Pi 5](#22-raspberry-pi-5)
     - [2.2.1. Linux](#221-linux)
       - [2.2.1.1. sendto](#2211-sendto)
       - [2.2.1.2. sendmmsg](#2212-sendmmsg)
+    - [2.2.2. QNX 8.0.4 (io-sock)](#222-qnx-804-io-sock)
+      - [2.2.2.1. sendto](#2221-sendto)
+      - [2.2.2.2. sendmmsg](#2222-sendmmsg)
+      - [2.2.2.3. BPF interface (Layer 2)](#2223-bpf-interface-layer-2)
+      - [2.2.2.4. BPF interface with Multiple Write extension (Layer 2)](#2224-bpf-interface-with-multiple-write-extension-layer-2)
+    - [2.2.3. QNX 8.0.5 (io-sock)](#223-qnx-805-io-sock)
+      - [2.2.3.1. sendto](#2231-sendto)
+      - [2.2.3.2. sendmmsg](#2232-sendmmsg)
+      - [2.2.3.3. BPF interface (Layer 2)](#2233-bpf-interface-layer-2)
+      - [2.2.3.4. BPF interface with Multiple Write extension (Layer 2)](#2234-bpf-interface-with-multiple-write-extension-layer-2)
 
 ## 1. Capture
 
@@ -87,18 +107,7 @@ overhead the device driver introduces as well).
 
 ![](./images/rpi4_rpios_sendto_eth.png)
 
-Shows that single-threaded performance is the best. Real-world applications with
-multiple processes/threads sending data have problems with the driver. The
-application and kernel takes 35% CPU, where the system has an additional 20% CPU
-overhead. This is due to the driver being tested, as when testing with Loopback,
-this overhead is not present.
-
-The bandwidth limit resulting in about 55% is approximately 540Mbps.
-
 ![](./images/rpi4_rpios_sendto_lo.png)
-
-The network hardware is the limiting factor, where in software only, 1Gbps can
-be reached with about 105% CPU (2 threads).
 
 ##### 2.1.1.2. sendmmsg
 
@@ -107,6 +116,24 @@ be reached with about 105% CPU (2 threads).
 ![](./images/rpi4_rpios_sendmmsg_lo.png)
 
 #### 2.1.2. QNX 7.1 (io-pkt)
+
+The image version tested is:
+
+```text
+QNX rpi4-710-e729ecba 7.1.0 2025/11/05-09:27:32EST RaspberryPi4B aarch64le
+
+# use -i io-pkt-v6-hc
+QNX_BUILDID=(GNU)514b6076cba753791f0f96daaf86f974
+NAME=io-pkt-v6-hc
+DESCRIPTION=TCP/IP protocol module.
+DATE=2024/06/14-01:11:44-EDT
+STATE=lookup
+HOST=sdp710-node1
+USER=builder
+VERSION=7.1.0
+TAGID=710-SDP-2532
+PACKAGE=com.qnx.qnx710.target.net.iopkt/0.0.7.02532T202406140244L
+```
 
 ##### 2.1.2.1. sendto
 
@@ -162,17 +189,36 @@ the UDP and IPv4 checksums directly on the generated packets.
 
 This interface does not work on the loopback device.
 
-#### 2.1.3. QNX 8.0.3 (io-sock)
+##### 2.1.2.4. BPF interface with Multiple Write extension (Layer 2)
 
-The iamge version tested is:
+While QNX 7.1 `io-pkt` offers the interface and it is documented by QNX, it
+doesn't work according to their example and returns EINVAL (22) when writing.
+
+#### 2.1.3. QNX 8.0.4 (io-sock)
+
+The image version tested is:
 
 ```text
-QNX rpi4-800-d9c9b4f7 8.0.0 2025/07/30-19:17:34EDT RaspberryPi4B aarch64le
+QNX rpi4-800-d9c9b4f7 8.0.0 2026/02/27-10:59:13EST RaspberryPi4B aarch64le
+
+# use -i io-sock
+QNX_BUILDID=(GNU)118221426d88c69d642130807c363bb4
+NAME=io-sock
+DESCRIPTION=TCP/IP protocol module.
+DATE=2025/07/30-19:03:05-EDT
+STATE=lookup
+HOST=docker-n5
+USER=builder
+VERSION=QNXOS_803_B600
+TAGID=QNXOS_803-600
+PACKAGE=com.qnx.qnx800.target.net.iosock/0.3.0.00600T202507302003L
 ```
+
+This version is based on FreeBSD 13.5-p1.
 
 ##### 2.1.3.1. sendto
 
-![](./images/rpi4_qnx8_sendto_eth.png)
+![](./images/rpi4_qnx804_sendto_eth.png)
 
 With QNX8 and the introduced `io-sock`, multithreaded behaviour can be observed
 with ability to reach with 2 threads 890Mbps at 250% CPU, or slightly better
@@ -186,74 +232,138 @@ similar performance (QNX 7.1 at 140% CPU, QNX 8 at 135% CPU for slightly lower
 bandwidth). But to now double the bandwith, more than double the CPU is
 required with 2 threads or more.
 
-![](./images/rpi4_qnx8_sendto_lo.png)
+![](./images/rpi4_qnx804_sendto_lo.png)
 
 The single threaded performance of `io-sock` with the loopback is half the
 performance of `io-pkt`.
 
 ##### 2.1.3.2. sendmmsg
 
-![](./images/rpi4_qnx8_sendmmsg_eth.png)
+![](./images/rpi4_qnx804_sendmmsg_eth.png)
 
-![](./images/rpi4_qnx8_sendmmsg_lo.png)
+![](./images/rpi4_qnx804_sendmmsg_lo.png)
 
 ##### 2.1.3.3. BPF interface (Layer 2)
 
-![](./images/rpi4_qnx8_bpf_eth.png)
+![](./images/rpi4_qnx804_bpf_eth.png)
 
 ##### 2.1.3.4. BPF interface with Multiple Write extension (Layer 2)
 
-![](./images/rpi4_qnx8_bpfmm_eth.png)
+![](./images/rpi4_qnx804_bpfmm_eth.png)
 
-#### 2.1.4. FreeBSD 13.5
+#### 2.1.4. QNX 8.0.5 (io-sock)
 
-FreeBSD will return quite often `ENOBUFS`, which are shown is a period `.` in
-the logs while testing (once per interval).
+The image version tested is:
+
+```text
+QNX rpi4-800-d9c9b4f7 8.0.0 2026/06/05-16:21:14EDT RaspberryPi4B aarch64le
+
+# use -i io-sock
+QNX_BUILDID=(GNU)67e0e8155d0ab0fc6ebf98c608c5540d
+NAME=io-sock
+DESCRIPTION=TCP/IP protocol module.
+DATE=2026/05/22-09:50:59-EDT
+STATE=lookup
+HOST=docker-n8
+USER=builder
+VERSION=networking_io-sock_br-qnx-805-rel_be-800_B15
+TAGID=networking_io-sock_br-qnx-805-rel_be-800-15
+PACKAGE=com.qnx.qnx800.target.net.iosock/0.5.0.00015T202605220948L
+```
+
+This version is based on FreeBSD 14.3-p14.
 
 ##### 2.1.4.1. sendto
 
-![](./images/rpi4_fbsd13.5_sendto_eth.png)
+![](./images/rpi4_qnx805_sendto_eth.png)
 
-![](./images/rpi4_fbsd13.5_sendto_lo.png)
+![](./images/rpi4_qnx805_sendto_lo.png)
 
 ##### 2.1.4.2. sendmmsg
 
-![](./images/rpi4_fbsd13.5_sendmmsg_eth.png)
+![](./images/rpi4_qnx805_sendmmsg_eth.png)
 
-![](./images/rpi4_fbsd13.5_sendmmsg_lo.png)
+![](./images/rpi4_qnx805_sendmmsg_lo.png)
 
 ##### 2.1.4.3. BPF interface (Layer 2)
 
-![](./images/rpi4_fbsd13.5_bpf_eth.png)
+![](./images/rpi4_qnx805_bpf_eth.png)
 
-#### 2.1.5. FreeBSD 14.2
+##### 2.1.4.4. BPF interface with Multiple Write extension (Layer 2)
+
+![](./images/rpi4_qnx805_bpfmm_eth.png)
+
+#### 2.1.5. FreeBSD 13.5
 
 FreeBSD will return quite often `ENOBUFS`, which are shown is a period `.` in
 the logs while testing (once per interval).
 
 ##### 2.1.5.1. sendto
 
-![](./images/rpi4_fbsd14.2_sendto_eth.png)
+![](./images/rpi4_fbsd13.5_sendto_eth.png)
 
-![](./images/rpi4_fbsd14.2_sendto_lo.png)
+![](./images/rpi4_fbsd13.5_sendto_lo.png)
 
 ##### 2.1.5.2. sendmmsg
 
-![](./images/rpi4_fbsd14.2_sendmmsg_eth.png)
+![](./images/rpi4_fbsd13.5_sendmmsg_eth.png)
 
-![](./images/rpi4_fbsd14.2_sendmmsg_lo.png)
+![](./images/rpi4_fbsd13.5_sendmmsg_lo.png)
 
 ##### 2.1.5.3. BPF interface (Layer 2)
 
-![](./images/rpi4_fbsd14.2_bpf_eth.png)
+![](./images/rpi4_fbsd13.5_bpf_eth.png)
 
-#### 2.1.6. NetBSD 10.1
+#### 2.1.6. FreeBSD 14.3
+
+FreeBSD will return quite often `ENOBUFS`, which are shown is a period `.` in
+the logs while testing (once per interval).
+
+##### 2.1.6.1. sendto
+
+![](./images/rpi4_fbsd14.3_sendto_eth.png)
+
+![](./images/rpi4_fbsd14.3_sendto_lo.png)
+
+##### 2.1.6.2. sendmmsg
+
+![](./images/rpi4_fbsd14.3_sendmmsg_eth.png)
+
+![](./images/rpi4_fbsd14.3_sendmmsg_lo.png)
+
+##### 2.1.6.3. BPF interface (Layer 2)
+
+![](./images/rpi4_fbsd14.3_bpf_eth.png)
+
+#### 2.1.7. FreeBSD 15.1
+
+FreeBSD will return quite often `ENOBUFS`, which are shown is a period `.` in
+the logs while testing (once per interval). When this happens, the
+implementation waits 750us for the buffers to empty and retries.
+
+##### 2.1.7.1. sendto
+
+![](./images/rpi4_fbsd15.1_sendto_eth.png)
+
+![](./images/rpi4_fbsd15.1_sendto_lo.png)
+
+##### 2.1.7.2. sendmmsg
+
+![](./images/rpi4_fbsd15.1_sendmmsg_eth.png)
+
+![](./images/rpi4_fbsd15.1_sendmmsg_lo.png)
+
+##### 2.1.7.3. BPF interface (Layer 2)
+
+![](./images/rpi4_fbsd15.1_bpf_eth.png)
+
+#### 2.1.8. NetBSD 10.1
 
 NetBSD may send `ENOBUFS`, but this is rarer as found in FreeBSD. The CPU load
 is shown as less than 100% in the tests, indicating the methods used for testing
 are not optimised.
 
-##### 2.1.6.1. sendto
+##### 2.1.8.1. sendto
 
 Total CPU measurements on NetBSD are not reliable, and so are not shown in the
 graphs. NetBSD is not able to reach full network saturation with the tests.
@@ -265,21 +375,86 @@ indicating tuning of the network stack can produce better performance.
 
 ![](./images/rpi4_nbsd10.1_sendto_lo.png)
 
-##### 2.1.6.2. sendmmsg
+And when compiled with Clang, the results should be the same (only the test
+program changes).
+
+![](./images/rpi4_nbsd10.1-clang_sendto_eth.png)
+
+![](./images/rpi4_nbsd10.1-clang_sendto_lo.png)
+
+##### 2.1.8.2. sendmmsg
 
 ![](./images/rpi4_nbsd10.1_sendmmsg_eth.png)
 
 ![](./images/rpi4_nbsd10.1_sendmmsg_lo.png)
 
-##### 2.1.6.3. BPF interface (Layer 2)
+And when compiled with Clang, the results should be the same (only the test
+program changes).
 
-The NetBSD 10.1 deadlocks in the `writev` method when running with more than one
+![](./images/rpi4_nbsd10.1-clang_sendmmsg_eth.png)
+
+![](./images/rpi4_nbsd10.1-clang_sendmmsg_lo.png)
+
+##### 2.1.8.3. BPF interface (Layer 2)
+
+The NetBSD 10.1 panics in the `writev` method when running with more than one
 thread, so there is no data to show. When this occurs, the SSH session usually
-exits also.
+exits also. The serial port shows the panic:
+
+```text
+[ 33178.0171776] panic: _bus_dmamap_sync: _BUS_DMA_BUFTYPE_INVALID
+[ 33178.0171776] cpu2: Begin traceback...
+[ 33178.0271791] trace fp ffffc002a0897940
+[ 33178.0271791] fp ffffc002a0897970 vpanic() at ffffc000004f8658 netbsd:vpanic+0x178
+[ 33178.0371800] fp ffffc002a08979d0 panic() at ffffc000004f8764 netbsd:panic+0x44
+[ 33178.0471797] fp ffffc002a0897a60 _bus_dmamap_sync() at ffffc000000a1438 netbsd:_bus_dmamap_sync+0x664
+[ 33178.0571797] fp ffffc002a0897ad0 genet_start() at ffffc000002439e8 netbsd:genet_start+0x108
+[ 33178.0571797] fp ffffc002a0897b50 if_transmit() at ffffc0000057a564 netbsd:if_transmit+0x164
+[ 33178.0671804] fp ffffc002a0897b90 ether_output() at ffffc00000583e30 netbsd:ether_output+0x1a0
+[ 33178.0771807] fp ffffc002a0897bf0 bpf_write() at ffffc00000575454 netbsd:bpf_write+0x484
+[ 33178.0871814] fp ffffc002a0897d10 do_filewritev.part.0() at ffffc000005055dc netbsd:do_filewritev.part.0+0x1fc
+[ 33178.0971830] fp ffffc002a0897e20 syscall() at ffffc000000a816c netbsd:syscall+0x19c
+[ 33178.1071821] tf ffffc002a0897ed0 el0_trap() at ffffc000000aaff0 netbsd:el1_trap_exit+0x68
+[ 33178.1171822] ---- SVC Instruction Execution: trapframe 0xffffc002a0897ed0 (304 bytes) ----
+[ 33178.1271830]     pc=0000f2cadd7dc658,   spsr=0000000080000000
+[ 33178.1271830]    esr=0000000056000079,    far=0000f2a33bcbf758
+[ 33178.1371831]     x0=0000000000000004,     x1=0000f2cadc5efe80
+[ 33178.1371831]     x2=0000000000000002,     x3=0000000000000000
+[ 33178.1471839]     x4=0000f2cadd73d000,     x5=000000000000ffff
+[ 33178.1571844]     x6=00000000000002e0,     x7=00000000000002e0
+[ 33178.1571844]     x8=0000f2cadd73d000,     x9=00000000000002e0
+[ 33178.1671848]    x10=00000000000005c8,    x11=00000000000002df
+[ 33178.1671848]    x12=000000000000000d,    x13=0000000000000005
+[ 33178.1771850]    x14=000000000000ffff,    x15=000000000000000a
+[ 33178.1771850]    x16=0000f2cadde342d0,    x17=0000f2cadd7dc654
+[ 33178.1871857]    x18=0000f2cadd73d020,    x19=0000f2cadde33000
+[ 33178.1971867]    x20=0000f2cadd772c00,    x21=0000000000000000
+[ 33178.1971867]    x22=0000000000000047,    x23=00000000000b71b0
+[ 33178.2071866]    x24=000000000000008a,    x25=0000000000000001
+[ 33178.2071866]    x26=00000000000c6f72,    x27=0000000000000abe
+[ 33178.2171872]    x28=000000000000172c, fp=x29=0000f2cadc5efe10
+[ 33178.2271874] lr=x30=0000f2cadde18e54,     sp=0000f2cadc5efe10
+[ 33178.2271874] ------------------------------------------------
+[ 33178.2371876] cpu2: End traceback...
+[ 33178.2371876] rebooting...
+```
+
+On the results for a single thread are shown (thread 2 is the same as thread 1,
+so that the graphic can be generated).
+
+![](./images/rpi4_nbsd10.1_bpf_eth.png)
 
 ### 2.2. Raspberry Pi 5
 
 #### 2.2.1. Linux
+
+The code is compiled with Linux with extra features for the RPi5. Disabling
+clang-tidy speeds up the builds.
+
+```cmd
+$ cmake -B . -S .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUN_CLANG_TIDY=off -DCMAKE_CXX_FLAGS="-march=armv8.1-a+lse"
+$ cmake --build . --target udp_load
+```
 
 ##### 2.2.1.1. sendto
 
@@ -295,3 +470,87 @@ Rasbperry Pi 4, comparing the two Linux implementations.
 ![](./images/rpi5_rpios_sendmmsg_eth.png)
 
 ![](./images/rpi5_rpios_sendmmsg_lo.png)
+
+#### 2.2.2. QNX 8.0.4 (io-sock)
+
+The image version tested is:
+
+```text
+QNX rpi5-800-b6a1d3ce 8.0.0 2026/02/27-10:59:13EST RaspberryPi5 aarch64le
+
+# use -i io-sock
+QNX_BUILDID=(GNU)118221426d88c69d642130807c363bb4
+NAME=io-sock
+DESCRIPTION=TCP/IP protocol module.
+DATE=2025/07/30-19:03:05-EDT
+STATE=lookup
+HOST=docker-n5
+USER=builder
+VERSION=QNXOS_803_B600
+TAGID=QNXOS_803-600
+PACKAGE=com.qnx.qnx800.target.net.iosock/0.3.0.00600T202507302003L
+```
+
+This version is based on FreeBSD 13.5-p1.
+
+##### 2.2.2.1. sendto
+
+![](./images/rpi5_qnx804_sendto_eth.png)
+
+![](./images/rpi5_qnx804_sendto_lo.png)
+
+##### 2.2.2.2. sendmmsg
+
+![](./images/rpi5_qnx804_sendmmsg_eth.png)
+
+![](./images/rpi5_qnx804_sendmmsg_lo.png)
+
+##### 2.2.2.3. BPF interface (Layer 2)
+
+![](./images/rpi5_qnx804_bpf_eth.png)
+
+##### 2.2.2.4. BPF interface with Multiple Write extension (Layer 2)
+
+![](./images/rpi5_qnx804_bpfmm_eth.png)
+
+#### 2.2.3. QNX 8.0.5 (io-sock)
+
+The image version tested is:
+
+```text
+QNX rpi5-800-b6a1d3ce 8.0.0 2026/06/05-16:21:14EDT RaspberryPi5 aarch64le
+
+# use -i io-sock
+QNX_BUILDID=(GNU)67e0e8155d0ab0fc6ebf98c608c5540d
+NAME=io-sock
+DESCRIPTION=TCP/IP protocol module.
+DATE=2026/05/22-09:50:59-EDT
+STATE=lookup
+HOST=docker-n8
+USER=builder
+VERSION=networking_io-sock_br-qnx-805-rel_be-800_B15
+TAGID=networking_io-sock_br-qnx-805-rel_be-800-15
+PACKAGE=com.qnx.qnx800.target.net.iosock/0.5.0.00015T202605220948L
+```
+
+This version is based on FreeBSD 14.3.
+
+##### 2.2.3.1. sendto
+
+![](./images/rpi5_qnx805_sendto_eth.png)
+
+![](./images/rpi5_qnx805_sendto_lo.png)
+
+##### 2.2.3.2. sendmmsg
+
+![](./images/rpi5_qnx805_sendmmsg_eth.png)
+
+![](./images/rpi5_qnx805_sendmmsg_lo.png)
+
+##### 2.2.3.3. BPF interface (Layer 2)
+
+![](./images/rpi5_qnx805_bpf_eth.png)
+
+##### 2.2.3.4. BPF interface with Multiple Write extension (Layer 2)
+
+![](./images/rpi5_qnx805_bpfmm_eth.png)
