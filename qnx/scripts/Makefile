@@ -66,7 +66,7 @@ $(info ------------------------------------------------------------------------)
 linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-jammy-clang ubuntu-noble ubuntu-noble-clang ubuntu-resolute ubuntu-resolute-clang
 
 .PHONY: netbsd
-netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb netbsd10.1-aarch64-clang
+netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb netbsd10.1-aarch64-clang netbsd11.0-aarch64 netbsd11.0-aarch64eb
 
 .PHONY: freebsd
 freebsd: freebsd15.1-aarch64 freebsd14.4-aarch64 freebsd13.5-aarch64
@@ -122,6 +122,12 @@ netbsd10.1-aarch64-clang:
 
 netbsd10.1-aarch64eb:
 	@./build.sh -dnetbsd -c10.1 -veb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+netbsd11.0-aarch64:
+	@./build.sh -dnetbsd -c11.0 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+netbsd11.0-aarch64eb:
+	@./build.sh -dnetbsd -c11.0 -veb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd13.5-aarch64:
 	@./build.sh -dfreebsd -c13.5 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd13.5-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"

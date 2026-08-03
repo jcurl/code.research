@@ -25,7 +25,7 @@ RUN (apt update -y || \
 
 RUN mkdir -p /opt/netbsd/${NETBSD_VERSION}/src \
    && cd /opt/netbsd/${NETBSD_VERSION}/src \
-   && wget --no-check-certificate -r -l 1 -np -nd -nc -nv -A "*.tgz" https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/source/sets
+   && wget --no-check-certificate -r -l 1 -np -nd -nc -nv -A "*.tgz" https://cdn.netbsd.org/pub/NetBSD/NetBSD-${NETBSD_VERSION}/source/sets
 
 # Put this on a new line, so we don't need to keep downloading the sources.
 # Extract the sources, build it, and then remove the sources and intermediate
