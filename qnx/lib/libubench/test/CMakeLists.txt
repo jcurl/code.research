@@ -3,6 +3,7 @@ include(GoogleTest)
 set(BINARY libubench_test)
 set(SOURCES
     clock_test.cpp
+    file_test.cpp
     flags_test.cpp
     measure/print_test.cpp
     options_test.cpp

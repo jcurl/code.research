@@ -118,8 +118,9 @@ class fdesc {
   ///
   /// @return the file descriptor before it is reset.
   auto reset() noexcept -> int {
+    int fd = fd_;
     fd_ = -1;
-    return fd_;
+    return fd;
   }
 
   /// @brief Closes the file descriptor.
