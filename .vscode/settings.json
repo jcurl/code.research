@@ -7,11 +7,8 @@
         "latex",
         "plaintext"
     ],
-    "files.associations": {
-        "*.tcc": "cpp"
-    },
     "cmake.sourceDirectory": "${workspaceRoot}/qnx",
     "C_Cpp.default.compileCommands": [
-        "${workspaceRoot}/build/compile_commands.json"
+        "${workspaceRoot}/qnx/build/local/compile_commands.json"
     ],
 }

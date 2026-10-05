@@ -2,19 +2,34 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Clean",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "VSCODE_WORKSPACE": "${workspaceFolder}/qnx"
+                }
+            },
+            "linux": {
+                "command": "${workspaceFolder}/qnx/scripts/build_local.sh clean"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Build (Debug)",
             "type": "shell",
             "options": {
                 "env": {
+                    "CC": "clang",
+                    "CXX": "clang++",
                     "CXX_FLAGS": "-O0 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer",
-                    "VERBOSE": "1"
+                    "VSCODE_WORKSPACE": "${workspaceFolder}/qnx"
                 }
             },
             "linux": {
                 "options": {
                     "cwd": "${workspaceFolder}/qnx"
                 },
-                "command": "cmake -E make_directory ${workspaceFolder}/qnx/build/linux-debug && cmake -G Ninja -S ${workspaceFolder}/qnx -B ${workspaceFolder}/qnx/build/linux-debug -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_RUN_CLANG_TIDY=off -DSANITIZE_THREAD=Off -DCODE_COVERAGE=off && cmake --build ${workspaceFolder}/qnx/build/linux-debug"
+                "command": "${workspaceFolder}/qnx/scripts/build_local.sh incremental"
             },
             "problemMatcher": [
                 {
@@ -33,39 +48,6 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
-        },
-        {
-            "label": "Build (Release)",
-            "type": "shell",
-            "options": {
-                "env": {
-                    "CXX_FLAGS": "-O3 -g"
-                }
-            },
-            "linux": {
-                "options": {
-                    "cwd": "${workspaceFolder}/qnx"
-                },
-                "command": "cmake -E make_directory ${workspaceFolder}/rcu/build/linux-release && cmake -S ${workspaceFolder}/qnx -B ${workspaceFolder}/qnx/build/linux-release -DCMAKE_BUILD_TYPE=RELEASE && cmake --build ${workspaceFolder}/qnx/build/linux-release"
-            },
-            "problemMatcher": [
-                {
-                    "owner": "cpp",
-                    "fileLocation": ["absolute"],
-                    "pattern": {
-                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                        "file": 1,
-                        "line": 2,
-                        "column": 3,
-                        "severity": 4,
-                        "message": 5
-                    }
-                }
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
             }
         }
     ]

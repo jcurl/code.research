@@ -5,7 +5,7 @@
 # build.sh [-c CODENAME] -i
 # build.sh [-c CODENAME] "command"
 
-BASEDIR=`realpath -e "$(dirname "$0")/../.." --relative-to=.`
+BASEDIR=$(realpath -e "$(dirname "$0")/../.." --relative-to=.)
 
 DISTRO=ubuntu
 VARIANT=
