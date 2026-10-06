@@ -70,12 +70,12 @@
 # Example 3: Target added to the 'ccov' and 'ccov-all' targets
 #
 # ~~~
-# add_code_coverage_all_targets(EXCLUDE test/*) # Adds the 'ccov-all' target set and sets it to exclude all files in test/ folders.
-#
-# add_executable(theExe main.cpp non_covered.cpp)
 # add_code_coverage_all_targets(
 #     LCOV_EXCLUDE test/*
 #     LLVM_EXCLUDE test/.*)# Adds the 'ccov-all' target set and sets it to exclude all files in test/ folders.
+#
+# add_executable(theExe main.cpp non_covered.cpp)
+# target_code_coverage(theExe AUTO ALL EXCLUDE non_covered.cpp test/*) # As an executable target, adds to the 'ccov' and ccov-all' targets, and the reports will exclude the non-covered.cpp file, and any files in a test/ folder.
 # ~~~
 #
 # Example 4: Hook all targets
@@ -114,28 +114,21 @@ find_program(GENHTML_PATH genhtml)
 # Hide behind the 'advanced' mode flag for GUI/ccmake
 mark_as_advanced(FORCE LLVM_COV_PATH LLVM_PROFDATA_PATH LCOV_PATH GENHTML_PATH)
 
-# 2022-10-29, jcurl:
-#   Check that the tools are all available before we execute the main logic.
+# 2026-10-06, jcurl: BEGIN
+# Check that the tools are all available before we execute the main logic.
 include(CMakeDependentOption)
-
-string(TOUPPER "${CMAKE_BUILD_TYPE}" upper_CMAKE_BUILD_TYPE)
-if(upper_CMAKE_BUILD_TYPE MATCHES "^(DEBUG|)$")
-  set(ENABLE_DEBUG ON)
-else()
-  set(ENABLE_DEBUG OFF)
-endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
   if(NOT LLVM_COV_PATH)
-    message(STATUS "Building with LLVM COV not enabled (missing llvm-cov)")
+    message(STATUS "Code Coverage with LLVM COV not enabled (missing llvm-cov)")
   else()
     set(ENABLE_COVERAGE "LLVM")
   endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   if(NOT LCOV_PATH)
-    message(STATUS "Building with LCOV not enabled (missing lcov)")
+    message(STATUS "Code Coverage with LCOV not enabled (missing lcov)")
   elseif(NOT GENHTML_PATH)
-    message(STATUS "Building with LCOV not enabled (missing genhtml)")
+    message(STATUS "Code Coverage with LCOV not enabled (missing genhtml)")
   else()
     set(ENABLE_COVERAGE "LCOV")
   endif()
@@ -146,19 +139,19 @@ cmake_dependent_option(CODE_COVERAGE
   "ENABLE_TEST;ENABLE_COVERAGE" OFF)
 
 if(CODE_COVERAGE)
-  message(STATUS "Building with ${ENABLE_COVERAGE} enabled")
+  message(STATUS "Code Coverage with ${ENABLE_COVERAGE} enabled")
 else()
   if((CMAKE_CXX_COMPILER_ID MATCHES "(Apple)?[Cc]lang") OR
      (CMAKE_CXX_COMPILER_ID MATCHES "GNU"))
     if(ENABLE_COVERAGE)
-      message(STATUS "Building with ${ENABLE_COVERAGE} not enabled (enable testing and coverage)")
+      message(STATUS "Code Coverage with ${ENABLE_COVERAGE} not enabled (enable testing and coverage)")
     endif()
   else()
-    message(STATUS "LLVM/LCOV not available for the compiler ${CMAKE_CXX_COMPILER_ID}")
+    message(STATUS "Code Coverage LLVM/LCOV not available for the compiler ${CMAKE_CXX_COMPILER_ID}")
     set(CODE_COVERAGE OFF)
   endif()
 endif()
-# 2022-10-29, jcurl: done.
+# 2026-10-06, jcurl: END
 
 # Variables
 set(CMAKE_COVERAGE_DATA_DIRECTORY ${CMAKE_BINARY_DIR}/ccov-data)
@@ -575,8 +568,12 @@ function(target_code_coverage TARGET_NAME)
       endforeach()
 
       if(EXCLUDE_REGEX)
+        # 2026-10-06, jcurl: BEGIN
+        #set(EXCLUDE_COMMAND ${LCOV_PATH} ${EXCLUDE_REGEX} --output-file
+        #                    ${COVERAGE_INFO})
         set(EXCLUDE_COMMAND ${LCOV_PATH} ${EXCLUDE_REGEX} --output-file
-                            ${COVERAGE_INFO})
+                            ${COVERAGE_INFO} ${target_code_coverage_LCOV_OPTIONS})
+        # 2026-10-06, jcurl: END
       else()
         set(EXCLUDE_COMMAND ;)
       endif()
