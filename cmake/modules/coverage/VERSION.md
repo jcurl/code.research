@@ -2,6 +2,6 @@
 
 Obtained from https://github.com/StableCoder/cmake-scripts/blob/main/code-coverage.cmake
 
-Version: https://github.com/StableCoder/cmake-scripts/commit/ed79fb95f7bd39b2cb158d7ff83a5dbb639343e8
+Version: https://github.com/StableCoder/cmake-scripts/commit/e30ae5f6a5148d1a68857b2f323690c0643a6f8f
 
 Changes have been made to the sources.
