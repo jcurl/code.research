@@ -146,11 +146,7 @@ if(CODE_COVERAGE AND NOT CODE_COVERAGE_ADDED)
   set(CODE_COVERAGE_ADDED ON)
 
   # Common Targets
-  add_custom_target(
-    ccov-preprocessing
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-            ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}
-    DEPENDS ccov-clean)
+  file(MAKE_DIRECTORY ${CMAKE_COVERAGE_OUTPUT_DIRECTORY})
 
   if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang"
      OR CMAKE_CXX_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
@@ -332,7 +328,7 @@ function(target_code_coverage TARGET_NAME)
           COMMAND
             ${CMAKE_COMMAND} -E echo "-object=$<TARGET_FILE:${TARGET_NAME}>" >>
             ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/binaries.list
-          DEPENDS ccov-preprocessing ${TARGET_NAME})
+          DEPENDS ${TARGET_NAME})
 
         if(NOT TARGET ccov-libs)
           message(
@@ -380,7 +376,7 @@ function(target_code_coverage TARGET_NAME)
             "${CMAKE_CURRENT_BINARY_DIR}/${target_code_coverage_COVERAGE_TARGET_NAME}.profraw"
             >> ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/profraw.list
           JOB_POOL ccov_serial_pool
-          DEPENDS ccov-preprocessing ccov-libs ${TARGET_NAME})
+          DEPENDS ccov-libs ${TARGET_NAME})
 
         # Merge the generated profile data so llvm-cov can process it
         add_custom_target(
@@ -449,7 +445,7 @@ function(target_code_coverage TARGET_NAME)
         add_custom_target(
           ccov-run-${target_code_coverage_COVERAGE_TARGET_NAME}
           COMMAND $<TARGET_FILE:${TARGET_NAME}> ${target_code_coverage_ARGS}
-          DEPENDS ccov-preprocessing ${TARGET_NAME})
+          DEPENDS ${TARGET_NAME})
 
         # Generate exclusion string for use
         foreach(EXCLUDE_ITEM ${target_code_coverage_EXCLUDE})
@@ -480,7 +476,7 @@ function(target_code_coverage TARGET_NAME)
               ${CMAKE_SOURCE_DIR} --capture ${EXTERNAL_OPTION} --output-file
               ${COVERAGE_INFO}
             COMMAND ${EXCLUDE_COMMAND}
-            DEPENDS ccov-preprocessing ${TARGET_NAME})
+            DEPENDS ${TARGET_NAME})
         else()
           add_custom_target(
             ccov-capture-${target_code_coverage_COVERAGE_TARGET_NAME}
@@ -492,7 +488,7 @@ function(target_code_coverage TARGET_NAME)
               ${CMAKE_SOURCE_DIR} --capture ${EXTERNAL_OPTION} --output-file
               ${COVERAGE_INFO}
             COMMAND ${EXCLUDE_COMMAND}
-            DEPENDS ccov-preprocessing ${TARGET_NAME})
+            DEPENDS ${TARGET_NAME})
         endif()
 
         # Generates HTML output of the coverage information for perusal
@@ -700,7 +696,7 @@ function(add_code_coverage_all_targets)
           COMMAND ${LCOV_PATH} --directory ${CMAKE_BINARY_DIR} --capture
                   --output-file ${COVERAGE_INFO}
           COMMAND ${EXCLUDE_COMMAND}
-          DEPENDS ccov-preprocessing ccov-all-processing)
+          DEPENDS ccov-all-processing)
       else()
         add_custom_target(
           ccov-all-capture
@@ -708,7 +704,7 @@ function(add_code_coverage_all_targets)
           COMMAND ${LCOV_PATH} --directory ${CMAKE_BINARY_DIR} --capture
                   --output-file ${COVERAGE_INFO}
           COMMAND ${EXCLUDE_COMMAND}
-          DEPENDS ccov-preprocessing ccov-all-processing)
+          DEPENDS ccov-all-processing)
       endif()
 
       # Generates HTML output of all targets for perusal
