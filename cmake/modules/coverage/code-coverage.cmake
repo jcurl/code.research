@@ -465,7 +465,7 @@ function(target_code_coverage TARGET_NAME)
       #
       # If the option for a hidden target were possible, this would be.
       add_custom_target(
-        ccov-ran-${target_code_coverage_COVERAGE_TARGET_NAME}
+        ccov-profraw-${target_code_coverage_COVERAGE_TARGET_NAME}
         DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profraw)
 
       # Merge the generated profile data so llvm-cov can process it
@@ -476,7 +476,10 @@ function(target_code_coverage TARGET_NAME)
           ${target_code_coverage_LLVM_PROFDATA_OPTIONS} -sparse
           ${target_code_coverage_COVERAGE_TARGET_NAME}.profraw -o
           ${target_code_coverage_COVERAGE_TARGET_NAME}.profdata
-        DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profraw)
+        DEPENDS ccov-profraw-${target_code_coverage_COVERAGE_TARGET_NAME})
+      add_custom_target(
+        ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME}
+        DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profdata)
 
       # Ignore regex only works on LLVM >= 7
       set(EXCLUDE_REGEX)
@@ -499,7 +502,7 @@ function(target_code_coverage TARGET_NAME)
           -instr-profile=${target_code_coverage_COVERAGE_TARGET_NAME}.profdata
           -show-line-counts-or-regions ${LINKED_OBJECTS} ${EXCLUDE_REGEX}
           ${target_code_coverage_LLVM_COV_SHOW_OPTIONS}
-        DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profdata)
+        DEPENDS ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME})
 
       # Print out a summary of the coverage information to the command line
       add_custom_target(
@@ -509,7 +512,7 @@ function(target_code_coverage TARGET_NAME)
           -instr-profile=${target_code_coverage_COVERAGE_TARGET_NAME}.profdata
           ${LINKED_OBJECTS} ${EXCLUDE_REGEX}
           ${target_code_coverage_LLVM_COV_REPORT_OPTIONS}
-        DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profdata)
+        DEPENDS ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME})
 
       # Export coverage information so continuous integration tools (e.g.
       # Jenkins) can consume it
@@ -521,7 +524,7 @@ function(target_code_coverage TARGET_NAME)
           -format="text" ${LINKED_OBJECTS} ${EXCLUDE_REGEX}
           ${target_code_coverage_LLVM_COV_EXPORT_OPTIONS} >
           ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/${target_code_coverage_COVERAGE_TARGET_NAME}.json
-        DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profdata)
+        DEPENDS ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME})
 
       # Only generates HTML output of the coverage information for perusal
       add_custom_target(
@@ -533,7 +536,7 @@ function(target_code_coverage TARGET_NAME)
           -output-dir=${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/${target_code_coverage_COVERAGE_TARGET_NAME}
           -format="html" ${LINKED_OBJECTS} ${EXCLUDE_REGEX}
           ${target_code_coverage_LLVM_COV_HTML_OPTIONS}
-        DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.profdata)
+        DEPENDS ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME})
 
       # Generates HTML output of the coverage information for perusal
       add_custom_target(
@@ -622,7 +625,7 @@ function(target_code_coverage TARGET_NAME)
       #
       # If the option for a hidden target were possible, this would be.
       add_custom_target(
-        ccov-ran-${target_code_coverage_COVERAGE_TARGET_NAME}
+        ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME}
         DEPENDS ${target_code_coverage_COVERAGE_TARGET_NAME}.ccov-run)
 
       add_custom_command(
@@ -690,8 +693,16 @@ function(target_code_coverage TARGET_NAME)
       add_dependencies(ccov-all-run
                        ccov-run-${target_code_coverage_COVERAGE_TARGET_NAME})
 
-      add_dependencies(ccov-all-ran
-                       ccov-ran-${target_code_coverage_COVERAGE_TARGET_NAME})
+      if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_ID MATCHES
+                                               "GNU")
+        add_dependencies(
+          ccov-all-ran
+          ccov-profiledata-${target_code_coverage_COVERAGE_TARGET_NAME})
+      else()
+        add_dependencies(
+          ccov-all-ran
+          ccov-profraw-${target_code_coverage_COVERAGE_TARGET_NAME})
+      endif()
     endif()
   endif()
 endfunction()
@@ -814,6 +825,9 @@ function(add_code_coverage_all_targets)
           ${CMAKE_COVERAGE_DATA_DIRECTORY}/all-profraw.list`
         DEPENDS ccov-all-ran)
     endif()
+    add_custom_target(
+      ccov-all-profiledata
+      DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
 
     # Regex exclude only available for LLVM >= 7
     set(EXCLUDE_REGEX)
@@ -839,7 +853,7 @@ function(add_code_coverage_all_targets)
           -instr-profile=${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata
           ${EXCLUDE_REGEX}
           ${add_code_coverage_all_targets_LLVM_COV_REPORT_OPTIONS}
-        DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
+        DEPENDS ccov-all-profiledata)
     else()
       add_custom_target(
         ccov-all-report
@@ -849,7 +863,7 @@ function(add_code_coverage_all_targets)
           -instr-profile=${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata
           ${EXCLUDE_REGEX}
           ${add_code_coverage_all_targets_LLVM_COV_REPORT_OPTIONS}
-        DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
+        DEPENDS ccov-all-profiledata)
     endif()
 
     # Export coverage information so continuous integration tools (e.g. Jenkins)
@@ -865,7 +879,7 @@ function(add_code_coverage_all_targets)
           -format="text" ${EXCLUDE_REGEX}
           ${add_code_coverage_all_targets_LLVM_COV_EXPORT_OPTIONS} >
           ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/coverage.json
-        DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
+        DEPENDS ccov-all-profiledata)
     else()
       add_custom_target(
         ccov-all-export
@@ -876,7 +890,7 @@ function(add_code_coverage_all_targets)
           -format="text" ${EXCLUDE_REGEX}
           ${add_code_coverage_all_targets_LLVM_COV_EXPORT_OPTIONS} >
           ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/coverage.json
-        DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
+        DEPENDS ccov-all-profiledata)
     endif()
 
     # Generate HTML output of all added targets for perusal
@@ -892,7 +906,7 @@ function(add_code_coverage_all_targets)
           -output-dir=${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/all-merged
           -format="html" ${EXCLUDE_REGEX}
           ${add_code_coverage_all_targets_LLVM_COV_HTML_OPTIONS}
-        DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
+        DEPENDS ccov-all-profiledata)
     else()
       add_custom_target(
         ccov-all
@@ -904,7 +918,7 @@ function(add_code_coverage_all_targets)
           -output-dir=${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/all-merged
           -format="html" ${EXCLUDE_REGEX}
           ${add_code_coverage_all_targets_LLVM_COV_HTML_OPTIONS}
-        DEPENDS ${CMAKE_COVERAGE_DATA_DIRECTORY}/ccov-all.profdata)
+        DEPENDS ccov-all-profiledata)
     endif()
 
   elseif(CMAKE_C_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES
