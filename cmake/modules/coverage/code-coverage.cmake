@@ -218,23 +218,6 @@ if(CODE_COVERAGE AND NOT CODE_COVERAGE_ADDED)
     # 2022-10-29, jcurl: Not needed, printed above.
     #message(STATUS "Building with lcov Code Coverage Tools")
 
-    # 2022-10-29, jcurl: Use ENABLE_DEBUG instead. Default is DEBUG mode
-    #if(CMAKE_BUILD_TYPE)
-      #string(TOUPPER ${CMAKE_BUILD_TYPE} upper_build_type)
-      #if(NOT ${upper_build_type} STREQUAL "DEBUG")
-      if(NOT ENABLE_DEBUG)
-        message(
-          WARNING
-            "Code coverage results with an optimized (non-Debug) build may be misleading"
-        )
-      endif()
-    #else()
-    #  message(
-    #    WARNING
-    #      "Code coverage results with an optimized (non-Debug) build may be misleading"
-    #  )
-    #endif()
-    # 2022-10-29, jcurl: done.
     if(NOT LCOV_PATH)
       message(FATAL_ERROR "lcov not found! Aborting...")
     endif()
