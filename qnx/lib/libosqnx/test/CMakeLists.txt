@@ -15,9 +15,12 @@ if(IS_DEBUG)
 endif()
 
 target_code_coverage(${BINARY}
+    LCOV_OPTIONS
+        --ignore-errors inconsistent,inconsistent
     EXCLUDE
-    ${CMAKE_SOURCE_DIR}/test/*
-    ${CMAKE_BINARY_DIR}/build/*
+        ${CMAKE_CURRENT_SOURCE_DIR}/*
+    LLVM_EXCLUDE
+        external/*
 )
 
 add_subdirectory(resmgr)
