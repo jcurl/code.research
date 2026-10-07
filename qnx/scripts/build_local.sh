@@ -37,8 +37,7 @@ fi
 
 build_parent="$VSCODE_WORKSPACE/build"
 if [ ! -d "$build_parent" ]; then
-  echo "Error: parent directory does not exist: $build_parent" >&2
-  exit 1
+  mkdir -p "$VSCODE_WORKSPACE/build"
 fi
 
 build_dir="$VSCODE_WORKSPACE/build/local"
