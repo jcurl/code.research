@@ -39,8 +39,9 @@ auto query_net_interface_hw_addr(const ubench::file::fdesc& sock,
 
   // Linux provides ether_addr in the global namespace.
   std::uint8_t* native_hw_addr =
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-      ((::ether_addr*)&ifr.ifr_hwaddr.sa_data)->ether_addr_octet;
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+      reinterpret_cast<::ether_addr*>(&ifr.ifr_hwaddr.sa_data)
+          ->ether_addr_octet;
   constexpr size_t ETHLEN = ETH_ALEN;
 #else
   // Cygwin 1.7.x and later doesn't have ether_addr. Use `sockaddr`

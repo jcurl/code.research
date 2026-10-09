@@ -112,8 +112,9 @@ auto query_net_interfaces_getifaddrs(
     // NOLINTNEXTLINE(bugprone-switch-missing-default-case)
     switch (ifaddr.ifa_addr->sa_family) {
       case AF_INET: {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-        const in_addr ipv4addr = ((sockaddr_in*)(ifaddr.ifa_addr))->sin_addr;
+        const in_addr ipv4addr =
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+            reinterpret_cast<sockaddr_in*>(ifaddr.ifa_addr)->sin_addr;
 
         // Add only if this IP address doesn't already exist.
         if (std::find_if(interface.inet().begin(), interface.inet().end(),
@@ -129,24 +130,24 @@ auto query_net_interfaces_getifaddrs(
             // (NetBSD, QNX8, etc.) have sa_family == AF_INET as one would
             // expect.
             entry.netmask(
-                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-                ((sockaddr_in*)(ifaddr.ifa_netmask))->sin_addr);
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+                reinterpret_cast<sockaddr_in*>(ifaddr.ifa_netmask)->sin_addr);
           }
 
           if ((ifaddr.ifa_flags & IFF_BROADCAST) && ifaddr.ifa_broadaddr &&
               (ifaddr.ifa_broadaddr->sa_family == AF_UNSPEC ||
                   ifaddr.ifa_broadaddr->sa_family == AF_INET)) {
             entry.broadcast_addr(
-                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-                ((sockaddr_in*)(ifaddr.ifa_broadaddr))->sin_addr);
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+                reinterpret_cast<sockaddr_in*>(ifaddr.ifa_broadaddr)->sin_addr);
           }
 
           if ((ifaddr.ifa_flags & IFF_POINTOPOINT) && ifaddr.ifa_dstaddr &&
               (ifaddr.ifa_dstaddr->sa_family == AF_UNSPEC ||
                   ifaddr.ifa_dstaddr->sa_family == AF_INET)) {
             entry.dest_addr(
-                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-                ((sockaddr_in*)(ifaddr.ifa_dstaddr))->sin_addr);
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+                reinterpret_cast<sockaddr_in*>(ifaddr.ifa_dstaddr)->sin_addr);
           }
         }
         break;

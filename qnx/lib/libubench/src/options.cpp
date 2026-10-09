@@ -33,7 +33,7 @@ auto build_option_map(std::string_view options) -> std::array<option_arg, 128> {
     if (is_valid_opt(optchar)) {
       char optchar_next = options_pos + 1 < options.length()
                               ? options[options_pos + 1]
-                              : (char)0;
+                              : static_cast<char>(0);
       if (optchar_next == 0 || optchar_next != ':') {
         // is_valid_opt() ensures that optchar is in the range of the array.
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
@@ -53,7 +53,7 @@ auto build_option_map(std::string_view options) -> std::array<option_arg, 128> {
 }
 
 auto inline str_char(std::string_view opt, std::size_t index) -> char {
-  return index >= opt.length() ? (char)0 : opt[index];
+  return index >= opt.length() ? static_cast<char>(0) : opt[index];
 }
 
 }  // namespace

@@ -501,7 +501,7 @@ TEST(rcu, DISABLED_stress_threaded_update) {
   std::thread thread_y([&]() -> void {
     while (!terminate.load()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      std::unique_ptr<MyData> new_data(new MyData(24));
+      auto new_data = std::make_unique<MyData>(24);
       bool r = rcu.update(std::move(new_data));
       if (!r) {
         std::cout << "Error updating" << std::endl;

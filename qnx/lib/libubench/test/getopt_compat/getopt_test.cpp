@@ -422,14 +422,15 @@ auto dump_options(ubench::experimental::options& options) -> void {
     std::cout << "optind: " << ::optind << std::endl;
     c = options.getopt();
     if (c != -1) {
-      std::cout << "  getopt: " << (char)c << std::endl;
+      std::cout << "  getopt: " << static_cast<char>(c) << std::endl;
       auto arg = options.optarg();
       if (arg.has_value()) {
         std::cout << "  optarg: " << arg.value() << std::endl;
       } else {
         std::cout << "  optarg: (null)" << std::endl;
       }
-      std::cout << "  optopt: " << (char)options.optopt() << std::endl;
+      std::cout << "  optopt: " << static_cast<char>(options.optopt())
+                << std::endl;
     }
   }
 

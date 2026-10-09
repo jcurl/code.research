@@ -42,8 +42,7 @@ auto inet_ntos(const sockaddr_in& addr) -> std::string {
 
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   char paddr[INET_ADDRSTRLEN];
-  if (inet_ntop(AF_INET, &(addr.sin_addr), (char*)paddr, sizeof(paddr)) ==
-      nullptr)
+  if (inet_ntop(AF_INET, &(addr.sin_addr), &paddr[0], sizeof(paddr)) == nullptr)
     return {};
   std::string result{};
   result.resize(22);
@@ -52,7 +51,7 @@ auto inet_ntos(const sockaddr_in& addr) -> std::string {
   // it, and then extracting the string from it.
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
   int len = std::snprintf(
-      result.data(), 22, "%s:%d", (char*)paddr, ntohs(addr.sin_port));
+      result.data(), 22, "%s:%d", &paddr[0], ntohs(addr.sin_port));
   result.resize(len);
   return result;
 }
@@ -60,8 +59,7 @@ auto inet_ntos(const sockaddr_in& addr) -> std::string {
 auto inet_ntos(const in_addr& addr) -> std::string {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
   char paddr[INET_ADDRSTRLEN];
-  if (inet_ntop(AF_INET, &addr, (char*)paddr, sizeof(paddr)) == nullptr)
-    return {};
+  if (inet_ntop(AF_INET, &addr, &paddr[0], sizeof(paddr)) == nullptr) return {};
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
   return std::string{paddr};
