@@ -340,14 +340,9 @@ class cpuid_driver {
     return devices_;
   }
 
-  auto read(resmgr_context_t*, io_read_t* msg, RESMGR_OCB_T* ocb,
+  auto read(resmgr_context_t*ctp, io_read_t* msg, RESMGR_OCB_T* ocb,
     [[maybe_unused]] attr_type* attr) noexcept -> int {
     // TODO read and pread
-  }
-
-  auto lseek(resmgr_context_t*, io_lseek_t* msg, RESMGR_OCB_T* ocb,
-    [[maybe_unused]] attr_type* attr) noexcept -> int {
-    // TODO 32-bit and 64-bit reads
   }
 
  private:

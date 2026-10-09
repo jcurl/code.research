@@ -1,5 +1,11 @@
+#ifndef CPUID_DEVC_CPUID_DRIVER_H
+#define CPUID_DEVC_CPUID_DRIVER_H
+
 #include <vector>
 
+#include "cpuid/cpuid.h"
+#include "cpuid/cpuidreader_cache.h"
+#include "cpuid/cpuidreader_native.h"
 #include "osqnx/resmgr/device.h"
 
 /// @brief Per device path attribute structure
@@ -28,18 +34,19 @@ class cpuid_driver {
     return devices_;
   }
 
-  auto read(resmgr_context_t*, io_read_t* msg, RESMGR_OCB_T* ocb,
-      [[maybe_unused]] attr_type* attr) noexcept -> int;
-
-  auto lseek(resmgr_context_t*, io_lseek_t* msg, RESMGR_OCB_T* ocb,
-      [[maybe_unused]] attr_type* attr) noexcept -> int;
+  auto read(resmgr_context_t* ctp, io_read_t* msg, RESMGR_OCB_T* ocb,
+      attr_type* attr) noexcept -> int;
 
  private:
   os::qnx::resmgr::config config_{
       .self = false, .fixed_prio = false, .inherit_runmask = false};
   std::vector<attr_type> attrs_;
   std::vector<os::qnx::resmgr::rsrc<attr_type>> devices_;
+  rjcp::cpuid::cpuidreader_native cpuid_{};
+  rjcp::cpuid::cpuidreader_cache cpuid_cache_{cpuid_};
 
   // Sets up the vector devices_ based on the number of CPUs.
   auto init_cpuid_driver() -> void;
 };
+
+#endif

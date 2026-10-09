@@ -39,7 +39,9 @@ int main(void) {
   // Detach, that the process that called us thinks we're done. We continue to
   // run our process in the background on our thread, and just wait for it to
   // exit.
-  procmgr_daemon(0, 0);
+  // procmgr_daemon(0, 0);
+  procmgr_daemon(0, PROCMGR_DAEMON_NOCHDIR | PROCMGR_DAEMON_NOCLOSE |
+                        PROCMGR_DAEMON_NODEVNULL | PROCMGR_DAEMON_KEEPUMASK);
   thread.join();
   return 0;
 }
