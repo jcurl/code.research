@@ -292,7 +292,6 @@ using udp_talker_bpf = udp_talker;
 using udp_talker_bpfmm = udp_talker;
 #endif
 
-
 /// @brief Create the benchmark class from the mode.
 auto make_udp_talker(send_mode mode) -> std::unique_ptr<udp_talker>;
 

@@ -1,0 +1,1 @@
+The QNX binary providing the interface `/dev/cpu/N/cpuid`.

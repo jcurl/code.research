@@ -17,11 +17,18 @@ provides the correct results.
     - [2.2.1. Managing a Context](#221-managing-a-context)
     - [2.2.2. Common Implementation of a Context](#222-common-implementation-of-a-context)
   - [2.3. Dumping](#23-dumping)
-- [3. Usage Examples](#3-usage-examples)
+- [3. Library Usage Examples](#3-library-usage-examples)
   - [3.1. Instantiating a Reader](#31-instantiating-a-reader)
   - [3.2. Querying the Reader](#32-querying-the-reader)
   - [3.3. Querying a CPUID](#33-querying-a-cpuid)
   - [3.4. Setting up CPU Control on FreeBSD](#34-setting-up-cpu-control-on-freebsd)
+- [4. devc-cpuid Design](#4-devc-cpuid-design)
+  - [4.1. QNX Resource Manager](#41-qnx-resource-manager)
+    - [4.1.1. Skeleton Outline](#411-skeleton-outline)
+    - [4.1.2. Per Interface Attributes](#412-per-interface-attributes)
+    - [4.1.3. Configuration](#413-configuration)
+    - [4.1.4. Main Event Loop](#414-main-event-loop)
+  - [4.2. Integration with CPUID Libray](#42-integration-with-cpuid-libray)
 
 ## 1. Component Design
 
@@ -169,7 +176,7 @@ With this, there are three files (no classes are created):
   AMD, so many methods here can be used by AMD and other CPUs also.
 - `dump_amd.h` dump AMD specific registers.
 
-## 3. Usage Examples
+## 3. Library Usage Examples
 
 ### 3.1. Instantiating a Reader
 
@@ -303,3 +310,130 @@ Then on restart, you should see the device
 ```text
 /dev/cpuctl0
 ```
+
+## 4. devc-cpuid Design
+
+The class that handles the QNX driver logic is in `libosqnx` by the templated
+class `os::qnx::resmgr::driver`. The template parameter is a driver, which is
+what this design concentrates on.
+
+### 4.1. QNX Resource Manager
+
+#### 4.1.1. Skeleton Outline
+
+The `driver` has the following outline:
+
+```cpp
+class cpuid_driver {
+ public:
+  using attr_type = cpuid_attribute;
+  operator bool() const noexcept { return true; }
+  cpuid_driver() { init_cpuid_driver(); }
+
+  [[nodiscard]] auto get_config() const noexcept
+      -> const os::qnx::resmgr::config& {
+    return config_;
+  }
+
+  [[nodiscard]] auto get_devices() const noexcept
+      -> const std::vector<os::qnx::resmgr::rsrc<attr_type>>& {
+    return devices_;
+  }
+
+  auto read(resmgr_context_t*, io_read_t* msg, RESMGR_OCB_T* ocb,
+    [[maybe_unused]] attr_type* attr) noexcept -> int {
+    // TODO read and pread
+  }
+
+  auto lseek(resmgr_context_t*, io_lseek_t* msg, RESMGR_OCB_T* ocb,
+    [[maybe_unused]] attr_type* attr) noexcept -> int {
+    // TODO 32-bit and 64-bit reads
+  }
+
+ private:
+  os::qnx::resmgr::config config_{
+      .self = false, .fixed_prio = false, .inherit_runmask = false};
+  std::vector<attr_byte> attrs_;
+  std::vector<os::qnx::resmgr::rsrc<attr_type>> devices_;
+
+  // Sets up the vector devices_ based on the number of CPUs.
+  auto init_cpuid_driver() -> void;
+}
+```
+
+The existence of the methods results in template matching in the header with a
+`constexpr`, so that if the function is defined in the driver it is used, if it
+is not defined, then a default handler is used.
+
+The `read` method must also handle the `io_pread_t` extended type.
+
+The `open` and `close` methods will be provided by the default implementations.
+
+#### 4.1.2. Per Interface Attributes
+
+On each `read` or `lseek`, the correct thread must be pinned first, followed by
+reading with the `cpuid` instruction.
+
+For this, we must assign an attribute for each path, which contains the CPU
+thread that should be used.
+
+```cpp
+struct cpuid_attribute {
+  unsigned int cpu;
+};
+```
+
+This means that the assignment of the attribute field is a pointer to a
+`std::vector<cpuid_attribute>` that contains the correct `cpu` value. The vector
+is owned by the driver, and must have the lifetime that exceeds the running time
+of the resource manager loop.
+
+The `driver` class handles the `iofunc_attr_t` internally, so we do not require
+this as the first field in our attribute.
+
+#### 4.1.3. Configuration
+
+Setting up a path would be similar to:
+
+```cpp
+auto init_cpuid_driver() -> void {
+  const std::string basedev{"/dev/cpu/"};
+
+  const auto threads = ubench::thread::thread_count();
+  std::string path = basedev + std::to_string(core) + "/cpuid";
+  for (std::size_t i = 0; i < threads; i++) {
+    attrs.emplace_back(attr_type{i});
+    devices_.emplace_back(os::qnx::resmgr::rsrc<void>{
+      .path = std::string{path.c_str()},
+      .order = os::qnx::resmgr::path_order::default_order,
+      .mode = S_IFNAM | 0666,
+      .uid = 0,
+      .gid = 0,
+      .rdev = makedev(0, 203, core),
+      .nbytes = 0,
+      .attr = &attrs[i]});
+  }
+}
+```
+
+Note that taking the address of the vector `attrs` requires that later the
+vector contents are not reallocated, resulting in a change in the pointer.
+
+#### 4.1.4. Main Event Loop
+
+The main event loop is single threaded. The resource manager only runs once, on
+a single thread, so that if multiple threads/processes request CPUID
+information, it is serialised by the QNX operating system.
+
+The correct core is chosen within the driver function call. Because of process
+boundaries, the calling client is not affected, except by possible delays in
+calls while doing a context switch to get the correct information.
+
+### 4.2. Integration with CPUID Libray
+
+The methods `read` and `lseek` would determine the CPU core, based on the
+attribute being passed to the function.
+
+Once the core is known, it should used the *cached* CPUID information. If that
+doesn't exist, then it should pin the thread and return the value for the
+specific core.

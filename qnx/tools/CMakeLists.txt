@@ -14,7 +14,7 @@ if(QNXNTO)
 endif()
 
 target_clangformat(TARGET core_latency DIR core_latency)
-target_clangformat(TARGET cpuid_x86 DIR_RECURSE cpuid-x86/libcpuid/src DIR_RECURSE cpuid-x86/libcpuid/include DIR_RECURSE cpuid-x86/libcpuid/test)
+target_clangformat(TARGET cpuid_x86 DIR_RECURSE cpuid-x86/libcpuid/src DIR_RECURSE cpuid-x86/libcpuid/include DIR_RECURSE cpuid-x86/libcpuid/test DIR_RECURSE cpuid-x86/devc-cpuid)
 target_clangformat(TARGET iplist DIR iplist)
 target_clangformat(TARGET lshmem DIR lshmem)
 target_clangformat(TARGET lsqf DIR lsqf)

@@ -152,8 +152,8 @@ struct iofunc_attr_ext_t {
 };
 
 template <typename TDriver, typename TMsg, typename TMsgExtra, typename TAttr,
-    int (TDriver::*Func)(
-        resmgr_context_t*, TMsg*, RESMGR_HANDLE_T*, TMsgExtra*, TAttr*)>
+    int (TDriver::*Func)(resmgr_context_t*, TMsg*, RESMGR_HANDLE_T*, TMsgExtra*,
+        TAttr*) noexcept>
 auto resmgr_connect_handler(resmgr_context_t* ctp, TMsg* msg,
     RESMGR_HANDLE_T* handle, TMsgExtra* extra) noexcept -> int {
   auto dattr = reinterpret_cast<iofunc_attr_ext_t*>(handle);
@@ -163,7 +163,8 @@ auto resmgr_connect_handler(resmgr_context_t* ctp, TMsg* msg,
 }
 
 template <typename TDriver, typename TMsg, typename TAttr,
-    int (TDriver::*Func)(resmgr_context_t*, TMsg*, RESMGR_OCB_T*, TAttr*)>
+    int (TDriver::*Func)(
+        resmgr_context_t*, TMsg*, RESMGR_OCB_T*, TAttr*) noexcept>
 auto resmgr_iofunc_handler(
     resmgr_context_t* ctp, TMsg* msg, RESMGR_OCB_T* ocb) noexcept -> int {
   auto dattr = reinterpret_cast<iofunc_attr_ext_t*>(ocb->attr);

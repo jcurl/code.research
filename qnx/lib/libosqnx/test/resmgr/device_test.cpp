@@ -585,7 +585,7 @@ class driver {
   }
 
   auto lseek(resmgr_context_t* ctp, io_lseek_t* msg, RESMGR_OCB_T* ocb,
-      attr_type* attr) -> int {
+      attr_type* attr) noexcept -> int {
     attr->lseek++;
     return iofunc_lseek_default(ctp, msg, ocb);
   }
