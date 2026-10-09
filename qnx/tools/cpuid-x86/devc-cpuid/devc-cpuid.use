@@ -1,0 +1,18 @@
+NAME
+
+  devc-cpuid - Driver for /dev/cpu/N/cpuid
+
+SYNOPSYS
+
+  devc-cpuid [-U uid] [-G gid] [-P perms]
+
+DESCRIPTION
+
+  This resource manager implements Linux API compatible devices similar to the
+  cpuid.ko module.
+
+OPTIONS
+
+  -U  The user id (name or integer)
+  -G  The group id (name or integer)
+  -P  Permissions for the device node (masked 0777)
