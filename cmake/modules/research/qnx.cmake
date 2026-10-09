@@ -30,7 +30,7 @@ function(get_qnx_version)
 
     set(_QNX_SYSTEM_VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
     if("${CMAKE_SYSTEM_VERSION}" STREQUAL "")
-        set(CMAKE_SYSTEM_VERSION "${_QNX_SYSTEM_VERSION}" CACHE STRING "CMake System Version")
+        set(CMAKE_SYSTEM_VERSION "${_QNX_SYSTEM_VERSION}")
 	    set(CMAKE_SYSTEM_VERSION "${_QNX_SYSTEM_VERSION}" PARENT_SCOPE)
         if(${_qnx_ver_firstrun})
             message(STATUS "Checking for QNX - Consider setting CMAKE_SYSTEM_VERSION set to ${CMAKE_SYSTEM_VERSION}")
