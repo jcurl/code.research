@@ -3,10 +3,12 @@ include(GoogleTest)
 set(BINARY libcpuid_test)
 set(SOURCES
     cpuid_test.cpp
+    cpuid_dev.h cpuid_dev.cpp
     cpuid_cache_test.cpp
     cpuid_cpuctl_test.cpp
     cpuid_dev_test.cpp
     cpuid_native_test.cpp
+    cpuid_kernel_dev_test.cpp
     cpuidreader_cache_test.cpp
     cpuidreader_cpuctl_test.cpp
     cpuidreader_dev_test.cpp
@@ -18,6 +20,7 @@ add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
 target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libcpuid libubench)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
+target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../src)
 
 find_package(LibXml2)
 if (LibXml2_FOUND)

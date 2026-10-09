@@ -1,11 +1,11 @@
 #include "cpuid/cpuidreader_dev.h"
 
-#include <filesystem>
 #include <set>
 
 #include <gtest/gtest.h>
 
 #include "ubench/string.h"
+#include "cpuid_dev.h"
 
 using namespace rjcp::cpuid;
 
@@ -18,27 +18,16 @@ using namespace rjcp::cpuid;
     if (!(variable).has_value()) return; \
   }
 
-namespace {
-
-auto has_cpuid_driver() -> bool {
-  std::string path = std::string{"/dev/cpu/0/cpuid"};
-  std::filesystem::path dev{path};
-
-  return std::filesystem::exists(dev);
-}
-
-}  // namespace
-
 TEST(cpuidreader_dev, has_cpuid) {
   cpuidreader_dev cpu{};
 
-  ASSERT_EQ(cpu.has_cpuid(), has_cpuid_driver());
+  ASSERT_EQ(cpu.has_cpuid(), has_cpuid_dev_driver());
 }
 
 TEST(cpuidreader_dev, make_cpuidreader) {
   auto cpu = make_cpuidreader<cpuidreader_dev>();
 
-  ASSERT_EQ(cpu->has_cpuid(), has_cpuid_driver());
+  ASSERT_EQ(cpu->has_cpuid(), has_cpuid_dev_driver());
 }
 
 TEST(cpuidreader_dev, cpuid_zero) {

@@ -1,15 +1,9 @@
 #include "cpuid/cpuid_dev.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include <filesystem>
-#include <string>
-
 #include <gtest/gtest.h>
 
 #include "ubench/file.h"
+#include "cpuid_dev.h"
 
 using namespace rjcp::cpuid;
 
@@ -22,29 +16,13 @@ using namespace rjcp::cpuid;
     if (!(variable).has_value()) return; \
   }
 
-namespace {
-
-auto get_fdpath(unsigned int cpunum) -> ubench::file::fdesc {
-  std::string path =
-      std::string{"/dev/cpu/"} + std::to_string(cpunum) + std::string{"/cpuid"};
-  std::filesystem::path dev{path};
-
-  if (!std::filesystem::exists(dev)) return ubench::file::fdesc{};
-
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-  ubench::file::fdesc fd = open(dev.c_str(), O_RDONLY | O_CLOEXEC);
-  return fd;
-}
-
-}  // namespace
-
 TEST(cpuid_dev, has_cpuid_invalid) {
   cpuid_dev cpu{-1};
   ASSERT_FALSE(cpu.has_cpuid());
 }
 
 TEST(cpuid_dev, has_cpuid) {
-  auto fd = get_fdpath(0);
+  auto fd = get_cpuid_dev_fdpath(0);
   if (!fd) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
@@ -55,7 +33,7 @@ TEST(cpuid_dev, has_cpuid) {
 }
 
 TEST(cpuid_dev, cpuid_zero) {
-  auto fd = get_fdpath(0);
+  auto fd = get_cpuid_dev_fdpath(0);
   if (!fd) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
@@ -70,7 +48,7 @@ TEST(cpuid_dev, cpuid_zero) {
 }
 
 TEST(cpuid_dev, cpuid_ext) {
-  auto fd = get_fdpath(0);
+  auto fd = get_cpuid_dev_fdpath(0);
   if (!fd) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
@@ -85,7 +63,7 @@ TEST(cpuid_dev, cpuid_ext) {
 }
 
 TEST(cpuid_dev, move_ctor) {
-  auto fd = get_fdpath(0);
+  auto fd = get_cpuid_dev_fdpath(0);
   if (!fd) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
@@ -106,7 +84,7 @@ TEST(cpuid_dev, move_ctor) {
 }
 
 TEST(cpuid_dev, move_assignment) {
-  auto fd = get_fdpath(0);
+  auto fd = get_cpuid_dev_fdpath(0);
   if (!fd) {
     GTEST_SKIP() << "Couldn't open '/dev/cpu/0/cpuid'";
   }
