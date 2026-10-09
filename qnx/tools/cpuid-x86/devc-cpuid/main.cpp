@@ -6,6 +6,7 @@
 #include "osqnx/resmgr/device.h"
 #include "ubench/string.h"
 #include "cpuid-driver.h"
+#include "options.h"
 
 auto driver_thread(os::qnx::resmgr::device<cpuid_driver>& driver,
     stdext::expected<int, int>& result) noexcept -> void {
@@ -22,9 +23,15 @@ auto driver_thread(os::qnx::resmgr::device<cpuid_driver>& driver,
   }
 }
 
-int main(void) {
+int main(int argc, const char* argv[]) {
+  auto o = make_options(argc, argv);
+  if (!o) return 1;
+
   stdext::expected<int, int> result{};
   os::qnx::resmgr::device<cpuid_driver> driver{};
+  driver.driver().set_user(o->user_id());
+  driver.driver().set_group(o->group_id());
+  driver.driver().set_permissions(o->permissions());
 
   // Start the thread, and wait for the driver to run. If it's not running,
   // there was an error.

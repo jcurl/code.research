@@ -28,7 +28,7 @@ auto get_cpuid(rjcp::cpuid::cpuidreader_cache& cpuid, unsigned int core,
 
 }  // namespace
 
-auto cpuid_driver::init_cpuid_driver() -> void {
+auto cpuid_driver::init() -> void {
   static const std::string basedev{"/dev/cpu/"};
 
   const auto threads = ubench::thread::thread_count();
@@ -47,9 +47,9 @@ auto cpuid_driver::init_cpuid_driver() -> void {
       devices.emplace_back(os::qnx::resmgr::rsrc<attr_type>{
           .path = basedev + std::to_string(i) + "/cpuid",
           .order = os::qnx::resmgr::path_order::default_order,
-          .mode = S_IFNAM | 0666,
-          .uid = 0,
-          .gid = 0,
+          .mode = S_IFNAM | (perms_ & 0777),
+          .uid = user_,
+          .gid = group_,
           .rdev = makedev(0, 203, i),
           .nbytes = 0,
           .attr = &attrs[i]});

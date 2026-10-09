@@ -2,6 +2,7 @@ set(BINARY devc-cpuid)
 set(SOURCES
     main.cpp
     cpuid-driver.cpp cpuid-driver.h
+    options.cpp options.h
 )
 
 add_executable(${BINARY} ${SOURCES})

@@ -329,6 +329,14 @@ class device {
   static constexpr int DISPATCH_EXIT_REQUESTED = 1;
 
   template <typename T, typename = std::void_t<>>
+  struct has_init : std::false_type {};
+
+  template <typename T>
+  struct has_init<T,
+      std::void_t<decltype(static_cast<void (T::*)()>(&T::init))>>
+      : std::true_type {};
+
+  template <typename T, typename = std::void_t<>>
   struct has_open : std::false_type {};
 
   template <typename T>
@@ -427,6 +435,13 @@ class device {
       device_.wait_set();
       return device_.exit_code();
     }
+
+    if constexpr (has_init<TDriver>::value) {
+      // Allow lazy initialisation on run() if the user doesn't want to do this
+      // in the constructor.
+      driver_.init();
+    }
+
     if (!driver_) {
       device_.wait_set();
       return stdext::unexpected{-EDRVNOTREADY};

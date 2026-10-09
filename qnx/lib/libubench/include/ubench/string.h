@@ -29,8 +29,32 @@ template <typename T, std::enable_if_t<std::is_integral<T>{}, bool> = true>
 auto parse_int(std::string_view arg) -> std::optional<T> {
   T value;
   auto [ptr, ec] = std::from_chars(arg.data(), arg.data() + arg.size(), value);
-  if (ec != std::errc{}) return {};
-  if (ptr != arg.data() + arg.size()) return {};
+  if (ec != std::errc{}) return std::nullopt;
+  if (ptr != arg.data() + arg.size()) return std::nullopt;
+  return value;
+}
+
+/// @brief Parses the string as an octal number if it starts with '0', else as
+/// a decimal number.
+///
+/// Negative values (a leading '-') are not supported.
+///
+/// @tparam T The type to convert from the string to.
+///
+/// @param arg The string to parse.
+///
+/// @return The value that was read, or no value if there was a parsing error.
+template <typename T, std::enable_if_t<std::is_integral<T>{}, bool> = true>
+auto parse_int_octal(std::string_view arg) -> std::optional<T> {
+  if (arg.empty() || arg.front() == '-' || arg.front() == '+')
+    return std::nullopt;
+  int base = arg.front() == '0' ? 8 : 10;
+
+  T value;
+  auto [ptr, ec] =
+      std::from_chars(arg.data(), arg.data() + arg.size(), value, base);
+  if (ec != std::errc{}) return std::nullopt;
+  if (ptr != arg.data() + arg.size()) return std::nullopt;
   return value;
 }
 

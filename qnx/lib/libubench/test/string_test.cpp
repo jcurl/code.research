@@ -164,6 +164,60 @@ TEST(ubench_string, parse_int) {
   parse_int_check<int>("x");
 }
 
+template <typename T>
+auto parse_int_octal_check(const std::string& arg) -> void {
+  auto value = ubench::string::parse_int_octal<T>(arg);
+  EXPECT_FALSE(value) << "Argument: " << arg;
+}
+
+template <typename T>
+auto parse_int_octal_check(const std::string& arg, T expected) -> void {
+  auto value = ubench::string::parse_int_octal<T>(arg);
+  EXPECT_TRUE(value) << "Argument: " << arg;
+  if (value) {
+    EXPECT_EQ(*value, expected) << "Argument: " << arg;
+  }
+}
+
+TEST(ubench_string, parse_int_octal) {
+  // A leading zero is octal.
+  parse_int_octal_check<unsigned int>("0", 0);
+  parse_int_octal_check<unsigned int>("00", 0);
+  parse_int_octal_check<unsigned int>("07", 7);
+  parse_int_octal_check<unsigned int>("010", 8);
+  parse_int_octal_check<unsigned int>("0644", 0644);
+  parse_int_octal_check<unsigned int>("0777", 0777);
+  parse_int_octal_check<unsigned int>("08");
+  parse_int_octal_check<unsigned int>("0x10");
+
+  // Otherwise decimal.
+  parse_int_octal_check<unsigned int>("1", 1);
+  parse_int_octal_check<unsigned int>("10", 10);
+  parse_int_octal_check<unsigned int>("644", 644);
+  parse_int_octal_check<unsigned int>("1.0");
+  parse_int_octal_check<unsigned int>("x");
+  parse_int_octal_check<unsigned int>("");
+  parse_int_octal_check<unsigned int>("1 ");
+  parse_int_octal_check<int>("1.0");
+
+  // Negative values and signs are not supported.
+  parse_int_octal_check<unsigned int>("-1");
+  parse_int_octal_check<unsigned int>("-0");
+  parse_int_octal_check<unsigned int>("+1");
+  parse_int_octal_check<int>("-1");
+  parse_int_octal_check<int>("-010");
+
+  // Range checks.
+  parse_int_octal_check<std::uint8_t>("0377", 255);
+  parse_int_octal_check<std::uint8_t>("0400");
+  parse_int_octal_check<std::uint8_t>("255", 255);
+  parse_int_octal_check<std::uint8_t>("256");
+  parse_int_octal_check<std::int8_t>("0177", 127);
+  parse_int_octal_check<std::int8_t>("0200");
+  parse_int_octal_check<std::int8_t>("127", 127);
+  parse_int_octal_check<std::int8_t>("128");
+}
+
 static const std::string byte_string{"12"};
 static const std::string short_string{"fa23"};
 static const std::string long_string{"de45ca28"};
