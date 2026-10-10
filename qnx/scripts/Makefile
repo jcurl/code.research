@@ -133,7 +133,7 @@ freebsd13.5-aarch64:
 	@./build.sh -dfreebsd -c13.5 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd13.5-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd14.2-aarch64:
-	@./build.sh -dfreebsd -c14.2 -sfreebsd-old-docker "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c14.2 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd14.3-aarch64:
 	@./build.sh -dfreebsd -c14.3 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.3-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"

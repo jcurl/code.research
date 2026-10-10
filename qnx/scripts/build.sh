@@ -158,7 +158,12 @@ if [ $REBUILD -ne 0 ]; then
     SQUASH=
   fi
 
-  podman build $SQUASH --build-arg CODE_VERSION=$CODENAME $BUILDARGS -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
+  BUILDCONTEXT=
+  if [ x$DISTRO == "xfreebsd" ]; then
+    BUILDCONTEXT="--build-context pkgdownload=$BASEDIR/qnx/scripts/freebsd/pkg"
+  fi
+
+  podman build $SQUASH --build-arg CODE_VERSION=$CODENAME $BUILDARGS $BUILDCONTEXT -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
   if [ $? -ne 0 ]; then
     echo "Error building. Exiting"
     exit 1
