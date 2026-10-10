@@ -1,0 +1,6 @@
+# HTTPS downloads of the package repository
+requests>=2.34,<3
+# Decompress packagesite.pkg (zstd); Python 3.12 has no built-in zstd support
+zstandard>=0.25,<1
+# Verify the packagesite.yaml RSA signature
+cryptography>=50.0.2,<51
