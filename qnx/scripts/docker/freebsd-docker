@@ -33,8 +33,8 @@ ARG SYSROOT=/opt/freebsd/${FREEBSD_VERSION}/aarch64/sysroot
 COPY --from=pkgdownload pkgdownload.py /opt/pkg/
 RUN mkdir -p /opt/freebsd/src
 WORKDIR /opt/freebsd/src
-RUN /opt/pkg/pkgdownload.py --os freebsd --version ${FREEBSD_VERSION} --arch aarch64 --branch RELEASE --sysroot ${SYSROOT} --system base.txz
-RUN /opt/pkg/pkgdownload.py --os freebsd --version ${FREEBSD_VERSION} --arch aarch64 --branch latest --sysroot ${SYSROOT} libxml2
+RUN /opt/pkg/pkgdownload.py --ignore-ca --os freebsd --version ${FREEBSD_VERSION} --arch aarch64 --branch RELEASE --sysroot ${SYSROOT} --system base.txz
+RUN /opt/pkg/pkgdownload.py --ignore-ca --os freebsd --version ${FREEBSD_VERSION} --arch aarch64 --branch latest --sysroot ${SYSROOT} libxml2
 
 # Remove the "bin" directories. (1) saves space; (2) clang looks to the system instead
 RUN for D in bin boot dev media mnt net proc rescue root sbin sys tmp var; do \

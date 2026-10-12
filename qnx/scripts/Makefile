@@ -66,7 +66,10 @@ $(info ------------------------------------------------------------------------)
 linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-jammy-clang ubuntu-noble ubuntu-noble-clang ubuntu-resolute ubuntu-resolute-clang
 
 .PHONY: netbsd
-netbsd: netbsd10.1-aarch64 netbsd10.1-aarch64eb netbsd10.1-aarch64-clang netbsd11.0-aarch64 netbsd11.0-aarch64eb
+netbsd: netbsd11.0-aarch64 netbsd10.1-aarch64-clang netbsd10.1-aarch64
+
+.PHONY:netbsd-all
+netbsd-all: netbsd11.0-aarch64 netbsd11.0-aarch64eb netbsd11.0-x64 netbsd11.0-x86 netbsd10.1-aarch64 netbsd10.1-aarch64-clang netbsd10.1-aarch64eb netbsd10.1-x64 netbsd10.1-x86
 
 .PHONY: freebsd
 freebsd: freebsd15.1-aarch64 freebsd14.4-aarch64 freebsd13.5-aarch64
@@ -81,7 +84,7 @@ qnx: qnx-710-aarch64 qnx-710-x64 qnx-800-aarch64-rpi5 qnx-800-aarch64 qnx-800-x6
 clang: alpine-latest-clang ubuntu-resolute-clang ubuntu-noble-clang ubuntu-jammy-clang freebsd15.0-aarch64 freebsd14.4-aarch64 netbsd10.1-aarch64-clang
 
 .PHONY: all
-all: linux netbsd freebsd
+all: linux netbsd-all freebsd-all qnx
 
 # Defining clangformat in a podman container ensures consistent formatting across all platforms.
 clangformat:
@@ -115,37 +118,49 @@ ubuntu-resolute-clang:
 	@./build.sh -cresolute -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
 
 netbsd10.1-aarch64:
-	@./build.sh -dnetbsd -c10.1 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dnetbsd -c10.1 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 netbsd10.1-aarch64-clang:
-	@./build.sh -dnetbsd -c10.1 -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dnetbsd -c10.1 -varm64clang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 netbsd10.1-aarch64eb:
-	@./build.sh -dnetbsd -c10.1 -veb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dnetbsd -c10.1 -varm64eb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+netbsd10.1-x64:
+	@./build.sh -dnetbsd -c10.1 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+netbsd10.1-x86:
+	@./build.sh -dnetbsd -c10.1 -vx86 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-i486.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 netbsd11.0-aarch64:
-	@./build.sh -dnetbsd -c11.0 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dnetbsd -c11.0 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 netbsd11.0-aarch64eb:
-	@./build.sh -dnetbsd -c11.0 -veb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dnetbsd -c11.0 -varm64eb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+netbsd11.0-x64:
+	@./build.sh -dnetbsd -c11.0 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+
+netbsd11.0-x86:
+	@./build.sh -dnetbsd -c11.0 -vx86 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-i486.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd13.5-aarch64:
-	@./build.sh -dfreebsd -c13.5 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd13.5-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c13.5 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd13.5-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd14.2-aarch64:
-	@./build.sh -dfreebsd -c14.2 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c14.2 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd14.3-aarch64:
-	@./build.sh -dfreebsd -c14.3 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.3-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c14.3 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.3-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd14.4-aarch64:
-	@./build.sh -dfreebsd -c14.4 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.4-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c14.4 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.4-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd15.0-aarch64:
-	@./build.sh -dfreebsd -c15.0 -bUBUNTU_VERSION=resolute "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c15.0 -bUBUNTU_VERSION=resolute -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 freebsd15.1-aarch64:
-	@./build.sh -dfreebsd -c15.1 -bUBUNTU_VERSION=resolute "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	@./build.sh -dfreebsd -c15.1 -bUBUNTU_VERSION=resolute -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
 
 qnx-710-aarch64:
 	@./build.sh -dqnx -c710 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"

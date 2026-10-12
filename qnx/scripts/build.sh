@@ -161,6 +161,8 @@ if [ $REBUILD -ne 0 ]; then
   BUILDCONTEXT=
   if [ x$DISTRO == "xfreebsd" ]; then
     BUILDCONTEXT="--build-context pkgdownload=$BASEDIR/qnx/scripts/freebsd/pkg"
+  elif [ x$DISTRO == "xnetbsd" ]; then
+    BUILDCONTEXT="--build-context pkgdownload=$BASEDIR/qnx/scripts/freebsd/pkg"
   fi
 
   podman build $SQUASH --build-arg CODE_VERSION=$CODENAME $BUILDARGS $BUILDCONTEXT -t "coderesearch:$PODVERSION" $BASEDIR/qnx/scripts/docker -f $DOCKERFILE
