@@ -1,6 +1,6 @@
 # To use this toolchain file
 #
-# cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain/netbsd11.0-i486.cmake
+# cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain/netbsd10.1-i486.cmake
 #
 
 # Intended to work with the Docker Containers build in the qnx/scripts
