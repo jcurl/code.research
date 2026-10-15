@@ -1,0 +1,10 @@
+---
+Checks: >
+    bugprone-*,
+    -bugprone-exception-escape,
+    -bugprone-unchecked-optional-access,
+    modernize-*,
+    cppcoreguidelines-*,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-avoid-do-while,
+HeaderFilterRegex: ''

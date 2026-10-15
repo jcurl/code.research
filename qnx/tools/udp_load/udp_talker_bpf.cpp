@@ -56,13 +56,8 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
     if (intf.hw_addr() && (intf.status() & flags)) {
       for (const auto& ip : intf.inet()) {
         if (source.sin_addr.s_addr == ip.addr().s_addr) {
-          // Accessing const is fine. Clang 18.1.3 false warning.
-          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           if (intf.mtu() && *intf.mtu() < pkt_size + 28u) {
-            std::cerr << "BPF mode size " << pkt_size
-                      << " <= UDP Max "
-                      // Clang 18.1.3 false warning.
-                      // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+            std::cerr << "BPF mode size " << pkt_size << " <= UDP Max "
                       << (*intf.mtu() - 28)
                       << " would require IPv4 fragmentation" << std::endl;
             return false;

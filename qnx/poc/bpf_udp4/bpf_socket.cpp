@@ -88,12 +88,9 @@ bpf_socket::bpf_socket(const sockaddr_in& src, const sockaddr_in& dest)
   if (!srcintf->mtu()) return;
   if (!srcintf->hw_addr()) return;
 
-  // Already checked that it's valid here. Clang 18.1.3 false warning.
-  // NOLINTBEGIN(bugprone-unchecked-optional-access)
   mtu_ = *srcintf->mtu();
   pkt_->write_src_mac(*srcintf->hw_addr());
   pkt_->write_src_ip(src);
-  // NOLINTEND(bugprone-unchecked-optional-access)
 
   // Initialise the BPF interface.
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)

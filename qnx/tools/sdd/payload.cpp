@@ -19,8 +19,6 @@ namespace std {
 auto to_string(const if_ipv4& addr) -> std::string {
   int netmask = -1;
   if (addr.netmask()) {
-    // False positive.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     in_addr_t n = ntohl(addr.netmask()->s_addr);
 
     // Count consecutive set bits from MSB, stopping at first zero bit
@@ -58,18 +56,12 @@ namespace {
 auto create_net_iface(json_writer_object& block_iface, const interface& iface)
     -> void {
   if (iface.vlan().has_value()) {
-    // False positive.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     block_iface.write_value("vlan", iface.vlan()->id);
   }
   if (iface.hw_addr().has_value()) {
-    // False positive.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     block_iface.write_value("mac", *iface.hw_addr());
   }
   if (iface.mtu()) {
-    // False positive.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     block_iface.write_value("mtu", *iface.mtu());
   }
   auto block_ipv4 = block_iface.write_array("ipv4");
@@ -242,8 +234,6 @@ auto payload::query(in_port_t srcport) -> bool {
         addr.sin_port = srcport;
         unsigned int mtu{};
         if (intf.mtu()) {
-          // False positive clang-tidy 18.1.3
-          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           mtu = *intf.mtu();
         }
         auto result = open(addr, mtu);
@@ -273,8 +263,6 @@ auto payload::query(std::string iface, in_port_t srcport) -> bool {
         addr.sin_port = srcport;
         unsigned int mtu{};
         if (intf.mtu()) {
-          // False positive clang-tidy 18.1.3
-          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           mtu = *intf.mtu();
         }
         auto result = open(addr, mtu);
@@ -300,8 +288,6 @@ auto payload::query(const sockaddr_in& iface) -> bool {
         if (iface.sin_addr.s_addr == ipv4.addr().s_addr) {
           unsigned int mtu{};
           if (intf.mtu()) {
-            // False positive clang-tidy 18.1.3
-            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             mtu = *intf.mtu();
           }
           auto result = open(iface, mtu);

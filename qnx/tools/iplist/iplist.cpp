@@ -24,25 +24,15 @@ class if_details final {
   ~if_details() = default;
 
   auto operator()(std::ostream& os) const -> std::ostream& {
-    // Clang 19.1.4 FALSE POSITIVE.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     std::string ifname = intf_.alias() ? *intf_.alias() : intf_.name();
 
     os << std::setw(ifwidth_) << ifname << " ";
     os << std::setw(wid_mac)
-       // Clang 19.1.4 FALSE POSITIVE.
-       // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
        << (intf_.hw_addr() ? ether_ntos(*intf_.hw_addr()) : "") << " ";
     os << std::setw(wid_mtu)
-       // Clang 19.1.4 FALSE POSITIVE.
-       // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
        << (intf_.mtu() ? std::to_string(*intf_.mtu()) : "") << " ";
     os << std::setw(wid_vlan)
-       // Clang 19.1.4 FALSE POSITIVE.
-       // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
        << (intf_.vlan() ? std::to_string(intf_.vlan()->id) : "") << " ";
-    // Clang 19.1.4 FALSE POSITIVE.
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     os << std::setw(ifwidth_) << (intf_.vlan() ? intf_.vlan()->parent : "")
        << " ";
     return os;
@@ -76,20 +66,14 @@ class ipv4_details final {
          << " ";
       os << std::setw(wid_ipv4) << ipv4_->addr() << " ";
       os << std::setw(wid_ipv4)
-         // Clang 19.1.4 FALSE POSITIVE.
-         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
          << (ipv4_->netmask() ? ubench::net::inet_ntos(*ipv4_->netmask()) : "")
          << " ";
       os << std::setw(wid_ipv4)
          << (ipv4_->broadcast_addr()
-                    // Clang 19.1.4 FALSE POSITIVE.
-                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                     ? ubench::net::inet_ntos(*ipv4_->broadcast_addr())
                     : "")
          << " ";
       os << std::setw(wid_ipv4)
-         // Clang 19.1.4 FALSE POSITIVE.
-         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
          << (ipv4_->dest_addr() ? ubench::net::inet_ntos(*ipv4_->dest_addr())
                                 : "")
          << " ";
@@ -137,8 +121,6 @@ auto main() -> int {
   for (const auto& [name, interface] : interfaces) {
     if (interface.alias()) {
       ifwidth =
-          // Clang 19.1.4 FALSE POSITIVE.
-          // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           std::max(ifwidth, static_cast<int>(interface.alias()->length()));
     } else {
       ifwidth = std::max(ifwidth, static_cast<int>(name.length()));
