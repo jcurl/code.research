@@ -2,19 +2,11 @@
 
 #include <gtest/gtest.h>
 
+#include "rtest/rtest.h"
 #include "ubench/file.h"
 #include "cpuid_dev.h"
 
 using namespace rjcp::cpuid;
-
-// Needed so that clang-tidy doesn't complain about values being used without
-// checking the condition first.
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_VALUE(variable)       \
-  {                                      \
-    ASSERT_TRUE((variable).has_value()); \
-    if (!(variable).has_value()) return; \
-  }
 
 TEST(cpuid_dev, has_cpuid_invalid) {
   cpuid_dev cpu{-1};
@@ -43,7 +35,7 @@ TEST(cpuid_dev, cpuid_zero) {
 
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
@@ -58,7 +50,7 @@ TEST(cpuid_dev, cpuid_ext) {
 
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
 

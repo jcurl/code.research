@@ -9,6 +9,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "rtest/rtest.h"
 #include "ubench/clock.h"
 #include "ubench/net.h"
 #include "ubench/string.h"
@@ -126,82 +127,47 @@ TEST(ubench_net_udp, udp_default) {
   ASSERT_EQ(static_cast<int>(udp), -1);
 
   auto sendbuf = udp.get_sendbuf();
-  ASSERT_FALSE(sendbuf.has_value());
-  if (!sendbuf) {
-    EXPECT_EQ(sendbuf.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(sendbuf, EINVAL);
 
   auto sendbuf_s = udp.set_sendbuf(1400);
-  ASSERT_FALSE(sendbuf_s.has_value());
-  if (!sendbuf_s) {
-    EXPECT_EQ(sendbuf_s.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(sendbuf_s, EINVAL);
 
   auto mcastloop = udp.get_multicast_loopback();
-  ASSERT_FALSE(mcastloop.has_value());
-  if (!mcastloop) {
-    EXPECT_EQ(mcastloop.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(mcastloop, EINVAL);
 
   auto mcastloop_s = udp.set_multicast_loopback(true);
-  ASSERT_FALSE(mcastloop_s.has_value());
-  if (!mcastloop_s) {
-    EXPECT_EQ(mcastloop_s.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(mcastloop_s, EINVAL);
 
   auto mcastreg = udp.multicast_register_interface(localhost);
-  ASSERT_FALSE(mcastreg.has_value());
-  if (!mcastreg) {
-    EXPECT_EQ(mcastreg.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(mcastreg, EINVAL);
 
   auto mcastregs = udp.multicast_register_interface(localsock);
-  ASSERT_FALSE(mcastregs.has_value());
-  if (!mcastregs) {
-    EXPECT_EQ(mcastreg.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(mcastregs, EINVAL);
 
   auto mcastttl = udp.get_multicast_ttl();
-  ASSERT_FALSE(mcastttl.has_value());
-  if (!mcastttl) {
-    EXPECT_EQ(mcastttl.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(mcastttl, EINVAL);
 
   auto mcastttl_s = udp.set_multicast_ttl(2);
-  ASSERT_FALSE(mcastttl_s.has_value());
-  if (!mcastttl_s) {
-    EXPECT_EQ(mcastttl_s.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(mcastttl_s, EINVAL);
 
   // May be used before open.
   auto reuse = udp.get_reuse_addr();
-  if (!reuse) {
-    EXPECT_EQ(reuse.error(), ENOTSUP);
-  }
+  MAYBE_OPTIONAL_ERROR(reuse, ENOTSUP);
 
   // May be used before open.
   auto reuse_s = udp.set_reuse_addr(true);
-  if (!reuse_s) {
-    EXPECT_EQ(reuse_s.error(), ENOTSUP);
-  }
+  MAYBE_OPTIONAL_ERROR(reuse_s, ENOTSUP);
 
   // May be used before open.
   auto reusep = udp.get_reuse_port();
-  if (!reusep) {
-    EXPECT_EQ(reusep.error(), ENOTSUP);
-  }
+  MAYBE_OPTIONAL_ERROR(reusep, ENOTSUP);
 
   // May be used before open.
   auto reusep_s = udp.set_reuse_port(true);
-  if (!reusep_s) {
-    EXPECT_EQ(reusep_s.error(), ENOTSUP);
-  }
+  MAYBE_OPTIONAL_ERROR(reusep_s, ENOTSUP);
 
   auto ipv4hdr = udp.ipv4hdr_length();
-  ASSERT_FALSE(ipv4hdr.has_value());
-  if (!ipv4hdr) {
-    EXPECT_EQ(ipv4hdr.error(), EINVAL);
-  }
+  EXPECT_OPTIONAL_ERROR(ipv4hdr, EINVAL);
 }
 
 TEST(ubench_net_udp, udp_open_bind_localhost) {
@@ -215,7 +181,7 @@ TEST(ubench_net_udp, udp_open_bind_localhost) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   // Ensure the socket really is open.
   EXPECT_TRUE(udp);
@@ -242,7 +208,7 @@ TEST(ubench_net_udp, udp_open_bind_connect_localhost) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   // Ensure the socket really is open.
   EXPECT_TRUE(udp);
@@ -264,7 +230,7 @@ TEST(ubench_net_udp, ipv4hdr_length) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   // Ensure the socket really is open.
   EXPECT_TRUE(udp);
@@ -285,24 +251,20 @@ TEST(ubench_net_udp, sendbuf) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto osb = udp.get_sendbuf();
-  EXPECT_TRUE(osb) << ubench::string::perror(osb.error());
+  ASSERT_OPTIONAL(osb) << ubench::string::perror(osb.error());
   std::cout << "sendbuf = " << *osb << std::endl;
 
   auto sb_s = udp.set_sendbuf(1420);
-  EXPECT_TRUE(sb_s) << ubench::string::perror(sb_s.error());
+  ASSERT_OPTIONAL(sb_s) << ubench::string::perror(sb_s.error());
 
-  if (osb && sb_s) {
-    auto nsb = udp.get_sendbuf();
-    EXPECT_TRUE(nsb) << ubench::string::perror(nsb.error());
-    if (nsb) {
-      // OSes usually double the buffers.
-      EXPECT_GE(*nsb, 1420);
-      std::cout << "sendbuf(1420) = " << *nsb << std::endl;
-    }
-  }
+  auto nsb = udp.get_sendbuf();
+  ASSERT_OPTIONAL(nsb) << ubench::string::perror(nsb.error());
+  // OSes usually double the buffers.
+  EXPECT_GE(*nsb, 1420);
+  std::cout << "sendbuf(1420) = " << *nsb << std::endl;
 }
 
 TEST(ubench_net_udp, multicast_ttl) {
@@ -313,22 +275,16 @@ TEST(ubench_net_udp, multicast_ttl) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto omttl = udp.get_multicast_ttl();
-  EXPECT_TRUE(omttl) << ubench::string::perror(omttl.error());
-  ;
+  ASSERT_OPTIONAL(omttl) << ubench::string::perror(omttl.error());
 
   auto mttl_s = udp.set_multicast_ttl(5);
-  EXPECT_TRUE(mttl_s) << ubench::string::perror(mttl_s.error());
+  ASSERT_OPTIONAL(mttl_s) << ubench::string::perror(mttl_s.error());
 
-  if (omttl && mttl_s) {
-    auto nmttl = udp.get_multicast_ttl();
-    EXPECT_TRUE(nmttl) << ubench::string::perror(nmttl.error());
-    if (nmttl) {
-      EXPECT_EQ(*nmttl, 5);
-    }
-  }
+  auto nmttl = udp.get_multicast_ttl();
+  EXPECT_OPTIONAL_EQ(nmttl, 5) << ubench::string::perror(nmttl.error());
 }
 
 TEST(ubench_net_udp, multicast_loopback) {
@@ -339,21 +295,16 @@ TEST(ubench_net_udp, multicast_loopback) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto omlb = udp.get_multicast_loopback();
-  EXPECT_TRUE(omlb) << ubench::string::perror(omlb.error());
+  ASSERT_OPTIONAL(omlb) << ubench::string::perror(omlb.error());
 
   auto mlb_s = udp.set_multicast_loopback(true);
-  EXPECT_TRUE(mlb_s) << ubench::string::perror(mlb_s.error());
+  ASSERT_OPTIONAL(mlb_s) << ubench::string::perror(mlb_s.error());
 
-  if (omlb && mlb_s) {
-    auto nmlb = udp.get_multicast_loopback();
-    EXPECT_TRUE(nmlb) << ubench::string::perror(nmlb.error());
-    if (nmlb) {
-      EXPECT_TRUE(*nmlb);
-    }
-  }
+  auto nmlb = udp.get_multicast_loopback();
+  EXPECT_OPTIONAL_TRUE(nmlb) << ubench::string::perror(nmlb.error());
 }
 
 TEST(ubench_net_udp, reuse_addr) {
@@ -366,21 +317,16 @@ TEST(ubench_net_udp, reuse_addr) {
 
   auto ora = udp.get_reuse_addr();
   if (!ora && ora.error() == ENOTSUP) return;
-  EXPECT_TRUE(ora) << ubench::string::perror(ora.error());
+  ASSERT_OPTIONAL(ora) << ubench::string::perror(ora.error());
 
   auto ra_s = udp.set_reuse_addr(true);
-  EXPECT_TRUE(ra_s) << ubench::string::perror(ra_s.error());
+  ASSERT_OPTIONAL(ra_s) << ubench::string::perror(ra_s.error());
 
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
-  if (ora && ra_s) {
-    auto nra = udp.get_reuse_addr();
-    EXPECT_TRUE(nra) << ubench::string::perror(nra.error());
-    if (nra) {
-      EXPECT_TRUE(*nra);
-    }
-  }
+  auto nra = udp.get_reuse_addr();
+  EXPECT_OPTIONAL_TRUE(nra) << ubench::string::perror(nra.error());
 }
 
 TEST(ubench_net_udp, reuse_port) {
@@ -393,21 +339,16 @@ TEST(ubench_net_udp, reuse_port) {
 
   auto orp = udp.get_reuse_port();
   if (!orp && orp.error() == ENOTSUP) return;
-  EXPECT_TRUE(orp) << ubench::string::perror(orp.error());
+  ASSERT_OPTIONAL(orp) << ubench::string::perror(orp.error());
 
   auto rp_s = udp.set_reuse_port(true);
-  EXPECT_TRUE(rp_s) << ubench::string::perror(rp_s.error());
+  ASSERT_OPTIONAL(rp_s) << ubench::string::perror(rp_s.error());
 
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
-  if (orp && rp_s) {
-    auto nrp = udp.get_reuse_port();
-    EXPECT_TRUE(nrp) << ubench::string::perror(nrp.error());
-    if (nrp) {
-      EXPECT_TRUE(*nrp);
-    }
-  }
+  auto nrp = udp.get_reuse_port();
+  EXPECT_OPTIONAL_TRUE(nrp) << ubench::string::perror(nrp.error());
 }
 
 auto get_packet(const std::string& payload) -> std::vector<std::byte> {
@@ -422,10 +363,8 @@ auto get_packet(const std::string& payload) -> std::vector<std::byte> {
 
 auto check_receive(udp_receive& r, std::string exp) -> void {
   auto p = r.receive();
-  ASSERT_TRUE(p.has_value()) << ubench::string::perror(p.error());
-  if (p) {
-    ASSERT_EQ(exp, p->packet);
-  }
+  ASSERT_OPTIONAL(p) << ubench::string::perror(p.error());
+  ASSERT_EQ(p->packet, exp);
 }
 
 TEST(ubench_net_udp, send_dest_unicast) {
@@ -447,16 +386,14 @@ TEST(ubench_net_udp, send_dest_unicast) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto sres = udp.send(destsock, packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
   check_receive(udpr, "T000");
 
   auto sbres = udp.send(destsock, get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
   check_receive(udpr, "T000");
 }
 
@@ -479,16 +416,14 @@ TEST(ubench_net_udp, send_unicast) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto sres = udp.send(packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
   check_receive(udpr, "T001");
 
   auto sbres = udp.send(get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
   check_receive(udpr, "T001");
 }
 
@@ -516,16 +451,14 @@ TEST(ubench_net_udp, send_unicast_other) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto sres = udp.send(destsock2, packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
   check_receive(udpr, "T002");
 
   auto sbres = udp.send(destsock2, get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
   check_receive(udpr, "T002");
 }
 
@@ -539,7 +472,7 @@ TEST(ubench_net_udp, send_unicast_no_connect) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   // Should fail, as no destination is specific here or in the open.
   auto sres = udp.send(packet);
@@ -567,21 +500,19 @@ TEST(ubench_net_udp, send_dest_multicast) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto mjres = udp.multicast_register_interface(localsock);
-  ASSERT_TRUE(mjres) << ubench::string::perror(mjres.error());
+  ASSERT_OPTIONAL(mjres) << ubench::string::perror(mjres.error());
 
   auto mtres = udp.set_multicast_ttl(1);
-  ASSERT_TRUE(mtres) << ubench::string::perror(mtres.error());
+  ASSERT_OPTIONAL(mtres) << ubench::string::perror(mtres.error());
 
   auto sres = udp.send(destsock, packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
 
   auto sbres = udp.send(destsock, get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
 }
 
 TEST(ubench_net_udp, send_multicast) {
@@ -602,21 +533,19 @@ TEST(ubench_net_udp, send_multicast) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto mjres = udp.multicast_register_interface(localsock);
-  ASSERT_TRUE(mjres) << ubench::string::perror(mjres.error());
+  ASSERT_OPTIONAL(mjres) << ubench::string::perror(mjres.error());
 
   auto mtres = udp.set_multicast_ttl(1);
-  ASSERT_TRUE(mtres) << ubench::string::perror(mtres.error());
+  ASSERT_OPTIONAL(mtres) << ubench::string::perror(mtres.error());
 
   auto sres = udp.send(packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
 
   auto sbres = udp.send(get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
 }
 
 TEST(ubench_net_udp, send_multicast_other) {
@@ -642,21 +571,19 @@ TEST(ubench_net_udp, send_multicast_other) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto mjres = udp.multicast_register_interface(localsock);
-  ASSERT_TRUE(mjres) << ubench::string::perror(mjres.error());
+  ASSERT_OPTIONAL(mjres) << ubench::string::perror(mjres.error());
 
   auto mtres = udp.set_multicast_ttl(1);
-  ASSERT_TRUE(mtres) << ubench::string::perror(mtres.error());
+  ASSERT_OPTIONAL(mtres) << ubench::string::perror(mtres.error());
 
   auto sres = udp.send(destsock2, packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
 
   auto sbres = udp.send(destsock2, get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
 }
 
 TEST(ubench_net_udp, send_multicast_no_register) {
@@ -677,13 +604,11 @@ TEST(ubench_net_udp, send_multicast_no_register) {
 
   ubench::net::udp udp{};
   auto ores = udp.open(localsock, destsock);
-  ASSERT_TRUE(ores) << ubench::string::perror(ores.error());
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
 
   auto sres = udp.send(packet);
-  ASSERT_TRUE(sres) << ubench::string::perror(sres.error());
-  ASSERT_EQ(*sres, 4);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
 
   auto sbres = udp.send(get_packet(packet));
-  ASSERT_TRUE(sbres) << ubench::string::perror(sbres.error());
-  ASSERT_EQ(*sbres, 4);
+  ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
 }

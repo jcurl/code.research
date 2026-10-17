@@ -9,6 +9,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "rtest/rtest.h"
+
 using ::testing::Contains;
 
 TEST(ubench_net, is_multicast_false) {
@@ -184,8 +186,7 @@ TEST(ubench_net, query_interface) {
 
   for (auto const& pair : interfaces) {
     auto interface = ubench::net::query_net_interface(pair.first);
-    EXPECT_NE(interface, std::nullopt)
-        << "Couldn't get interface for " << pair.first;
+    ASSERT_OPTIONAL(interface) << "Couldn't get interface for " << pair.first;
     if (interface) {
       EXPECT_EQ(interface->name(), pair.second.name());
       EXPECT_EQ(interface->alias(), pair.second.alias());
@@ -261,7 +262,7 @@ TEST(ubench_net, parse_sockaddr_invalid4) {
 
 TEST(ubench_net, gethostname) {
   auto hostname = ubench::net::gethostname();
-  ASSERT_TRUE(hostname.has_value());
+  ASSERT_OPTIONAL(hostname);
   if (hostname) {
     ASSERT_GT(hostname->length(), 0);
     std::cout << "hostname: " << *hostname << std::endl;

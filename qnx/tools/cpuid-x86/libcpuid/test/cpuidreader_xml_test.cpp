@@ -4,26 +4,11 @@
 
 #include <gtest/gtest.h>
 
+#include "rtest/rtest.h"
 #include "ubench/os.h"
 #include "ubench/string.h"
 
 using namespace rjcp::cpuid;
-
-// Needed so that clang-tidy doesn't complain about values being used without
-// checking the condition first.
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_VALUE(variable)       \
-  {                                      \
-    ASSERT_TRUE((variable).has_value()); \
-    if (!(variable).has_value()) return; \
-  }
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_NOT_VALUE(variable)    \
-  {                                       \
-    ASSERT_FALSE((variable).has_value()); \
-    if (!(variable).has_value()) return;  \
-  }
 
 namespace {
 
@@ -62,7 +47,7 @@ TEST(cpuidreader_xml, cpuid_zero) {
   cpuidreader_xml cpu{xml_file.string()};
 
   auto reg = cpu.cpuid(0, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax, 0x00000020);
   ASSERT_EQ(reg->ebx, 0x756E6547);
   ASSERT_EQ(reg->ecx, 0x6C65746E);
@@ -77,7 +62,7 @@ TEST(cpuidreader_xml, cpuid_ext) {
   cpuidreader_xml cpu{xml_file.string()};
 
   auto reg = cpu.cpuid(0x80000000, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax, 0x80000008);
   ASSERT_EQ(reg->ebx, 0x00000000);
   ASSERT_EQ(reg->ecx, 0x00000000);
@@ -94,12 +79,11 @@ TEST(cpuidreader_xml, cpuid_threads) {
   std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
     EXPECT_EQ((*pin)->core(), core);
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
-    ASSERT_HAS_VALUE(result);
+    ASSERT_OPTIONAL(result);
 
     // NOTE: This test can fail if run from within valgrind, which virtualises
     // the CPUID instruction. Using the /dev/cpu/N/cpuid will still work!
@@ -178,14 +162,14 @@ auto one_core_invalid_line(std::filesystem::path xml_file) {
   ASSERT_TRUE(cpu.has_cpuid());
   ASSERT_EQ(cpu.cores(), 1);
 
-  ASSERT_HAS_VALUE(cpu.cpuid(0x00000000, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x00000001, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x00000002, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000000, 0x00000000));
-  ASSERT_HAS_NOT_VALUE(cpu.cpuid(0x80000001, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000002, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000003, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000004, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x00000000, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x00000001, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x00000002, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000000, 0x00000000));
+  ASSERT_OPTIONAL_HAS_ERROR(cpu.cpuid(0x80000001, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000002, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000003, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000004, 0x00000000));
 }
 
 TEST(cpuidreader_xml, one_core_invalid_line_missing_field1) {
@@ -244,14 +228,14 @@ auto one_core_valid_line(std::filesystem::path xml_file) {
   ASSERT_TRUE(cpu.has_cpuid());
   ASSERT_EQ(cpu.cores(), 1);
 
-  ASSERT_HAS_VALUE(cpu.cpuid(0x00000000, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x00000001, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x00000002, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000000, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000001, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000002, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000003, 0x00000000));
-  ASSERT_HAS_VALUE(cpu.cpuid(0x80000004, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x00000000, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x00000001, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x00000002, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000000, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000001, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000002, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000003, 0x00000000));
+  ASSERT_OPTIONAL(cpu.cpuid(0x80000004, 0x00000000));
 }
 
 TEST(cpuidreader_xml, one_core_valid_line_space1) {
@@ -281,9 +265,9 @@ TEST(cpuidreader_xml, one_core_valid_line_ff) {
 
   cpuidreader_xml cpu{xml_file.string()};
   auto ctx = cpu.enable_core(0);
-  ASSERT_HAS_VALUE(ctx);
+  ASSERT_OPTIONAL(ctx);
 
   auto reg = cpu.cpuid(0x80000001, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax, 0xFFFFFFFF);
 }

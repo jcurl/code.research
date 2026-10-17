@@ -1,6 +1,7 @@
 add_subdirectory(libubench)
 add_subdirectory(libunet)
 add_subdirectory(libstdext)
+add_subdirectory(librtest)
 
 if(QNXNTO)
     add_subdirectory(libosqnx)
@@ -10,3 +11,4 @@ target_clangformat(TARGET libubench DIR_RECURSE libubench/src DIR_RECURSE libube
 target_clangformat(TARGET libstdext DIR_RECURSE libstdext/test)
 target_clangformat(TARGET libunet DIR_RECURSE libunet/src DIR_RECURSE libunet/include DIR_RECURSE libunet/test DIR_RECURSE libunet/benchmark)
 target_clangformat(TARGET libosqnx DIR_RECURSE libosqnx/src DIR_RECURSE libosqnx/include DIR_RECURSE libosqnx/test)
+target_clangformat(TARGET librtest DIR_RECURSE librtest/include DIR_RECURSE librtest/test)

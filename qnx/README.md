@@ -31,6 +31,7 @@
   - [3.4. Read/Copy/Update Userspace Implementation](#34-readcopyupdate-userspace-implementation)
 - [4. Proof of Concept Code](#4-proof-of-concept-code)
   - [4.1. UDPv4 with Fragmentation](#41-udpv4-with-fragmentation)
+  - [4.2. QNX statvfs](#42-qnx-statvfs)
 
 ## 1. Compilation
 
@@ -241,7 +242,7 @@ Show all files opened by a process under QNX, like in `pidin`.
 Check the mapping for all PIDs and look for shared memory pages.
 
 - Tool: `lshmem`
-- Supported: QNX 7.1, QNX 9.0
+- Supported: QNX 7.1, QNX 8.0
 - [Documentation](./tools/lshmem.md)
 
 #### 2.2.6. List Interfaces and IPv4 Addresses
@@ -308,3 +309,9 @@ fragmentation. Operating systems that don't have the BSD BPF interface do the
 same thing with the network stack.
 
 See [README.md](./poc/bpf_udp4/docs/README.md)
+
+### 4.2. QNX statvfs
+
+Executes the `DCMD_FSYS_STATVFS` on a QNX device and report the results.
+
+See [README.md](./poc/qnx_statvfs/)

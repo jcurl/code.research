@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include "rtest/rtest.h"
+
 auto split_check(const std::string& arg, std::initializer_list<std::string> l)
     -> void {
   auto arg_parse = ubench::string::split_args(arg);
@@ -136,11 +138,7 @@ auto parse_int_check(const std::string& arg) -> void {
 template <typename T>
 auto parse_int_check(const std::string& arg, T expected) -> void {
   auto value = ubench::string::parse_int<T>(arg);
-  EXPECT_TRUE(value);
-  if (value) {
-    EXPECT_EQ(value, expected)
-        << "Value: " << *value << " didn't result in " << expected;
-  }
+  EXPECT_OPTIONAL_EQ(value, expected);
 }
 
 TEST(ubench_string, parse_int) {
@@ -173,10 +171,7 @@ auto parse_int_octal_check(const std::string& arg) -> void {
 template <typename T>
 auto parse_int_octal_check(const std::string& arg, T expected) -> void {
   auto value = ubench::string::parse_int_octal<T>(arg);
-  EXPECT_TRUE(value) << "Argument: " << arg;
-  if (value) {
-    EXPECT_EQ(*value, expected) << "Argument: " << arg;
-  }
+  EXPECT_OPTIONAL_EQ(value, expected) << "Argument: " << arg;
 }
 
 TEST(ubench_string, parse_int_octal) {

@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 TEST(asinfo, is_ordered) {

@@ -18,7 +18,7 @@ set(SOURCES
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libcpuid libubench)
+target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libcpuid libubench librtest)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../src)
 

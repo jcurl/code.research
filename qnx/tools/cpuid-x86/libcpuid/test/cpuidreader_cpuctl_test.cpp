@@ -5,18 +5,10 @@
 
 #include <gtest/gtest.h>
 
+#include "rtest/rtest.h"
 #include "ubench/string.h"
 
 using namespace rjcp::cpuid;
-
-// Needed so that clang-tidy doesn't complain about values being used without
-// checking the condition first.
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_VALUE(variable)       \
-  {                                      \
-    ASSERT_TRUE((variable).has_value()); \
-    if (!(variable).has_value()) return; \
-  }
 
 namespace {
 
@@ -48,7 +40,7 @@ TEST(cpuidreader_cpuctl, cpuid_zero) {
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
   auto reg = cpu.cpuid(0, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
@@ -59,7 +51,7 @@ TEST(cpuidreader_cpuctl, cpuid_ext) {
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
   auto reg = cpu.cpuid(0x80000000, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
 
@@ -71,19 +63,17 @@ TEST(cpuidreader_cpuctl, cpuid_context_move) {
   if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
-  ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-  ASSERT_TRUE(*pin);
+  ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
 
   auto reg0 = cpu.cpuid(1, 0);
-  ASSERT_HAS_VALUE(reg0);
+  ASSERT_OPTIONAL(reg0);
   auto reg0ebx = reg0->ebx;
 
   decltype(pin) pin2 = std::move(pin);
-  ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
-  ASSERT_TRUE(*pin2);
+  ASSERT_OPTIONAL_TRUE(pin2) << ubench::string::perror(pin2.error());
 
   auto reg1 = cpu.cpuid(1, 0);
-  ASSERT_HAS_VALUE(reg1);
+  ASSERT_OPTIONAL(reg1);
   auto reg1ebx = reg1->ebx;
 
   // Moving the context should not affect which core is being read. We check
@@ -99,11 +89,10 @@ TEST(cpuidreader_cpuctl, cpuid_threads) {
   std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
-    ASSERT_HAS_VALUE(result);
+    ASSERT_OPTIONAL(result);
     EXPECT_TRUE(acpi.find(result->ebx) == acpi.end());
     acpi.insert(result->ebx);
   }
@@ -116,15 +105,13 @@ TEST(cpuidreader_cpuctl, cpuid_threads_context_move) {
   std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
 
     auto pin2 = std::move(pin);
-    ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
-    ASSERT_TRUE(*pin2);
+    ASSERT_OPTIONAL_TRUE(pin2) << ubench::string::perror(pin2.error());
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
-    ASSERT_HAS_VALUE(result);
+    ASSERT_OPTIONAL(result);
     EXPECT_TRUE(acpi.find(result->ebx) == acpi.end());
     acpi.insert(result->ebx);
   }
@@ -136,7 +123,7 @@ TEST(cpuidreader_cpuctl, cpuid_query_then_enable) {
 
   // Query using the default core (0).
   auto regd = cpu.cpuid(1, 0);
-  ASSERT_HAS_VALUE(regd);
+  ASSERT_OPTIONAL(regd);
   auto regdebx = regd->ebx;
 
   // Now enable a specific core, which should succeed.
@@ -144,12 +131,11 @@ TEST(cpuidreader_cpuctl, cpuid_query_then_enable) {
   if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
-  ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-  ASSERT_TRUE(*pin);
+  ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
   EXPECT_EQ((*pin)->core(), core);
 
   auto regc = cpu.cpuid(1, 0);
-  ASSERT_HAS_VALUE(regc);
+  ASSERT_OPTIONAL(regc);
   auto regcebx = regc->ebx;
 
   // They should be different, unless we queried the same core.
@@ -164,8 +150,7 @@ TEST(cpuidreader_cpuctl, cpuid_enable_core_twice_fail) {
   if (cpu.cores() > 1) core = 1;
 
   auto pin = cpu.enable_core(core);
-  ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-  ASSERT_TRUE(*pin);
+  ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
   EXPECT_EQ((*pin)->core(), core);
 
   // The second activation should fail, because the first activation is still
@@ -186,11 +171,10 @@ TEST(cpuidreader_cpuctl, cpuid_enable_core_twice_success) {
   cpuidreg regc = 0;
   {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
     EXPECT_EQ((*pin)->core(), core);
     auto reg = cpu.cpuid(1, 0);
-    ASSERT_HAS_VALUE(reg);
+    ASSERT_OPTIONAL(reg);
     regc = reg->ebx;
   }
 
@@ -199,11 +183,10 @@ TEST(cpuidreader_cpuctl, cpuid_enable_core_twice_success) {
   cpuidreg reg0 = 0;
   {
     auto pin = cpu.enable_core(0);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
     EXPECT_EQ((*pin)->core(), 0);
     auto reg = cpu.cpuid(1, 0);
-    ASSERT_HAS_VALUE(reg);
+    ASSERT_OPTIONAL(reg);
     reg0 = reg->ebx;
   }
 
@@ -220,18 +203,17 @@ TEST(cpuidreader_cpuctl, move_ctor) {
   cpuidreg regebx{}, regmebx{};
   {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
     EXPECT_EQ((*pin)->core(), core);
     auto reg = cpu.cpuid(1, 0);
-    ASSERT_HAS_VALUE(reg);
+    ASSERT_OPTIONAL(reg);
     regebx = reg->ebx;
 
     // Move and test we get the same results.
 
     decltype(cpu) cpu2{std::move(cpu)};
     auto regm = cpu2.cpuid(1, 0);
-    ASSERT_HAS_VALUE(regm);
+    ASSERT_OPTIONAL(regm);
     regmebx = regm->ebx;
   }
 
@@ -250,26 +232,24 @@ TEST(cpuidreader_cpuctl, move_assignment) {
   cpuidreg regebx{}, regmebx{};
   {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
     EXPECT_EQ((*pin)->core(), core);
     auto reg = cpu.cpuid(1, 0);
-    ASSERT_HAS_VALUE(reg);
+    ASSERT_OPTIONAL(reg);
     regebx = reg->ebx;
 
     // Move and test we get the same results.
 
     cpu2 = std::move(cpu);
     auto regm = cpu2.cpuid(1, 0);
-    ASSERT_HAS_VALUE(regm);
+    ASSERT_OPTIONAL(regm);
     regmebx = regm->ebx;
   }
 
   ASSERT_EQ(regebx, regmebx);
 
   auto pin2 = cpu2.enable_core(0);
-  ASSERT_TRUE(pin2) << ubench::string::perror(pin2.error());
-  ASSERT_TRUE(*pin2);
+  ASSERT_OPTIONAL_TRUE(pin2) << ubench::string::perror(pin2.error());
 }
 
 TEST(cpuidreader_cpuctl, oob_cores) {

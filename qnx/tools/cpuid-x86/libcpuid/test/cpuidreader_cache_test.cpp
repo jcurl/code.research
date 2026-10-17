@@ -4,18 +4,10 @@
 
 #include "cpuid/cpuidreader_dev.h"
 #include "cpuid/cpuidreader_native.h"
+#include "rtest/rtest.h"
 #include "ubench/string.h"
 
 using namespace rjcp::cpuid;
-
-// Needed so that clang-tidy doesn't complain about values being used without
-// checking the condition first.
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_VALUE(variable)       \
-  {                                      \
-    ASSERT_TRUE((variable).has_value()); \
-    if (!(variable).has_value()) return; \
-  }
 
 namespace {
 
@@ -57,7 +49,7 @@ TEST(cpuidreader_cache, native_cpuid_zero) {
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
   auto reg = cpu.cpuid(0, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0);
 }
 
@@ -70,7 +62,7 @@ TEST(cpuidreader_cache, native_cpuid_ext) {
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
   auto reg = cpu.cpuid(0x80000000, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax & 0xFFFFFF00, 0x80000000);
 }
 
@@ -83,12 +75,11 @@ TEST(cpuidreader_cache, native_cpuid_threads) {
   std::set<cpuidreg> acpi{};
   for (unsigned int core = 0; core < cpu.cores(); core++) {
     auto pin = cpu.enable_core(core);
-    ASSERT_TRUE(pin) << ubench::string::perror(pin.error());
-    ASSERT_TRUE(*pin);
+    ASSERT_OPTIONAL_TRUE(pin) << ubench::string::perror(pin.error());
     EXPECT_EQ((*pin)->core(), core);
 
     auto result = cpu.cpuid(0x00000001, 0x00000000);
-    ASSERT_HAS_VALUE(result);
+    ASSERT_OPTIONAL(result);
 
     // NOTE: This test can fail if run from within valgrind, which virtualises
     // the CPUID instruction. Using the /dev/cpu/N/cpuid will still work!
@@ -109,8 +100,8 @@ TEST(cpuidreader_cache, cpuid_native_compare) {
     auto ndump = cpuid_dump(ncpu, core);
     auto dump = cpuid_dump(cpu, core);
 
-    ASSERT_HAS_VALUE(ndump);
-    ASSERT_HAS_VALUE(dump);
+    ASSERT_OPTIONAL(ndump);
+    ASSERT_OPTIONAL(dump);
 
     ASSERT_EQ(ndump->size(), dump->size());
 
@@ -167,7 +158,7 @@ TEST(cpuidreader_cache, fake_cpuid_zero) {
   cpuidreader_fake cpu{};
 
   auto reg = cpu.cpuid(0, 0);
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax, 1);
   ASSERT_EQ(reg->ebx, 2);
   ASSERT_EQ(reg->ecx, 3);

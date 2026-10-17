@@ -2,16 +2,9 @@
 
 #include <gtest/gtest.h>
 
-using namespace rjcp::cpuid;
+#include "rtest/rtest.h"
 
-// Needed so that clang-tidy doesn't complain about values being used without
-// checking the condition first.
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_HAS_VALUE(variable)       \
-  {                                      \
-    ASSERT_TRUE((variable).has_value()); \
-    if (!(variable).has_value()) return; \
-  }
+using namespace rjcp::cpuid;
 
 const std::vector<cpuid_info> default_data{
     {{0, 0}, {0, 0x56e6547, 0x6c65746e, 0x49656e69}},
@@ -36,7 +29,7 @@ TEST(cpuid_cache, cpuid_zero) {
 
   // Check the first register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax, 0);
 }
 
@@ -46,7 +39,7 @@ TEST(cpuid_cache, cpuid_ext) {
 
   // Check the extended register, whose result is expected to be not more than
   // 0xFF leaves.
-  ASSERT_HAS_VALUE(reg);
+  ASSERT_OPTIONAL(reg);
   ASSERT_EQ(reg->eax, 0x80000000);
 }
 
@@ -59,11 +52,11 @@ TEST(cpuid_cache, cpuid_updatecache) {
   ASSERT_TRUE(cpu.update_cache(info1));
 
   auto reg0 = cpu.cpuid(0, 0);
-  ASSERT_HAS_VALUE(reg0);
+  ASSERT_OPTIONAL(reg0);
   ASSERT_EQ(reg0->eax, 0x1);
 
   auto reg1 = cpu.cpuid(1, 0);
-  ASSERT_HAS_VALUE(reg1);
+  ASSERT_OPTIONAL(reg1);
   ASSERT_EQ(reg1->eax, 0xb0671);
 }
 
@@ -77,7 +70,7 @@ TEST(cpuid_cache, cpuid_empty_updatecache) {
   ASSERT_TRUE(cpu.has_cpuid());
 
   auto reg0 = cpu.cpuid(0, 0);
-  ASSERT_HAS_VALUE(reg0);
+  ASSERT_OPTIONAL(reg0);
   ASSERT_EQ(reg0->eax, 0x1);
 
   auto reg1 = cpu.cpuid(1, 0);
