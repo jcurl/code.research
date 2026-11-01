@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# PROVIDE: sdd
+# REQUIRE: LOGIN
+
+. /etc/rc.subr
+
+name="sdd"
+rcvar="sdd_enable"
+start_cmd="${name}_start"
+command="/usr/local/bin/sdd"
+procname="sdd"
+
+load_rc_config "${name}"
+
+sdd_start()
+{
+    ${command} ${rc_flags} > /dev/null &
+}
+
+run_rc_command "$1"
