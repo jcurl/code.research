@@ -141,9 +141,14 @@ auto payload::open(const sockaddr_in& bind, unsigned int mtu)
   iface_ctx in{};
   in.udp = udp{};
 
+  // Reuse options must be set before open() binds the socket.
+  in.udp.set_reuse_addr(true);
+  in.udp.set_reuse_port(true);
+
   auto oresult = in.udp.open(bind, dest_);
   if (!oresult) return stdext::unexpected{oresult.error()};
 
+  in.udp.set_multicast_loopback(true);
   auto tresult = in.udp.set_multicast_ttl(1);
   if (!tresult) return stdext::unexpected{tresult.error()};
 

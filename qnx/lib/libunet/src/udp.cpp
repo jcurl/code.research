@@ -338,6 +338,20 @@ auto udp::open(const sockaddr_in& bind, const sockaddr_in& dest) noexcept
   if (!ores) return stdext::unexpected{ores.error()};
   ubench::file::fdesc fd = std::move(*ores);
 
+#if HAVE_SO_REUSEADDR
+  if (reuse_addr_) {
+    auto rares = internal::set_reuse_addr(fd, reuse_addr_);
+    if (!rares) return stdext::unexpected{rares.error()};
+  }
+#endif
+
+#if HAVE_SO_REUSEPORT
+  if (reuse_port_) {
+    auto rpres = internal::set_reuse_port(fd, reuse_port_);
+    if (!rpres) return stdext::unexpected{rpres.error()};
+  }
+#endif
+
   auto bres = internal::bind(fd, bind);
   if (!bres) return stdext::unexpected{bres.error()};
 
