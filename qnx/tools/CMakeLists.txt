@@ -3,6 +3,7 @@ add_subdirectory(udp_load)
 add_subdirectory(iplist)
 add_subdirectory(cpuid-x86)
 add_subdirectory(sdd)
+#add_subdirectory(sdd-monitor)
 
 if(NOT APPLE)
     add_subdirectory(core_latency)
@@ -21,3 +22,5 @@ target_clangformat(TARGET lsqf DIR lsqf)
 target_clangformat(TARGET time_compare DIR time_compare)
 target_clangformat(TARGET udp_load DIR udp_load)
 target_clangformat(TARGET sdd DIR sdd DIR_RECURSE sdd/libsjson/src DIR_RECURSE sdd/libsjson/include DIR_RECURSE sdd/libsjson/test)
+#target_clangformat(TARGET sdd-monitor DIR sdd-monitor)
+

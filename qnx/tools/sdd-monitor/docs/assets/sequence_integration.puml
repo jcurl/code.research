@@ -1,0 +1,190 @@
+@startuml startup_qt_initialisation
+
+!define MAIN_COLOUR c9abd2
+!define UI_COLOUR 9595d5
+!define WORKER_COLOUR f1ddaf
+
+participant "main.cpp" as main
+participant "Qt event loop\n(UI thread)" as qt
+participant "qt_main_view" as view
+participant "main_presenter" as pres
+participant "computer_service\n(service thread)" as svc
+
+group Qt Initialisation on Startup
+
+activate main #MAIN_COLOUR
+
+main -> main ++ #MAIN_COLOUR : QApplication(argc, argv)
+main -> qt **
+main <-- main --
+
+main -> svc **
+
+main -> view **
+activate view #MAIN_COLOUR
+view -> view  : build_ui()
+view -[hidden]> view
+main <-- view --
+
+main -> pres ** : .ctor(service, view)
+activate pres #MAIN_COLOUR
+note over pres
+  Stores service and
+  view locally
+end note
+main <-- pres --
+
+main -> view ++ #MAIN_COLOUR : show() <<QWidget>>
+main <-- view --
+
+main -> pres ++ #MAIN_COLOUR : start()
+pres -> view ++ #MAIN_COLOUR : subscription =\n view.set_listener(*this)
+pres <-- view --
+pres -> svc ++ #MAIN_COLOUR : subscription =\n service.subscribe(*this)
+svc --> pres --
+opt only if service thread already started
+  pres -> view ++ #MAIN_COLOUR : request_ready()
+  note over view
+    view posts a queued
+    callback to itself
+    using Qt::QueuedConnection
+  end note
+  pres <-- view --
+end opt
+pres --> main --
+
+main -> svc ++ #WORKER_COLOUR : start()
+svc --> main
+
+main -> qt ++ #UI_COLOUR : exec()
+qt -> qt : Run event loop
+opt only if service thread already started
+  qt -> view ++ #UI_COLOUR : ready callback runs
+  note over view
+    proof the loop
+    is running
+  end note
+  view -> pres ++ #UI_COLOUR : on_view_ready()
+  pres -> svc ++ #UI_COLOUR : notify_computers()
+  loop computers
+    svc -> pres ++ #UI_COLOUR : on_computer_changed(c)
+    pres -> view ++ #UI_COLOUR : show_computer(c)
+    view ->> qt : computer_shown(c)
+    pres <-- view --
+    svc <-- pres --
+  end loop
+  pres <-- svc --
+  view <-- pres --
+end opt
+qt <-- view --
+
+@enduml
+
+
+
+@startuml running_service_computer_added
+
+skinparam sequenceMessageAlign center
+
+!define MAIN_COLOUR c9abd2
+!define UI_COLOUR 9595d5
+!define WORKER_COLOUR f1ddaf
+
+participant "Qt event loop\n(UI thread)" as qt
+participant "qt_main_view" as view
+participant "main_presenter" as pres
+participant "computer_service\n(service thread)" as svc
+
+group Async: computer added (service thread)
+
+activate svc #WORKER_COLOUR
+svc -> pres ++ #WORKER_COLOUR : on_computer_changed(c)
+pres -> view ++ #WORKER_COLOUR : show_computer(c)
+view ->> qt : computer_shown(c)
+view --> pres -- :
+pres --> svc -- :
+
+activate qt #UI_COLOUR
+qt -> view ++ #UI_COLOUR : on_computer_shown(c)
+view -> view : computer_list_model::upsert(c)
+view --> qt -- :
+qt -[hidden]-> qt
+deactivate qt
+
+deactivate svc
+
+@enduml
+
+
+
+@startuml running_service_computer_removed
+
+skinparam sequenceMessageAlign center
+
+!define MAIN_COLOUR c9abd2
+!define UI_COLOUR 9595d5
+!define WORKER_COLOUR f1ddaf
+
+participant "Qt event loop\n(UI thread)" as qt
+participant "qt_main_view" as view
+participant "main_presenter" as pres
+participant "computer_service\n(service thread)" as svc
+
+group Async: computer removed (service thread)
+
+activate svc #WORKER_COLOUR
+svc -> pres ++ #WORKER_COLOUR : on_computer_removed(id)
+pres -> view ++ #WORKER_COLOUR : remove_computer(id)
+view ->> qt : computer_removed(id)
+view --> pres -- :
+pres --> svc -- :
+
+activate qt #UI_COLOUR
+qt -> view ++ #UI_COLOUR : on_computer_removed(id)
+view -> view : computer_list_model::remove(id)
+view --> qt -- :
+qt -[hidden]-> qt
+deactivate qt
+
+deactivate svc
+
+@enduml
+
+
+
+@startuml running_service_computer_selected
+
+skinparam sequenceMessageAlign center
+
+!define MAIN_COLOUR c9abd2
+!define UI_COLOUR 9595d5
+!define WORKER_COLOUR f1ddaf
+
+actor "User" as user
+participant "Qt event loop\n(UI thread)" as qt
+participant "qt_main_view" as view
+participant "main_presenter" as pres
+participant "computer_service\n(service thread)" as svc
+
+user ->> qt : click row (input event)
+
+group Async: user selects a computer (UI thread)
+
+activate qt #UI_COLOUR
+
+qt -> view ++ #UI_COLOUR : currentChanged, on_current_changed(index)
+view -> pres ++ #UI_COLOUR : on_selected(id)
+pres -> svc ++ #UI_COLOUR : request_details(id)
+
+svc -> pres ++ #UI_COLOUR : on_computer_changed(c)
+pres -> view ++ #UI_COLOUR : show_computer(c)
+pres <-- view --
+svc <-- pres --
+
+svc --> pres -- :
+pres --> view -- :
+view --> qt -- :
+
+deactivate qt
+
+@enduml

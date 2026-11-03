@@ -1,0 +1,76 @@
+@startuml architecture
+
+skinparam componentStyle rectangle
+left to right direction
+
+package "Model (no Qt):\n sdd::core" {
+  interface "i_service" as isvc
+  note top
+    subscribe
+  end note
+  interface "i_observer" as iobs
+  note top
+    on_XX methods
+  end note
+  [computer_service] as svc <<i_service>>
+  note bottom
+    owns worker thread
+    (discovery, queries)
+  end note
+}
+
+package "Presenter/Listener (no Qt):\n sdd::presenter" {
+  interface "i_main_view" as iview
+  interface "i_view_listener" as ilistener
+  [main_presenter] as pres <<i_observer>>
+}
+
+package "View (Qt 6):\n sdd::view" {
+  [qt_main_view] as qv
+  [computer_list_model] as model
+}
+
+[main.cpp] as app
+
+svc -d- isvc
+svc -d[#silver]-( iobs #text:grey : <<notify>>
+
+pres -u- iobs
+pres -u[#silver]-( isvc #text:grey : <<init>>\n<<subscribe>>
+pres -d- ilistener
+pres -d[#silver]-( iview #text:grey : <<notify>>
+pres --d[#silver]-> qv #text:grey : <<init>>\ni_main_vew\n.register(listener)
+
+qv -u- iview
+qv -u[#silver]-( ilistener #text:grey : <<call>>
+qv -r-> model : <<updates>>
+
+app *-l- svc : #1\n<<create>>
+app *-l- pres : #3\n<<create>>\ninject\n- i_service,\n- i_main_view
+app *-l- qv : #2\n<<create>>
+
+@enduml
+
+
+
+@startuml dependency
+
+left to right direction
+
+package M as "Model (no Qt):\n sdd::core" <<library>> {
+  [computer_service] as svc <<i_service>>
+}
+
+package P as "Presenter/Listener (no Qt):\n sdd::presenter" <<library>> {
+  [main_presenter] as pres <<i_observer>>
+}
+
+package V as "View (Qt 6):\n sdd::view" <<exe>> {
+  [qt_main_view] as qv
+  [computer_list_model] as model
+}
+
+V -d-> P : app links presenter
+P -d-> M : presenter needs model
+
+@enduml
