@@ -1,5 +1,6 @@
 set(LIBRARY sddinfra)
 set(SOURCES
+    ../include/sdd/notifier.h
     ../include/sdd/subscription.h
 )
 add_library(${LIBRARY} INTERFACE)

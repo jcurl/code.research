@@ -2,6 +2,7 @@ include(GoogleTest)
 
 set(BINARY sddinfra_test)
 set(SOURCES
+    notifier_test.cpp
     subscription_test.cpp
 )
 
