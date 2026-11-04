@@ -593,36 +593,36 @@ sdd-monitor/
 ├── CMakeLists.txt            top level; project-wide Qt setup, subdirectories
 ├── infra/
 |   ├── CMakeLists.txt
+|   ├── include/sdd/          subscription.h
 │   ├── src/
 |   |   ├── CMakeLists.txt
-│   │   ├── include/sdd/      subscription.h
 │   │   └── *.cpp; *.h
 │   └── test/
 |       ├── CMakeLists.txt
 │       └── *.cpp; *.h
 ├── core/
 |   ├── CMakeLists.txt
+│   ├── include/sdd/          computer.h, i_observer.h, i_service.h
 │   ├── src/
 |   |   ├── CMakeLists.txt
-│   │   ├── include/sdd/      computer.h, i_observer.h, i_service.h
 │   │   └── *.cpp; *.h        computer_service.cpp, discovery and query code (to be written)
 │   └── test/
 |       ├── CMakeLists.txt
 │       └── *.cpp; *.h
 ├── presenter/                sdd_presenter (no Qt)
 |   ├── CMakeLists.txt
+│   ├── include/sdd/          main_presenter.h, i_main_view.h, i_view_listener.h, view_computer.h
 │   ├── src/
 |   |   ├── CMakeLists.txt
-│   │   ├── include/sdd/      main_presenter.h, i_main_view.h, i_view_listener.h, view_computer.h
 │   │   └── *.cpp; *.h
 │   └── test/
 |       ├── CMakeLists.txt
 │       └── *.cpp; *.h
 ├── qt6/                      sdd_qt (Qt 6, the only view code)
 |   ├── CMakeLists.txt
+│   ├── include/sdd/qt/       qt_main_view.h, computer_list.h
 │   ├── src/
 |   |   ├── CMakeLists.txt
-│   │   ├── include/sdd/qt/   qt_main_view.h, computer_list.h
 │   │   ├── *.cpp; *.h
 │   │   └── main.cpp          composition root
 │   └── test/
