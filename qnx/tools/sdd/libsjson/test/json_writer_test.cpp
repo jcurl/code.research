@@ -5,6 +5,8 @@
 
 #include <gtest/gtest.h>
 
+#include "test_output.h"
+
 namespace fs = std::filesystem;
 
 TEST(sjson_writer, create_stream) {
@@ -14,9 +16,7 @@ TEST(sjson_writer, create_stream) {
 }
 
 TEST(sjson_writer, create_file_string) {
-  const fs::path tmp = fs::temp_directory_path() / "sjson_writer_test_tmp.json";
-
-  if (fs::exists(tmp)) fs::remove(tmp);
+  const fs::path tmp = test_output_path("sjson_writer_test_tmp.json");
 
   {
     ubench::sjson::json_writer writer{tmp.string()};
@@ -25,17 +25,10 @@ TEST(sjson_writer, create_file_string) {
 
   EXPECT_TRUE(fs::exists(tmp));
   EXPECT_EQ(fs::file_size(tmp), 0u);
-
-  std::error_code ec;
-  fs::remove(tmp, ec);
-  EXPECT_FALSE(fs::exists(tmp));
 }
 
 TEST(sjson_writer, create_file_string_view) {
-  const fs::path tmp =
-      fs::temp_directory_path() / "sjson_writer_test_tmp2.json";
-
-  if (fs::exists(tmp)) fs::remove(tmp);
+  const fs::path tmp = test_output_path("sjson_writer_test_tmp2.json");
 
   {
     ubench::sjson::json_writer writer{std::string_view(tmp.string())};
@@ -44,17 +37,10 @@ TEST(sjson_writer, create_file_string_view) {
 
   EXPECT_TRUE(fs::exists(tmp));
   EXPECT_EQ(fs::file_size(tmp), 0u);
-
-  std::error_code ec;
-  fs::remove(tmp, ec);
-  EXPECT_FALSE(fs::exists(tmp));
 }
 
 TEST(sjson_writer, create_file_path) {
-  const fs::path tmp =
-      fs::temp_directory_path() / "sjson_writer_test_tmp_path.json";
-
-  if (fs::exists(tmp)) fs::remove(tmp);
+  const fs::path tmp = test_output_path("sjson_writer_test_tmp_path.json");
 
   {
     ubench::sjson::json_writer writer{tmp};
@@ -63,10 +49,6 @@ TEST(sjson_writer, create_file_path) {
 
   EXPECT_TRUE(fs::exists(tmp));
   EXPECT_EQ(fs::file_size(tmp), 0u);
-
-  std::error_code ec;
-  fs::remove(tmp, ec);
-  EXPECT_FALSE(fs::exists(tmp));
 }
 
 TEST(sjson_writer, create_stream_close_twice) {

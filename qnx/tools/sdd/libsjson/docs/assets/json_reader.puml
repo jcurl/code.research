@@ -12,6 +12,18 @@ object json_reader {
 object json_reader_context
 json_reader *-r- json_reader_context
 
+object mapped_file
+json_reader_context *-r- mapped_file
+note top
+ Only if opening a file name.
+ The file is mmap()'ed as a
+ string view, and the context
+ owns the memory handle.
+
+ Freed when the last context
+ goes out of scope.
+end note
+
 object json_array <<iterator: json_token>>
 object json_object <<iterator: json_key>>
 json_array o--u[#silver]- json_reader_context

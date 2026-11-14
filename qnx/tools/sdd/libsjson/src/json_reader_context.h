@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include "sjson/json_reader.h"
+#include "json_reader_mapped_file.h"
 
 namespace ubench::sjson::detail {
 
@@ -67,6 +68,14 @@ class json_reader_context
   /// @brief Constructor.
   /// @param json A string_view of the input.
   json_reader_context(std::string_view json) noexcept : json_{json} {}
+
+  /// @brief Constructor for input read from a mapped file.
+  ///
+  /// The context keeps the mapping alive, so the input stays valid for as long
+  /// as any copy of this context exists.
+  /// @param file The mapped file to parse.
+  json_reader_context(std::shared_ptr<mapped_file> file) noexcept
+      : file_{std::move(file)}, json_{file_->view()} {}
 
   /// @brief Copy the parse state.
   ///
@@ -188,6 +197,7 @@ class json_reader_context
     stack_.pop();
   }
 
+  std::shared_ptr<mapped_file> file_{};  //< Keeps json_ mapped, if any.
   std::string_view json_;
   std::size_t json_pos_{};
   std::stack<json_stack_entry> stack_{};

@@ -1,7 +1,10 @@
 #include "json_reader_context.h"
 
+#include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -14,6 +17,8 @@
 
 #include "rtest/rtest.h"
 #include "json_reader_context_inputs.h"
+#include "json_reader_mapped_file.h"
+#include "test_output.h"
 
 namespace valid_inputs = ubench::sjson::detail::valid_inputs;
 namespace invalid_inputs = ubench::sjson::detail::invalid_inputs;
@@ -981,4 +986,63 @@ TEST(sjson_reader, context_get_token_invalid_utf8_string_returns_error) {
     }
     EXPECT_TRUE(context.has_error());
   }
+}
+
+TEST(sjson_reader, mapped_copy_outlives_original) {
+  const auto path = test_output_path("mapped_copy_outlives.json");
+  {
+    std::ofstream out{path, std::ios::binary};
+    out << "[1]";
+  }
+  std::optional<ubench::sjson::detail::json_reader_context> copy;
+  {
+    auto file = ubench::sjson::detail::mapped_file::open(path);
+    ASSERT_TRUE(file.has_value());
+    ubench::sjson::detail::json_reader_context original{
+        std::make_shared<ubench::sjson::detail::mapped_file>(std::move(*file))};
+    copy.emplace(original);
+  }
+  ASSERT_TRUE(copy.has_value());
+  auto token = copy->get_keyword();
+  ASSERT_OPTIONAL(token);
+  EXPECT_EQ(
+      token->keyword(), ubench::sjson::detail::json_string_keyword::array_open);
+}
+
+TEST(sjson_reader, mapped_file_open_missing_returns_errno) {
+  const auto path = std::filesystem::temp_directory_path() /
+                    "sjson_mapped_file_open_missing_does_not_exist.json";
+  const auto file = ubench::sjson::detail::mapped_file::open(path);
+  ASSERT_FALSE(file.has_value());
+  EXPECT_EQ(file.error(), ENOENT);
+}
+
+TEST(sjson_reader, mapped_file_move_assign_replaces_mapping) {
+  const auto first_path =
+      test_output_path("mapped_file_move_assign_first.json");
+  const auto second_path =
+      test_output_path("mapped_file_move_assign_second.json");
+  {
+    std::ofstream out{first_path, std::ios::binary};
+    out << "[1]";
+  }
+  {
+    std::ofstream out{second_path, std::ios::binary};
+    out << "{}";
+  }
+  auto first = ubench::sjson::detail::mapped_file::open(first_path);
+  auto second = ubench::sjson::detail::mapped_file::open(second_path);
+  ASSERT_TRUE(first.has_value());
+  ASSERT_TRUE(second.has_value());
+  EXPECT_EQ(first->view(), "[1]");
+  *first = std::move(*second);
+  EXPECT_EQ(first->view(), "{}");
+}
+
+TEST(sjson_reader, mapped_file_open_empty_has_empty_view) {
+  const auto path = test_output_path("mapped_file_open_empty.json");
+  { std::ofstream out{path, std::ios::binary}; }
+  auto file = ubench::sjson::detail::mapped_file::open(path);
+  ASSERT_TRUE(file.has_value());
+  EXPECT_TRUE(file->view().empty());
 }

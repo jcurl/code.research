@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include <limits>
 #include <optional>
 #include <string>
@@ -14,6 +16,7 @@
 
 #include "rtest/rtest.h"
 #include "json_reader_context_inputs.h"
+#include "test_output.h"
 
 namespace valid_inputs = ubench::sjson::detail::valid_inputs;
 namespace invalid_grammar = ubench::sjson::detail::invalid_grammar;
@@ -1036,4 +1039,76 @@ TEST(sjson_reader, object_key_moved_keeps_nested_value_iterable) {
   ++it;
   EXPECT_TRUE(it == obj.end());
   EXPECT_FALSE(reader.has_error());
+}
+
+TEST(sjson_reader, file_reader_parses_root) {
+  const temp_file file{"sjson_file_reader_parses_root.json", "[1,2,3]"};
+  ubench::sjson::json_reader reader =
+      ubench::sjson::json_reader::open(file.path());
+  EXPECT_FALSE(reader.has_error());
+  std::optional<ubench::sjson::json_token> root = reader.root();
+  ASSERT_OPTIONAL(root);
+  const auto& arr = std::get<ubench::sjson::json_array>(*root);
+  auto it = arr.begin();
+  EXPECT_EQ(as_int(*it), 1);
+  ++it;
+  EXPECT_EQ(as_int(*it), 2);
+  ++it;
+  EXPECT_EQ(as_int(*it), 3);
+  ++it;
+  EXPECT_TRUE(it == arr.end());
+}
+
+TEST(sjson_reader, file_reader_missing_file_throws) {
+  const std::filesystem::path missing =
+      std::filesystem::temp_directory_path() /
+      "sjson_file_reader_missing_does_not_exist.json";
+  EXPECT_THROW(ubench::sjson::json_reader::open(missing),
+      ubench::sjson::json_reader_error);
+}
+
+TEST(sjson_reader, file_reader_empty_file_has_no_root) {
+  const temp_file file{"sjson_file_reader_empty.json", ""};
+  ubench::sjson::json_reader reader =
+      ubench::sjson::json_reader::open(file.path());
+  EXPECT_FALSE(reader.root().has_value());
+  EXPECT_FALSE(reader.has_error());
+}
+
+TEST(sjson_reader, file_reader_root_outlives_reader_and_file) {
+  const temp_file file{"sjson_file_reader_outlives.json", "[10,\"abc\"]"};
+  std::optional<ubench::sjson::json_token> root;
+  {
+    ubench::sjson::json_reader reader =
+        ubench::sjson::json_reader::open(file.path());
+    root = reader.root();
+  }
+  // The reader is gone, and the file is removed. The mapping still holds.
+  std::error_code ec;
+  std::filesystem::remove(file.path(), ec);
+  ASSERT_OPTIONAL(root);
+  const auto& arr = std::get<ubench::sjson::json_array>(*root);
+  auto it = arr.begin();
+  EXPECT_EQ(as_int(*it), 10);
+  ++it;
+  EXPECT_EQ(as_view(std::get<ubench::sjson::json_string>(*it)), "abc");
+  ++it;
+  EXPECT_TRUE(it == arr.end());
+}
+
+TEST(sjson_reader, file_reader_moved_continues_iteration) {
+  const temp_file file{"sjson_file_reader_moved.json", "[1,2,3]"};
+  ubench::sjson::json_reader reader =
+      ubench::sjson::json_reader::open(file.path());
+  std::optional<ubench::sjson::json_token> root = reader.root();
+  ASSERT_OPTIONAL(root);
+  const auto& arr = std::get<ubench::sjson::json_array>(*root);
+  auto it = arr.begin();
+  ubench::sjson::json_reader moved{std::move(reader)};
+  EXPECT_EQ(as_int(*it), 1);
+  ++it;
+  EXPECT_EQ(as_int(*it), 2);
+  ++it;
+  EXPECT_EQ(as_int(*it), 3);
+  EXPECT_FALSE(moved.has_error());
 }

@@ -2,12 +2,24 @@
 
 #include <cassert>
 
+#include "ubench/string.h"
 #include "json_reader_context.h"
+#include "json_reader_mapped_file.h"
 
 namespace ubench::sjson {
 
 json_reader::json_reader(std::string_view json) {
   context_ = std::make_shared<detail::json_reader_context>(json);
+}
+
+auto json_reader::open(const std::filesystem::path& path) -> json_reader {
+  auto file = detail::mapped_file::open(path);
+  if (!file)
+    throw json_reader_error{"cannot read '" + path.string() +
+                            "': " + ubench::string::perror(file.error())};
+
+  return json_reader{std::make_shared<detail::json_reader_context>(
+      std::make_shared<detail::mapped_file>(std::move(*file)))};
 }
 
 auto json_reader::root() const -> const std::optional<json_token> {
@@ -32,7 +44,8 @@ auto json_reader::has_error() const noexcept -> bool {
 }
 
 auto json_reader::close() noexcept -> void {
-  // TODO: Nothing for now. Unmap if required.
+  // The mapping is not released here, because returned objects still read it.
+  // It is released when the last context owner is destroyed.
 }
 
 auto json_reader::is_closed() const noexcept -> bool {

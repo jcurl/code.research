@@ -2,6 +2,7 @@
 #define SJSON_JSON_READER_H
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -472,6 +473,15 @@ class json_reader {
   /// @param json The string_view to parse the JSON snippet.
   json_reader(std::string_view json);
 
+  /// @brief Create a new instance to read the JSON from a file.
+  ///
+  /// The file is mapped read-only. The mapping is released when the last object
+  /// that uses it is destroyed, so the file may be removed after opening.
+  /// @param path The file to read.
+  /// @return The reader for the file contents.
+  /// @exception json_reader_error if the file cannot be opened or mapped.
+  static auto open(const std::filesystem::path& path) -> json_reader;
+
   /// @brief Get the root element of the JSON document.
   /// @return The token if present, else the document has no root.
   /// @exception json_reader_error if the reader is not at the start of the
@@ -491,6 +501,10 @@ class json_reader {
 
  private:
   std::shared_ptr<detail::json_reader_context> context_{};
+
+  /// @brief Wrap an existing context.
+  explicit json_reader(std::shared_ptr<detail::json_reader_context> context)
+      : context_{std::move(context)} {}
 };
 
 }  // namespace ubench::sjson

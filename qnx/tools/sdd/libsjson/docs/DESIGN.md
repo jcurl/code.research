@@ -16,7 +16,8 @@ needing also a small writer.
 - [3. Reader](#3-reader)
   - [3.1. Deviations from the Standard when Reading](#31-deviations-from-the-standard-when-reading)
   - [3.2. Usage](#32-usage)
-    - [3.2.1. Exceptions](#321-exceptions)
+    - [3.2.1. Inputs](#321-inputs)
+    - [3.2.2. Exceptions](#322-exceptions)
   - [3.3. Class Design](#33-class-design)
     - [3.3.1. JSON Class Diagram](#331-json-class-diagram)
     - [3.3.2. Class Copy Semantics](#332-class-copy-semantics)
@@ -88,11 +89,28 @@ The iterators are C++17 `input_iterator`s. They support copy operations. The
 input string must have a lifetime that exceeds the `json_reader` object and the
 iterators. Iterators can be copied, and iterate independently of each other.
 
-#### 3.2.1. Exceptions
+#### 3.2.1. Inputs
+
+The JSON to be parsed is expected to be small. The JSON snippet is given to the
+`json_reader` as a `string_view`. If a file is opened, it is memory `mmap()`ped,
+and accessed still as a `string_view`.
+
+This design does not support streaming inputs as needed. It should be possible
+to extend the implementation to use a file that is read on demand (with a
+maximum buffer size), as the basic part is providing tokens. Care would need to
+be taken with copied contexts, as files typically share the offsets which
+wouldn't be copied, but shared, thus two different copies of a context referring
+to the same file would interfere.
+
+#### 3.2.2. Exceptions
 
 Generally no exceptions are raised, unless there is a programmatic error in the
 sources, allowing one to easily skip the usage of exceptions, terminating on
 catastropic (programming) errors.
+
+Checks are made that if multiple iterators are active at the same time (which
+aren't copies), advancing one iterator at a parent level raises an exception
+when the child iterator is not yet destroyed.
 
 ### 3.3. Class Design
 
@@ -132,8 +150,20 @@ or into ownership by other classes.
 
 #### 3.3.4. Memory Management
 
-The class maintains a reference to a `string_view`, so the lifetime of that
-object must exceed the lifetime of the `json_reader`.
+The reader reads from either a caller-owned `string_view`, or a file opened with
+`json_reader::open()`. The caller must keep a `string_view` input alive for as
+long as the `json_reader` and the objects it returns are in use.
+
+A file is mapped read-only with `mmap()`, and the descriptor is closed straight
+away. The mapping is owned by a `std::shared_ptr` in the parse context, which
+is shared by the reader, its iterators and the objects it returns. Copies of the
+context share the same mapping and never remap the file. The mapping is released
+when the last of those objects is destroyed, so the file may be removed after
+it is opened.
+
+Internally, the mapping is opened by a function that returns
+`stdext::expected<mapped_file, int>`, carrying the Unix `errno` on failure.
+`json_reader::open()` converts that error into a `json_reader_error`.
 
 ## 4. Writer
 
