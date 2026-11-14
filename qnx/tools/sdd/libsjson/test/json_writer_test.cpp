@@ -7,13 +7,13 @@
 
 namespace fs = std::filesystem;
 
-TEST(sjson, create_stream) {
+TEST(sjson_writer, create_stream) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer(ss);
   EXPECT_NO_THROW(json_writer.close());
 }
 
-TEST(sjson, create_file_string) {
+TEST(sjson_writer, create_file_string) {
   const fs::path tmp = fs::temp_directory_path() / "sjson_writer_test_tmp.json";
 
   if (fs::exists(tmp)) fs::remove(tmp);
@@ -31,7 +31,7 @@ TEST(sjson, create_file_string) {
   EXPECT_FALSE(fs::exists(tmp));
 }
 
-TEST(sjson, create_file_string_view) {
+TEST(sjson_writer, create_file_string_view) {
   const fs::path tmp =
       fs::temp_directory_path() / "sjson_writer_test_tmp2.json";
 
@@ -50,7 +50,7 @@ TEST(sjson, create_file_string_view) {
   EXPECT_FALSE(fs::exists(tmp));
 }
 
-TEST(sjson, create_file_path) {
+TEST(sjson_writer, create_file_path) {
   const fs::path tmp =
       fs::temp_directory_path() / "sjson_writer_test_tmp_path.json";
 
@@ -69,14 +69,14 @@ TEST(sjson, create_file_path) {
   EXPECT_FALSE(fs::exists(tmp));
 }
 
-TEST(sjson, create_stream_close_twice) {
+TEST(sjson_writer, create_stream_close_twice) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
   EXPECT_NO_THROW(json_writer.close());
   EXPECT_NO_THROW(json_writer.close());
 }
 
-TEST(sjson, create_object_array_invalid_sequence) {
+TEST(sjson_writer, create_object_array_invalid_sequence) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -85,7 +85,7 @@ TEST(sjson, create_object_array_invalid_sequence) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_array_object_invalid_sequence) {
+TEST(sjson_writer, create_array_object_invalid_sequence) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -94,7 +94,7 @@ TEST(sjson, create_array_object_invalid_sequence) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_object_object_invalid_sequence) {
+TEST(sjson_writer, create_object_object_invalid_sequence) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -103,7 +103,7 @@ TEST(sjson, create_object_object_invalid_sequence) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_array_array_invalid_sequence) {
+TEST(sjson_writer, create_array_array_invalid_sequence) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -112,7 +112,7 @@ TEST(sjson, create_array_array_invalid_sequence) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_object_array_single_root) {
+TEST(sjson_writer, create_object_array_single_root) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -122,7 +122,7 @@ TEST(sjson, create_object_array_single_root) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_array_object_single_root) {
+TEST(sjson_writer, create_array_object_single_root) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -132,7 +132,7 @@ TEST(sjson, create_array_object_single_root) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_object_object_single_root) {
+TEST(sjson_writer, create_object_object_single_root) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -142,7 +142,7 @@ TEST(sjson, create_object_object_single_root) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_array_array_single_root) {
+TEST(sjson_writer, create_array_array_single_root) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -152,7 +152,7 @@ TEST(sjson, create_array_array_single_root) {
       ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_object_array_close_invalid_sequence) {
+TEST(sjson_writer, create_object_array_close_invalid_sequence) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -161,7 +161,7 @@ TEST(sjson, create_object_array_close_invalid_sequence) {
   EXPECT_THROW({ o1.close(); }, ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_array_object_close_invalid_sequence) {
+TEST(sjson_writer, create_array_object_close_invalid_sequence) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -170,7 +170,7 @@ TEST(sjson, create_array_object_close_invalid_sequence) {
   EXPECT_THROW({ a1.close(); }, ubench::sjson::json_writer_error);
 }
 
-TEST(sjson, create_object_array_close_root) {
+TEST(sjson_writer, create_object_array_close_root) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -184,7 +184,7 @@ TEST(sjson, create_object_array_close_root) {
   a1.write_value("test");
 }
 
-TEST(sjson, create_array_object_close_root) {
+TEST(sjson_writer, create_array_object_close_root) {
   std::stringstream ss;
   ubench::sjson::json_writer json_writer{ss};
 
@@ -199,7 +199,7 @@ TEST(sjson, create_array_object_close_root) {
   o1.write_value("key", "test");
 }
 
-TEST(sjson, complex_object) {
+TEST(sjson_writer, complex_object) {
   std::stringstream ss;
 
   // The braces which define scope cause the block to terminate by appending the
@@ -235,7 +235,7 @@ TEST(sjson, complex_object) {
       R"({ "host": "netbsd-arm64-rpi4", "domain": "home.lan", "interfaces": { "eth0": { "ipv4": [ "192.168.1.15\/24", "169.254.234.23\/16" ] }, "lo0": { "ipv4": [ "127.0.0.1\/8" ] } } })");
 }
 
-TEST(sjson, complex_object_no_solidus_escape) {
+TEST(sjson_writer, complex_object_no_solidus_escape) {
   std::stringstream ss;
 
   // The braces which define scope cause the block to terminate by appending the

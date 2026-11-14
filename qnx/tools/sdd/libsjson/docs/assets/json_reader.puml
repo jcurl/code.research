@@ -1,0 +1,53 @@
+@startuml json_reader
+
+object json_reader {
+    +json_reader(json: string_view);
+    +~json_reader()
+    ---
+    +root(): optional<json_token>
+    +has_error(): bool
+    +close()
+}
+
+object json_reader_context
+json_reader *-r- json_reader_context
+
+object json_array <<iterator: json_token>>
+object json_object <<iterator: json_key>>
+json_array o--u[#silver]- json_reader_context
+json_object o--u[#silver]- json_reader_context
+
+object json_token_root as "json_token"
+
+json_reader -d- json_token_root : <<create>>
+json_token_root *-d- json_array
+json_token_root *-d- json_object
+
+object json_token
+object json_key {
+    key(): json_string
+    value(): json_token
+}
+
+json_array *-d- json_token : <<create>>
+json_object *-d- json_key : <<create>>
+json_key *-l- json_token
+
+object json_int
+object json_bool
+object json_null
+object json_string
+object json_array2 as "json_array"
+object json_object2 as "json_object"
+
+json_token *-d- json_int
+json_token *-d- json_bool
+json_token *-d- json_null
+json_token *-d- json_string
+json_token *-d- json_object2
+json_token *-d- json_array2
+
+json_array2 o----u[#silver]- json_reader_context
+json_object2 o----u[#silver]- json_reader_context
+
+@enduml

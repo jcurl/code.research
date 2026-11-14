@@ -2,6 +2,8 @@ include(GoogleTest)
 
 set(BINARY libsjson_test)
 set(SOURCES
+    json_reader_test.cpp
+    json_reader_context_test.cpp
     json_writer_test.cpp
     json_writer_array_test.cpp
     json_writer_object_test.cpp
@@ -9,7 +11,8 @@ set(SOURCES
 
 add_executable(${BINARY} ${SOURCES})
 target_compile_features(${BINARY} PRIVATE cxx_std_17)
-target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libsjson)
+target_include_directories(${BINARY} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(${BINARY} PRIVATE GTest::gtest_main gmock_main libsjson librtest)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
 if(QNXNTO)

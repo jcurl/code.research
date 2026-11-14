@@ -1,9 +1,13 @@
 set(LIBRARY libsjson)
 set(SOURCES
+    ../include/sjson/json_reader.h
     ../include/sjson/json_writer.h
+    json_reader.cpp
+    json_reader_array.cpp
+    json_reader_object.cpp
+    json_reader_context.h json_reader_context.cpp
     json_writer.cpp
-    json_writer_context.h
-    json_writer_context.cpp
+    json_writer_context.h json_writer_context.cpp
     json_writer_array.cpp
     json_writer_object.cpp
 )

@@ -1,26 +1,150 @@
-# Simple JSON Writer <!-- omit in toc -->
+# Simple JSON <!-- omit in toc -->
 
-This library is a small implementation in C++17 to write JSON to a stream. The
-class is intended to be simple to use and check against misuse.
+This library is a small implementation in C++17 to read JSON from a
+`string_view` and write JSON to a stream. The class is intended to be simple to
+use and check against misuse.
+
+The model of the reader is to parse without a validator, for simple
+implementations. Validation is to be done in code.
 
 The model of the writer is to write to a stream without an intermediate DOM
 (Document Object Model). It is therefore intended for small implementations
 needing also a small writer.
 
-- [1. Usage](#1-usage)
+- [1. JSON File Format](#1-json-file-format)
 - [2. Dependencies](#2-dependencies)
-- [3. Class Design](#3-class-design)
-  - [3.1. JSON File Format](#31-json-file-format)
-  - [3.2. JSON Class Diagram](#32-json-class-diagram)
-  - [3.3. Class Copy Semantics](#33-class-copy-semantics)
-  - [3.4. Move Semantics](#34-move-semantics)
-  - [3.5. Memory Management](#35-memory-management)
-  - [3.6. Checks](#36-checks)
+- [3. Reader](#3-reader)
+  - [3.1. Deviations from the Standard when Reading](#31-deviations-from-the-standard-when-reading)
+  - [3.2. Usage](#32-usage)
+    - [3.2.1. Exceptions](#321-exceptions)
+  - [3.3. Class Design](#33-class-design)
+    - [3.3.1. JSON Class Diagram](#331-json-class-diagram)
+    - [3.3.2. Class Copy Semantics](#332-class-copy-semantics)
+    - [3.3.3. Move Semantics](#333-move-semantics)
+    - [3.3.4. Memory Management](#334-memory-management)
+- [4. Writer](#4-writer)
+  - [4.1. Deviations from the Standard when Writing](#41-deviations-from-the-standard-when-writing)
+  - [4.2. Usage](#42-usage)
+  - [4.3. Class Design](#43-class-design)
+    - [4.3.1. JSON Class Diagram](#431-json-class-diagram)
+    - [4.3.2. Class Copy Semantics](#432-class-copy-semantics)
+    - [4.3.3. Move Semantics](#433-move-semantics)
+    - [4.3.4. Memory Management](#434-memory-management)
+    - [4.3.5. Checks](#435-checks)
 
-## 1. Usage
+## 1. JSON File Format
 
-The class diagrams are next, but this section highlights the intended usage,
-that influences the class design.
+The file format is defined by
+[RFC-7159](https://datatracker.ietf.org/doc/html/rfc7159). The usage of the
+close should flow like the grammar. The class design should enforce the grammar.
+
+<u>Object</u>:
+
+![](./assets/object.png)
+
+<u>Array</u>:
+
+![](./assets/array.png)
+
+<u>Value</u>:
+
+![](./assets/value.png)
+
+<u>String</u>:
+
+![](./assets/string.png)
+
+## 2. Dependencies
+
+The SJSON library dependencies should be kept only to the standard C++17
+runtime.
+
+## 3. Reader
+
+### 3.1. Deviations from the Standard when Reading
+
+When reading JSON input:
+
+- Comments starting with `//` are skipped up to the end of the line.
+- Whitespace is ignored. It is the set accepted by `std::isspace` in the C
+  locale.
+- Strings may contain an unescaped quote of the other type: `"it's"` and `'say
+  "hi"'`. Escapes are optional for these quotes.
+- Integers may have a `+` or `-` prefix and any number of digits.
+- Floats are not supported. A float is an invalid sequence.
+- Trailing commas are allowed in arrays and objects.
+
+### 3.2. Usage
+
+Only one class can be instantiated by the user, `json_reader`. The root object
+is obtained with the `root()` method, which returns an iterator `json_array` or
+`json_object`.
+
+If we continue iterating from the current level, the `json_array` or
+`json_object` element returned is skipped, allowing to ignore blocks that
+doesn't need parsing.
+
+The iterators are C++17 `input_iterator`s. They support copy operations. The
+input string must have a lifetime that exceeds the `json_reader` object and the
+iterators. Iterators can be copied, and iterate independently of each other.
+
+#### 3.2.1. Exceptions
+
+Generally no exceptions are raised, unless there is a programmatic error in the
+sources, allowing one to easily skip the usage of exceptions, terminating on
+catastropic (programming) errors.
+
+### 3.3. Class Design
+
+#### 3.3.1. JSON Class Diagram
+
+The reader implements parsing of the input string on demand (instead of parsing
+everything upfront), returning objects at the current position in the stream.
+Nesting of elements within the JSON stream is mirrored with nesting the
+iteration of JSON arrays and objects.
+
+![](./assets/json_reader/json_reader.svg)
+
+In this diagram, we see that the `json_reader` is the root, and the first object
+is obtained from there. The first object is expected to be an array or an
+object.
+
+From the array or object, one iterates with `json_token` or `json_key`. So that
+when iterating an object or a key, one can call a function receiving the
+`json_array` or `json_object` and iterate that. When that function returns (the
+stack is returned), the iterator in caller would continue.
+
+The internal context, `json_reader_context` is shared between all classes that
+iterate and derive from th source. If an iterator is copied, the context is
+copied new and a separate copy is owned by the new object through a shared
+pointer. The source JSON input is not copied.
+
+#### 3.3.2. Class Copy Semantics
+
+C++17 requires the iterators to be copyable. A copy can be a potentially
+expensive operation, so should not be used. In particular, post-increment
+operators are expensive for this reason.
+
+#### 3.3.3. Move Semantics
+
+The objects are be movable. This allows moving the objects into function calls,
+or into ownership by other classes.
+
+#### 3.3.4. Memory Management
+
+The class maintains a reference to a `string_view`, so the lifetime of that
+object must exceed the lifetime of the `json_reader`.
+
+## 4. Writer
+
+### 4.1. Deviations from the Standard when Writing
+
+When writing JSON:
+
+- The `/` should also be escaped. This is the default, change the config to make
+  the outputs more readable.
+
+### 4.2. Usage
 
 Only one class can be instantiated by the user. This is the `json_writer`. The
 user provides a file name or a stream, which methods write to.
@@ -44,39 +168,12 @@ another object/array from "1" while "2" is active results in an error.
 This is unlike a DOM (Document Object Model), where objects are created in
 memory first and then organised, relinked, etc. We are not writing a DOM.
 
-## 2. Dependencies
-
-The SJSON library dependencies should be kept only to the standard C++17
-runtime.
-
-## 3. Class Design
+### 4.3. Class Design
 
 There is the base class `json_writer` which the user instantiates. From this
 class, objects or arras are written.
 
-### 3.1. JSON File Format
-
-The file format is defined by
-[RFC-7159](https://datatracker.ietf.org/doc/html/rfc7159). The usage of the
-close should flow like the grammar. The class design should enforce the grammar.
-
-<u>Object</u>:
-
-![](./assets/object.png)
-
-<u>Array</u>:
-
-![](./assets/array.png)
-
-<u>Value</u>:
-
-![](./assets/value.png)
-
-<u>String</u>:
-
-![](./assets/string.png)
-
-### 3.2. JSON Class Diagram
+#### 4.3.1. JSON Class Diagram
 
 From the grammar, the following restrictions are placed on this implementation:
 
@@ -91,12 +188,12 @@ Writing outwrite values is not supported.
 Observe that the two objects created from `json_writer` do not have public
 constructors for the user.
 
-### 3.3. Class Copy Semantics
+#### 4.3.2. Class Copy Semantics
 
 The objects are not copyable. The style of writing the JSON file is imperative
 and each method writes directly to the output stream.
 
-### 3.4. Move Semantics
+#### 4.3.3. Move Semantics
 
 The objects should be movable. This allows moving the objects into function
 calls, or into ownership by other classes.
@@ -107,7 +204,7 @@ move with the intent that at the end of the function call, the object is closed.
 The lifetime of each object crated from the `json_writer` root is expected to be
 small, only long enough to write the file.
 
-### 3.5. Memory Management
+#### 4.3.4. Memory Management
 
 The three classes that the user sees, `json_writer`, `json_writer_array` and
 `json_writer_object` are all placed on the stack. The amount of data they keep
@@ -117,7 +214,7 @@ The `json_writer` creates an object on the heap, the `json_writer_context`, as a
 shared pointer. All classes would keep a copy of this shared pointer. The
 context knows how to write to the stream, and checks the correctness of usage.
 
-### 3.6. Checks
+#### 4.3.5. Checks
 
 When the user creates a new element, say from `json_writer`, a
 `json_writer_array` or a `json_writer_object`, then creating any new element
