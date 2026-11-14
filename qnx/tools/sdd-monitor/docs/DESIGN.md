@@ -68,15 +68,16 @@ model's only dependency is its observer interface, which the presenter
 implements. The view can be replaced without touching the model or the presenter
 logic.
 
-| Role / target                | Contents                                           | Qt? | Threads        |
-| ---------------------------- | -------------------------------------------------- | --- | -------------- |
-| Infrastructure: `sdd::infra` | `subscription`                                     | no  | none           |
-| Model: `sdd::core`           | `computer`, `i_service`, `computer_service`        | no  | service thread |
-| Presenter: `sdd::presenter`  | `main_presenter`, `i_main_view`, `i_view_listener` | no  | none           |
-| View: `sdd::view`            | `qt_main_view`, `computer_list`                    | yes | UI thread      |
-| Composition root: `app`      | `main.cpp`                                         | yes | UI thread      |
+| Role / target                | Contents                                                                      | Qt? | Threads        |
+| ---------------------------- | ----------------------------------------------------------------------------- | --- | -------------- |
+| Infrastructure: `sdd::infra` | `subscription`, `notifier`                                                    | no  | none           |
+| Model: `sdd::core`           | `computer`, `computer_service`, `computer_observer`, `local_computer_service` | no  | service thread |
+| Presenter: `sdd::presenter`  | `main_presenter`, `i_main_view`, `i_view_listener`                            | no  | none           |
+| View: `sdd::view`            | `qt_main_view`, `computer_list`                                               | yes | UI thread      |
+| Composition root: `app`      | `main.cpp`                                                                    | yes | UI thread      |
 
 Rules:
+
 - Only `sdd::view` and `app` include Qt headers.
 - The presenter has no thread code. The view handles marshalling.
 - The model never calls the view. It calls only the observer it was given.
@@ -103,7 +104,7 @@ destroyed first, so no callback can run into a dead view.
 ```cpp
 auto main(int argc, char** argv) -> int {
   QApplication app(argc, argv);
-  sdd::core::computer_service service;
+  sdd::core::local_computer_service service;
   sdd::view::qt_main_view view;
   sdd::presenter::main_presenter presenter(service, view);
   presenter.start(); // subscribe to service
@@ -160,7 +161,7 @@ be destroyed after the subscription.
 Typical usage looks like this:
 
 ```cpp
-sdd::core::computer_service service;
+sdd::core::local_computer_service service;
 sdd::view::qt_main_view view;
 sdd::presenter::main_presenter presenter(service, view);
 
@@ -213,8 +214,8 @@ service thread.
 
 In the MVP design, every observer uses the same pattern for managing the
 lifetime of the subscriber and maintaining an in-flight counter. The `notifier`
-template can then exist in `sdd::infra`. The class `computer_service` uses it
-for `i_observer`, and `qt_main_view` uses it for `i_view_listener`:
+template can then exist in `sdd::infra`. The class `local_computer_service` uses
+it for `computer_observer`, and `qt_main_view` uses it for `i_view_listener`:
 
 ```cpp
 template <typename Listener>
@@ -272,18 +273,17 @@ for its observers. The subscribe and cancel logic lives in the notifier, so the
 service only forwards notifications through it:
 
 ```cpp
-class computer_service : public i_service {
+class local_computer_service : public computer_service {
  public:
-  auto subscribe(i_observer& observer) -> subscription override {
+  auto subscribe(computer_observer& observer) -> subscription override {
     return observers_.subscribe(observer);
   }
 
-  auto notify_changed(const computer& c) -> void {
-    observers_.notify([&](i_observer& o) { o.on_computer_changed(c); });
-  }
+  // Updates the stored computers and calls observers_.notify(on_computer).
+  auto computer_ping_received(const computer& packet) -> int;
 
  private:
-  sdd::infra::notifier<i_observer> observers_;
+  notifier<computer_observer> observers_;
 };
 ```
 
@@ -298,22 +298,30 @@ the lifetime of the presenter object, so this restriction is met.
 
 ```cpp
 // computer.h
-using computer_id = std::uint64_t;
-using property_map = std::map<std::string, std::string>;   // open-ended key/value
-struct computer { computer_id id; std::string hostname, address; property_map properties; };
-
-// i_observer.h
-class i_observer {               // called on the service thread
- public:
-  virtual auto on_computer_changed(const computer&) -> void = 0;   // add or update
-  virtual auto on_computer_removed(computer_id) -> void = 0;
+struct interface {
+  std::string mac;
+  std::uint32_t mtu;
+  std::vector<std::string> ipv4;  // IPv4 addresses and netmasks
 };
 
-// i_service.h
-class i_service {
+struct computer {
+  int id;
+  time_t last_seen;
+  std::string hostname;
+  std::string domain;
+  std::map<std::string, interface> interfaces;
+};
+
+// computer_observer.h
+class computer_observer {        // called on the service thread
  public:
-  [[nodiscard]] virtual auto subscribe(i_observer&) -> subscription = 0;
-  virtual auto request_details(computer_id) -> void = 0;        // returns at once; answer via observer
+  virtual auto on_computer(const computer&) -> void = 0;  // add or update
+};
+
+// computer_service.h
+class computer_service {
+ public:
+  virtual auto subscribe(computer_observer&) -> subscription = 0;
 };
 ```
 
@@ -326,17 +334,17 @@ The `sdd::core` owns:
 
 - the computer data
 - the discovery threads
-- emits asynchronous changes via `i_observer`
+- emits asynchronous changes via `computer_observer`
 
-The `main_presenter` implements `i_observer`, which provides the callbacks the
-presenter needs so that the UI is updated. The `i_service` calls methods from
-the observer when things change.
+The `main_presenter` implements `computer_observer`, which provides the
+callbacks the presenter needs so that the UI is updated. The `computer_service`
+calls methods from the observer when things change.
 
-The main program instantiates an instance of `i_service`, say `computer_service`.
-It then injects it into the presenter via the constructor that takes a
-`i_service`. Then the presenter will call `i_service.subscribe` to its own
-implementation of `i_observer` to get its updates, perhaps even to
-itself, if the presenter implements the `i_observer`.
+The main program instantiates an instance of `local_computer_service`. It then
+injects it into the presenter via the constructor that takes a
+`computer_service&`. Then the presenter will call `computer_service.subscribe`
+to its own implementation of `computer_observer` to get its updates, perhaps
+even to itself, if the presenter implements the `computer_observer`.
 
 ## 7. Presenter (`sdd::presenter`)
 
@@ -347,9 +355,9 @@ view's cancel runs on the UI thread, so the presenter must be destroyed there
 too. It translates between the two interfaces and does no locking.
 
 ```cpp
-class main_presenter final : public i_observer, public i_view_listener {
+class main_presenter final : public computer_observer, public i_view_listener {
  public:
-  main_presenter(i_service& s, i_main_view& v) : service_(s), view_(v) {}
+  main_presenter(computer_service& s, i_main_view& v) : service_(s), view_(v) {}
 
   auto start() -> void {
     // Main thread.
@@ -362,14 +370,9 @@ class main_presenter final : public i_observer, public i_view_listener {
     if (id) service_.request_details(*id);
   }
 
-  auto on_computer_changed(const computer& c) -> void override {
-    // On service thread, i_observer
+  auto on_computer(const computer& c) -> void override {
+    // On service thread, computer_observer
     view_.show_computer(to_view(c));
-  }
-
-  auto on_computer_removed(computer_id id) -> void override {
-    // On service thread, i_observer
-    view_.remove_computer(id);
   }
 
  private:
@@ -377,7 +380,7 @@ class main_presenter final : public i_observer, public i_view_listener {
     return {c.id, c.hostname, c.address, c.properties};
   }
 
-  i_service& service_;
+  computer_service& service_;
   i_main_view& view_;
   subscription view_subscription_;
   subscription service_subscription_;
@@ -551,7 +554,8 @@ without extra code.
 
 ### 9.1. Qt Relation between Signals and Slots
 
-A signal is declaration only. The Qt metaobject compiler (moc) generate its body. The call
+A signal is declaration only. The Qt metaobject compiler (moc) generate its
+body. The call
 
 ```cpp
 emit computer_shown(c);
@@ -602,10 +606,10 @@ sdd-monitor/
 │       └── *.cpp; *.h
 ├── core/
 |   ├── CMakeLists.txt
-│   ├── include/sdd/          computer.h, i_observer.h, i_service.h
+│   ├── include/sdd/          computer.h, computer_observer.h, computer_service.h, local_computer_service.h
 │   ├── src/
 |   |   ├── CMakeLists.txt
-│   │   └── *.cpp; *.h        computer_service.cpp, discovery and query code (to be written)
+│   │   └── *.cpp; *.h        local_computer_service.cpp, discovery and query code
 │   └── test/
 |       ├── CMakeLists.txt
 │       └── *.cpp; *.h
