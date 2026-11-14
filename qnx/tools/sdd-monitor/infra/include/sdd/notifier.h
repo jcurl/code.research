@@ -10,6 +10,8 @@
 
 #include "sdd/subscription.h"
 
+namespace sdd::infra {
+
 /// @brief Handle commonly notification operations using subscribers.
 ///
 /// There are two objects, the client C which is subscribing for notifications,
@@ -88,5 +90,7 @@ class notifier {
   std::vector<L*> listeners_{};
   std::size_t in_flight_{0};
 };
+
+}  // namespace sdd::infra
 
 #endif

@@ -25,16 +25,16 @@ class i_client {
 
 class server {
  public:
-  [[nodiscard]] auto subscribe(i_client& c) -> subscription {
+  [[nodiscard]] auto subscribe(i_client& c) -> sdd::infra::subscription {
     return notifier_.subscribe(c);
   }
 
   void notify_all(bool rethrow = false) {
-    notifier_.notify([](i_client& c) { c.on_notify(); }, rethrow);
+    notifier_.notify([](i_client& c) -> void { c.on_notify(); }, rethrow);
   }
 
  private:
-  notifier<i_client> notifier_;
+  sdd::infra::notifier<i_client> notifier_;
 };
 
 struct notify_on_client {
@@ -43,14 +43,14 @@ struct notify_on_client {
 
 class server_explicit {
  public:
-  [[nodiscard]] auto subscribe(i_client& c) -> subscription {
+  [[nodiscard]] auto subscribe(i_client& c) -> sdd::infra::subscription {
     return notifier_.subscribe(c);
   }
 
   void notify_all() { notifier_.notify(notify_on_client{}); }
 
  private:
-  notifier<i_client> notifier_;
+  sdd::infra::notifier<i_client> notifier_;
 };
 
 template <typename S>
@@ -63,7 +63,7 @@ class client : public i_client {
   [[nodiscard]] auto notify_count() const -> int { return notify_count_; }
 
  private:
-  subscription subscription_;
+  sdd::infra::subscription subscription_;
   int notify_count_{0};
 };
 
@@ -92,7 +92,7 @@ class counting_client : public i_client {
 
  private:
   int count_{0};
-  subscription subscription_;
+  sdd::infra::subscription subscription_;
 };
 
 TEST(notifier, notify_with_no_subscribers) {
@@ -131,12 +131,12 @@ TEST(notifier, subscribe_after_notify_is_not_notified) {
 TEST(notifier, unsubscribe_stops_notifications) {
   server s;
   counting_client c;
-  subscription sub = s.subscribe(c);
+  sdd::infra::subscription sub = s.subscribe(c);
   s.notify_all();
   EXPECT_EQ(c.count(), 1);
 
   // Moving into sub unsubscribes the old one.
-  sub = subscription{};
+  sub = sdd::infra::subscription{};
   s.notify_all();
   EXPECT_EQ(c.count(), 1);
 }
@@ -145,7 +145,7 @@ TEST(notifier, unsubscribe_one_leaves_others_subscribed) {
   server s;
   counting_client a;
   counting_client b(s);
-  { subscription sub_a = s.subscribe(a); }
+  { sdd::infra::subscription sub_a = s.subscribe(a); }
   s.notify_all();
   EXPECT_EQ(a.count(), 0);
   EXPECT_EQ(b.count(), 1);
@@ -159,7 +159,7 @@ class throwing_client : public i_client {
   void on_notify() override { throw std::runtime_error("callback failed"); }
 
  private:
-  subscription subscription_;
+  sdd::infra::subscription subscription_;
 };
 
 TEST(notifier, notify_exception_releases_in_flight) {
@@ -173,7 +173,7 @@ TEST(notifier, notify_exception_releases_in_flight) {
   // subscription) would block forever.
   std::promise<void> done;
   std::future<void> finished = done.get_future();
-  std::thread canceller([owned = std::move(c), &done]() mutable {
+  std::thread canceller([owned = std::move(c), &done]() mutable -> void {
     owned.reset();
     done.set_value();
   });
@@ -222,17 +222,17 @@ class client_threaded : public i_client {
     std::unique_lock lock(mutex_);
     notified_ = true;
     cv_.notify_all();
-    cv_.wait(lock, [this] { return resumed_; });
+    cv_.wait(lock, [this]() -> bool { return resumed_; });
     ++notify_count_;
   }
 
   void wait_for_notification() {
     std::unique_lock lock(mutex_);
-    cv_.wait(lock, [this] { return notified_; });
+    cv_.wait(lock, [this]() -> bool { return notified_; });
   }
 
   void resume() {
-    std::lock_guard lock(mutex_);
+    std::scoped_lock lock(mutex_);
     resumed_ = true;
     cv_.notify_all();
   }
@@ -244,7 +244,7 @@ class client_threaded : public i_client {
   bool resumed_{false};
   int notify_count_{0};
   // Declared last so it is destroyed first, before the state on_notify() uses.
-  subscription subscription_;
+  sdd::infra::subscription subscription_;
 };
 
 TEST(notifier, unsubscribe_while_inflight) {
@@ -264,7 +264,8 @@ TEST(notifier, unsubscribe_while_inflight) {
   std::future<void> finished_notify = done_notify.get_future();
 
   std::thread thread1(
-      [](std::unique_ptr<client_threaded> owned, std::promise<void>& done) {
+      [](std::unique_ptr<client_threaded> owned,
+          std::promise<void>& done) -> void {
         owned->wait_for_notification();
         owned.reset();
         done.set_value();
@@ -272,7 +273,8 @@ TEST(notifier, unsubscribe_while_inflight) {
       std::move(c1), std::ref(done1));
 
   std::thread thread2(
-      [](std::unique_ptr<client_threaded> owned, std::promise<void>& done) {
+      [](std::unique_ptr<client_threaded> owned,
+          std::promise<void>& done) -> void {
         owned->wait_for_notification();
         owned.reset();
         // netbsd10.1 clang only (clang-analyzer-core.CallAndMessage).
@@ -290,7 +292,7 @@ TEST(notifier, unsubscribe_while_inflight) {
       },
       std::move(c2), std::ref(done2));
 
-  std::thread notifier_thread([&s, &done_notify] {
+  std::thread notifier_thread([&s, &done_notify]() -> void {
     s.notify_all();
     done_notify.set_value();
   });

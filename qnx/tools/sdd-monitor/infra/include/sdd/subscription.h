@@ -4,6 +4,8 @@
 #include <functional>
 #include <utility>
 
+namespace sdd::infra {
+
 /// @brief A subscription object that notifies when it is destroyed.
 ///
 /// A class can do some work, and return a subscription object to its caller, so
@@ -58,5 +60,7 @@ class subscription {
  private:
   std::function<void()> cancel_{};
 };
+
+}  // namespace sdd::infra
 
 #endif
