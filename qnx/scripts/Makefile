@@ -62,6 +62,24 @@ $(info CMAKE_CTEST  : $(CMAKE_CTEST))
 $(info NUM_CPUS     : $(NUM_CPUS))
 $(info ------------------------------------------------------------------------)
 
+# Shared build settings used by every build rule below.
+RELEASE := -DCMAKE_BUILD_TYPE=Release
+BUILD_TEST := -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}
+BUILD_ONLY := -j${NUM_CPUS} ${CMAKE_TARGET}
+
+# Cmake toolchain file in /source/toolchain, given without the .cmake suffix.
+toolchain = -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/$(1).cmake
+
+# $(1) build.sh arguments,
+# $(2) cmake configure arguments,
+# $(3) cmake --build arguments.
+#
+# With INC set (e.g. INC=1), the build directory is kept and cmake is not
+# reconfigured, so only the build (and test) steps run.
+define run_build
+@./build.sh $(1) "$(if $(INC),,rm -rf * && cmake -B . -S /source/qnx $(2) && )cmake --build . $(3)"
+endef
+
 .PHONY: linux
 linux: alpine-latest-clang ubuntu-focal ubuntu-focal-clang ubuntu-jammy ubuntu-jammy-clang ubuntu-noble ubuntu-noble-clang ubuntu-resolute ubuntu-resolute-clang
 
@@ -91,103 +109,103 @@ clangformat:
 	@./build.sh -dubuntu -cjammy -S -Bclangformat "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . --target clangformat"
 
 alpine-latest-clang:
-	@./build.sh -dalpine -clatest -vclang "rm -rf * && cmake -B . -S /source/qnx -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-dalpine -clatest -vclang,-G Ninja $(RELEASE) $(call toolchain,x86-linux-clang),$(BUILD_TEST))
 
 ubuntu-focal:
-	@./build.sh -cfocal "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUN_CLANG_TIDY=off && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cfocal,$(RELEASE) -DCMAKE_RUN_CLANG_TIDY=off,$(BUILD_TEST))
 
 ubuntu-focal-clang:
-	@./build.sh -cfocal -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUN_CLANG_TIDY=off -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cfocal -vclang,$(RELEASE) -DCMAKE_RUN_CLANG_TIDY=off $(call toolchain,x86-linux-clang),$(BUILD_TEST))
 
 ubuntu-jammy:
-	@./build.sh -cjammy "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cjammy,$(RELEASE),$(BUILD_TEST))
 
 ubuntu-jammy-clang:
-	@./build.sh -cjammy -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cjammy -vclang,$(RELEASE) $(call toolchain,x86-linux-clang),$(BUILD_TEST))
 
 ubuntu-noble:
-	@./build.sh -cnoble "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cnoble,$(RELEASE),$(BUILD_TEST))
 
 ubuntu-noble-clang:
-	@./build.sh -cnoble -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cnoble -vclang,$(RELEASE) $(call toolchain,x86-linux-clang),$(BUILD_TEST))
 
 ubuntu-resolute:
-	@./build.sh -cresolute "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cresolute,$(RELEASE),$(BUILD_TEST))
 
 ubuntu-resolute-clang:
-	@./build.sh -cresolute -vclang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/x86-linux-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET} ${CMAKE_CTEST}"
+	$(call run_build,-cresolute -vclang,$(RELEASE) $(call toolchain,x86-linux-clang),$(BUILD_TEST))
 
 netbsd10.1-aarch64:
-	@./build.sh -dnetbsd -c10.1 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.1 -varm64,$(RELEASE) $(call toolchain,netbsd10.1-aarch64),$(BUILD_ONLY))
 
 netbsd10.1-aarch64-clang:
-	@./build.sh -dnetbsd -c10.1 -varm64clang "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64-clang.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.1 -varm64clang,$(RELEASE) $(call toolchain,netbsd10.1-aarch64-clang),$(BUILD_ONLY))
 
 netbsd10.1-aarch64eb:
-	@./build.sh -dnetbsd -c10.1 -varm64eb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.1 -varm64eb,$(RELEASE) $(call toolchain,netbsd10.1-aarch64eb),$(BUILD_ONLY))
 
 netbsd10.1-x64:
-	@./build.sh -dnetbsd -c10.1 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.1 -vx64,$(RELEASE) $(call toolchain,netbsd10.1-x86_64),$(BUILD_ONLY))
 
 netbsd10.1-x86:
-	@./build.sh -dnetbsd -c10.1 -vx86 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.1-i486.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.1 -vx86,$(RELEASE) $(call toolchain,netbsd10.1-i486),$(BUILD_ONLY))
 
 netbsd10.2-aarch64:
-	@./build.sh -dnetbsd -c10.2 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.2-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.2 -varm64,$(RELEASE) $(call toolchain,netbsd10.2-aarch64),$(BUILD_ONLY))
 
 netbsd10.2-aarch64eb:
-	@./build.sh -dnetbsd -c10.2 -varm64eb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.2-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.2 -varm64eb,$(RELEASE) $(call toolchain,netbsd10.2-aarch64eb),$(BUILD_ONLY))
 
 netbsd10.2-x64:
-	@./build.sh -dnetbsd -c10.2 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.2-x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.2 -vx64,$(RELEASE) $(call toolchain,netbsd10.2-x86_64),$(BUILD_ONLY))
 
 netbsd10.2-x86:
-	@./build.sh -dnetbsd -c10.2 -vx86 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd10.2-i486.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c10.2 -vx86,$(RELEASE) $(call toolchain,netbsd10.2-i486),$(BUILD_ONLY))
 
 netbsd11.0-aarch64:
-	@./build.sh -dnetbsd -c11.0 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c11.0 -varm64,$(RELEASE) $(call toolchain,netbsd11.0-aarch64),$(BUILD_ONLY))
 
 netbsd11.0-aarch64eb:
-	@./build.sh -dnetbsd -c11.0 -varm64eb "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-aarch64eb.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c11.0 -varm64eb,$(RELEASE) $(call toolchain,netbsd11.0-aarch64eb),$(BUILD_ONLY))
 
 netbsd11.0-x64:
-	@./build.sh -dnetbsd -c11.0 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c11.0 -vx64,$(RELEASE) $(call toolchain,netbsd11.0-x86_64),$(BUILD_ONLY))
 
 netbsd11.0-x86:
-	@./build.sh -dnetbsd -c11.0 -vx86 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/netbsd11.0-i486.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dnetbsd -c11.0 -vx86,$(RELEASE) $(call toolchain,netbsd11.0-i486),$(BUILD_ONLY))
 
 freebsd13.5-aarch64:
-	@./build.sh -dfreebsd -c13.5 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd13.5-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c13.5 -varm64,$(RELEASE) $(call toolchain,freebsd13.5-aarch64),$(BUILD_ONLY))
 
 freebsd14.2-aarch64:
-	@./build.sh -dfreebsd -c14.2 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.2-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c14.2 -varm64,$(RELEASE) $(call toolchain,freebsd14.2-aarch64),$(BUILD_ONLY))
 
 freebsd14.3-aarch64:
-	@./build.sh -dfreebsd -c14.3 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.3-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c14.3 -varm64,$(RELEASE) $(call toolchain,freebsd14.3-aarch64),$(BUILD_ONLY))
 
 freebsd14.4-aarch64:
-	@./build.sh -dfreebsd -c14.4 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.4-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c14.4 -varm64,$(RELEASE) $(call toolchain,freebsd14.4-aarch64),$(BUILD_ONLY))
 
 freebsd14.5-aarch64:
-	@./build.sh -dfreebsd -c14.5 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd14.5-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c14.5 -varm64,$(RELEASE) $(call toolchain,freebsd14.5-aarch64),$(BUILD_ONLY))
 
 freebsd15.0-aarch64:
-	@./build.sh -dfreebsd -c15.0 -bUBUNTU_VERSION=resolute -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.0-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c15.0 -bUBUNTU_VERSION=resolute -varm64,$(RELEASE) $(call toolchain,freebsd15.0-aarch64),$(BUILD_ONLY))
 
 freebsd15.1-aarch64:
-	@./build.sh -dfreebsd -c15.1 -bUBUNTU_VERSION=resolute -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/freebsd15.1-aarch64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dfreebsd -c15.1 -bUBUNTU_VERSION=resolute -varm64,$(RELEASE) $(call toolchain,freebsd15.1-aarch64),$(BUILD_ONLY))
 
 qnx-710-aarch64:
-	@./build.sh -dqnx -c710 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dqnx -c710 -varm64,$(RELEASE) $(call toolchain,qcc_aarch64le),$(BUILD_ONLY))
 
 qnx-710-x64:
-	@./build.sh -dqnx -c710 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dqnx -c710 -vx64,$(RELEASE) $(call toolchain,qcc_x86_64),$(BUILD_ONLY))
 
 qnx-800-aarch64:
-	@./build.sh -dqnx -c800 -varm64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dqnx -c800 -varm64,$(RELEASE) $(call toolchain,qcc_aarch64le),$(BUILD_ONLY))
 
 qnx-800-aarch64-rpi5:
-	@./build.sh -dqnx -c800 -varm64-rpi5 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_aarch64le-rpi5.cmake -DCMAKE_BUILD_TYPE=Release && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dqnx -c800 -varm64-rpi5,$(call toolchain,qcc_aarch64le-rpi5) $(RELEASE),$(BUILD_ONLY))
 
 qnx-800-x64:
-	@./build.sh -dqnx -c800 -vx64 "rm -rf * && cmake -B . -S /source/qnx -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/source/toolchain/qcc_x86_64.cmake && cmake --build . -j${NUM_CPUS} ${CMAKE_TARGET}"
+	$(call run_build,-dqnx -c800 -vx64,$(RELEASE) $(call toolchain,qcc_x86_64),$(BUILD_ONLY))

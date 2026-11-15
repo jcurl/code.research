@@ -14,6 +14,7 @@
     - [1.4.5. Building QNX](#145-building-qnx)
 - [2. Building using Makefile](#2-building-using-makefile)
   - [2.1. Overriding Targets](#21-overriding-targets)
+  - [2.2. Incremental Builds](#22-incremental-builds)
 - [3. Adding Your Own Distribution](#3-adding-your-own-distribution)
 
 ## 1. Podman Container - build.sh
@@ -293,7 +294,8 @@ You can then run `build.sh` manually in interactive mode to debug and fix.
 ### 2.1. Overriding Targets
 
 Buliding the entire repository multiple times per target may take too long. For
-example, on a Skylake 6700T, it takes about 1.5 hours.
+example, on a Skylake 6700T, it takes about 4 hours for all the targets and
+version variants.
 
 To reduce the time to test changes during development, two environment variables
 are checked for on build.
@@ -332,6 +334,16 @@ If you want to build all targets, but only test a subset, we need to use the
 
 ```sh
 TESTTARGET="-R ubench_test|libsjson_test" make all qnx
+```
+
+### 2.2. Incremental Builds
+
+By default, making a target does a new build, by erasing the build directory
+first and rerunning `cmake`. If doing a minor bug-fix, it is much faster doing
+an incremental build. To do this:
+
+```sh
+INC=1 TESTTARGET=libunet_test make all qnx
 ```
 
 ## 3. Adding Your Own Distribution
