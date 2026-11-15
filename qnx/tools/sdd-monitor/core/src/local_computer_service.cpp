@@ -2,7 +2,6 @@
 
 #include <netinet/in.h>
 
-#include <algorithm>
 #include <cerrno>
 #include <chrono>
 #include <cstddef>
@@ -15,6 +14,7 @@
 #include <vector>
 
 #include "ubench/net.h"
+#include "packet_parse_computer.h"
 
 namespace sdd::core {
 
@@ -22,14 +22,6 @@ namespace {
 
 // Bounds how long stop() takes to be seen by the receive thread.
 constexpr auto receive_timeout = std::chrono::milliseconds{100};
-
-// Placeholder until the discovery payload is decoded.
-auto parse_computer([[maybe_unused]] std::string_view json) -> computer {
-  computer packet{};
-  packet.id = -1;
-  packet.last_seen = std::time(nullptr);
-  return packet;
-}
 
 }  // namespace
 
@@ -68,6 +60,8 @@ local_computer_service::~local_computer_service() {
   return {};
 }
 
+/// @brief Creates the multicast receive socket bound to the configured port.
+/// @return The open socket, or the errno if it could not be set up.
 auto local_computer_service::open_socket()
     -> stdext::expected<ubench::net::udp, int> {
   auto group = ubench::net::parse_sockaddr(config_.multicast_group);
@@ -95,6 +89,9 @@ auto local_computer_service::open_socket()
   return socket;
 }
 
+/// @brief Receive thread body. Parses each packet until stop is requested or
+/// the socket fails, then notifies observers.
+/// @param socket The socket to receive on. It is closed before returning.
 auto local_computer_service::run(ubench::net::udp socket) -> void {
   int error = 0;
   // Largest UDP payload over IPv4, so no datagram is rejected for size.
@@ -113,7 +110,9 @@ auto local_computer_service::run(ubench::net::udp socket) -> void {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     std::string_view text{reinterpret_cast<const char*>(buffer.data()),
         static_cast<std::size_t>(*nbytes)};
-    computer_ping_received(parse_computer(text));
+    if (auto packet = packet_parse_computer{text}.parse(computers_)) {
+      computer_ping_received(*packet);
+    }
   }
 
   socket.close();
@@ -125,10 +124,7 @@ auto local_computer_service::run(ubench::net::udp socket) -> void {
 
 auto local_computer_service::computer_ping_received(const computer& packet)
     -> int {
-  auto it = std::find_if(computers_.begin(), computers_.end(),
-      [&packet](const computer& c) -> bool {
-        return c.hostname == packet.hostname && c.domain == packet.domain;
-      });
+  auto it = find_computer(computers_, packet);
 
   int id = -1;
   if (it == computers_.end()) {

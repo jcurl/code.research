@@ -5,6 +5,8 @@ set(SOURCES
     ../include/sdd/computer_service.h
     ../include/sdd/local_computer_service.h
     local_computer_service.cpp
+    packet_parse_computer.cpp
+    packet_parse_computer.h
 )
 
 find_package(Threads REQUIRED)

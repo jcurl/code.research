@@ -26,7 +26,7 @@ class computer_service {
   /// @brief Reports whether the service is currently receiving.
   /// @return No value while running. Otherwise the error that stopped the
   /// service: 0 when stopped on request, or the errno.
-  [[nodiscard]] virtual auto is_running() const
+  [[nodiscard]] virtual auto is_running() const noexcept
       -> stdext::expected<void, int> = 0;
 };
 

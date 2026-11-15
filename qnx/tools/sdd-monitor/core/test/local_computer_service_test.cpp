@@ -46,6 +46,11 @@ class recording_observer : public computer_observer {
   std::atomic<bool> terminated{false};
 };
 
+/// @brief Builds a computer with no interfaces and an unassigned id.
+/// @param hostname The hostname.
+/// @param domain The domain name.
+/// @param last_seen The Unix timestamp of the last update.
+/// @return The computer.
 auto make_computer(const char* hostname, const char* domain, time_t last_seen)
     -> computer {
   return computer{-1, last_seen, hostname, domain, {}};
@@ -154,6 +159,73 @@ TEST(local_computer_service, start_receives_unicast_and_stop_terminates) {
   EXPECT_EQ(observer.terminated_error.load(), 0);
   auto state = service.is_running();
   ASSERT_OPTIONAL_ERROR(state, 0);
+}
+
+TEST(local_computer_service, parses_packet_and_keeps_known_interfaces) {
+  constexpr std::uint16_t port = 37052;
+  local_computer_service_config config;
+  config.port = port;
+  local_computer_service service{config};
+  recording_observer observer;
+  auto subscription = service.subscribe(observer);
+
+  ASSERT_TRUE(service.start());
+
+  ubench::net::udp sender;
+  ASSERT_TRUE(sender.open(loopback(0)));
+  ASSERT_TRUE(sender.send(loopback(port), test::computer_packet_json));
+  ASSERT_TRUE(sender.send(loopback(port), test::computer_packet_json));
+
+  EXPECT_TRUE(
+      wait_until([&observer]() -> bool { return observer.computer_count >= 2; },
+          std::chrono::seconds{2}));
+  service.stop();
+  EXPECT_TRUE(
+      wait_until([&observer]() -> bool { return observer.terminated.load(); },
+          std::chrono::seconds{2}));
+
+  ASSERT_EQ(observer.seen.size(), 2U);
+  for (const auto& c : observer.seen) {
+    EXPECT_EQ(c.id, 0);
+    EXPECT_EQ(c.hostname, "rotorua");
+    EXPECT_EQ(c.domain, "home.lan");
+    ASSERT_EQ(c.interfaces.size(), 2U);
+    EXPECT_EQ(c.interfaces.at("enp4s0").mac, "02:00:00:00:00:01");
+    EXPECT_EQ(c.interfaces.at("enp4s0").mtu, 1500U);
+    EXPECT_EQ(c.interfaces.at("enp4s0").ipv4,
+        std::vector<std::string>{"192.168.1.110/24"});
+    EXPECT_EQ(c.interfaces.at("lo").mtu, 65536U);
+  }
+}
+
+TEST(local_computer_service, drops_invalid_packet_and_defaults_bad_mtu) {
+  constexpr std::uint16_t port = 37053;
+  local_computer_service_config config;
+  config.port = port;
+  local_computer_service service{config};
+  recording_observer observer;
+  auto subscription = service.subscribe(observer);
+
+  ASSERT_TRUE(service.start());
+
+  // The invalid packet is received first, so it is processed first.
+  ubench::net::udp sender;
+  ASSERT_TRUE(sender.open(loopback(0)));
+  ASSERT_TRUE(sender.send(loopback(port), test::computer_bad_mac_json));
+  ASSERT_TRUE(sender.send(loopback(port), test::computer_bad_mtu_json));
+
+  EXPECT_TRUE(
+      wait_until([&observer]() -> bool { return observer.computer_count > 0; },
+          std::chrono::seconds{2}));
+  service.stop();
+  EXPECT_TRUE(
+      wait_until([&observer]() -> bool { return observer.terminated.load(); },
+          std::chrono::seconds{2}));
+
+  ASSERT_EQ(observer.seen.size(), 1U);
+  EXPECT_EQ(observer.seen[0].hostname, "mtu");
+  EXPECT_EQ(observer.seen[0].interfaces.at("eth0").mac, "02:00:00:00:00:02");
+  EXPECT_EQ(observer.seen[0].interfaces.at("eth0").mtu, 0U);
 }
 
 TEST(local_computer_service, destructor_without_stop_terminates) {

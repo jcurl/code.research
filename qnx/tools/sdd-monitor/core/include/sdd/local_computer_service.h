@@ -43,13 +43,13 @@ class local_computer_service : public computer_service {
   [[nodiscard]] auto start() -> stdext::expected<void, int>;
 
   /// @brief Requests the receive thread to exit. Returns without waiting.
-  auto stop() -> void { stop_requested_ = true; }
+  auto stop() noexcept -> void { stop_requested_ = true; }
 
   /// @brief Reports whether the receive thread is running.
   /// @return No value while running. Otherwise the error that stopped it: 0
   /// when stopped on request, or the errno that ended the thread or stopped
   /// start().
-  [[nodiscard]] auto is_running() const
+  [[nodiscard]] auto is_running() const noexcept
       -> stdext::expected<void, int> override {
     if (running_) return {};
     return stdext::unexpected{last_error_.load()};
