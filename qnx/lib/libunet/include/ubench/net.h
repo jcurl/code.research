@@ -78,12 +78,10 @@ struct ether_addr {
 /// @param addr the IPv4 address to convert from. This is already in network
 /// byte order.
 ///
-/// @param[out] eth the Ethernet MAC address to convert to.
-///
-/// @return true if the conversion was successful, false otherwise (e.g. the
-/// value of addr is not a multicast address, or eth is nullptr).
-[[nodiscard]] auto get_ether_multicast(const in_addr& addr, ether_addr* eth)
-    -> bool;
+/// @return The Ethernet MAC address, or no value if the conversion was not
+/// possible (e.g. the value of addr is not a multicast address).
+[[nodiscard]] auto get_ether_multicast(const in_addr& addr)
+    -> std::optional<ether_addr>;
 
 /// @brief Converts addr to a string.
 ///

@@ -33,21 +33,21 @@ TEST(ubench_net, is_multicast_false) {
 
 TEST(ubench_net, get_ether_multicast) {
   in_addr ipv4addr{};
-  ubench::net::ether_addr ethaddr{};
 
   // Not a multicast address, should fail
   EXPECT_EQ(inet_pton(AF_INET, "192.168.1.1", &ipv4addr), 1);
-  EXPECT_EQ(ubench::net::get_ether_multicast(ipv4addr, &ethaddr), false);
+  ASSERT_OPTIONAL_HAS_ERROR(ubench::net::get_ether_multicast(ipv4addr));
 
   // Is a multicast address.
   EXPECT_EQ(inet_pton(AF_INET, "224.0.0.252", &ipv4addr), 1);
-  EXPECT_EQ(ubench::net::get_ether_multicast(ipv4addr, &ethaddr), true);
-  EXPECT_EQ(ethaddr.ether_addr_octet[0], 0x01);
-  EXPECT_EQ(ethaddr.ether_addr_octet[1], 0x00);
-  EXPECT_EQ(ethaddr.ether_addr_octet[2], 0x5e);
-  EXPECT_EQ(ethaddr.ether_addr_octet[3], 0x00);
-  EXPECT_EQ(ethaddr.ether_addr_octet[4], 0x00);
-  EXPECT_EQ(ethaddr.ether_addr_octet[5], 0xfc);
+  auto ethaddr = ubench::net::get_ether_multicast(ipv4addr);
+  ASSERT_OPTIONAL(ethaddr);
+  EXPECT_EQ(ethaddr->ether_addr_octet[0], 0x01);
+  EXPECT_EQ(ethaddr->ether_addr_octet[1], 0x00);
+  EXPECT_EQ(ethaddr->ether_addr_octet[2], 0x5e);
+  EXPECT_EQ(ethaddr->ether_addr_octet[3], 0x00);
+  EXPECT_EQ(ethaddr->ether_addr_octet[4], 0x00);
+  EXPECT_EQ(ethaddr->ether_addr_octet[5], 0xfc);
 }
 
 TEST(ubench_net, inet_ntos_sockaddr_in) {

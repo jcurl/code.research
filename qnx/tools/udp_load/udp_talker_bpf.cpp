@@ -41,10 +41,12 @@ auto udp_talker_bpf::init_packets(const struct sockaddr_in& source,
   }
 
   pkt_ = std::make_unique<l2_eth_udp_pkt>();
-  if (!ubench::net::get_ether_multicast(dest.sin_addr, &pkt_->dst_mac())) {
+  auto dst_mac = ubench::net::get_ether_multicast(dest.sin_addr);
+  if (!dst_mac) {
     std::cerr << "BPF mode requires multicast destination MAC" << std::endl;
     return false;
   }
+  pkt_->dst_mac() = *dst_mac;
 
   // Find the source MAC, by iterating over all available interfaces.
   constexpr auto flags = ubench::net::if_flags::MULTICAST |

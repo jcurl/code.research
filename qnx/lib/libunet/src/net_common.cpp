@@ -22,18 +22,18 @@ auto is_multicast(const in_addr& addr) -> bool {
   return (ntohl(addr.s_addr) & 0xF0000000) == 0xE0000000;
 }
 
-auto get_ether_multicast(const in_addr& addr, ether_addr* eth) -> bool {
-  if (eth == nullptr) return false;
-  if (!is_multicast(addr)) return false;
+auto get_ether_multicast(const in_addr& addr) -> std::optional<ether_addr> {
+  if (!is_multicast(addr)) return std::nullopt;
 
   auto ipv4addr = ntohl(addr.s_addr);
-  eth->ether_addr_octet[0] = 0x01;
-  eth->ether_addr_octet[1] = 0x00;
-  eth->ether_addr_octet[2] = 0x5E;
-  eth->ether_addr_octet[3] = (ipv4addr >> 16) & 0x7F;
-  eth->ether_addr_octet[4] = (ipv4addr >> 8) & 0xFF;
-  eth->ether_addr_octet[5] = ipv4addr & 0xFF;
-  return true;
+  ether_addr eth{};
+  eth.ether_addr_octet[0] = 0x01;
+  eth.ether_addr_octet[1] = 0x00;
+  eth.ether_addr_octet[2] = 0x5E;
+  eth.ether_addr_octet[3] = (ipv4addr >> 16) & 0x7F;
+  eth.ether_addr_octet[4] = (ipv4addr >> 8) & 0xFF;
+  eth.ether_addr_octet[5] = ipv4addr & 0xFF;
+  return eth;
 }
 
 auto inet_ntos(const sockaddr_in& addr) -> std::string {

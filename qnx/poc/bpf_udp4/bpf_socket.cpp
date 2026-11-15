@@ -77,9 +77,9 @@ bpf_socket::bpf_socket(const sockaddr_in& src, const sockaddr_in& dest)
   // Sending UDPv4 can only support multicast, as we don't implement ARP and
   // other protocols.
   if (!ubench::net::is_multicast(dest.sin_addr)) return;
-  ubench::net::ether_addr destmac{};
-  if (!ubench::net::get_ether_multicast(dest.sin_addr, &destmac)) return;
-  pkt_->write_dest_mac(destmac);
+  auto destmac = ubench::net::get_ether_multicast(dest.sin_addr);
+  if (!destmac) return;
+  pkt_->write_dest_mac(*destmac);
   pkt_->write_dest_ip(dest);
 
   // Query all interfaces and find the source MAC and the MTU.
