@@ -460,9 +460,16 @@ class interface {
 /// @return The host name, if it could be retrieved.
 [[nodiscard]] auto gethostname() -> std::optional<std::string>;
 
-/// @brief Get teh machine domain name
+/// @brief Get the machine domain name
 ///
-/// @return The domain name, if it could be retrieved
+/// Uses the local configuration to get the domain name portion of the machine's
+/// FQDN from DNS. This method does not use a DNS reverse name lookup, so it
+/// shouldn't need the network. If it isn't available, you should get all
+/// interface IP addresses and do a reverse DNS lookup yourself. That isn't done
+/// here, as the system may be configured to have multiple IP addresses each
+/// resolving to a different FQDN making a general solution ambiguous.
+///
+/// @return The domain name, if it could be retrieved.
 [[nodiscard]] auto getdomainname() -> std::optional<std::string>;
 
 /// @brief Handles UDP sockets.

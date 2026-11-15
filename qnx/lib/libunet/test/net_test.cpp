@@ -271,8 +271,6 @@ TEST(ubench_net, gethostname) {
 
 TEST(ubench_net, getdomainname) {
   auto domainname = ubench::net::getdomainname();
-  if (domainname) {
-    ASSERT_GT(domainname->length(), 0);
-    std::cout << "domain name: " << *domainname << std::endl;
-  }
+  ASSERT_OPTIONAL(domainname);
+  std::cout << "domain name: " << *domainname << std::endl;
 }
