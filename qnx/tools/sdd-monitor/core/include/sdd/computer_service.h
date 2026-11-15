@@ -3,6 +3,7 @@
 
 #include "sdd/computer_observer.h"
 #include "sdd/subscription.h"
+#include "stdext/expected.h"
 
 namespace sdd::core {
 
@@ -21,6 +22,12 @@ class computer_service {
   /// @return A reference to a subscription, that when destroyed, unsubscribes.
   [[nodiscard]] virtual auto subscribe(computer_observer& observer)
       -> infra::subscription = 0;
+
+  /// @brief Reports whether the service is currently receiving.
+  /// @return No value while running. Otherwise the error that stopped the
+  /// service: 0 when stopped on request, or the errno.
+  [[nodiscard]] virtual auto is_running() const
+      -> stdext::expected<void, int> = 0;
 };
 
 }  // namespace sdd::core

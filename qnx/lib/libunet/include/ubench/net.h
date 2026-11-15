@@ -121,12 +121,10 @@ struct ether_addr {
 /// @param arg The argument given to the program which is to be parsed to an
 /// IPv4 number and port.
 ///
-/// @param addr [out] The result of parsing. If no port is present in the
-/// string, it is set to zero.
-///
-/// @return true if the conversion was successful, false otherwise.
-[[nodiscard]] auto parse_sockaddr(std::string_view arg, sockaddr_in& addr)
-    -> bool;
+/// @return The parsed address. If no port is present in the string, the port
+/// is zero. Returns std::nullopt if the string could not be parsed.
+[[nodiscard]] auto parse_sockaddr(std::string_view arg)
+    -> std::optional<sockaddr_in>;
 
 /// @brief Interface flags.
 ///

@@ -8,7 +8,7 @@ participant "main.cpp" as main
 participant "Qt event loop\n(UI thread)" as qt
 participant "qt_main_view" as view
 participant "main_presenter" as pres
-participant "computer_service\n(service thread)" as svc
+participant "local_computer_service\n(service thread)" as svc
 
 group Qt Initialisation on Startup
 
@@ -18,7 +18,7 @@ main -> main ++ #MAIN_COLOUR : QApplication(argc, argv)
 main -> qt **
 main <-- main --
 
-main -> svc **
+main -> svc ** : .ctor(config)
 
 main -> view **
 activate view #MAIN_COLOUR
@@ -54,7 +54,11 @@ end opt
 pres --> main --
 
 main -> svc ++ #WORKER_COLOUR : start()
-svc --> main
+note over svc
+  opens socket, then
+  starts receive thread
+end note
+svc --> main : expected<void, int>
 
 main -> qt ++ #UI_COLOUR : exec()
 qt -> qt : Run event loop
@@ -67,7 +71,7 @@ opt only if service thread already started
   view -> pres ++ #UI_COLOUR : on_view_ready()
   pres -> svc ++ #UI_COLOUR : notify_computers()
   loop computers
-    svc -> pres ++ #UI_COLOUR : on_computer_changed(c)
+    svc -> pres ++ #UI_COLOUR : on_computer(c)
     pres -> view ++ #UI_COLOUR : show_computer(c)
     view ->> qt : computer_shown(c)
     pres <-- view --
@@ -93,12 +97,12 @@ skinparam sequenceMessageAlign center
 participant "Qt event loop\n(UI thread)" as qt
 participant "qt_main_view" as view
 participant "main_presenter" as pres
-participant "computer_service\n(service thread)" as svc
+participant "local_computer_service\n(service thread)" as svc
 
 group Async: computer added (service thread)
 
 activate svc #WORKER_COLOUR
-svc -> pres ++ #WORKER_COLOUR : on_computer_changed(c)
+svc -> pres ++ #WORKER_COLOUR : on_computer(c)
 pres -> view ++ #WORKER_COLOUR : show_computer(c)
 view ->> qt : computer_shown(c)
 view --> pres -- :
@@ -107,41 +111,6 @@ pres --> svc -- :
 activate qt #UI_COLOUR
 qt -> view ++ #UI_COLOUR : on_computer_shown(c)
 view -> view : computer_list_model::upsert(c)
-view --> qt -- :
-qt -[hidden]-> qt
-deactivate qt
-
-deactivate svc
-
-@enduml
-
-
-
-@startuml running_service_computer_removed
-
-skinparam sequenceMessageAlign center
-
-!define MAIN_COLOUR c9abd2
-!define UI_COLOUR 9595d5
-!define WORKER_COLOUR f1ddaf
-
-participant "Qt event loop\n(UI thread)" as qt
-participant "qt_main_view" as view
-participant "main_presenter" as pres
-participant "computer_service\n(service thread)" as svc
-
-group Async: computer removed (service thread)
-
-activate svc #WORKER_COLOUR
-svc -> pres ++ #WORKER_COLOUR : on_computer_removed(id)
-pres -> view ++ #WORKER_COLOUR : remove_computer(id)
-view ->> qt : computer_removed(id)
-view --> pres -- :
-pres --> svc -- :
-
-activate qt #UI_COLOUR
-qt -> view ++ #UI_COLOUR : on_computer_removed(id)
-view -> view : computer_list_model::remove(id)
 view --> qt -- :
 qt -[hidden]-> qt
 deactivate qt
@@ -164,7 +133,7 @@ actor "User" as user
 participant "Qt event loop\n(UI thread)" as qt
 participant "qt_main_view" as view
 participant "main_presenter" as pres
-participant "computer_service\n(service thread)" as svc
+participant "local_computer_service\n(service thread)" as svc
 
 user ->> qt : click row (input event)
 
@@ -176,7 +145,7 @@ qt -> view ++ #UI_COLOUR : currentChanged, on_current_changed(index)
 view -> pres ++ #UI_COLOUR : on_selected(id)
 pres -> svc ++ #UI_COLOUR : request_details(id)
 
-svc -> pres ++ #UI_COLOUR : on_computer_changed(c)
+svc -> pres ++ #UI_COLOUR : on_computer(c)
 pres -> view ++ #UI_COLOUR : show_computer(c)
 pres <-- view --
 svc <-- pres --

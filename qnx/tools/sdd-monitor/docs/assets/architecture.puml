@@ -4,25 +4,28 @@ skinparam componentStyle rectangle
 left to right direction
 
 package "Model (no Qt):\n sdd::core" {
-  interface "i_service" as isvc
-  note top
-    subscribe
-  end note
-  interface "i_observer" as iobs
-  note top
-    on_XX methods
-  end note
-  [computer_service] as svc <<i_service>>
+  interface "computer_service" as isvc
   note bottom
-    owns worker thread
-    (discovery, queries)
+    subscribe()
+    is_running()
+  end note
+  interface "computer_observer" as iobs
+  note bottom
+    on_computer()
+    on_terminated()
+  end note
+  [local_computer_service] as svc <<computer_service>>
+  note bottom
+    start(), stop()
+    owns receive thread
+    (UDP multicast)
   end note
 }
 
 package "Presenter/Listener (no Qt):\n sdd::presenter" {
   interface "i_main_view" as iview
   interface "i_view_listener" as ilistener
-  [main_presenter] as pres <<i_observer>>
+  [main_presenter] as pres <<computer_observer>>
 }
 
 package "View (Qt 6):\n sdd::view" {
@@ -46,7 +49,7 @@ qv -u[#silver]-( ilistener #text:grey : <<call>>
 qv -r-> model : <<updates>>
 
 app *-l- svc : #1\n<<create>>
-app *-l- pres : #3\n<<create>>\ninject\n- i_service,\n- i_main_view
+app *-l- pres : #3\n<<create>>\ninject\n- computer_service,\n- i_main_view
 app *-l- qv : #2\n<<create>>
 
 @enduml
@@ -58,11 +61,11 @@ app *-l- qv : #2\n<<create>>
 left to right direction
 
 package M as "Model (no Qt):\n sdd::core" <<library>> {
-  [computer_service] as svc <<i_service>>
+  [local_computer_service] as svc <<computer_service>>
 }
 
 package P as "Presenter/Listener (no Qt):\n sdd::presenter" <<library>> {
-  [main_presenter] as pres <<i_observer>>
+  [main_presenter] as pres <<computer_observer>>
 }
 
 package V as "View (Qt 6):\n sdd::view" <<exe>> {

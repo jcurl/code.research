@@ -91,14 +91,17 @@ auto if_ipv4::operator==(const if_ipv4& rhs) const noexcept -> bool {
   return true;
 }
 
-auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
+auto parse_sockaddr(std::string_view arg) -> std::optional<sockaddr_in> {
+  sockaddr_in addr{};
+  addr.sin_family = AF_INET;
+
   auto port_sep = arg.find_last_of(':');
   if (port_sep != std::string_view::npos) {
-    if (arg.size() < port_sep - 1) return false;
+    if (arg.size() < port_sep - 1) return std::nullopt;
 
     std::string_view portstr = arg.substr(port_sep + 1);
     auto port = ubench::string::parse_int<std::uint16_t>(portstr);
-    if (!port) return false;
+    if (!port) return std::nullopt;
     addr.sin_port = htons(*port);
 
     // Get a NUL-terminated string. The value `port_sep` is guaranteed to be
@@ -106,16 +109,19 @@ auto parse_sockaddr(std::string_view arg, sockaddr_in& addr) -> bool {
     //
     // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
     std::string addrstr{arg.data(), port_sep};
-    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
+    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) {
+      return std::nullopt;
+    }
   } else {
     addr.sin_port = 0;
     // arg may not be NUL terminated. Ensure it is.
     std::string addrstr{arg.data(), arg.size()};
-    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) return false;
+    if (inet_pton(AF_INET, addrstr.data(), &(addr.sin_addr)) != 1) {
+      return std::nullopt;
+    }
   }
 
-  addr.sin_family = AF_INET;
-  return true;
+  return addr;
 }
 
 namespace {

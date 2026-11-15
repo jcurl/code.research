@@ -18,6 +18,11 @@ class computer_observer {
   /// @brief Called when there is an update to a computer record.
   /// @param computer The record that is new or has been updated.
   virtual auto on_computer(const computer&) -> void = 0;
+
+  /// @brief Called just before the service receive thread exits.
+  /// @param error The errno that stopped the thread, or zero if stopped on
+  /// request.
+  virtual auto on_terminated(int error) -> void = 0;
 };
 
 }  // namespace sdd::core

@@ -201,63 +201,51 @@ TEST(ubench_net, query_interface) {
 }
 
 TEST(ubench_net, parse_sockaddr) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_TRUE(ubench::net::parse_sockaddr("127.0.0.1", ipv4addr));
-  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
-  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0x7f000001);
-  ASSERT_EQ(ntohs(ipv4addr.sin_port), 0);
+  auto ipv4addr = ubench::net::parse_sockaddr("127.0.0.1");
+  ASSERT_OPTIONAL(ipv4addr);
+  ASSERT_EQ(ipv4addr->sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr->sin_addr.s_addr), 0x7f000001);
+  ASSERT_EQ(ntohs(ipv4addr->sin_port), 0);
 }
 
 TEST(ubench_net, parse_sockaddr_port) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_TRUE(ubench::net::parse_sockaddr("127.0.0.1:3499", ipv4addr));
-  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
-  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0x7f000001);
-  ASSERT_EQ(ntohs(ipv4addr.sin_port), 3499);
+  auto ipv4addr = ubench::net::parse_sockaddr("127.0.0.1:3499");
+  ASSERT_OPTIONAL(ipv4addr);
+  ASSERT_EQ(ipv4addr->sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr->sin_addr.s_addr), 0x7f000001);
+  ASSERT_EQ(ntohs(ipv4addr->sin_port), 3499);
 }
 
 TEST(ubench_net, parse_sockaddr_any) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_TRUE(ubench::net::parse_sockaddr("0.0.0.0:3499", ipv4addr));
-  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
-  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0);
-  ASSERT_EQ(ntohs(ipv4addr.sin_port), 3499);
+  auto ipv4addr = ubench::net::parse_sockaddr("0.0.0.0:3499");
+  ASSERT_OPTIONAL(ipv4addr);
+  ASSERT_EQ(ipv4addr->sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr->sin_addr.s_addr), 0);
+  ASSERT_EQ(ntohs(ipv4addr->sin_port), 3499);
 }
 
 TEST(ubench_net, parse_sockaddr_broadcast) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_TRUE(ubench::net::parse_sockaddr("255.255.255.255:3499", ipv4addr));
-  ASSERT_EQ(ipv4addr.sin_family, AF_INET);
-  ASSERT_EQ(ntohl(ipv4addr.sin_addr.s_addr), 0xffffffff);
-  ASSERT_EQ(ntohs(ipv4addr.sin_port), 3499);
+  auto ipv4addr = ubench::net::parse_sockaddr("255.255.255.255:3499");
+  ASSERT_OPTIONAL(ipv4addr);
+  ASSERT_EQ(ipv4addr->sin_family, AF_INET);
+  ASSERT_EQ(ntohl(ipv4addr->sin_addr.s_addr), 0xffffffff);
+  ASSERT_EQ(ntohs(ipv4addr->sin_port), 3499);
 }
 
 TEST(ubench_net, parse_sockaddr_invalid) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_FALSE(ubench::net::parse_sockaddr("192.168.1.256:3499", ipv4addr));
+  ASSERT_OPTIONAL_HAS_ERROR(ubench::net::parse_sockaddr("192.168.1.256:3499"));
 }
 
 TEST(ubench_net, parse_sockaddr_invalid2) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_FALSE(ubench::net::parse_sockaddr("host.local", ipv4addr));
+  ASSERT_OPTIONAL_HAS_ERROR(ubench::net::parse_sockaddr("host.local"));
 }
 
 TEST(ubench_net, parse_sockaddr_invalid3) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_FALSE(ubench::net::parse_sockaddr("127.0.0.1:ssh", ipv4addr));
+  ASSERT_OPTIONAL_HAS_ERROR(ubench::net::parse_sockaddr("127.0.0.1:ssh"));
 }
 
 TEST(ubench_net, parse_sockaddr_invalid4) {
-  struct sockaddr_in ipv4addr {};
-
-  ASSERT_FALSE(ubench::net::parse_sockaddr("127.0.0.1:0:1", ipv4addr));
+  ASSERT_OPTIONAL_HAS_ERROR(ubench::net::parse_sockaddr("127.0.0.1:0:1"));
 }
 
 TEST(ubench_net, gethostname) {

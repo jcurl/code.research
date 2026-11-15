@@ -117,11 +117,13 @@ auto make_options(int argc, char* const argv[]) noexcept
         case 'D': {
           // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
           auto arg = *opt->argument();
-          if (!ubench::net::parse_sockaddr(std::string_view{arg}, o.dest_)) {
+          auto dest = ubench::net::parse_sockaddr(std::string_view{arg});
+          if (!dest) {
             std::cerr << "Error: Invalid destination address - " << arg
                       << std::endl;
             return stdext::unexpected{1};
           }
+          o.dest_ = *dest;
           break;
         }
         case '?':

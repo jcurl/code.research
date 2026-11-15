@@ -11,6 +11,7 @@
 - [6. Core API (`sdd::core`)](#6-core-api-sddcore)
   - [6.1. Interfaces for Core](#61-interfaces-for-core)
   - [6.2. Initialisation and Usage](#62-initialisation-and-usage)
+  - [6.3. Receive Thread (`local_computer_service`)](#63-receive-thread-local_computer_service)
 - [7. Presenter (`sdd::presenter`)](#7-presenter-sddpresenter)
 - [8. View Contract (`sdd::presenter`)](#8-view-contract-sddpresenter)
   - [8.1. Pushing Updates](#81-pushing-updates)
@@ -19,8 +20,7 @@
   - [9.1. Qt Relation between Signals and Slots](#91-qt-relation-between-signals-and-slots)
 - [10. Sequences for Views](#10-sequences-for-views)
   - [10.1. A New Computer Discovered](#101-a-new-computer-discovered)
-  - [10.2. A Computer Expired / Removed](#102-a-computer-expired--removed)
-  - [10.3. User Selecting a Computer](#103-user-selecting-a-computer)
+  - [10.2. User Selecting a Computer](#102-user-selecting-a-computer)
 - [11. Directory Layout (target)](#11-directory-layout-target)
 
 ## 1. Scope
@@ -29,6 +29,7 @@ How the Qt 6 view connects to the business-logic library `sdd::core`. Out of
 scope: discovery protocol, timeouts, and property contents.
 
 Drivers:
+
 - `sdd::core` has no Qt headers and runs its own threads.
 - Computers are added, updated, and removed asynchronously. The view receives
   these by push, not polling.
@@ -104,7 +105,7 @@ destroyed first, so no callback can run into a dead view.
 ```cpp
 auto main(int argc, char** argv) -> int {
   QApplication app(argc, argv);
-  sdd::core::local_computer_service service;
+  sdd::core::local_computer_service service{sdd::core::local_computer_service_config{}};
   sdd::view::qt_main_view view;
   sdd::presenter::main_presenter presenter(service, view);
   presenter.start(); // subscribe to service
@@ -279,6 +280,8 @@ class local_computer_service : public computer_service {
     return observers_.subscribe(observer);
   }
 
+  auto is_running() const -> stdext::expected<void, int> override;
+
   // Updates the stored computers and calls observers_.notify(on_computer).
   auto computer_ping_received(const computer& packet) -> int;
 
@@ -316,19 +319,26 @@ struct computer {
 class computer_observer {        // called on the service thread
  public:
   virtual auto on_computer(const computer&) -> void = 0;  // add or update
+  virtual auto on_terminated(int error) -> void = 0;      // thread exiting
 };
 
 // computer_service.h
 class computer_service {
  public:
   virtual auto subscribe(computer_observer&) -> subscription = 0;
+  virtual auto is_running() const -> stdext::expected<void, int> = 0;
 };
 ```
 
 ### 6.2. Initialisation and Usage
 
-`computer_service` adds `start()`. Only the composition root calls them. There
-is no `stop()` as this is handled by the destructor.
+`local_computer_service` implements `computer_service` and adds `start()`. Only
+the composition root calls them. `local_computer_service` takes a
+`local_computer_service_config` (multicast group and port) in its constructor.
+Its `start()` returns `stdext::expected<void, int>`, holding the `errno` if the
+socket could not be set up. `local_computer_service` also has `stop()`, which
+requests the thread to exit without waiting. The destructor calls `stop()` and
+joins the thread.
 
 The `sdd::core` owns:
 
@@ -345,6 +355,36 @@ injects it into the presenter via the constructor that takes a
 `computer_service&`. Then the presenter will call `computer_service.subscribe`
 to its own implementation of `computer_observer` to get its updates, perhaps
 even to itself, if the presenter implements the `computer_observer`.
+
+### 6.3. Receive Thread (`local_computer_service`)
+
+- `start()` opens the UDP socket on the calling thread, so setup errors are
+  returned to the caller. The socket is bound to any address on the configured
+  port, joins the multicast group, and gets a receive timeout of 100 ms. A
+  non-multicast group address fails with `EINVAL`.
+- The socket is moved into the receive thread, which owns it and closes it
+  when the thread exits. The service does not keep a copy of the socket.
+- The thread loops, receiving packets and reporting each one to
+  `computer_ping_received`. A receive timeout (`EAGAIN`/`EWOULDBLOCK`) is not
+  an error, and only lets the loop check the stop request.
+- `stop()` sets a stop flag, which the loop checks on each timeout. Shutdown
+  therefore takes up to 100 ms, and the socket is not closed from another
+  thread.
+- Any other receive error ends the loop. The thread then exits with that
+  errno.
+- Just before the thread exits, `on_terminated(error)` is called on each
+  observer. `error` is the errno, or zero if the thread stopped on request.
+- `is_running()` returns no value while the thread is running, from `start()`
+  until the thread has exited. Otherwise it returns an unexpected value with the
+  reason the service stopped: `0` if it was stopped on request, or the errno
+  that ended the thread or made `start()` fail. Calling `start()` again clears
+  the stored error and restarts the thread.
+- The presenter and GUI use `is_running()` to explain why the service is not
+  receiving, for example to show an indicator to the user. A non-zero error
+  means the service stopped unexpectedly.
+- The packet text is copied into a string reserved once for the thread, sized
+  to the Ethernet MTU (1500 bytes). `udp::receive()` still returns a new buffer
+  for each packet.
 
 ## 7. Presenter (`sdd::presenter`)
 
@@ -582,17 +622,13 @@ called immediately.
 
 ![new](assets/sequence_integration/running_service_computer_added.svg)
 
-### 10.2. A Computer Expired / Removed
-
-![removed](assets/sequence_integration/running_service_computer_removed.svg)
-
-### 10.3. User Selecting a Computer
+### 10.2. User Selecting a Computer
 
 ![selected](assets/sequence_integration/running_service_computer_selected.svg)
 
 ## 11. Directory Layout (target)
 
-```
+```text
 sdd-monitor/
 ├── CMakeLists.txt            top level; project-wide Qt setup, subdirectories
 ├── infra/
