@@ -58,7 +58,8 @@ auto calc_ipv4_cs(const std::vector<std::uint8_t>& hdr,
   std::uint32_t size = (hdr[offset + IPV4HDR_VER_IHL] & 0x0f) << 2;
   std::uint32_t cs = 0;
 
-  for (std::ptrdiff_t w = 0; w < size / 2; ++w) {
+  auto wmax = static_cast<std::ptrdiff_t>(size / 2);
+  for (std::ptrdiff_t w = 0; w < wmax; ++w) {
     cs += read_uint16_t_be(hdr, offset + w * 2);
   }
   while (cs > 0xFFFF) {
@@ -114,7 +115,8 @@ auto calc_udp_cs(const std::vector<std::uint8_t>& hdr, std::ptrdiff_t offset,
   }
 
   // Take the UDP Payload.
-  for (std::ptrdiff_t w = 0; w < (udp_len - UDP_HDR_LEN) / 2; ++w) {
+  auto wmax = static_cast<std::ptrdiff_t>((udp_len - UDP_HDR_LEN) / 2);
+  for (std::ptrdiff_t w = 0; w < wmax; ++w) {
     cs += read_uint16_t_be(payload, w * 2);
   }
 
