@@ -50,7 +50,7 @@ auto json_array_iterator::validate() -> bool {
 
   if (!context_) return false;
 
-  if (context_->has_error()) {
+  if (context_->has_error() || context_->is_closed()) {
     release(false);
     return false;
   }

@@ -159,7 +159,8 @@ away. The mapping is owned by a `std::shared_ptr` in the parse context, which
 is shared by the reader, its iterators and the objects it returns. Copies of the
 context share the same mapping and never remap the file. The mapping is released
 when the last of those objects is destroyed, so the file may be removed after
-it is opened.
+it is opened. Destroying or closing the `json_reader` ends its input: objects
+it returned then read as empty, and iterators see the end of the input.
 
 Internally, the mapping is opened by a function that returns
 `stdext::expected<mapped_file, int>`, carrying the Unix `errno` on failure.

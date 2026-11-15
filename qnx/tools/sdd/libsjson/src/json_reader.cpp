@@ -45,7 +45,9 @@ auto json_reader::has_error() const noexcept -> bool {
 
 auto json_reader::close() noexcept -> void {
   // The mapping is not released here, because returned objects still read it.
-  // It is released when the last context owner is destroyed.
+  // It is released when the last context owner is destroyed. Closing the
+  // context makes every iterator see the end of the input.
+  if (context_) context_->close();
 }
 
 auto json_reader::is_closed() const noexcept -> bool {

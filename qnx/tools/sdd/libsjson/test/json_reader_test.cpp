@@ -1075,25 +1075,20 @@ TEST(sjson_reader, file_reader_empty_file_has_no_root) {
   EXPECT_FALSE(reader.has_error());
 }
 
-TEST(sjson_reader, file_reader_root_outlives_reader_and_file) {
-  const temp_file file{"sjson_file_reader_outlives.json", "[10,\"abc\"]"};
+TEST(sjson_reader, file_reader_root_ends_when_reader_destroyed) {
+  const temp_file file{"sjson_file_reader_destroyed.json", "[10,\"abc\"]"};
   std::optional<ubench::sjson::json_token> root;
   {
     ubench::sjson::json_reader reader =
         ubench::sjson::json_reader::open(file.path());
     root = reader.root();
   }
-  // The reader is gone, and the file is removed. The mapping still holds.
+  // Destroying the reader closes it, so returned objects see the end of input.
   std::error_code ec;
   std::filesystem::remove(file.path(), ec);
   ASSERT_OPTIONAL(root);
   const auto& arr = std::get<ubench::sjson::json_array>(*root);
-  auto it = arr.begin();
-  EXPECT_EQ(as_int(*it), 10);
-  ++it;
-  EXPECT_EQ(as_view(std::get<ubench::sjson::json_string>(*it)), "abc");
-  ++it;
-  EXPECT_TRUE(it == arr.end());
+  EXPECT_TRUE(arr.begin() == arr.end());
 }
 
 TEST(sjson_reader, file_reader_moved_continues_iteration) {
