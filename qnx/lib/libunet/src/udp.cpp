@@ -1,10 +1,12 @@
 #include "config.h"
 
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
 #include <cerrno>
+#include <chrono>
 #include <limits>
 
 #include "ubench/net.h"
@@ -132,6 +134,30 @@ auto ipv4hdr_length(int fd) -> stdext::expected<int, int> {
   return 20 + options_len;
 }
 
+auto get_receive_timeout(int fd)
+    -> stdext::expected<std::chrono::microseconds, int> {
+  timeval tv{};
+  socklen_t optlen = sizeof(tv);
+  auto res = getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, &optlen);
+  if (res) return stdext::unexpected{errno};
+  return std::chrono::microseconds{
+      static_cast<std::int64_t>(tv.tv_sec) * 1000000 + tv.tv_usec};
+}
+
+auto set_receive_timeout(int fd, std::chrono::microseconds timeout)
+    -> stdext::expected<void, int> {
+  if (timeout.count() < 0) {
+    return stdext::unexpected{EINVAL};
+  }
+
+  timeval tv{};
+  tv.tv_sec = static_cast<time_t>(timeout.count() / 1000000);
+  tv.tv_usec = static_cast<suseconds_t>(timeout.count() % 1000000);
+  auto res = setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+  if (res) return stdext::unexpected{errno};
+  return {};
+}
+
 auto open() -> stdext::expected<ubench::file::fdesc, int> {
   int fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (fd < 0) return stdext::unexpected{errno};
@@ -152,6 +178,16 @@ auto connect(int fd, const sockaddr_in& dest) -> stdext::expected<void, int> {
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   auto destaddr = reinterpret_cast<const sockaddr*>(&dest);
   auto res = ::connect(fd, destaddr, sizeof(dest));
+  if (res) return stdext::unexpected{errno};
+  return {};
+}
+
+auto multicast_join(int fd, const in_addr group, const in_addr local)
+    -> stdext::expected<void, int> {
+  ip_mreq mreq{};
+  mreq.imr_multiaddr = group;
+  mreq.imr_interface = local;
+  auto res = setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
   if (res) return stdext::unexpected{errno};
   return {};
 }
@@ -282,6 +318,22 @@ auto udp::ipv4hdr_length() noexcept -> stdext::expected<int, int> {
     return stdext::unexpected{EINVAL};
   }
   return internal::ipv4hdr_length(socket_);
+}
+
+auto udp::get_receive_timeout() noexcept
+    -> stdext::expected<std::chrono::microseconds, int> {
+  if (!socket_) {
+    return stdext::unexpected{EINVAL};
+  }
+  return internal::get_receive_timeout(socket_);
+}
+
+auto udp::set_receive_timeout(std::chrono::microseconds timeout) noexcept
+    -> stdext::expected<void, int> {
+  if (!socket_) {
+    return stdext::unexpected{EINVAL};
+  }
+  return internal::set_receive_timeout(socket_, timeout);
 }
 
 auto udp::open(const sockaddr_in& bind) noexcept
@@ -420,6 +472,42 @@ auto udp::send(const sockaddr_in& dest, const std::vector<std::byte>& payload)
       socket_, payload.data(), payload.size(), 0, destaddr, sizeof(dest));
   if (nbytes < 0) return stdext::unexpected{errno};
   return nbytes;
+}
+
+auto udp::receive() -> stdext::expected<std::vector<std::byte>, int> {
+  // Large enough for any UDP datagram over IPv4.
+  std::vector<std::byte> buffer(std::numeric_limits<std::uint16_t>::max());
+  auto nbytes = receive_bytes(buffer.data(), buffer.size());
+  if (!nbytes) return stdext::unexpected{nbytes.error()};
+  buffer.resize(static_cast<std::size_t>(*nbytes));
+  return buffer;
+}
+
+auto udp::receive_bytes(void* data, std::size_t capacity) noexcept
+    -> stdext::expected<int, int> {
+  if (!socket_) return stdext::unexpected{EINVAL};
+
+  ssize_t nbytes = recv(socket_, data, capacity, MSG_TRUNC);
+  if (nbytes < 0) return stdext::unexpected{errno};
+  // With MSG_TRUNC, nbytes is the datagram length, even when it was cut.
+  if (static_cast<std::size_t>(nbytes) > capacity)
+    return stdext::unexpected{EMSGSIZE};
+  return static_cast<int>(nbytes);
+}
+
+auto udp::multicast_join(const in_addr group, const in_addr local) noexcept
+    -> stdext::expected<void, int> {
+  if (!socket_ || !is_multicast(group) || local.s_addr == INADDR_NONE) {
+    return stdext::unexpected{EINVAL};
+  }
+  return internal::multicast_join(socket_, group, local);
+}
+
+auto udp::multicast_join(const in_addr group) noexcept
+    -> stdext::expected<void, int> {
+  in_addr any{};
+  any.s_addr = INADDR_ANY;
+  return multicast_join(group, any);
 }
 
 }  // namespace ubench::net

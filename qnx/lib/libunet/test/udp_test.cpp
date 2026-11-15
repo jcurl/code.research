@@ -4,12 +4,18 @@
 #include <algorithm>
 #include <cerrno>
 #include <chrono>
+#include <iostream>
+#include <optional>
 #include <sstream>
+#include <string_view>
+#include <thread>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "rtest/rtest.h"
+#include "stdext/expected.h"
 #include "ubench/clock.h"
 #include "ubench/net.h"
 #include "ubench/string.h"
@@ -168,6 +174,18 @@ TEST(ubench_net_udp, udp_default) {
 
   auto ipv4hdr = udp.ipv4hdr_length();
   EXPECT_OPTIONAL_ERROR(ipv4hdr, EINVAL);
+
+  auto mcastjoin = udp.multicast_join(localhost, localhost);
+  EXPECT_OPTIONAL_ERROR(mcastjoin, EINVAL);
+
+  auto recv = udp.receive();
+  EXPECT_OPTIONAL_ERROR(recv, EINVAL);
+
+  auto rtimeout = udp.get_receive_timeout();
+  EXPECT_OPTIONAL_ERROR(rtimeout, EINVAL);
+
+  auto rtimeout_s = udp.set_receive_timeout(std::chrono::seconds(1));
+  EXPECT_OPTIONAL_ERROR(rtimeout_s, EINVAL);
 }
 
 TEST(ubench_net_udp, udp_open_bind_localhost) {
@@ -611,4 +629,257 @@ TEST(ubench_net_udp, send_multicast_no_register) {
 
   auto sbres = udp.send(get_packet(packet));
   ASSERT_OPTIONAL_EQ(sbres, 4) << ubench::string::perror(sbres.error());
+}
+
+TEST(ubench_net_udp, receive_unicast) {
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr.s_addr = htonl(0x7F000001);
+  localsock.sin_port = htons(37000);
+
+  sockaddr_in destsock{};
+  destsock.sin_family = AF_INET;
+  destsock.sin_addr.s_addr = htonl(0x7F000001);
+  destsock.sin_port = htons(37010);
+
+  std::string packet{"T008"};
+
+  ubench::net::udp rx{};
+  auto rxres = rx.open(destsock);
+  ASSERT_OPTIONAL(rxres) << ubench::string::perror(rxres.error());
+  ASSERT_OPTIONAL(rx.set_receive_timeout(std::chrono::seconds(1)));
+
+  ubench::net::udp tx{};
+  auto txres = tx.open(localsock);
+  ASSERT_OPTIONAL(txres) << ubench::string::perror(txres.error());
+
+  auto sres = tx.send(destsock, packet);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
+
+  auto rres = rx.receive();
+  ASSERT_OPTIONAL(rres) << ubench::string::perror(rres.error());
+  EXPECT_EQ(*rres, get_packet(packet));
+}
+
+TEST(ubench_net_udp, receive_into_buffer_keeps_size) {
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr.s_addr = htonl(0x7F000001);
+  localsock.sin_port = htons(37020);
+
+  sockaddr_in destsock{};
+  destsock.sin_family = AF_INET;
+  destsock.sin_addr.s_addr = htonl(0x7F000001);
+  destsock.sin_port = htons(37021);
+
+  std::string packet{"T008"};
+
+  ubench::net::udp rx{};
+  auto rxres = rx.open(destsock);
+  ASSERT_OPTIONAL(rxres) << ubench::string::perror(rxres.error());
+  ASSERT_OPTIONAL(rx.set_receive_timeout(std::chrono::seconds(1)));
+
+  ubench::net::udp tx{};
+  auto txres = tx.open(localsock);
+  ASSERT_OPTIONAL(txres) << ubench::string::perror(txres.error());
+
+  auto sres = tx.send(destsock, packet);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
+
+  std::vector<std::byte> buffer(16, std::byte{0xEE});
+  auto rres = rx.receive(buffer);
+  ASSERT_OPTIONAL(rres) << ubench::string::perror(rres.error());
+  EXPECT_EQ(*rres, 4);
+  EXPECT_EQ(buffer.size(), 16U);
+  EXPECT_THAT(std::vector<std::byte>(buffer.begin(), buffer.begin() + *rres),
+      ::testing::ElementsAreArray(get_packet(packet)));
+}
+
+TEST(ubench_net_udp, receive_into_small_buffer_fails) {
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr.s_addr = htonl(0x7F000001);
+  localsock.sin_port = htons(37020);
+
+  sockaddr_in destsock{};
+  destsock.sin_family = AF_INET;
+  destsock.sin_addr.s_addr = htonl(0x7F000001);
+  destsock.sin_port = htons(37021);
+
+  std::string packet{"T008"};
+
+  ubench::net::udp rx{};
+  auto rxres = rx.open(destsock);
+  ASSERT_OPTIONAL(rxres) << ubench::string::perror(rxres.error());
+  ASSERT_OPTIONAL(rx.set_receive_timeout(std::chrono::seconds(1)));
+
+  ubench::net::udp tx{};
+  auto txres = tx.open(localsock);
+  ASSERT_OPTIONAL(txres) << ubench::string::perror(txres.error());
+
+  auto sres = tx.send(destsock, packet);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
+
+  std::vector<std::byte> buffer(2);
+  auto rres = rx.receive(buffer);
+  ASSERT_OPTIONAL_ERROR(rres, EMSGSIZE);
+  EXPECT_EQ(buffer.size(), 2U);
+}
+
+TEST(ubench_net_udp, receive_unicast_blocked) {
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr.s_addr = htonl(0x7F000001);
+  localsock.sin_port = htons(37016);
+
+  sockaddr_in destsock{};
+  destsock.sin_family = AF_INET;
+  destsock.sin_addr.s_addr = htonl(0x7F000001);
+  destsock.sin_port = htons(37015);
+
+  std::string packet{"T010"};
+
+  ubench::net::udp rx{};
+  auto rxres = rx.open(destsock);
+  ASSERT_OPTIONAL(rxres) << ubench::string::perror(rxres.error());
+  ASSERT_OPTIONAL(rx.set_receive_timeout(std::chrono::seconds(2)));
+
+  ubench::net::udp tx{};
+  auto txres = tx.open(localsock);
+  ASSERT_OPTIONAL(txres) << ubench::string::perror(txres.error());
+
+  std::optional<stdext::expected<std::vector<std::byte>, int>> rres;
+  std::thread receiver([&rx, &rres]() -> void { rres = rx.receive(); });
+
+  // Give the receiver thread time to enter receive() before sending.
+  std::this_thread::sleep_for(std::chrono::milliseconds{100});
+  auto sres = tx.send(destsock, packet);
+
+  receiver.join();
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
+  ASSERT_OPTIONAL(rres);
+  ASSERT_OPTIONAL(*rres) << ubench::string::perror((*rres).error());
+  EXPECT_EQ(**rres, get_packet(packet));
+}
+
+TEST(ubench_net_udp, receive_multicast) {
+  in_addr local = find_first_interface();
+  if (local.s_addr == 0) {
+    GTEST_SKIP() << "No available interfaces for multicast";
+  }
+
+  sockaddr_in bindsock{};
+  bindsock.sin_family = AF_INET;
+  bindsock.sin_addr.s_addr = htonl(INADDR_ANY);
+  bindsock.sin_port = htons(37011);
+
+  sockaddr_in groupsock{};
+  groupsock.sin_family = AF_INET;
+  groupsock.sin_addr.s_addr = htonl(0xEFFF2A63);
+  groupsock.sin_port = htons(37011);
+
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr = local;
+  localsock.sin_port = htons(37012);
+
+  std::string packet{"T009"};
+
+  ubench::net::udp rx{};
+  auto rxres = rx.open(bindsock);
+  ASSERT_OPTIONAL(rxres) << ubench::string::perror(rxres.error());
+  ASSERT_OPTIONAL(rx.set_receive_timeout(std::chrono::seconds(1)));
+
+  auto jres = rx.multicast_join(groupsock.sin_addr);
+  ASSERT_OPTIONAL(jres) << ubench::string::perror(jres.error());
+
+  ubench::net::udp tx{};
+  auto txres = tx.open(localsock, groupsock);
+  ASSERT_OPTIONAL(txres) << ubench::string::perror(txres.error());
+
+  auto sres = tx.send(packet);
+  ASSERT_OPTIONAL_EQ(sres, 4) << ubench::string::perror(sres.error());
+
+  auto rres = rx.receive();
+  ASSERT_OPTIONAL(rres) << ubench::string::perror(rres.error());
+  EXPECT_EQ(*rres, get_packet(packet));
+}
+
+TEST(ubench_net_udp, multicast_join_unicast) {
+  in_addr localhost{};
+  ASSERT_EQ(inet_pton(AF_INET, "127.0.0.1", &localhost), 1);
+
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr = localhost;
+  localsock.sin_port = htons(37013);
+
+  ubench::net::udp udp{};
+  auto ores = udp.open(localsock);
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
+
+  // Only multicast group addresses can be joined.
+  auto jres = udp.multicast_join(localhost, localhost);
+  EXPECT_OPTIONAL_ERROR(jres, EINVAL);
+}
+
+TEST(ubench_net_udp, receive_timeout) {
+  sockaddr_in localsock{};
+  localsock.sin_family = AF_INET;
+  localsock.sin_addr.s_addr = htonl(0x7F000001);
+  localsock.sin_port = htons(37014);
+
+  ubench::net::udp udp{};
+  auto ores = udp.open(localsock);
+  ASSERT_OPTIONAL(ores) << ubench::string::perror(ores.error());
+
+  auto ts = udp.set_receive_timeout(std::chrono::milliseconds{250});
+  ASSERT_OPTIONAL(ts) << ubench::string::perror(ts.error());
+
+  auto nt = udp.get_receive_timeout();
+  ASSERT_OPTIONAL_EQ(nt, std::chrono::milliseconds{250});
+
+  auto nts = udp.set_receive_timeout(std::chrono::microseconds{-1});
+  EXPECT_OPTIONAL_ERROR(nts, EINVAL);
+
+  // Nothing is sent, so the receive times out.
+  auto rres = udp.receive();
+  ASSERT_FALSE(rres);
+  EXPECT_TRUE(rres.error() == EAGAIN || rres.error() == EWOULDBLOCK);
+}
+
+// Manual test: receives packets from an externally running multicast sender.
+// Run with: libunet_test --gtest_also_run_disabled_tests
+// --gtest_filter='ubench_net_udp.DISABLED_receive_external_multicast'
+//
+// Designed to work with the "sdd" program in this repository, which sends the
+// multicast messages.
+TEST(ubench_net_udp, DISABLED_receive_external_multicast) {
+  constexpr std::uint16_t port = 52599;
+  constexpr std::size_t packets_to_receive = 10;
+
+  sockaddr_in bindsock{};
+  bindsock.sin_family = AF_INET;
+  bindsock.sin_addr.s_addr = htonl(INADDR_ANY);
+  bindsock.sin_port = htons(port);
+
+  in_addr group{};
+  group.s_addr = htonl(0xEFFF2A63);  // 239.255.42.99
+
+  ubench::net::udp rx{};
+  ASSERT_OPTIONAL(rx.set_reuse_addr(true));
+  auto rxres = rx.open(bindsock);
+  ASSERT_OPTIONAL(rxres) << ubench::string::perror(rxres.error());
+  ASSERT_OPTIONAL(rx.set_receive_timeout(std::chrono::seconds(30)));
+
+  auto jres = rx.multicast_join(group);
+  ASSERT_OPTIONAL(jres) << ubench::string::perror(jres.error());
+
+  for (std::size_t i = 0; i < packets_to_receive; ++i) {
+    auto rres = rx.receive();
+    ASSERT_OPTIONAL(rres) << ubench::string::perror(rres.error());
+    std::string text;
+    for (std::byte b : *rres) text.push_back(static_cast<char>(b));
+    std::cout << std::string_view{text} << '\n';
+  }
 }

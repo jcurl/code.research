@@ -8,11 +8,15 @@
 #include <arpa/inet.h>
 
 #include <array>
+#include <cerrno>
+#include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <optional>
 #include <ostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "stdext/expected.h"
@@ -519,6 +523,28 @@ class udp {
   auto multicast_register_interface(const sockaddr_in& local) noexcept
       -> stdext::expected<void, int>;
 
+  /// @brief Join a multicast group, letting the OS choose the interface.
+  ///
+  /// Equivalent to multicast_join(group, INADDR_ANY).
+  ///
+  /// @param group The multicast group address to join.
+  ///
+  /// @return The errno, if unexpected.
+  auto multicast_join(const in_addr group) noexcept
+      -> stdext::expected<void, int>;
+
+  /// @brief Join a multicast group so this socket receives its datagrams.
+  ///
+  /// The socket must have been opened with open(bind) or open(bind, dest).
+  ///
+  /// @param group The multicast group address to join.
+  ///
+  /// @param local The local interface address to join on.
+  ///
+  /// @return The errno, if unexpected.
+  auto multicast_join(const in_addr group, const in_addr local) noexcept
+      -> stdext::expected<void, int>;
+
   /// @brief Read the time-to-live value of outgoing multicast packets for
   /// this socket.
   ///
@@ -568,6 +594,24 @@ class udp {
   ///
   /// @return The size of the header, or the errno if unexpected.
   auto ipv4hdr_length() noexcept -> stdext::expected<int, int>;
+
+  /// @brief Get the timeout for blocking receive calls.
+  ///
+  /// @return The timeout, where zero means no timeout, or the errno if
+  /// unexpected.
+  auto get_receive_timeout() noexcept
+      -> stdext::expected<std::chrono::microseconds, int>;
+
+  /// @brief Set the timeout for blocking receive calls.
+  ///
+  /// When the timeout expires before a datagram arrives, receive() fails with
+  /// EAGAIN or EWOULDBLOCK.
+  ///
+  /// @param timeout the new timeout, where zero means no timeout.
+  ///
+  /// @return The errno, if unexpected.
+  auto set_receive_timeout(std::chrono::microseconds timeout) noexcept
+      -> stdext::expected<void, int>;
 
   /// @brief Open the socket and bind it to the port.
   ///
@@ -657,7 +701,38 @@ class udp {
   auto send(const sockaddr_in& dest, const std::vector<std::byte>& payload)
       -> stdext::expected<int, int>;
 
+  /// @brief Receive a UDP payload.
+  ///
+  /// Waits for a datagram arrives Works for both unicast and multicast
+  /// datagrams, The socket must have been opened with open(bind) or open(bind,
+  /// dest).
+  ///
+  /// @return The received payload as raw bytes, or the errno if unexpected.
+  auto receive() -> stdext::expected<std::vector<std::byte>, int>;
+
+  /// @brief Receive a UDP payload into a caller-provided buffer.
+  ///
+  /// Waits for a datagram and writes its payload into the vector's storage.
+  /// The vector's size is not changed and no memory is allocated, so the
+  /// vector must be sized before the call to hold the largest expected
+  /// datagram.
+  ///
+  /// @param buffer The storage for the payload. T must be trivially copyable.
+  ///
+  /// @return The number of bytes received, or the errno if unexpected. If the
+  /// datagram is larger than the buffer, EMSGSIZE is returned and the datagram
+  /// is discarded.
+  template <typename T>
+  auto receive(std::vector<T>& buffer) noexcept -> stdext::expected<int, int> {
+    static_assert(std::is_trivially_copyable_v<T>,
+        "receive() buffer elements must be trivially copyable");
+    return receive_bytes(buffer.data(), buffer.size() * sizeof(T));
+  }
+
  private:
+  auto receive_bytes(void* data, std::size_t capacity) noexcept
+      -> stdext::expected<int, int>;
+
   ubench::file::fdesc socket_{};
   bool reuse_port_{false};
   bool reuse_addr_{false};
