@@ -62,7 +62,7 @@ class sync_event {
   /// @brief Set the event, so that everyone blocked on wait() will resume.
   void set() {
     {
-      std::lock_guard g(mutex_);
+      std::scoped_lock g(mutex_);
       flag_ = true;
     }
     cond_var_.notify_all();
@@ -73,7 +73,7 @@ class sync_event {
   /// Clearing an event while an object is waiting on it has undefined
   /// behaviour.
   void clear() {
-    std::lock_guard g(mutex_);
+    std::scoped_lock g(mutex_);
     flag_ = false;
   }
 

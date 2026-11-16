@@ -185,7 +185,7 @@ class rcu {
     // Don't allow updates to `nullptr`.
     if (!update) return false;
 
-    std::lock_guard<std::mutex> lock(write_mutex_);
+    std::scoped_lock<std::mutex> lock(write_mutex_);
 
     // Allocate a new position for the pointer and reference counter.
     std::uint32_t i_start = index_.load();

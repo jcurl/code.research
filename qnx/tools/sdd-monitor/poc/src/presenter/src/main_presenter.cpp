@@ -39,7 +39,7 @@ main_presenter::main_presenter(i_main_view& view)
 
 main_presenter::~main_presenter() {
   {
-    std::lock_guard lock{mutex_};
+    std::scoped_lock lock{mutex_};
     stop_requested_ = true;
   }
   cv_.notify_all();
@@ -57,7 +57,7 @@ void main_presenter::on_selected(std::optional<computer_id> id) {
     return;
   }
   {
-    std::lock_guard lock{mutex_};
+    std::scoped_lock lock{mutex_};
     requests_.push_back(*id);
   }
   cv_.notify_one();
@@ -68,8 +68,7 @@ void main_presenter::run() {
   for (const computer& c : computers_) {
     std::this_thread::sleep_for(announce_interval);
     {
-      std::lock_guard lock{mutex_};
-      if (stop_requested_) {
+      std::scoped_lock lock{mutex_};
         return;
       }
     }
