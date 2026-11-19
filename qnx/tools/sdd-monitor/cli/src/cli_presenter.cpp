@@ -45,7 +45,7 @@ auto cli_presenter::expire_lost_computers() -> void {
   }
 }
 
-auto cli_presenter::on_computer(const core::computer& computer) -> void {
+auto cli_presenter::on_computer(const data::computer& computer) -> void {
   // An exception (out of memory, or a failed write to std::cout) does not
   // corrupt state, but the notification may be lost: a computer whose details
   // were not fully printed stays recorded as seen, so it is not printed again

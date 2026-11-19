@@ -8,29 +8,29 @@
   - [5.1. Without RAII](#51-without-raii)
   - [5.2. Generic Notifier (`sdd::infra`)](#52-generic-notifier-sddinfra)
   - [5.3. Using a Subscription](#53-using-a-subscription)
-- [6. Core API (`sdd::core`)](#6-core-api-sddcore)
-  - [6.1. Interfaces for Core](#61-interfaces-for-core)
-  - [6.2. Initialisation and Usage](#62-initialisation-and-usage)
-  - [6.3. Receive Thread (`local_computer_service`)](#63-receive-thread-local_computer_service)
-- [7. Presenter (`sdd::presenter`)](#7-presenter-sddpresenter)
-- [8. View Contract (`sdd::presenter`)](#8-view-contract-sddpresenter)
-  - [8.1. Pushing Updates](#81-pushing-updates)
-  - [8.2. Listener](#82-listener)
-- [9. Qt View (`sdd::view`)](#9-qt-view-sddview)
-  - [9.1. Qt Relation between Signals and Slots](#91-qt-relation-between-signals-and-slots)
-- [10. Sequences for Views](#10-sequences-for-views)
-  - [10.1. A New Computer Discovered](#101-a-new-computer-discovered)
-  - [10.2. User Selecting a Computer](#102-user-selecting-a-computer)
-- [11. Directory Layout (target)](#11-directory-layout-target)
+- [6. Data (`sdd::data`)](#6-data-sdddata)
+  - [6.1. Core Data Structures](#61-core-data-structures)
+- [7. Core API (`sdd::core`)](#7-core-api-sddcore)
+  - [7.1. Interfaces for Core](#71-interfaces-for-core)
+  - [7.2. Initialisation and Usage](#72-initialisation-and-usage)
+  - [7.3. Receive Thread (`local_computer_service`)](#73-receive-thread-local_computer_service)
+- [8. Presenter (`sdd::presenter`)](#8-presenter-sddpresenter)
+- [9. View Contract (`sdd::presenter`)](#9-view-contract-sddpresenter)
+  - [9.1. Pushing Updates](#91-pushing-updates)
+  - [9.2. Listener](#92-listener)
+- [10. Qt View (`sdd::view`)](#10-qt-view-sddview)
+  - [10.1. Qt Relation between Signals and Slots](#101-qt-relation-between-signals-and-slots)
+- [11. Sequences for Views](#11-sequences-for-views)
+  - [11.1. A New Computer Discovered](#111-a-new-computer-discovered)
+  - [11.2. User Selecting a Computer](#112-user-selecting-a-computer)
+- [12. Directory Layout (target)](#12-directory-layout-target)
 
 ## 1. Scope
 
-How the Qt 6 view connects to the business-logic library `sdd::core`. Out of
-scope: discovery protocol, timeouts, and property contents.
+How the Qt 6 view connects to the business-logic library `sdd::core`.
 
 Drivers:
 
-- `sdd::core` has no Qt headers and runs its own threads.
 - Computers are added, updated, and removed asynchronously. The view receives
   these by push, not polling.
 - Properties are queried on demand. Answers arrive asynchronously.
@@ -69,13 +69,14 @@ model's only dependency is its observer interface, which the presenter
 implements. The view can be replaced without touching the model or the presenter
 logic.
 
-| Role / target                | Contents                                                                      | Qt? | Threads        |
-| ---------------------------- | ----------------------------------------------------------------------------- | --- | -------------- |
-| Infrastructure: `sdd::infra` | `subscription`, `notifier`                                                    | no  | none           |
-| Model: `sdd::core`           | `computer`, `computer_service`, `computer_observer`, `local_computer_service` | no  | service thread |
-| Presenter: `sdd::presenter`  | `main_presenter`, `i_main_view`, `i_view_listener`                            | no  | none           |
-| View: `sdd::view`            | `qt_main_view`, `computer_list`                                               | yes | UI thread      |
-| Composition root: `app`      | `main.cpp`                                                                    | yes | UI thread      |
+| Role / target                | Contents                                                          | Qt? | Threads        |
+| ---------------------------- | ----------------------------------------------------------------- | --- | -------------- |
+| Infrastructure: `sdd::infra` | `subscription`, `notifier`                                        | no  | none           |
+| Data: `sdd:data`             | `computer`                                                        | no  | no             |
+| Model: `sdd::core`           | `computer_service`, `computer_observer`, `local_computer_service` | no  | service thread |
+| Presenter: `sdd::presenter`  | `main_presenter`, `i_main_view`, `i_view_listener`                | no  | none           |
+| View: `sdd::view`            | `qt_main_view`, `computer_list`                                   | yes | UI thread      |
+| Composition root: `app`      | `main.cpp`                                                        | yes | UI thread      |
 
 Rules:
 
@@ -92,6 +93,11 @@ everything to be linked. The build system prevents the view from including any
 headers from the model.
 
 ![PackageDeps](assets/architecture/dependency.svg)
+
+The `sdd::data` is not shown in these diagrams - it contains common data
+structures that are used between the model, view and presenter. It reduces
+unnecessary duplication of types, and allows passing references instead of
+manually copying types.
 
 The `sdd::infra` is not shown in these diagrams - it contains utility functions
 that can be used across all layers (as it provides application agnostic
@@ -134,14 +140,13 @@ extension is needed to request an update for all known computers. See the
 optional section in the initialisation sequence which isn't required for the
 current design.
 
-Destruction is in the reverse order that it is constructed, so destruction is in
-the reverse order:
+Destruction is in the reverse order that it is constructed:
 
 - presenter (it depends on the service and view)
-  - The presenter holds a subscription object to the service. When the
-    presenter is destroyed, it waits for all inflight callbacks and unsubscribes
-    from the service. The service knows the subscription is cancelled through
-    its callback stored in the subscription object it gave back, and removes the
+  - The presenter holds a subscription object to the service. When the presenter
+    is destroyed, it waits for all inflight callbacks and unsubscribes from the
+    service. The service knows the subscription is cancelled through its
+    callback stored in the subscription object it gave back, and removes the
     presenter from its internal list of objects to notify.
   - The presenter holds a subscription object also to the view. The inflight
     callbacks from the view to the presenter are completed first, and then
@@ -261,8 +266,8 @@ class notifier {
 };
 ```
 
-A cancel must not run from inside `notify`, because it waits for `in_flight_`
-to reach zero, which can't happen while the cancelling callback is still running.
+A cancel must not run from inside `notify`, because it waits for `in_flight_` to
+reach zero, which can't happen while the cancelling callback is still running.
 `notify` iterates over a copy of the registry, so a cancel during a notification
 only affects future notifications. The cancel still waits for the current
 notification to finish, for all listeners, not just the one being cancelled.
@@ -295,9 +300,9 @@ notifier enforces this, because cancelling a subscription waits for all
 in-flight notifications on that notifier. In this design, the subscribers have
 the lifetime of the presenter object, so this restriction is met.
 
-## 6. Core API (`sdd::core`)
+## 6. Data (`sdd::data`)
 
-### 6.1. Interfaces for Core
+### 6.1. Core Data Structures
 
 ```cpp
 // computer.h
@@ -314,6 +319,20 @@ struct computer {
   std::string domain;
   std::map<std::string, interface> interfaces;
 };
+```
+
+Generally the datatypes have no implementation, or an implementation that
+relates directly to the datatypes only. The intent of the `sdd::data` is to
+allow `sdd::core` to store data, notify the presenter of updates, and that the
+presenter can then pass the same data types to the view. By sharing the data
+types, there is no need to marshal from the core to the view through the
+presenter.
+
+## 7. Core API (`sdd::core`)
+
+### 7.1. Interfaces for Core
+
+```cpp
 
 // computer_observer.h
 class computer_observer {        // called on the service thread
@@ -330,7 +349,7 @@ class computer_service {
 };
 ```
 
-### 6.2. Initialisation and Usage
+### 7.2. Initialisation and Usage
 
 `local_computer_service` implements `computer_service` and adds `start()`. Only
 the composition root calls them. `local_computer_service` takes a
@@ -356,22 +375,21 @@ injects it into the presenter via the constructor that takes a
 to its own implementation of `computer_observer` to get its updates, perhaps
 even to itself, if the presenter implements the `computer_observer`.
 
-### 6.3. Receive Thread (`local_computer_service`)
+### 7.3. Receive Thread (`local_computer_service`)
 
 - `start()` opens the UDP socket on the calling thread, so setup errors are
   returned to the caller. The socket is bound to any address on the configured
   port, joins the multicast group, and gets a receive timeout of 100 ms. A
   non-multicast group address fails with `EINVAL`.
-- The socket is moved into the receive thread, which owns it and closes it
-  when the thread exits. The service does not keep a copy of the socket.
+- The socket is moved into the receive thread, which owns it and closes it when
+  the thread exits. The service does not keep a copy of the socket.
 - The thread loops, receiving packets and reporting each one to
-  `computer_ping_received`. A receive timeout (`EAGAIN`/`EWOULDBLOCK`) is not
-  an error, and only lets the loop check the stop request.
+  `computer_ping_received`. A receive timeout (`EAGAIN`/`EWOULDBLOCK`) is not an
+  error, and only lets the loop check the stop request.
 - `stop()` sets a stop flag, which the loop checks on each timeout. Shutdown
   therefore takes up to 100 ms, and the socket is not closed from another
   thread.
-- Any other receive error ends the loop. The thread then exits with that
-  errno.
+- Any other receive error ends the loop. The thread then exits with that errno.
 - Just before the thread exits, `on_terminated(error)` is called on each
   observer. `error` is the errno, or zero if the thread stopped on request.
 - `is_running()` returns no value while the thread is running, from `start()`
@@ -382,17 +400,17 @@ even to itself, if the presenter implements the `computer_observer`.
 - The presenter and GUI use `is_running()` to explain why the service is not
   receiving, for example to show an indicator to the user. A non-zero error
   means the service stopped unexpectedly.
-- The packet text is copied into a string reserved once for the thread, sized
-  to the Ethernet MTU (1500 bytes). `udp::receive()` still returns a new buffer
-  for each packet.
+- The packet text is copied into a string reserved once for the thread, sized to
+  the Ethernet MTU (1500 bytes). `udp::receive()` still returns a new buffer for
+  each packet.
 
-## 7. Presenter (`sdd::presenter`)
+## 8. Presenter (`sdd::presenter`)
 
 The presenter is stateless, except for holding its two subscriptions. Both are
 created and cancelled through the `sdd::infra` notifier, so cancelling them in
-its destructor stops the service and view calling into the presenter. The
-view's cancel runs on the UI thread, so the presenter must be destroyed there
-too. It translates between the two interfaces and does no locking.
+its destructor stops the service and view calling into the presenter. The view's
+cancel runs on the UI thread, so the presenter must be destroyed there too. It
+translates between the two interfaces and does no locking.
 
 ```cpp
 class main_presenter final : public computer_observer, public i_view_listener {
@@ -427,13 +445,13 @@ class main_presenter final : public computer_observer, public i_view_listener {
 };
 ```
 
-## 8. View Contract (`sdd::presenter`)
+## 9. View Contract (`sdd::presenter`)
 
 The view-facing contract is intentionally small. It defines only the operations
 that the presenter needs to push state into the UI and the operations that the
 UI must send back to the presenter.
 
-### 8.1. Pushing Updates
+### 9.1. Pushing Updates
 
 The view never sees core types. The presenter defines its own DTO, and the view
 includes only the presenter headers:
@@ -466,7 +484,7 @@ marshalling to the UI thread.
 The presenter, on construction, gets a reference to the model `i_service` and
 the view `i_main_view`.
 
-### 8.2. Listener
+### 9.2. Listener
 
 ```cpp
 class i_view_listener {                        // called on the UI thread
@@ -476,11 +494,12 @@ class i_view_listener {                        // called on the UI thread
 ```
 
 The presenter implements `i_view_listener` and is registered with the view by
-the presenter calling `i_main_view.set_listener(*this)`. The presenter stores the
-returned `subscription`, so the view can notify the presenter when the user
-changes the selection, and the presenter can cancel that notification on destruction.
+the presenter calling `i_main_view.set_listener(*this)`. The presenter stores
+the returned `subscription`, so the view can notify the presenter when the user
+changes the selection, and the presenter can cancel that notification on
+destruction.
 
-## 9. Qt View (`sdd::view`)
+## 10. Qt View (`sdd::view`)
 
 `qt_main_view` implements `i_main_view` by emitting signals. With the default
 `AutoConnection`, a signal emitted from the service thread queues its slot onto
@@ -592,7 +611,7 @@ Qt emits `currentChanged` with an invalid index. `on_current_changed` then calls
 `on_selected(std::nullopt)`, so the presenter learns about the new selection
 without extra code.
 
-### 9.1. Qt Relation between Signals and Slots
+### 10.1. Qt Relation between Signals and Slots
 
 A signal is declaration only. The Qt metaobject compiler (moc) generate its
 body. The call
@@ -616,17 +635,17 @@ thread to call `on_computer_shown`.
 When `show_computer` is called from the UI thread, the `on_computer_shown` is
 called immediately.
 
-## 10. Sequences for Views
+## 11. Sequences for Views
 
-### 10.1. A New Computer Discovered
+### 11.1. A New Computer Discovered
 
 ![new](assets/sequence_integration/running_service_computer_added.svg)
 
-### 10.2. User Selecting a Computer
+### 11.2. User Selecting a Computer
 
 ![selected](assets/sequence_integration/running_service_computer_selected.svg)
 
-## 11. Directory Layout (target)
+## 12. Directory Layout (target)
 
 ```text
 sdd-monitor/
@@ -640,9 +659,18 @@ sdd-monitor/
 │   └── test/
 |       ├── CMakeLists.txt
 │       └── *.cpp; *.h
+├── data/
+|   ├── CMakeLists.txt
+│   ├── include/sdd/          computer.h
+│   ├── src/
+|   |   ├── CMakeLists.txt
+│   │   └── *.cpp; *.h        only if required
+│   └── test/
+|       ├── CMakeLists.txt    only if required
+│       └── *.cpp; *.h        only if required
 ├── core/
 |   ├── CMakeLists.txt
-│   ├── include/sdd/          computer.h, computer_observer.h, computer_service.h, local_computer_service.h
+│   ├── include/sdd/          computer_observer.h, computer_service.h, local_computer_service.h
 │   ├── src/
 |   |   ├── CMakeLists.txt
 │   │   └── *.cpp; *.h        local_computer_service.cpp, discovery and query code

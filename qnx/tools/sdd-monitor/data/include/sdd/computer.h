@@ -1,5 +1,5 @@
-#ifndef SDD_CORE_COMPUTER_H
-#define SDD_CORE_COMPUTER_H
+#ifndef SDD_DATA_COMPUTER_H
+#define SDD_DATA_COMPUTER_H
 
 #include <cstdint>
 #include <ctime>
@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace sdd::core {
+namespace sdd::data {
 
 /// @brief Describes a network interface.
 struct interface {

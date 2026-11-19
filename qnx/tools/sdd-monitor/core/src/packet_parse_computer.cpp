@@ -46,7 +46,7 @@ auto packet_parse_computer::for_each(const Container& container, Visit visit)
 /// @param fields The JSON object holding the interface fields.
 /// @param intf The interface to store the fields in.
 auto packet_parse_computer::parse_interface(
-    const json_object& fields, interface& intf) -> void {
+    const json_object& fields, data::interface& intf) -> void {
   for_each(fields, [this, &intf](const auto& field) -> bool {
     const auto& value = field.value();
     if (field.key() == "mac") {
@@ -72,8 +72,8 @@ auto packet_parse_computer::parse_interface(
   });
 }
 
-auto packet_parse_computer::parse(std::vector<computer>& known)
-    -> std::optional<computer> {
+auto packet_parse_computer::parse(std::vector<data::computer>& known)
+    -> std::optional<data::computer> {
   result_.id = -1;
   result_.last_seen = std::time(nullptr);
 
@@ -98,7 +98,7 @@ auto packet_parse_computer::parse(std::vector<computer>& known)
       // A known computer keeps its interfaces; nothing more needs reading.
       const auto existing = find_computer(known, result_);
       if (existing != known.end()) {
-        computer refreshed = *existing;
+        data::computer refreshed = *existing;
         refreshed.id = -1;
         refreshed.last_seen = result_.last_seen;
         result_ = std::move(refreshed);

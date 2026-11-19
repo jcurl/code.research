@@ -59,7 +59,7 @@ class local_computer_service : public computer_service {
   /// subscribers.
   /// @param packet The packet received
   /// @return The computer identifier associated with the packet.
-  auto computer_ping_received(const computer& packet) -> int;
+  auto computer_ping_received(const data::computer& packet) -> int;
 
  private:
   auto open_socket() -> stdext::expected<ubench::net::udp, int>;
@@ -67,7 +67,7 @@ class local_computer_service : public computer_service {
 
   local_computer_service_config config_;
   infra::notifier<computer_observer> observers_{};
-  std::vector<computer> computers_{};
+  std::vector<data::computer> computers_{};
   std::atomic<bool> stop_requested_{false};
   std::atomic<bool> running_{false};
   std::atomic<int> last_error_{0};

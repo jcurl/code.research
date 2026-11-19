@@ -35,7 +35,7 @@ class cli_presenter : public core::computer_observer {
   /// @brief Prints the computer when it is first seen, or seen again after it
   /// was reported lost. Later updates are not printed.
   /// @param computer The record that is new or has been updated.
-  auto on_computer(const core::computer& computer) -> void override;
+  auto on_computer(const data::computer& computer) -> void override;
 
   /// @brief Called when the service receive thread exits. Nothing is printed,
   /// and run() is woken up.

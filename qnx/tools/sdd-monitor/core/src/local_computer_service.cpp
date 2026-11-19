@@ -122,13 +122,13 @@ auto local_computer_service::run(ubench::net::udp socket) -> void {
       [error](computer_observer& o) -> void { o.on_terminated(error); });
 }
 
-auto local_computer_service::computer_ping_received(const computer& packet)
+auto local_computer_service::computer_ping_received(const data::computer& packet)
     -> int {
   auto it = find_computer(computers_, packet);
 
   int id = -1;
   if (it == computers_.end()) {
-    computer added = packet;
+    data::computer added = packet;
     id = static_cast<int>(computers_.size());
     added.id = id;
     computers_.push_back(std::move(added));

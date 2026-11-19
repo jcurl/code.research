@@ -30,7 +30,7 @@ class recording_observer : public computer_observer {
   auto operator=(recording_observer&&) -> recording_observer& = delete;
   ~recording_observer() override = default;
 
-  void on_computer(const computer& c) override {
+  void on_computer(const data::computer& c) override {
     seen.push_back(c);
     computer_count++;
   }
@@ -40,7 +40,7 @@ class recording_observer : public computer_observer {
     terminated = true;
   }
 
-  std::vector<computer> seen;
+  std::vector<data::computer> seen;
   std::atomic<int> computer_count{0};
   std::atomic<int> terminated_error{-1};
   std::atomic<bool> terminated{false};
@@ -52,8 +52,8 @@ class recording_observer : public computer_observer {
 /// @param last_seen The Unix timestamp of the last update.
 /// @return The computer.
 auto make_computer(const char* hostname, const char* domain, time_t last_seen)
-    -> computer {
-  return computer{-1, last_seen, hostname, domain, {}};
+    -> data::computer {
+  return data::computer{-1, last_seen, hostname, domain, {}};
 }
 
 }  // namespace
